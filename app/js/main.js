@@ -12,6 +12,7 @@ import { renderReview } from './review.js';
 import { renderSkillLesson } from './skill.js';
 import { renderStory, renderLibraryStory } from './story.js';
 import { renderQuran } from './quran.js';
+import { renderGate } from './gate.js';
 import { renderGarden } from './garden.js';
 import { renderLadder } from './ladder.js';
 import { renderParent, skillsText } from './parent.js';
@@ -91,10 +92,11 @@ function renderMap() {
     const folded = Math.abs(index - focus) > FOLD_NEAR && !unfolded.has(section.id);
     main.append(section.kind === 'group' ? stationEl(section, groupIndex++, next, folded)
       : section.kind === 'quran' ? quranEl(section, next, folded)
-        : section.kind === 'garden' ? gardenEl(section, next, folded)
-          : section.kind === 'ladder' ? ladderEl(section, next, folded)
-            : section.kind === 'library' ? libraryEl(section, next, folded)
-              : interludeEl(section, next, folded));
+        : section.kind === 'gate' ? gateEl(section, next, folded)
+          : section.kind === 'garden' ? gardenEl(section, next, folded)
+            : section.kind === 'ladder' ? ladderEl(section, next, folded)
+              : section.kind === 'library' ? libraryEl(section, next, folded)
+                : interludeEl(section, next, folded));
   }
 
   if (DEV) {
@@ -222,6 +224,32 @@ function quranEl(section, next, folded) {
 }
 
 /**
+ * محطة «بوابة الإتقان» (الحزمة ١٤): عقدةٌ واحدة قبل المفصل الكبير — لا تُجتاز
+ * بالإتمام بل بالإصابة. تُعلن حالها صراحةً على الخريطة («مجتازة» أو «أرِني حروفك»)
+ * كي يعرف الطفل — ووليّ أمره — لِمَ توقّفت الرحلة هنا.
+ */
+function gateEl(section, next, folded) {
+  const node = section.nodes[0];
+  const unlocked = progress.isNodeUnlockedById(node.id);
+  const open = progress.isDone(node.id);
+
+  return trackEl({
+    id: section.id,
+    folded,
+    className: `station station--gate${unlocked ? '' : ' station--locked'}${open ? ' station--done' : ''}`,
+    accent: PAUSE_ACCENT,
+    mark: 'gate',
+    label: `${section.gate.title}${unlocked ? '' : ' — مقفلة'}`,
+    badge: section.gate.face,
+    title: section.gate.title,
+    sub: open ? 'اجتزتَها — الطريق مفتوح' : section.gate.hint,
+    meta: unlocked ? (open ? '✓ مجتازة' : 'عشرة تمارين') : '🔒 مقفلة',
+    nodes: section.nodes,
+    next,
+  });
+}
+
+/**
  * بستان موضوعات (الحزمة ٧): محطةٌ لكل موضوع، عقدها باقات من خمس كلمات.
  * تأتي بعد المرحلة القرآنية — هنا يتوسّع الرصيد بعد أن اكتمل فكّ الشيفرة.
  */
@@ -318,7 +346,7 @@ function accentOf(node, group) {
   if (node.type === 'garden') return accentForGarden(node.garden);
   if (node.type === 'ladder') return SENTENCE_ACCENT;
   if (node.type === 'library') return STORY_ACCENT;
-  if (node.type === 'skill' || node.type === 'story') return PAUSE_ACCENT;
+  if (node.type === 'skill' || node.type === 'story' || node.type === 'gate') return PAUSE_ACCENT;
   return accentFor(group);
 }
 
@@ -493,6 +521,9 @@ async function render() {
   } else if (name === 'quran' && arg1) {
     if (!guard(`quran:${decodeURIComponent(arg1)}`)) return;
     screen = renderQuran(decodeURIComponent(arg1)) || renderMap();
+  } else if (name === 'gate' && arg1) {
+    if (!guard(`gate:${decodeURIComponent(arg1)}`)) return;
+    screen = renderGate(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'garden' && arg1) {
     if (!guard(`garden:${decodeURIComponent(arg1)}`)) return;
     screen = renderGarden(decodeURIComponent(arg1)) || renderMap();

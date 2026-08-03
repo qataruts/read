@@ -145,25 +145,27 @@ function checkTargets(where) {
 
 try {
   // ————— ١) الخريطة: محطة ما بين المجموعتين —————
-  await seed(idsBefore('skill:madd'));
+  // (الحزمة ١٤) أول محطة مهارات صارت بعد المجموعة الأولى: «مدّ الألف» — يُسمّى للطفل
+  // ساعةَ أول استعمالٍ له في «بَابَا»، لا بعد ثلاث مجموعات من استعماله.
+  await seed(idsBefore('skill:madd-alif'));
   await waitFor(() => $('.station'), 'الخريطة');
-  ok($$('.station--pause').length === 4,
-    `الخريطة فيها أربع محطات مهارات وقصص (${$$('.station--pause').length})`);
+  ok($$('.station--pause').length === 6,
+    `الخريطة فيها ستّ محطات مهارات وقصص (${$$('.station--pause').length})`);
   const pause = $$('.station--pause')[0];
-  ok(!pause.classList.contains('station--locked'), 'أولاها فُتحت بإتمام المجموعة الثالثة');
+  ok(!pause.classList.contains('station--locked'), 'أولاها فُتحت بإتمام المجموعة الأولى');
   ok($$('.station--pause')[1].classList.contains('station--locked'), 'وما بعدها ما زال مقفلاً');
-  ok(pause.textContent.includes('المَدّ') && pause.textContent.includes('السُّكون'),
+  ok(pause.textContent.includes('مَدّ الألِف'),
     `وتُعلن ما فيها (${pause.querySelector('.station-letters').textContent})`);
-  ok(continueCard().textContent.includes('المَدّ'),
-    `«تابع من هنا» يشير إلى درس المدّ (${continueCard().textContent.trim().replace(/\s+/g, ' ')})`);
-  ok($('[data-next]')?.getAttribute('aria-label')?.includes('المَدّ'),
+  ok(continueCard().textContent.includes('مَدّ الألِف'),
+    `«تابع من هنا» يشير إلى درس مدّ الألف (${continueCard().textContent.trim().replace(/\s+/g, ' ')})`);
+  ok($('[data-next]')?.getAttribute('aria-label')?.includes('مَدّ الألِف'),
     'وعقدة الدرس مميَّزة على الخريطة');
 
   await goto('#/story/st1');
   ok(!!$('.station') && !$('.story'), 'الدخول المباشر على قصة مقفلة يعيده إلى الخريطة');
 
-  // ————— ٢) درس المهارة: المدّ الطبيعي —————
-  await goto('#/skill/madd');
+  // ————— ٢) درس المهارة: مدّ الألف —————
+  await goto('#/skill/madd-alif');
   await waitFor(() => $('.lesson'), 'شاشة درس المهارة');
   const madd = SKILLS[0];
   ok(texts('.step-name').join('|') === 'القاعدة|قارِن|ميّز بأذنك',
@@ -177,11 +179,11 @@ try {
   ok(lastHeard() === madd.rule, `زر القاعدة يُسمعها (${spoken.includes(madd.rule) ? 'احتياطاً — منتظِرة في القائمة' : 'من ملف'})`);
 
   const examples = $$('.example-word');
-  ok(examples.length === 3, `ثلاث كلمات أمثلة (${examples.length})`);
+  ok(examples.length === 4, `كلمات المجموعة الأولى كلها أمثلةٌ للمدّ (${examples.length})`);
   examples[0].click();
   await sleep(60);
   ok(lastHeard() === 'بابا', `نقرة على المثال تُسمعه (${lastHeard()})`);
-  assertDecodable(lettersUpTo('g3'), '.giant, .word-text, .vchip-face', 'خطوة القاعدة');
+  assertDecodable(lettersUpTo('g1'), '.giant, .word-text, .vchip-face', 'خطوة القاعدة');
   checkTargets('خطوة القاعدة');
 
   $('.next').click();
@@ -199,7 +201,7 @@ try {
   await sleep(60);
   ok(heardShort === madd.compare.pairs[0][0] && lastHeard() === madd.compare.pairs[0][1],
     `طرفا الزوج يُسمعان بنقرة (${heardShort} ← ${lastHeard()})`);
-  assertDecodable(lettersUpTo('g3'), '.vchip-face', 'خطوة المقارنة');
+  assertDecodable(lettersUpTo('g1'), '.vchip-face', 'خطوة المقارنة');
   checkTargets('خطوة المقارنة');
 
   $('.next').click();
@@ -236,13 +238,14 @@ try {
 
   await waitFor(() => $('.celebrate'), 'ختام درس المهارة');
   ok($$('.big-stars .on').length === 2, `خطأ واحد ⇒ نجمتان (${$$('.big-stars .on').length})`);
-  ok(stored().stars['skill:madd'] === 2, 'ونجوم الدرس محفوظة بمعرّف عقدته');
+  ok(stored().stars['skill:madd-alif'] === 2, 'ونجوم الدرس محفوظة بمعرّف عقدته');
   ok(Object.keys(stored().skills).length === 0,
     'درس المهارة لا يكتب في سجلّ (حرف × حركة) — وحدة القياس حرف لا علامة');
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
-  ok(continueCard().textContent.includes('السُّكون'), 'والتالي صار درس السكون');
+  ok(continueCard().textContent.includes('حرف نون'),
+    `وبإتمامه تُفتح المجموعة الثانية (${continueCard().querySelector('b').textContent})`);
 
   // ————— ٣) القصة الأولى: شاشة القراءة —————
   await seed(idsBefore('story:st1'));

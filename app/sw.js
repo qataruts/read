@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v9';   // v9: جبهة الفتح والخريطة الكسولة (إصلاح بطء الخريطة)
+const VERSION = 'v10';  // v10: التعديل المنهجي المزدوج وبوابتا الإتقان (الحزمة ١٤)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -48,6 +48,7 @@ const SHELL = [
   'js/audio.js',
   'js/curriculum.js',
   'js/garden.js',
+  'js/gate.js',
   'js/ladder.js',
   'js/lesson.js',
   'js/library.js',

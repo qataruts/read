@@ -5,7 +5,7 @@
 // **الحرف × الحركة × نوع التمرين**، ومنه يُبنى التكرار المتباعد وجلسة المراجعة
 // ولوحة وليّ الأمر. لا نصّ منطوق جديد هنا — القياس لا يضيف محتوى.
 
-import { GROUPS, SKILLS, STORIES, QURAN, quranParts, bareLetters } from './curriculum.js';
+import { GROUPS, SKILLS, STORIES, QURAN, GATES, gateBefore, quranParts, bareLetters } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf } from './sentences.js';
 import { libraryOf } from './library.js';
@@ -68,6 +68,39 @@ function load() {
 
 let state = load();
 
+// ————— ترحيل إعادة ترتيب الرحلة (الحزمة ١٤) —————
+// إعادةُ الترتيب شأنُنا نحن لا تقصيرُ الطفل، فلا يُحبَس أحد رجعياً: العقدةُ المشقوقة
+// نجومُها لشطريها، والبوابةُ الجديدة تُعدّ مجتازةً لمن كان قد عبر مفصلَها قبل وجودها
+// (نجمةٌ في عقدةٍ بعدها = عبورٌ فعليّ). ترحيلٌ بالبيانات لا برقم نسخة — فلا تُرفَع
+// `VERSION` هنا: رفعُها يُسقِط حالةَ كل طفل قائم (`migrate` لا تقبل غير ١ والحالية).
+
+/** الدرسُ المشقوق ← شطراه: من درس المدّ كلَّه فقد درس شطريه. */
+const SPLIT_NODES = { 'skill:madd': ['skill:madd-alif', 'skill:madd-waw-ya'] };
+
+function migrateJourney() {
+  if (!Object.keys(state.stars).length) return;   // طفلٌ جديد: لا شيء يُرحَّل
+  let changed = false;
+
+  for (const [old, heirs] of Object.entries(SPLIT_NODES)) {
+    const stars = state.stars[old];
+    if (!stars) continue;
+    for (const heir of heirs) if (!state.stars[heir]) state.stars[heir] = stars;
+    delete state.stars[old];
+    changed = true;
+  }
+
+  const nodes = allNodes();
+  let last = -1;                                  // موضع آخر عقدة لها نجمة
+  for (const [i, node] of nodes.entries()) if (state.stars[node.id] > 0) last = i;
+  for (const [i, node] of nodes.entries()) {
+    if (node.type !== 'gate' || state.stars[node.id] || i >= last) continue;
+    state.stars[node.id] = MAX_STARS;
+    changed = true;
+  }
+
+  if (changed) save();
+}
+
 function save() {
   frontierCache = null;   // النجوم وحدها تحرّك الجبهة، وكل تغيّر فيها يمرّ من هنا
   state.updatedAt = Date.now();
@@ -78,6 +111,8 @@ function save() {
   }
   for (const fn of listeners) fn(state);
 }
+
+migrateJourney();
 
 /** الاشتراك في تغيّر التقدّم (لإعادة رسم الخريطة). */
 export function onChange(fn) {
@@ -140,6 +175,14 @@ export function quranNodes() {
 }
 
 /**
+ * عقدة «بوابة الإتقان» (الحزمة ١٤): عقدةٌ واحدة تقف قبل مفصلٍ كبير، لا تُجتاز
+ * بالإتمام بل بالإصابة — وحدها في محطتها كي يراها الطفل بوّابةً لا درساً.
+ */
+export function gateNodes(gate) {
+  return [{ id: `gate:${gate.id}`, type: 'gate', part: gate.id, gate }];
+}
+
+/**
  * عقد بستان الموضوعات (الحزمة ٧): باقةٌ لكل عقدة، بترتيب `lexicon.js`.
  * موضعها بعد المرحلة القرآنية — حصيلة الطفل عندها كاملة، فالجديد رصيدٌ لا شيفرة.
  */
@@ -172,17 +215,25 @@ export function libraryNodes(garden) {
 
 /**
  * الرحلة كاملةً بأقسامها بالترتيب: مجموعة ← ما بعدها من مهارات وقصص ← … ←
- * المرحلة القرآنية ← (بستان ← سلّم جمله ← قصصه) × البساتين.
+ * بوابة المصحف ← المرحلة القرآنية ← بوابة الحديقة ← (بستان ← سلّم جمله ← قصصه) × البساتين.
  */
 export function journey() {
   if (journeyCache) return journeyCache;
   const out = [];
+  // البوابة بيانٌ مُعلَن: إن سقطت من `GATES` سقطت من الرحلة، ولا يبقى لها أثر في القفل
+  const pushGate = (where) => {
+    const gate = gateBefore(where);
+    if (gate) out.push({ kind: 'gate', id: `gate:${gate.id}`, gate, nodes: gateNodes(gate) });
+  };
+
   for (const group of GROUPS) {
     out.push({ kind: 'group', id: group.id, group, nodes: groupNodes(group) });
     const nodes = interludeNodes(group.id);
     if (nodes.length) out.push({ kind: 'interlude', id: `after:${group.id}`, after: group.id, nodes });
   }
+  pushGate('quran');
   out.push({ kind: 'quran', id: 'quran', nodes: quranNodes() });
+  pushGate('gardens');
   for (const garden of GARDENS) {
     out.push({ kind: 'garden', id: `garden:${garden.id}`, garden, nodes: gardenNodes(garden) });
     const ladder = ladderOf(garden.id);
@@ -417,14 +468,25 @@ export function recordAttempt(letter, haraka, kind, correct, today = dayNumber()
   return s;
 }
 
+/** ترتيب الضعف: أدنى صندوق، ثم أكثر أخطاءً، ثم أقدم استحقاقاً (وأخيراً المفتاح لثبات الترتيب). */
+const byWeakness = (a, b) =>
+  a.box - b.box || b.wrong - a.wrong || a.due - b.due || a.key.localeCompare(b.key);
+
 /**
- * المستحقّ للمراجعة اليوم، الأضعف أولاً: أدنى صندوق، ثم أكثر أخطاءً، ثم أقدم استحقاقاً.
+ * المستحقّ للمراجعة اليوم، الأضعف أولاً.
  * (المهارة التي لم تُلمس بعدُ ليست هنا — المراجعة تراجع ما مرّ به الطفل فعلاً.)
  */
 export function dueSkills(today = dayNumber()) {
-  return skills()
-    .filter((s) => s.due <= today)
-    .sort((a, b) => a.box - b.box || b.wrong - a.wrong || a.due - b.due || a.key.localeCompare(b.key));
+  return skills().filter((s) => s.due <= today).sort(byWeakness);
+}
+
+/**
+ * كل المهارات المسجّلة بالأضعف أولاً **بلا نظر إلى موعد ليتنر** — مادّةُ بوابة الإتقان
+ * (الحزمة ١٤): البوابة تسأل عن أضعف ما في يده لا عمّا حان موعده، فقد يحين موعد القويّ
+ * وحده يوم البوابة فتمرّ بلا معنى.
+ */
+export function weakestSkills() {
+  return skills().sort(byWeakness);
 }
 
 /**

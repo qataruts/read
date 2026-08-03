@@ -127,10 +127,12 @@ try {
   // ————— الخريطة —————
   await waitFor(() => $('.station'), 'الخريطة');
   ok($$('.station:not(.station--pause):not(.station--quran):not(.station--garden)'
-    + ':not(.station--ladder):not(.station--library)').length === 7,
+    + ':not(.station--ladder):not(.station--library):not(.station--gate)').length === 7,
     'الخريطة تعرض المحطات السبع');
-  ok($$('.station--pause').length === 4,
+  ok($$('.station--pause').length === 6,
     `ومحطات المهارات والقصص بينها (${$$('.station--pause').length})`);
+  ok($$('.station--gate').length === 2,
+    `وبوابتا الإتقان قبل المفصلين (${$$('.station--gate').length} — الحزمة ١٤)`);
   ok($$('.station--quran').length === 1, 'والمرحلة القرآنية بعدها (الجلسة ٦)');
   ok($$('.station--garden').length >= 8, `وبساتين الموضوعات بعدها (${$$('.station--garden').length} بستاناً — الحزمة ٧)`);
   ok($$('.station--library').length === $$('.station--ladder').length,
@@ -267,7 +269,8 @@ try {
   // ————— درس متأخّر (راء في المجموعة ٢): ثلاثة خيارات من ستة حروف مدروسة —————
   win.localStorage.setItem('muallim.progress.v1', JSON.stringify({
     v: 1,
-    stars: Object.fromEntries(['g1:ا', 'g1:ب', 'g1:م', 'g1:ل', 'g1:words', 'g2:ن'].map((k) => [k, 3])),
+    stars: Object.fromEntries(
+      ['g1:ا', 'g1:ب', 'g1:م', 'g1:ل', 'g1:words', 'skill:madd-alif', 'g2:ن'].map((k) => [k, 3])),
     seconds: 0, errors: {}, startedAt: Date.now(), updatedAt: Date.now(),
   }));
   await reload();

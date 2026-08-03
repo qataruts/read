@@ -15,8 +15,8 @@ globalThis.localStorage = {
 };
 
 const {
-  GROUPS, SKILLS, STORIES, quranParts, skillById, storyById, skillExamples, skillTexts, storyTexts,
-  sentenceText, bareLetters,
+  GROUPS, SKILLS, STORIES, GATES, quranParts, skillById, storyById, skillExamples, skillTexts,
+  storyTexts, sentenceText, bareLetters,
 } = await import(new URL('curriculum.js', APP));
 const { buildSkillRounds } = await import(new URL('skill.js', APP));
 const { starsForStory } = await import(new URL('story.js', APP));
@@ -32,10 +32,14 @@ function rng(seed) {
 
 // ————— ١. الترتيب والمواضع (METHOD §٥) —————
 
-ok(SKILLS.map((s) => s.id).join('،') === 'madd،sukun،shadda،tanween،lam',
+ok(SKILLS.map((s) => s.id).join('،') === 'madd-alif،sukun،madd-waw-ya،shadda،tanween،lam',
   `المهارات بترتيب §٥: ${SKILLS.map((s) => s.title).join(' ← ')}`);
-ok(SKILLS.map((s) => s.after).join('،') === 'g3،g3،g4،g5،g6',
-  'مواضعها: المدّ والسكون بعد المجموعة ٣ (بها تكتمل حروف المدّ)، ثم الشدّة والتنوين واللام');
+// الحزمة ١٤ (قرار المالك على و٢): مدّ الألف بعد ١ (يُشرَح ساعة أول استعماله في «بَابَا»)،
+// والسكون بعد ٢ (أمثلته بْ مْ دْ رْ مدروسة حينها)، ومدّ الواو والياء بعد ٣ (بها يكتملان).
+ok(SKILLS.map((s) => s.after).join('،') === 'g1،g2،g3،g4،g5،g6',
+  'مواضعها: مدّ الألف بعد ١، السكون بعد ٢، مدّ الواو والياء بعد ٣، ثم الشدّة والتنوين واللام');
+ok(SKILLS.every((s) => s.compare.pairs.every(([a, b]) => a && b && a !== b)),
+  'ولكل درس أزواج مقارنة سليمة الطرفين');
 ok(STORIES.length === 3 && STORIES.every((s) => s.sentences.length >= 3 && s.sentences.length <= 5),
   `ثلاث قصص، كل واحدة ٣–٥ جمل (${STORIES.map((s) => s.sentences.length).join('،')})`);
 ok(STORIES.every((s) => s.sentences.every((x) => x.words.length <= 6)),
@@ -47,7 +51,7 @@ for (const g of GROUPS) {
   order.push(...SKILLS.filter((s) => s.after === g.id).map((s) => `مهارة:${s.id}`));
   order.push(...STORIES.filter((s) => s.after === g.id).map((s) => `قصة:${s.id}`));
 }
-ok(order.join(' ← ') === 'مهارة:madd ← مهارة:sukun ← مهارة:shadda ← قصة:st1 ← مهارة:tanween ← قصة:st2 ← مهارة:lam ← قصة:st3',
+ok(order.join(' ← ') === 'مهارة:madd-alif ← مهارة:sukun ← مهارة:madd-waw-ya ← مهارة:shadda ← قصة:st1 ← مهارة:tanween ← قصة:st2 ← مهارة:lam ← قصة:st3',
   `كل قصة تلي المهارة التي تُوظّفها (${order.join(' ← ')})`);
 
 // ————— ٢. الأمثلة: الإحالات تُحلّ، والجديد كامل —————
@@ -55,11 +59,14 @@ ok(order.join(' ← ') === 'مهارة:madd ← مهارة:sukun ← مهارة:
 const badRefs = SKILLS.flatMap((s) => (s.wordRefs || []).filter((say) =>
   !GROUPS.flatMap((g) => g.words).some((w) => w.say === say)));
 ok(badRefs.length === 0, `كل إحالات الكلمات تُصيب كلمةً في المنهج${badRefs.length ? ': ' + badRefs : ''}`);
-ok(SKILLS.every((s) => skillExamples(s).length >= 3
+// العدد الأدنى كلمتان لا ثلاث منذ الحزمة ١٤: «مدّ الواو والياء» بعد المجموعة ٣ ورصيد
+// الطفل عندها فيه كلمتان بهذا المدّ لا ثالثة لهما (توت، تين) — والزيادة تعني كلمةً
+// مؤلَّفة لا يملكها، أو تأخيرَ الدرس عن موضعه. وما زاد رصيدُه فثلاثٌ فأكثر.
+ok(SKILLS.every((s) => skillExamples(s).length >= 2
   && skillExamples(s).every((w) => w.text && w.say && w.emoji)),
-  'لكل مهارة ثلاث كلمات مصوَّرة على الأقل، كلها بنصّ ونطق وصورة');
-ok(skillExamples(skillById('madd'))[0].text === 'بَابَا'
-  && skillExamples(skillById('madd'))[0].say === 'بابا',
+  `لكل مهارة كلمتان مصوَّرتان على الأقل بنصّ ونطق وصورة (${SKILLS.map((s) => skillExamples(s).length).join('،')})`);
+ok(skillExamples(skillById('madd-alif'))[0].text === 'بَابَا'
+  && skillExamples(skillById('madd-alif'))[0].say === 'بابا',
   'الكلمة المُحال إليها تُعرض بمقاطعها المركّبة وتُنطق بنصّ المنهج (صوتها موجود)');
 
 // ————— ٣. جولات «ميّز بأذنك» في درس المهارة —————
@@ -102,14 +109,19 @@ const { RUNGS } = await import(new URL('sentences.js', APP));
 const { LIBRARY } = await import(new URL('library.js', APP));
 const BUNDLES = GARDENS.reduce((s, g) => s + g.bundles.length, 0);
 ok(nodes.length === GROUPS.reduce((s, g) => s + g.letters.length + 1, 0)
-  + SKILLS.length + STORIES.length + quranParts().length + BUNDLES + RUNGS.length
+  + SKILLS.length + STORIES.length + GATES.length + quranParts().length + BUNDLES + RUNGS.length
   + LIBRARY.length,
-  `عقد الرحلة = عقد المجموعات + ٥ مهارات + ٣ قصص + خاتمة قرآنية + ${BUNDLES} باقة`
-  + ` + ${RUNGS.length} درجة جمل + ${LIBRARY.length} قصة مكتبة (${nodes.length} عقدة)`);
-ok(ids.indexOf('skill:madd') === ids.indexOf('g3:words') + 1
-  && ids.indexOf('skill:sukun') === ids.indexOf('skill:madd') + 1
-  && ids.indexOf('g4:ع') === ids.indexOf('skill:sukun') + 1,
-  'المهارتان تدخلان الخريطة بين المجموعتين ٣ و٤');
+  `عقد الرحلة = عقد المجموعات + ${SKILLS.length} مهارات + ٣ قصص + بوابتان + خاتمة قرآنية`
+  + ` + ${BUNDLES} باقة + ${RUNGS.length} درجة جمل + ${LIBRARY.length} قصة مكتبة (${nodes.length} عقدة)`);
+ok(ids.indexOf('skill:madd-alif') === ids.indexOf('g1:words') + 1
+  && ids.indexOf('g2:ن') === ids.indexOf('skill:madd-alif') + 1,
+  'مدّ الألف يدخل الخريطة بين المجموعتين ١ و٢');
+ok(ids.indexOf('skill:sukun') === ids.indexOf('g2:words') + 1
+  && ids.indexOf('g3:ت') === ids.indexOf('skill:sukun') + 1,
+  'والسكون بين ٢ و٣');
+ok(ids.indexOf('skill:madd-waw-ya') === ids.indexOf('g3:words') + 1
+  && ids.indexOf('g4:ع') === ids.indexOf('skill:madd-waw-ya') + 1,
+  'ومدّ الواو والياء بين ٣ و٤');
 ok(ids.indexOf('story:st1') === ids.indexOf('skill:shadda') + 1,
   'والقصة تلي مهارتها مباشرة');
 ok(p.maxTotalStars() === nodes.length * p.MAX_STARS, 'سقف النجوم يشمل العقد الجديدة');
@@ -123,15 +135,19 @@ const upTo = (id) => {                       // إنجاز كل ما قبل عق
   }
 };
 
-upTo('skill:madd');
-ok(p.isNodeUnlockedById('skill:madd'), 'درس المدّ يُفتح بإتمام المجموعة الثالثة');
-ok(!p.isNodeUnlockedById('skill:sukun'), 'ودرس السكون بعده مقفل حتى يُتمّه');
-ok(!p.isGroupUnlocked('g4'), 'والمجموعة الرابعة مقفلة حتى تتمّ مهارات ما قبلها');
-ok(p.nextNode().id === 'skill:madd', '«تابع من هنا» يشير إلى درس المدّ');
+upTo('skill:madd-alif');
+ok(p.isNodeUnlockedById('skill:madd-alif'), 'درس مدّ الألف يُفتح بإتمام المجموعة الأولى');
+ok(!p.isGroupUnlocked('g2'), 'والمجموعة الثانية مقفلة حتى يُتمّه');
+ok(p.nextNode().id === 'skill:madd-alif', '«تابع من هنا» يشير إليه');
 
-p.setStars('skill:madd', 3);
-p.setStars('skill:sukun', 2);
-ok(p.isGroupUnlocked('g4'), 'وبإتمام المهارتين تُفتح المجموعة الرابعة');
+p.setStars('skill:madd-alif', 3);
+ok(p.isGroupUnlocked('g2'), 'وبإتمامه تُفتح المجموعة الثانية');
+
+upTo('skill:madd-waw-ya');
+ok(p.isNodeUnlockedById('skill:madd-waw-ya'), 'ومدّ الواو والياء يُفتح بإتمام المجموعة الثالثة');
+ok(!p.isGroupUnlocked('g4'), 'والمجموعة الرابعة مقفلة حتى يُتمّه');
+p.setStars('skill:madd-waw-ya', 2);
+ok(p.isGroupUnlocked('g4'), 'وبإتمامه تُفتح المجموعة الرابعة');
 
 upTo('story:st1');
 ok(p.isNodeUnlockedById('story:st1') && p.nextNode().id === 'story:st1',
@@ -139,7 +155,7 @@ ok(p.isNodeUnlockedById('story:st1') && p.nextNode().id === 'story:st1',
 ok(!p.isGroupUnlocked('g5'), 'والمجموعة الخامسة تنتظر قراءتها');
 
 p.reset();
-ok(!p.isNodeUnlockedById('skill:madd') && !p.isNodeUnlockedById('story:st3'),
+ok(!p.isNodeUnlockedById('skill:madd-alif') && !p.isNodeUnlockedById('story:st3'),
   'كل عقد المهارات والقصص مقفلة في البداية');
 ok(p.findNode('skill:lam') && !p.findNode('skill:لا-وجود-له'), 'البحث عن عقدة مجهولة يعود بلا شيء');
 

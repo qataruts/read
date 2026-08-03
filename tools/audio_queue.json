@@ -9385,5 +9385,21 @@
     "priority": 100,
     "status": "pending",
     "doneAt": null
+  },
+  {
+    "text": "الفَتْحَةُ قَبْلَ الأَلِفِ تُمَدُّ، فَتُقْرَأُ طَوِيلَةً.",
+    "category": "sentence",
+    "requestedBy": "package-14",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضَّمَّةُ قَبْلَ الوَاوِ تُمَدُّ، وَالكَسْرَةُ قَبْلَ اليَاءِ تُمَدُّ.",
+    "category": "sentence",
+    "requestedBy": "package-14",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
   }
 ]

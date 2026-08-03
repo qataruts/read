@@ -53,8 +53,8 @@ function cell(title, node) {
 
 const step = (app, label) => $$(app, '.btn').find((b) => b.textContent.includes(label))?.click();
 
-// ١) درس المدّ: القاعدة والأمثلة
-cell('١ — درس المهارة: القاعدة', renderSkillLesson('madd'));
+// ١) درس مدّ الألف: القاعدة والأمثلة (الحزمة ١٤ — بعد المجموعة الأولى)
+cell('١ — درس المهارة: القاعدة', renderSkillLesson('madd-alif'));
 
 // ٢) الشدّة: خطوة المقارنة (مفكوكة ← مشدَّدة)
 const shadda = cell('٢ — قارِن بأذنك (الشدّة)', renderSkillLesson('shadda'));
@@ -77,10 +77,10 @@ const st3 = cell('٦ — ختام القراءة (قصة ٣)', renderStory('st3'
 $$(st3, '.line-ear').forEach((b) => b.click());
 $$(st3, '.next')[0].click();
 
-// ٧) الخريطة: محطة المهارات والقصص بين المجموعتين ٣ و٤ (طفل أتمّ الثالثة)
+// ٧) الخريطة: محطة المهارات والقصص بعد المجموعة الأولى (طفل أتمّها)
 progress.reset();
 for (const node of progress.allNodes()) {
-  if (node.id === 'skill:madd') break;
+  if (node.id === 'skill:madd-alif') break;
   progress.setStars(node.id, 3);
 }
 const map = cell('٧ — الخريطة: محطة ما بين المجموعتين', document.createElement('div'));

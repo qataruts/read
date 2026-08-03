@@ -62,6 +62,7 @@ export function nodeTitle(node) {
   if (node.type === 'skill') return node.skill.title;
   if (node.type === 'story') return `قصة «${node.story.title}»`;
   if (node.type === 'quran') return node.title;
+  if (node.type === 'gate') return node.gate.title;
   if (node.type === 'garden') return `باقة ${arNum(node.bundle.index)} — ${node.garden.title}`;
   if (node.type === 'ladder') return `جمل ${node.garden.title} — درجة ${arNum(node.rung.index)}`;
   if (node.type === 'library') return `قصة «${node.story.title}»`;
@@ -74,6 +75,7 @@ export function nodeWhere(node) {
     return GROUPS.find((g) => g.id === node.groupId)?.title ?? '';
   }
   if (node.type === 'quran') return QURAN.title;
+  if (node.type === 'gate') return 'بوابة الإتقان';
   if (node.type === 'garden') return `بستان ${node.garden.title}`;
   if (node.type === 'ladder') return `سلّم جمل ${node.garden.title}`;
   if (node.type === 'library') return `مكتبة ${node.garden.title}`;
@@ -87,6 +89,7 @@ export function nodeFace(node) {
   if (node.type === 'skill') return node.skill.face;
   if (node.type === 'story') return node.story.emoji;
   if (node.type === 'quran') return node.face;
+  if (node.type === 'gate') return node.gate.face;
   if (node.type === 'garden') return node.garden.emoji;
   if (node.type === 'ladder') return '📖';
   if (node.type === 'library') return node.story.emoji;
@@ -172,6 +175,8 @@ const LANDMARKS = {
   ladder: '<path d="M20 46V6M44 46V6" /><path d="M20 38h24M20 30h24M20 22h24M20 14h24" /><path d="M10 46h44" />',
   // المكتبة: كتابٌ مفتوح على منضدة — معلمُ محطة القصص المؤلَّفة
   book: '<path d="M32 16v26" /><path d="M32 16q-9-6-22-4v26q13-2 22 4" /><path d="M32 16q9-6 22-4v26q-13-2-22 4" /><path d="M8 44h48" />',
+  // البوابة: قوسٌ على عمودين ومصراعاه — معلمُ محطة الإتقان قبل المفاصل الكبرى
+  gate: '<path d="M6 44h52" /><path d="M13 44V25a19 19 0 0 1 38 0v19" /><path d="M32 44V6" /><path d="M22 44V27a10 10 0 0 1 20 0v17" />',
 };
 
 // ميكروفون «اقرأ لي» (الحزمة ١٠): شكلٌ هندسيّ لا إيموجي (DESIGN §٦)، يتبع لون زرّه.

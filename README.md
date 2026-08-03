@@ -60,6 +60,7 @@ python3 tools/icon_audit.py          # جرد الأيقونات وحارس ال
 node tools/test_icons.mjs            # «صدق الصورة»: المستعصية لا تُسأل بصورتها وتبقى في التهجئة
 python3 tools/test_queue.py          # تصريف قائمة الانتظار الصوتية (بلا شبكة)
 node tools/test_progress.mjs         # قواعد القفل والنجوم وسجلّ المهارات والتكرار المتباعد
+node tools/test_gate.mjs             # بوابتا الإتقان: موضعهما وعتبتهما ومادّتهما والترحيل الرحيم
 node tools/test_lesson.mjs           # مفكوكية جولات درس الحرف
 node tools/test_words.mjs            # مفكوكية ألواح لعبة الكلمات وتغطية أصواتها
 node tools/test_review.mjs           # جلسة المراجعة (مفكوكيتها وتغطية أصواتها) واللوحة
@@ -73,5 +74,6 @@ python3 tools/browser_test.py --review   # المراجعة اليومية ول�
 python3 tools/browser_test.py --story    # دروس المهارات وشاشة قراءة القصص
 python3 tools/browser_test.py --quran    # المرحلة القرآنية والعمل دون إنترنت
 python3 tools/browser_test.py --garden   # بساتين الموضوعات (حديقة الكلمات)
+python3 tools/browser_test.py --gate     # بوابتا الإتقان (عبور وإخفاق وإعادة وترحيل)
 python3 tools/browser_test.py --map      # الخريطة: جبهة الفتح والطيّ الكسول وقياس سرعتهما
 ```

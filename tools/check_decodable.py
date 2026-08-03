@@ -881,8 +881,9 @@ def self_test(letters, skills, stories, parts, quran=None) -> int:
     ok(not err("الْقَمَرْ", g1_3 | set("ق"), lam_on), "و«الْقَمَرْ» قمرية تمرّ")
     ok(not err("سُكْ كَرْ", g1_3 | set("ك"), base), "والفراغ بين مقطعين لا يخلط الجوار")
 
-    ok(len(skills) == 5 and [s["id"] for s in skills] == ["madd", "sukun", "shadda", "tanween", "lam"],
-       f"محلّل المهارات يقرأ الخمسة بالترتيب ({'، '.join(s['id'] for s in skills)})")
+    ok(len(skills) == 6 and [s["id"] for s in skills]
+       == ["madd-alif", "sukun", "madd-waw-ya", "shadda", "tanween", "lam"],
+       f"محلّل المهارات يقرأ الستّة بالترتيب ({'، '.join(s['id'] for s in skills)})")
     ok(all(len(s["pairs"]) >= 3 and s["labels"] and s["rule"] for s in skills),
        "بأزواجها وعناوينها وقواعدها")
     ok(len(stories) == 3 and [len(s["sentences"]) for s in stories] == [5, 4, 5],

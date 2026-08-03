@@ -170,13 +170,18 @@ export function itemTexts(item) {
   return [];
 }
 
-// ————— الشاشة —————
+// ————— محرّك الجلسة —————
+//
+// شاشتان تركبانه: «مراجعة اليوم» و«بوابة الإتقان» (الحزمة ١٤). ما يفترقان فيه
+// **مادّةُ الجلسة وحكمُ ختامها** لا ميكانيكية التمارين، فبقيت التمارين الأربعة هنا
+// وحدها لا تُنسَخ: نسختان منها تفترقان يوماً في تسجيل الخطأ أو في «لا تلقين للجواب».
+//
+// @param {() => object[]} make  بناء تمارين المحاولة — يُستدعى في كل إعادة (لا نمط يُحفظ)
+// @param {(ctx) => Node} verdict  شاشة الختام: تتلقّى {right, errors, items, again}
+// @param {string} pill · accent · leaveAsk  زينة الشاشة وسؤال المغادرة
 
-export function renderReview() {
-  const letters = progress.studiedLetters();
-  const words = progress.studiedWords(letters);
-  const sentences = progress.studiedSentences().filter((s) => s.mechanic === 'order');
-  const items = buildSession({ letters, words, sentences, due: progress.dueSkills() });
+export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, header = null }) {
+  let items = make();
   if (!items.length) return null;   // لا حصيلة بعدُ: main.js يعيده إلى الخريطة
 
   const state = { index: 0, errors: 0, right: 0, done: false, token: 0 };
@@ -431,46 +436,36 @@ export function renderReview() {
 
   // ————— الختام —————
 
+  /** إعادة المحاولة: تمارين تُبنى من جديد (لا نمط يُحفظ) وحالةٌ نظيفة. */
+  function again() {
+    const next = make();
+    if (!next.length) return void go('#/');
+    items = next;
+    Object.assign(state, { index: 0, errors: 0, right: 0, done: false });
+    paint();
+  }
+
   function finish() {
     audio.stop();
     state.done = true;
     state.token++;
     paintDots();
-    progress.markReview(state.right + state.errors, state.right);
-
-    const stars = starsForReview(state.errors, items.length);
-    const streak = progress.reviewStreak();
-    const line = state.errors === 0
-      ? 'مراجعة بلا خطأ واحد! 🎉'
-      : `أصبتَ ${arNum(state.right)} من ${arNum(state.right + state.errors)} محاولة — وما أخطأتَ فيه يعود غداً.`;
-
-    body.replaceChildren(h('div', { class: 'celebrate' },
-      mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, '🔁'),
-      h('h2', {}, 'أتممتَ مراجعة اليوم!'),
-      starsRow(stars, 'big-stars'),
-      h('p', { class: 'hint' }, line),
-      streak > 1 && h('p', { class: 'note' },
-        `🔥 ${arCount(streak, ['يوم', 'يومان متتاليان', 'أيام متتالية', 'يوماً متتالياً'])} من المراجعة`),
-      h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة')),
-    ));
+    body.replaceChildren(verdict({ right: state.right, errors: state.errors, items, again }));
   }
 
   paint();
 
-  root = h('div', { class: 'screen lesson', css: { '--accent': ACCENT } },
+  root = h('div', { class: 'screen lesson', css: { '--accent': accent } },
     topbar(
       h('button', {
         class: 'btn',
-        onclick: () => {
-          if (state.done || state.index === 0 || confirm('تريد الخروج قبل إتمام المراجعة؟')) go('#/');
-        },
+        onclick: () => { if (state.done || state.index === 0 || confirm(leaveAsk)) go('#/'); },
       }, '→ الخريطة'),
       h('span', { class: 'spacer' }),
-      h('span', { class: 'pill' }, 'مراجعة اليوم'),
+      h('span', { class: 'pill' }, pill),
     ),
     h('main', { class: 'screen-card' },
+      header,
       dots,
       body,
       DEV && h('div', { class: 'dev' },
@@ -478,9 +473,46 @@ export function renderReview() {
         h('div', { class: 'dev-row' },
           h('span', {}, `التمارين: ${items.map((i) => i.kind).join('، ')}`),
           h('button', { class: 'btn', onclick: () => toast(`أخطاء: ${arNum(state.errors)}`) }, 'عدّ الأخطاء'),
-          h('button', { class: 'btn', onclick: finish }, 'إنهاء المراجعة الآن'),
+          h('button', { class: 'btn', onclick: finish }, 'إنهاء الجلسة الآن'),
         )),
     ),
   );
   return root;
+}
+
+// ————— شاشة مراجعة اليوم —————
+
+export function renderReview() {
+  const make = () => {
+    const letters = progress.studiedLetters();
+    const words = progress.studiedWords(letters);
+    const sentences = progress.studiedSentences().filter((s) => s.mechanic === 'order');
+    return buildSession({ letters, words, sentences, due: progress.dueSkills() });
+  };
+
+  return renderSession({
+    make,
+    pill: 'مراجعة اليوم',
+    leaveAsk: 'تريد الخروج قبل إتمام المراجعة؟',
+    verdict: ({ right, errors, items }) => {
+      progress.markReview(right + errors, right);
+      const stars = starsForReview(errors, items.length);
+      const streak = progress.reviewStreak();
+      const line = errors === 0
+        ? 'مراجعة بلا خطأ واحد! 🎉'
+        : `أصبتَ ${arNum(right)} من ${arNum(right + errors)} محاولة — وما أخطأتَ فيه يعود غداً.`;
+
+      return h('div', { class: 'celebrate' },
+        mascot('mascot mascot--cheer'),
+        h('div', { class: 'celebrate-face' }, '🔁'),
+        h('h2', {}, 'أتممتَ مراجعة اليوم!'),
+        starsRow(stars, 'big-stars'),
+        h('p', { class: 'hint' }, line),
+        streak > 1 && h('p', { class: 'note' },
+          `🔥 ${arCount(streak, ['يوم', 'يومان متتاليان', 'أيام متتالية', 'يوماً متتالياً'])} من المراجعة`),
+        h('div', { class: 'row foot' },
+          h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة')),
+      );
+    },
+  });
 }

@@ -17,7 +17,8 @@ globalThis.localStorage = {
 };
 
 const {
-  GROUPS, QURAN, quranParts, surahById, quranSpokenTexts, quranMushafTexts, bareLetters,
+  GROUPS, SKILLS, STORIES, GATES, QURAN, quranParts, surahById,
+  quranSpokenTexts, quranMushafTexts, bareLetters,
 } = await import(new URL('curriculum.js', APP));
 const { keyFor } = await import(new URL('audio.js', APP));   // مفتاح النصّ نفسه في كل المشروع
 const { buildRasmRounds } = await import(new URL('quran.js', APP));
@@ -62,11 +63,16 @@ ok(ids.slice(quranStart, quranStart + parts.length).join('|') === parts.map((x) 
   && ids.slice(0, quranStart).every((id) => !id.startsWith('quran:')),
   'وهي متتابعة بعد الرحلة كلها (من درس الحرفين إلى آخر سورة)');
 ok(ids.slice(quranStart + parts.length).every((id) => id.startsWith('garden:')
-  || id.startsWith('ladder:') || id.startsWith('library:')),
-  'ولا يليها إلا بساتين الموضوعات (٧) وسلالم جملها (٨) ومكتبة قصصها (٩)');
+  || id.startsWith('ladder:') || id.startsWith('library:') || id === 'gate:gardens'),
+  'ولا يليها إلا بوابة الحديقة (١٤) وبساتين الموضوعات (٧) وسلالم جملها (٨) ومكتبة قصصها (٩)');
+ok(ids[quranStart - 1] === 'gate:quran',
+  'ويسبقها مباشرةً بوابة الإتقان — لا مصحف بحروف هشّة (الحزمة ١٤)');
+// عقد التأسيس: حروف المجموعات ولعبها + المهارات + القصص + البوابتان + المرحلة القرآنية
+const CORE = GROUPS.reduce((s, g) => s + g.letters.length + 1, 0)
+  + SKILLS.length + STORIES.length + GATES.length + quranParts().length;
 ok(p.maxTotalStars() === nodes.length * p.MAX_STARS
-  && nodes.length === 51 + BUNDLES + RUNGS.length + LIBRARY.length,
-  `سقف النجوم يشمل الخاتمة والبساتين والسلالم والمكتبة (${nodes.length} عقدة، ${p.maxTotalStars()} نجمة)`);
+  && nodes.length === CORE + BUNDLES + RUNGS.length + LIBRARY.length,
+  `سقف النجوم يشمل الخاتمة والبوابتين والبساتين والسلالم والمكتبة (${nodes.length} عقدة، ${p.maxTotalStars()} نجمة)`);
 
 const upTo = (id) => {
   p.reset();

@@ -893,6 +893,50 @@ button {
 .node--skill .node-face { font-size: 2.1rem; }
 .node--story .node-face { font-family: var(--font-ui); font-size: 2rem; }
 
+/* ————— محطة بوابة الإتقان (الحزمة ١٤): قوسٌ يقف قبل المفصل ————— */
+
+.station--gate {
+  border-inline-start-width: 8px;
+  background: linear-gradient(180deg, var(--card) 45%, color-mix(in srgb, var(--accent) 14%, var(--mix)));
+}
+
+.station--gate .station-letters { font-family: var(--font-ui); font-size: .9rem; letter-spacing: 0; line-height: 1.7; }
+.station--gate .station-num { font-size: 1.6rem; }
+.node--gate .node-face { font-family: var(--font-ui); font-size: 2rem; }
+
+/* ترويسة شاشة البوابة: وجهُها واسمُها فوق شريط التمارين — يعرف الطفل أين يقف */
+.gate-head {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  margin-bottom: .9rem;
+  padding-bottom: .8rem;
+  border-bottom: 2px dashed color-mix(in srgb, var(--accent) 35%, transparent);
+  text-align: start;
+}
+
+.gate-head h2 { margin: 0 0 .15rem; font-size: 1.2rem; }
+.gate-head .hint { margin: 0; }
+
+.gate-face {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 16%, var(--mix));
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+/* «ليس بعدُ»: وجهٌ هادئ لا احتفال — لا عقاب في الإخفاق ولا حفاوة به */
+.celebrate--again .celebrate-face {
+  background: color-mix(in srgb, var(--accent) 18%, var(--mix));
+  color: var(--ink);
+  animation: none;
+}
+
 /* ————— درس المهارة ————— */
 
 .rule {

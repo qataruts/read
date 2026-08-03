@@ -181,14 +181,17 @@ try {
   ok($$('.big-stars .on').length === 2, `خطأ واحد ⇒ نجمتان (${$$('.big-stars .on').length})`);
   ok(JSON.parse(win.localStorage.getItem('muallim.progress.v1')).stars['g1:words'] === 2,
     'النجمتان محفوظتان في localStorage');
-  ok(!!$$('.note').find((n) => n.textContent.includes('المجموعة الثانية')),
-    'الاحتفال يبشّر بفتح المجموعة التالية');
+  // (الحزمة ١٤) بين لعبة المجموعة الأولى والثانية درسُ «مدّ الألف»، فلا بشارةَ بفتح
+  // مجموعةٍ لم تُفتح بعدُ — الصدق مع الطفل أولى من بشارةٍ يكذّبها قفلُ الخريطة.
+  ok(!$$('.note').find((n) => n.textContent.includes('المجموعة الثانية')),
+    'ولا يبشّر بفتح المجموعة التالية: بينهما درس مدّ الألف');
   ok($$('.dot--done').length === g1.words.length, 'كل صور المجموعة صارت منجَزة');
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
-  ok(!$$('.station')[1].classList.contains('station--locked'), 'المجموعة الثانية فُتحت على الخريطة');
-  ok($('[data-next]')?.getAttribute('aria-label')?.includes('نون'), 'الخريطة تشير إلى حرف النون تالياً');
+  ok(!$$('.station')[1].classList.contains('station--locked'), 'محطة مدّ الألف فُتحت على الخريطة');
+  ok($('[data-next]')?.getAttribute('aria-label')?.includes('مَدّ الألِف'),
+    `الخريطة تشير إلى درس مدّ الألف تالياً (${$('[data-next]')?.getAttribute('aria-label')})`);
 
   // ————— كل كلمات المجموعات السبع قابلة للعب —————
   // القفل تسلسلي على الرحلة كلها، فالوصول إلى لعبة مجموعة متأخرة يقتضي إنجاز

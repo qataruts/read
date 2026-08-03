@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار بوابتَي الإتقان</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+// عطب في صفحة الاختبار نفسها (استيراد فاشل مثلاً) يُرسَل تقريراً بدل صمت مُحيِّر
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();                        // نتيجة جزئية بعد كل تحقّق كي لا يضيع التقرير عند التعليق
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 130000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 5000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const { GROUPS, GATES } = await import('./js/curriculum.js');   // بيانات المنهج مصدرها الوحيد
+const { allNodes } = await import('./js/progress.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+// النصوص المنتظِرة في القائمة الصوتية: لا ملف لها بعدُ، فالنطق الآلي صوابٌ مؤقتاً
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+const WORDS = GROUPS.flatMap((g) => g.words);
+
+const played = [];      // نصوص شُغِّلت من الملفات المولَّدة
+const spoken = [];      // ما لجأ إلى النطق الآلي
+const jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      played.push(manifest[key] ?? `?${key}`);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { spoken.push(text); this.text = text; } };
+}
+
+/** كل معرّفات العقد السابقة لعقدة بعينها — لزرع تقدّم يفتحها تماماً. */
+function idsBefore(id) {
+  const out = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out;
+    out.push(node.id);
+  }
+  return out;
+}
+
+const dayNumber = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+
+/** يزرع حالة تقدّم (نجوماً ومهارات) ثم يعيد تحميل التطبيق عليها. */
+async function seed(nodeIds, extra = {}) {
+  win.localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, records: [], mic: false, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+    ...extra,
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(150);
+}
+
+const stored = () => JSON.parse(win.localStorage.getItem('muallim.progress.v1'));
+
+// الاستيرادات أعلاه تستغرق وقتاً قد يسبق فيه تحميلُ الإطار تركيبَ المستمع، فلا نعلّق
+// على حدثٍ فات: نتحقّق من حاله أولاً (وأول عملٍ بعده `seed` يعيد التحميل على كل حال).
+if (frame.contentDocument?.readyState !== 'complete') {
+  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+}
+attach();
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+const lastPlayed = () => played[played.length - 1];
+const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
+
+async function goto(hash) {
+  win.location.hash = hash;
+  await sleep(150);
+}
+
+/** الهدف المسموع في تمرين اختيار: صوتٌ **جديد** (بعد `mark`) يكون أحد الخيارات المعروضة. */
+const heardTarget = (faces, mark) => waitFor(
+  () => (played.length > mark && faces.includes(lastPlayed()) ? lastPlayed() : null),
+  'صوت الهدف', 6000);
+
+/**
+ * يجيب عن تمرين واحد من تمارين الجلسة. `wrongs` عدد النقرات الخاطئة المتعمَّدة قبل
+ * الصواب — بها نصنع الإخفاق قصداً ونقيس عتبة العبور على محاولات حقيقية.
+ * يعود بنوع التمرين.
+ */
+async function answerOne(wrongs = 0, mark = 0) {
+  await waitFor(() => $('.vchip') || $('.tiles'), 'تمرين البوابة');
+
+  if ($('.tiles')) {                                     // ركّب الكلمة
+    const say = $('.wgame-pic').getAttribute('aria-label').replace('اسمع كلمة ', '');
+    const word = WORDS.find((w) => w.say === say);
+    for (let i = 0; i < wrongs; i++) {                   // بلاطة ليست المطلوبة الآن
+      const bad = $$('.tile:not([disabled])')
+        .find((b) => b.querySelector('.tile-face').textContent !== word.tiles[0]);
+      if (bad) { bad.click(); await sleep(80); }
+    }
+    for (const t of word.tiles) {
+      const tile = await waitFor(
+        () => $$('.tile:not([disabled])').find((b) => b.querySelector('.tile-face').textContent === t),
+        `بلاطة «${t}»`);
+      tile.click();
+      await sleep(70);
+    }
+    await waitFor(() => played.includes(say), `صوت «${say}»`);
+    nextMark = played.length;      // بعد آخر صوت مؤكد لهذا التمرين — ما بعده نداءُ التالي
+    await sleep(120);
+    return 'build';
+  }
+
+  const big = $$('.vchip--big').length > 0;              // تمييز حرف أو حركة
+  const chips = $$('.vchip');
+  const faces = chips.map((c) => c.querySelector('.vchip-face').textContent);
+  // العلامة تُلتقط في runGate قبل ظهور التمرين — فلا يُقبل صوتٌ قديم صادف وجهاً
+  // معروضاً هدفاً (سباق «حكم البوابة» المتقطع الذي أمسكه المدير).
+  const heard = await heardTarget(faces, mark);
+  for (let i = 0; i < wrongs; i++) {
+    chips[faces.findIndex((f) => f !== heard)].click();
+    await sleep(120);
+  }
+  chips[faces.indexOf(heard)].click();
+  nextMark = played.length;        // الصواب صامت (DESIGN §٥.٢) — ما بعده نداءُ التالي حصراً
+  await sleep(900);                                      // مهلة الانتقال بعد الصواب
+  return big ? 'quiz' : 'haraka';
+}
+
+/** يسوق جلسة بوابة كاملة: `wrongsPlan` أخطاءٌ متعمَّدة لكل تمرين بترتيبه. */
+let nextMark = 0;                  // علامة «ما بعدها نداءُ التمرين التالي» — تضبطها answerOne
+
+async function runGate(wrongsPlan = []) {
+  const kinds = [];
+  const count = $$('.dot').length;
+  nextMark = Math.max(0, played.length - 1);   // الأول: نداؤه سبق النداء فيُقبل آخرُ مسموع
+  for (let i = 0; i < count; i++) {
+    if ($('.celebrate')) break;                          // انتهت الجلسة قبل أوانها
+    kinds.push(await answerOne(wrongsPlan[i] || 0, nextMark));
+  }
+  await waitFor(() => $('.celebrate'), 'حكم البوابة', 8000);
+  return kinds;
+}
+
+try {
+  // ————— ١) الخريطة: البوابة تقف قبل المرحلة القرآنية —————
+  const today = dayNumber();
+  const weak = (letter, haraka, kind, wrong) =>
+    [`${letter}|${haraka}|${kind}`, { right: 0, wrong, box: 0, due: today, seen: today }];
+  const SKILLS_SEED = Object.fromEntries([
+    weak('ك', 'fatha', 'quiz', 4), weak('ق', 'kasra', 'quiz', 3),
+    weak('ط', 'damma', 'haraka', 3), weak('ص', 'fatha', 'quiz', 2),
+    weak('ض', 'fatha', 'haraka', 2), weak('ظ', 'kasra', 'quiz', 1),
+  ]);
+
+  await seed(idsBefore('gate:quran'), { skills: SKILLS_SEED });
+  await waitFor(() => $('.station'), 'الخريطة');
+  const gateStation = $('.station--gate');
+  ok(!!gateStation, 'الخريطة فيها محطة بوابة');
+  ok($$('.station--gate').length === GATES.length,
+    `بوابتان على الرحلة (${$$('.station--gate').length})`);
+  ok(!gateStation.classList.contains('station--locked')
+    && gateStation.textContent.includes('بوابة المصحف'),
+    'بوابة المصحف مفتوحة لمن أتمّ الرحلة حتى المفصل');
+  ok($('.station--quran').classList.contains('station--locked'),
+    'والمرحلة القرآنية خلفها مقفلة');
+  const cont = $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
+  ok(cont.textContent.includes('بوابة المصحف'),
+    `«تابع من هنا» يشير إلى البوابة (${cont.querySelector('b').textContent})`);
+
+  await goto('#/quran/letters');
+  ok(!!$('.station') && !$('.quran'), 'والدخول المباشر على المصحف قبل عبورها يعيده إلى الخريطة');
+
+  // ————— ٢) الإخفاق: «ليس بعدُ» بلا نجمة ولا عبور —————
+  await goto('#/');
+  await waitFor(() => $('.station'), 'الخريطة');
+  $('.station--gate .node').click();
+  await waitFor(() => $('.dots'), 'شاشة البوابة');
+  ok($$('.dot').length === 10, `جلسة البوابة عشرة تمارين (${$$('.dot').length})`);
+  ok($('.gate-head').textContent.includes('بوابة المصحف'), 'وترويستها تُعلن أين يقف الطفل');
+  ok(texts('.pill').includes('بوابة'), 'وشارتها «بوابة» لا «مراجعة اليوم»');
+
+  const firstKinds = await runGate([6, 3, 2]);           // أخطاء متعمَّدة ⇒ دون العتبة
+  ok($('.celebrate--again'), 'دون ٨٠٪ لا تُفتح البوابة');
+  ok($('.celebrate h2').textContent.includes('لَيْسَ بَعْدُ'),
+    `والرسالة «${$('.celebrate h2').textContent}» — لا لفظ رسوب`);
+  ok($('.celebrate .rule').textContent.includes('قَوِّ حُرُوفَكْ'), 'وتوجيهٌ حانٍ: قَوِّ حُرُوفَكْ أَوَّلاً');
+  ok($$('.big-stars').length === 0 && !stored().stars['gate:quran'],
+    'ولا نجمة تُكتب للبوابة');
+  ok(!!btn('أعِد المحاولة'), 'وزرّ إعادةٍ فوريّ بلا حدّ');
+  const report = $('.celebrate .hint').textContent;
+  ok(/٪/.test(report), `والنتيجة معروضة بنسبتها (${report})`);
+
+  // ————— ٣) الإعادة تُولّد جلسة جديدة (لا نمط يُحفظ) —————
+  btn('أعِد المحاولة').click();
+  await waitFor(() => $('.dots') && !$('.celebrate'), 'جلسة الإعادة');
+  ok($$('.dot').length === 10 && $$('.dot--now').length === 1
+    && $$('.dot')[0].classList.contains('dot--now'),
+    'الإعادة تبدأ جلسة كاملة من أولها');
+  ok($$('.dot--done').length === 0, 'ولا أثر لتمارين المحاولة السابقة');
+
+  // ————— ٤) العبور: بلا خطأ ⇒ نجوم وفتحُ ما بعدها —————
+  const kinds = await runGate();
+  ok(!$('.celebrate--again') && $('.celebrate h2').textContent.includes('فُتِحَتِ'),
+    `العبور يُحتفى به (${$('.celebrate h2').textContent})`);
+  ok($$('.big-stars .on').length === 3, `بلا خطأ ⇒ ثلاث نجوم (${$$('.big-stars .on').length})`);
+  ok(stored().stars['gate:quran'] === 3, 'ونجمتها محفوظة بمعرّف عقدتها');
+  ok(new Set([...firstKinds, ...kinds]).size >= 2,
+    `الجلسة نوّعت تمارينها (${[...new Set([...firstKinds, ...kinds])].join('، ')})`);
+
+  const review = stored().reviews[new Date().toISOString().slice(0, 10)];
+  ok(review && review.tries > review.right,
+    `ونتيجتها مسجَّلة كسائر المراجعات بوحدة المحاولة (${JSON.stringify(review)})`);
+  const boxes = Object.values(stored().skills).filter((s) => s.box > 0).length;
+  ok(boxes >= 5, `وأصابتها ترفع صناديق ليتنر (${boxes} مهارة تباعد موعدها)`);
+
+  $('.celebrate .btn--primary').click();
+  await waitFor(() => $('.station'), 'العودة للخريطة');
+  ok(!$('.station--quran').classList.contains('station--locked'),
+    'وبعبورها فُتحت المرحلة القرآنية');
+  ok($('.station--gate').textContent.includes('اجتزتَها'),
+    'والخريطة تُعلن أن البوابة اجتُيزت');
+
+  await goto('#/quran/letters');
+  ok(!!$('.quran'), 'والدخول إلى المصحف صار مفتوحاً');
+
+  // ————— ٥) الترحيل الرحيم: مَن عبر المفصل قبل وجود البوابة —————
+  await seed([...idsBefore('gate:quran'), 'quran:letters', 'quran:words'],
+    { skills: SKILLS_SEED });
+  await waitFor(() => $('.station'), 'الخريطة بعد الترحيل');
+  ok(stored().stars['gate:quran'] === 3,
+    'طفلٌ له نجومٌ بعد البوابة تُعدّ بوابته مجتازة (لا يُحبَس رجعياً)');
+  ok(!$('.station--quran').classList.contains('station--locked')
+    && $('.station--gate').textContent.includes('اجتزتَها'),
+    'ورحلتُه تكمل من حيث وقف بلا حبس');
+  ok(!stored().stars['gate:gardens'], 'وبوابةُ الحديقة التي لم يبلغها بعدُ تبقى أمامه');
+
+  // ————— ٦) بوابة الحديقة: العقدة الثانية على الرحلة —————
+  await seed(idsBefore('gate:gardens'), { skills: SKILLS_SEED });
+  await waitFor(() => $('.station'), 'الخريطة عند بوابة الحديقة');
+  const gardensGate = $$('.station--gate')[1];
+  ok(!gardensGate.classList.contains('station--locked')
+    && gardensGate.textContent.includes('بوابة الحديقة'),
+    'بوابة الحديقة مفتوحة بعد المرحلة القرآنية');
+  ok($('.station--garden').classList.contains('station--locked'), 'والبساتين خلفها مقفلة');
+  await goto('#/gate/gardens');
+  await waitFor(() => $('.dots'), 'شاشة بوابة الحديقة');
+  ok($$('.dot').length === 10 && $('.gate-head').textContent.includes('بوابة الحديقة'),
+    'وتُلعب كأختها بعشرة تمارين');
+  const small = $$('.screen-card button')
+    .map((el) => [el, el.getBoundingClientRect()])
+    .filter(([, r]) => r.width && (r.height < 48 || r.width < 48))
+    .map(([el]) => el.className);
+  ok(small.length === 0, `أهداف اللمس ≥٤٨ بكسل${small.length ? ' — ' + small.join('،') : ''}`);
+
+  // ————— ٧) الصوت والأخطاء —————
+  const missing = played.filter((t) => t.startsWith('?'));
+  ok(missing.length === 0,
+    `كل ما نطقته البوابة له ملف مولَّد (${played.length} تشغيلاً، ${missing.length} ناقصاً)`);
+  const stray = spoken.filter((t) => !pendingAudio.has(t));
+  ok(stray.length === 0, `ولم تلجأ إلى النطق الآلي إلا لنصّ ينتظر التصريف `
+    + `(${spoken.length - stray.length} منتظِراً${stray.length ? '، خارج القائمة: ' + stray.join('، ') : ''})`);
+  ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, 'استثناء: ' + ((e && e.stack) || e));
+}
+
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

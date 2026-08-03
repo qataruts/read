@@ -353,8 +353,9 @@ try {
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
-  ok(continueCard()?.textContent.includes('بستان'),
-    `والخريطة تدلّه على أول بستان (${continueCard()?.textContent.trim().split('\n')[0]})`);
+  // (الحزمة ١٤) بين المصحف والبساتين بوابةُ إتقانٍ ثانية — فهي وجهتُه لا أول باقة
+  ok(continueCard()?.textContent.includes('بوابة الحديقة'),
+    `والخريطة تدلّه على بوابة الحديقة قبل البساتين (${continueCard()?.textContent.trim().split('\n')[0]})`);
 
   // ————— ٨) نصّ المصحف: يُتلى من تسجيل القارئ ولا يُولَّد صوتُه أبداً —————
   const mushaf = new Set(quranMushafTexts());
