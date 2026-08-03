@@ -5,7 +5,9 @@
 // **الحرف × الحركة × نوع التمرين**، ومنه يُبنى التكرار المتباعد وجلسة المراجعة
 // ولوحة وليّ الأمر. لا نصّ منطوق جديد هنا — القياس لا يضيف محتوى.
 
-import { GROUPS, SKILLS, STORIES, QURAN, GATES, gateBefore, quranParts, bareLetters } from './curriculum.js';
+import {
+  GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, gateBefore, quranParts, bareLetters,
+} from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf } from './sentences.js';
 import { libraryOf } from './library.js';
@@ -16,7 +18,9 @@ export const MAX_STARS = 3;
 export const WORDS_PART = 'words';   // عقدة لعبة الكلمات في آخر كل مجموعة
 
 /** أنواع التمارين المقيسة — أسماؤها ثابتة لأنها تُخزَّن في مفاتيح المهارات. */
-export const KINDS = { QUIZ: 'quiz', HARAKA: 'haraka', BUILD: 'build', ORDER: 'order' };
+export const KINDS = {
+  QUIZ: 'quiz', HARAKA: 'haraka', BUILD: 'build', ORDER: 'order', CONTRAST: 'contrast',
+};
 
 /** تباعد ليتنر بالأيام: كل إجابة صحيحة ترفع الصندوق، والخطأ يعيده إلى الصفر. */
 export const BOX_DAYS = [0, 1, 2, 4, 8, 16];
@@ -93,9 +97,16 @@ function migrateJourney() {
   let last = -1;                                  // موضع آخر عقدة لها نجمة
   for (const [i, node] of nodes.entries()) if (state.stars[node.id] > 0) last = i;
   for (const [i, node] of nodes.entries()) {
-    if (node.type !== 'gate' || state.stars[node.id] || i >= last) continue;
-    state.stars[node.id] = MAX_STARS;
-    changed = true;
+    if (state.stars[node.id] || i >= last) continue;
+    if (node.type === 'gate') {
+      state.stars[node.id] = MAX_STARS;           // بوابةٌ عبَر مفصلَها قبل وجودها ⇒ مجتازة
+      changed = true;
+    } else if (node.type === 'contrast') {
+      // محطةٌ استحدثناها خلف موضع الطفل: نجمةُ إتمامٍ واحدة تفكّ حبسه ولا تدّعي إتقاناً —
+      // فتبقى تدعوه إلى لعبها (النجوم لا تنقص، فما يكسبه حين يلعبها يعلو عليها).
+      state.stars[node.id] = 1;
+      changed = true;
+    }
   }
 
   if (changed) save();
@@ -183,6 +194,17 @@ export function gateNodes(gate) {
 }
 
 /**
+ * عقدة «ميّز بين» (الحزمة ١٣): محطةُ مواجهةٍ واحدة بعد مجموعتها — عقدةٌ واحدة
+ * تجمع أزواجها كلها، فجولتان لكل زوج درسٌ واحد لا دروسٌ من جولتين.
+ */
+export function contrastNodes(contrast) {
+  return [{
+    id: `contrast:${contrast.id}`, type: 'contrast',
+    groupId: contrast.after, part: contrast.id, contrast,
+  }];
+}
+
+/**
  * عقد بستان الموضوعات (الحزمة ٧): باقةٌ لكل عقدة، بترتيب `lexicon.js`.
  * موضعها بعد المرحلة القرآنية — حصيلة الطفل عندها كاملة، فالجديد رصيدٌ لا شيفرة.
  */
@@ -214,8 +236,12 @@ export function libraryNodes(garden) {
 }
 
 /**
- * الرحلة كاملةً بأقسامها بالترتيب: مجموعة ← ما بعدها من مهارات وقصص ← … ←
- * بوابة المصحف ← المرحلة القرآنية ← بوابة الحديقة ← (بستان ← سلّم جمله ← قصصه) × البساتين.
+ * الرحلة كاملةً بأقسامها بالترتيب: مجموعة ← ما بعدها من مهارات وقصص ← محطة «ميّز بين»
+ * إن كانت لها ← … ← بوابة المصحف ← المرحلة القرآنية ← بوابة الحديقة ←
+ * (بستان ← سلّم جمله ← قصصه) × البساتين.
+ *
+ * ومحطة المواجهة **بعد مهارات مجموعتها وقصصها**: الحرف يُدرَس، ثم تُسمّى علامته،
+ * ثم تُقرأ قصته، ثم يُواجَه بشبيهه — فالمواجهة مراجعةٌ لما استقرّ لا امتحانٌ لما جدّ.
  */
 export function journey() {
   if (journeyCache) return journeyCache;
@@ -230,6 +256,11 @@ export function journey() {
     out.push({ kind: 'group', id: group.id, group, nodes: groupNodes(group) });
     const nodes = interludeNodes(group.id);
     if (nodes.length) out.push({ kind: 'interlude', id: `after:${group.id}`, after: group.id, nodes });
+    for (const contrast of CONTRASTS.filter((c) => c.after === group.id)) {
+      out.push({
+        kind: 'contrast', id: `contrast:${contrast.id}`, contrast, nodes: contrastNodes(contrast),
+      });
+    }
   }
   pushGate('quran');
   out.push({ kind: 'quran', id: 'quran', nodes: quranNodes() });

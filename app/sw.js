@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v12';  // v12: «أكمل الجملة» — الخيار يُعرض بالرمز الذي يملأ الفراغ
+const VERSION = 'v13';  // v13: محطتا «ميّز بين» — مواجهة المتشابهات (الحزمة ١٣)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -46,6 +46,7 @@ const SHELL = [
   'fonts/BalooBhaijaan2-latin.woff2',
   'fonts/KFGQPCUthmanicHafs.woff2',
   'js/audio.js',
+  'js/contrast.js',
   'js/curriculum.js',
   'js/garden.js',
   'js/gate.js',

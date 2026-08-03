@@ -11,6 +11,7 @@
     python3 tools/browser_test.py --stories    # مكتبة «مصنع القصص» (المرحلة د)
     python3 tools/browser_test.py --record     # «اقرأ لي»: تسجيل صوت الطفل (المرحلة و)
     python3 tools/browser_test.py --gate       # بوابتا الإتقان (الحزمة ١٤)
+    python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record|--gate|--map]
     python3 tools/browser_test.py --show       # بمتصفّح مرئي لتتبّع ما يجري
@@ -63,6 +64,8 @@ PAGES = {
     "/__map_shots.html": TOOLS / "browser_map_shots.html",
     "/__gate.html": TOOLS / "browser_gate.html",
     "/__gate_shots.html": TOOLS / "browser_gate_shots.html",
+    "/__contrast.html": TOOLS / "browser_contrast.html",
+    "/__contrast_shots.html": TOOLS / "browser_contrast_shots.html",
     "/__device.html": TOOLS / "browser_device.html",
 }
 # نافذة Chrome بلا واجهة تحجز ٨٧ بكسلاً لإطارٍ وهميّ فوق المنظور — فلولا تعويضها لقِسنا
@@ -156,7 +159,7 @@ def run_chrome(url: str, profile: Path, extra: list, show: bool):
 # فالسحب فيها أصلٌ لا عطب.
 LANDSCAPE_MUST_FIT = {
     "lesson-listen", "lesson-harakat", "lesson-trace", "lesson-quiz",
-    "skill-rule", "skill-compare", "skill-quiz", "gate",
+    "skill-rule", "skill-compare", "skill-quiz", "gate", "contrast-compare", "contrast-quiz",
 }
 
 
@@ -296,6 +299,8 @@ def main():
     ap.add_argument("--stories", action="store_true", help="مكتبة «مصنع القصص» (المرحلة د)")
     ap.add_argument("--record", action="store_true", help="«اقرأ لي»: تسجيل صوت الطفل (المرحلة و)")
     ap.add_argument("--gate", action="store_true", help="بوابتا الإتقان: العبور والإخفاق والإعادة والترحيل")
+    ap.add_argument("--contrast", action="store_true",
+                    help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
     ap.add_argument("--device", action="store_true",
                     help="قياس الفائض الرأسي بمقاسات جهاز حقيقي في الوضعين (ومعه --shots --screen للقطة)")
@@ -321,7 +326,8 @@ def main():
         if args.shots:
             out = Path(args.shots).resolve()
             out.unlink(missing_ok=True)   # وإلا لعُدَّت لقطةُ تشغيلٍ سابق نجاحاً فوريّاً
-            page, size = (("__gate_shots.html", "1100,2400") if args.gate
+            page, size = (("__contrast_shots.html", "1100,2600") if args.contrast
+                          else ("__gate_shots.html", "1100,2400") if args.gate
                           else ("__map_shots.html", "1100,2600") if args.map
                           else ("__record_shots.html", "1100,3200") if args.record
                           else ("__stories_shots.html", "1100,4200") if args.stories
@@ -343,7 +349,8 @@ def main():
             print(f"اللقطة: {out}" if out.exists() else "تعذّرت اللقطة")
             return 0 if out.exists() else 1
 
-        page = ("__gate.html" if args.gate
+        page = ("__contrast.html" if args.contrast
+                else "__gate.html" if args.gate
                 else "__map.html" if args.map
                 else "__review.html" if args.review else "__story.html" if args.story
                 else "__quran.html" if args.quran else "__garden.html" if args.garden

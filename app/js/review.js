@@ -12,7 +12,7 @@
 // في `KINDS` تمرينُه هنا — وإلا لبقيت مهاراتُه في صندوق ليتنر الأول أبداً، فيكذب
 // «الحروف المتقنة» في لوحة وليّ الأمر على وليّ الأمر.
 
-import { HARAKAT, markOf, syllableSkill, wordSkill } from './curriculum.js';
+import { HARAKAT, contrastPairs, markOf, syllableSkill, wordSkill } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard } from './words.js';
@@ -49,6 +49,27 @@ function harakaItem(letter, haraka, rnd) {
     haraka: target.key,
     mark: target.mark,
     options: HARAKAT.map((k) => ({ ...k })),
+  };
+}
+
+/**
+ * تمرين «ميّز بين» — جولةٌ واحدة من محطة المواجهة (الحزمة ١٣): الخياران (أو الثلاثة)
+ * هم الزوج المتشابه نفسُه بحركةٍ واحدة، فالتمييز يقع على الحرف وحده.
+ *
+ * **ولا مهارةَ تُقاس بلا تمرينٍ يراجعها**: المحطة تكتب مهاراتها بنوع `contrast`، فلولا
+ * هذا التمرين لبقيت في صندوق ليتنر الأول أبداً — فلا يُعدّ حرفٌ متقناً وإن أُتقن.
+ */
+function contrastItem(letter, haraka, pairs, rnd) {
+  const hits = pairs.filter((p) => p.letters.includes(letter));
+  if (!hits.length) return null;
+  const k = HARAKAT.find((x) => x.key === haraka) || pick(HARAKAT, rnd);
+  return {
+    id: `contrast|${letter}|${k.key}`,
+    kind: progress.KINDS.CONTRAST,
+    letter,
+    haraka: k.key,
+    mark: k.mark,
+    options: shuffle(pick(hits, rnd).letters, rnd),
   };
 }
 
@@ -97,9 +118,12 @@ function sentenceForSkill(letter, haraka, sentences, rnd) {
   return hits.length ? pick(hits, rnd) : null;
 }
 
-function itemForSkill(skill, letters, words, sentences, rnd) {
+function itemForSkill(skill, letters, words, sentences, pairs, rnd) {
   if (skill.kind === progress.KINDS.QUIZ) return quizItem(skill.letter, skill.haraka, letters, rnd);
   if (skill.kind === progress.KINDS.HARAKA) return harakaItem(skill.letter, skill.haraka, rnd);
+  if (skill.kind === progress.KINDS.CONTRAST) {
+    return contrastItem(skill.letter, skill.haraka, pairs, rnd);
+  }
   if (skill.kind === progress.KINDS.BUILD) {
     return buildItem(wordForSkill(skill.letter, skill.haraka, words, rnd), words, rnd);
   }
@@ -115,7 +139,8 @@ function itemForSkill(skill, letters, words, sentences, rnd) {
  * دالّة خالصة: كل ما تحتاجه يُحقَن، فتُختبر في node بلا متصفّح.
  */
 export function buildSession({
-  letters = [], words = [], sentences = [], due = [], size = SESSION_SIZE, rnd = Math.random,
+  letters = [], words = [], sentences = [], pairs = [], due = [],
+  size = SESSION_SIZE, rnd = Math.random,
 } = {}) {
   const known = [...new Set(letters)];
   if (known.length < 2) return [];
@@ -142,13 +167,16 @@ export function buildSession({
     // كلمةٌ أو جملةٌ من حصيلته — فشرطُهما وجودها (الهمزة والتاء المربوطة تُدرَّسان في
     // المرحلة القرآنية ولا تظهران في المجموعات، وترد في كلمات البساتين)، وإلا فلا تمرين.
     if (!(skill.kind in longs) && !known.includes(skill.letter)) continue;
-    add(itemForSkill(skill, known, words, sentences, rnd));
+    add(itemForSkill(skill, known, words, sentences, pairs, rnd));
   }
 
-  // تنويع الباقي: تمييز الحرف والحركة على حروف مدروسة، وتركيب كلمة، وترتيب جملة
+  // تنويع الباقي: تمييز الحرف والحركة على حروف مدروسة، ومواجهة زوجٍ متشابه،
+  // وتركيب كلمة، وترتيب جملة
   const fillers = [
     ...shuffle(known, rnd).map((c) => () => quizItem(c, HARAKAT[0].key, known, rnd)),
     ...shuffle(known, rnd).map((c) => () => harakaItem(c, pick(HARAKAT, rnd).key, rnd)),
+    ...shuffle(pairs, rnd).map((p) => () =>
+      contrastItem(pick(p.letters, rnd), pick(HARAKAT, rnd).key, pairs, rnd)),
     ...shuffle(words, rnd).map((w) => () => buildItem(w, words, rnd)),
     ...shuffle(sentences, rnd).map((s) => () => orderItem(s, sentences, rnd)),
   ];
@@ -162,6 +190,7 @@ export function buildSession({
 /** كل النصوص التي قد ينطقها تمرين — للتحميل المسبق ولفحص تغطية الصوت في الاختبارات. */
 export function itemTexts(item) {
   if (item.kind === progress.KINDS.QUIZ) return item.options.map((c) => c + item.mark);
+  if (item.kind === progress.KINDS.CONTRAST) return item.options.map((c) => c + item.mark);
   if (item.kind === progress.KINDS.HARAKA) return item.options.map((k) => item.letter + k.mark);
   if (item.kind === progress.KINDS.BUILD) return [...item.board.map((t) => t.text), item.word.say];
   if (item.kind === progress.KINDS.ORDER) {
@@ -169,6 +198,18 @@ export function itemTexts(item) {
   }
   return [];
 }
+
+// ————— «اسمع الفرق»: استثناءُ تمرين المواجهة المعلَن (الحزمة ١٣) —————
+//
+// قاعدةُ الخطأ في التطبيق كلّه: يسمع الطفل **ما اختاره** ولا يُلقَّن الصواب (DESIGN §٥.٥)
+// — كي يقرأ ويقارن بدل أن يُملى عليه. وفي «ميّز بين» وحدها يُستثنى ذلك: يسمع ما اختاره
+// **ثم الهدف** بفاصلٍ يفصل بينهما، لأنّ جوهرَ هذا التمرين هو السماع المقارن نفسُه —
+// فمنعُ المقارنة فيه منعٌ لمادّته لا صيانةٌ لها. والفاصل مقصود: صوتان متلاصقان
+// يُسمَعان صوتاً واحداً في أذن طفل السادسة.
+export const CONTRAST_GAP_MS = 520;
+
+export const compareSounds = (chosen, target) =>
+  audio.playSequence([chosen, target], CONTRAST_GAP_MS);
 
 // ————— محرّك الجلسة —————
 //
@@ -209,7 +250,8 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       item.kind === progress.KINDS.BUILD ? buildView(item)
         : item.kind === progress.KINDS.ORDER ? orderView(item)
           : item.kind === progress.KINDS.HARAKA ? harakaView(item)
-            : quizView(item));
+            : item.kind === progress.KINDS.CONTRAST ? contrastView(item)
+              : quizView(item));
     const ahead = items[state.index + 1];
     if (ahead) audio.preload(itemTexts(ahead));
   }
@@ -269,6 +311,41 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
     setTimeout(play, 250);
     return h('div', {},
       h('h2', {}, 'أيَّ حرف سمعت؟'),
+      h('div', { class: 'row foot' },
+        h('button', { class: 'btn btn--primary', onclick: play }, '🔊 اسمع مرة أخرى')),
+      row,
+    );
+  }
+
+  // ————— ١ب) ميّز بين: الخياران هما الزوج المتشابه نفسه (الحزمة ١٣) —————
+
+  function contrastView(item) {
+    let locked = false;
+    const play = () => audio.play(item.letter + item.mark);
+    const row = h('div', { class: 'row vrow' }, item.options.map((ch) => {
+      const text = ch + item.mark;
+      const btn = h('button', {
+        class: 'vchip vchip--big',
+        'aria-label': text,
+        onclick: () => {
+          if (locked) return;
+          const correct = ch === item.letter;
+          score(item, item.letter, item.haraka, correct);
+          if (!correct) {
+            wrong(btn);
+            return void compareSounds(text, item.letter + item.mark);   // «اسمع الفرق»
+          }
+          locked = true;
+          right(btn);
+        },
+      }, h('span', { class: 'vchip-face' }, text));
+      return btn;
+    }));
+
+    setTimeout(play, 250);
+    return h('div', {},
+      h('h2', {}, 'أيَّ حرف سمعت؟'),
+      h('p', { class: 'hint' }, 'الحرفان متشابهان — أنصت للفرق'),
       h('div', { class: 'row foot' },
         h('button', { class: 'btn btn--primary', onclick: play }, '🔊 اسمع مرة أخرى')),
       row,
@@ -482,12 +559,18 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
 
 // ————— شاشة مراجعة اليوم —————
 
+/** أزواج المواجهة التي صار الطفل يملك حرفيها كليهما — وما نقص حرفُه لا يُسأل عنه. */
+export const studiedPairs = (letters) =>
+  contrastPairs().filter((p) => p.letters.every((c) => letters.includes(c)));
+
 export function renderReview() {
   const make = () => {
     const letters = progress.studiedLetters();
     const words = progress.studiedWords(letters);
     const sentences = progress.studiedSentences().filter((s) => s.mechanic === 'order');
-    return buildSession({ letters, words, sentences, due: progress.dueSkills() });
+    return buildSession({
+      letters, words, sentences, pairs: studiedPairs(letters), due: progress.dueSkills(),
+    });
   };
 
   return renderSession({

@@ -915,8 +915,25 @@ button {
 .station--gate .station-num { font-size: 1.6rem; }
 .node--gate .node-face { font-family: var(--font-ui); font-size: 2rem; }
 
-/* ترويسة شاشة البوابة: وجهُها واسمُها فوق شريط التمارين — يعرف الطفل أين يقف */
-.gate-head {
+/* ————— محطة «ميّز بين» (الحزمة ١٣): مواجهة المتشابهات بعد فصلها ————— */
+
+.station--contrast {
+  border-inline-start-style: double;
+  border-inline-start-width: 8px;
+  background: linear-gradient(180deg, var(--card) 55%, color-mix(in srgb, var(--accent) 10%, var(--mix)));
+}
+
+.station--contrast .station-letters { font-size: 1.35rem; letter-spacing: .04em; }
+.station--contrast .station-num { font-size: 1.6rem; }
+.node--contrast .node-face { font-family: var(--font-ui); font-size: 2rem; }
+
+/* أزواج المواجهة في خطوة «قارِن»: اسم الحرف تحت وجهه كي يسمّي الطفل ما يميّزه */
+.contrast-head .vchip small,
+.pair .vchip--pair small { display: block; margin-top: .15rem; color: var(--ink-soft); font-size: .8rem; }
+
+/* ترويسة شاشة البوابة ومحطة «ميّز بين»: وجهُها واسمُها فوق شريط الخطوات */
+.gate-head,
+.contrast-head {
   display: flex;
   align-items: center;
   gap: .85rem;
@@ -926,10 +943,11 @@ button {
   text-align: start;
 }
 
-.gate-head h2 { margin: 0 0 .15rem; font-size: 1.2rem; }
-.gate-head .hint { margin: 0; }
+.gate-head h2, .contrast-head h2 { margin: 0 0 .15rem; font-size: 1.2rem; }
+.gate-head .hint, .contrast-head .hint { margin: 0; }
 
-.gate-face {
+.gate-face,
+.contrast-face {
   display: grid;
   place-items: center;
   flex: none;
@@ -1650,4 +1668,16 @@ button {
   .rule { margin-top: .75rem; }
   .vrow { margin-top: .5rem; }
   .pairs { margin-top: .5rem; }
+
+  /* «ميّز بين»: صفوفُ الأزواج تنتظم عمودين في العرضيّ، وترويستُها تنكمش —
+     فتسع خطوةُ «قارِن» الشاشةَ العرضية بلا سحب (DESIGN §٤: الطولي مرجعٌ لا يُمسّ) */
+  .contrast-head { margin-bottom: .6rem; padding-bottom: .5rem; }
+  .contrast-face { width: 2.6rem; height: 2.6rem; font-size: 1.4rem; }
+  .pairs--grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .5rem 1.5rem;
+    max-width: 46rem;
+  }
+  .pairs--grid .vchip--pair .vchip-face { font-size: 2.1rem; }
 }

@@ -15,7 +15,7 @@
 
 import { gateById } from './curriculum.js';
 import * as progress from './progress.js';
-import { buildSession, renderSession, starsForReview } from './review.js';
+import { buildSession, renderSession, starsForReview, studiedPairs } from './review.js';
 import { h, go, arNum, starsRow, mascot, PAUSE_ACCENT } from './ui.js';
 
 export const GATE_SIZE = 10;      // عشرة تمارين: أطول من مراجعة اليوم ودون إرهاق
@@ -32,6 +32,7 @@ export function gateItems(rnd = Math.random) {
   const sentences = progress.studiedSentences().filter((s) => s.mechanic === 'order');
   return buildSession({
     letters, words, sentences,
+    pairs: studiedPairs(letters),
     due: progress.weakestSkills(),
     size: GATE_SIZE,
     rnd,

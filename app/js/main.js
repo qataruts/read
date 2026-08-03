@@ -13,6 +13,7 @@ import { renderSkillLesson } from './skill.js';
 import { renderStory, renderLibraryStory } from './story.js';
 import { renderQuran } from './quran.js';
 import { renderGate } from './gate.js';
+import { renderContrast } from './contrast.js';
 import { renderGarden } from './garden.js';
 import { renderLadder } from './ladder.js';
 import { renderParent, skillsText } from './parent.js';
@@ -93,10 +94,11 @@ function renderMap() {
     main.append(section.kind === 'group' ? stationEl(section, groupIndex++, next, folded)
       : section.kind === 'quran' ? quranEl(section, next, folded)
         : section.kind === 'gate' ? gateEl(section, next, folded)
-          : section.kind === 'garden' ? gardenEl(section, next, folded)
-            : section.kind === 'ladder' ? ladderEl(section, next, folded)
-              : section.kind === 'library' ? libraryEl(section, next, folded)
-                : interludeEl(section, next, folded));
+          : section.kind === 'contrast' ? contrastEl(section, next, folded)
+            : section.kind === 'garden' ? gardenEl(section, next, folded)
+              : section.kind === 'ladder' ? ladderEl(section, next, folded)
+                : section.kind === 'library' ? libraryEl(section, next, folded)
+                  : interludeEl(section, next, folded));
   }
 
   if (DEV) {
@@ -250,6 +252,36 @@ function gateEl(section, next, folded) {
 }
 
 /**
+ * محطة «ميّز بين» (الحزمة ١٣): مواجهةُ المتشابهات بعد أن باعد المنهجُ بينها —
+ * عقدةٌ واحدة تجمع أزواجها، وتُعلن أزواجَها على الخريطة (س/ص · ت/ط…) كي يعرف
+ * وليّ الأمر ما يُقاس فيها بالضبط.
+ */
+function contrastEl(section, next, folded) {
+  const contrast = section.contrast;
+  const node = section.nodes[0];
+  const unlocked = progress.isNodeUnlockedById(node.id);
+  const done = progress.isDone(node.id);
+  const pairs = contrast.pairs.map((p) => p.letters.join('/')).join(' · ');
+
+  return trackEl({
+    id: section.id,
+    folded,
+    className: `station station--contrast${unlocked ? '' : ' station--locked'}${done ? ' station--done' : ''}`,
+    accent: PAUSE_ACCENT,
+    mark: 'scales',
+    label: `${contrast.title}${unlocked ? '' : ' — مقفلة'}`,
+    badge: contrast.face,
+    title: contrast.title,
+    sub: pairs,
+    meta: unlocked
+      ? [h('b', {}, `★ ${arNum(progress.getStars(node.id))}`), ` / ${arNum(progress.MAX_STARS)}`]
+      : '🔒 مقفلة',
+    nodes: section.nodes,
+    next,
+  });
+}
+
+/**
  * بستان موضوعات (الحزمة ٧): محطةٌ لكل موضوع، عقدها باقات من خمس كلمات.
  * تأتي بعد المرحلة القرآنية — هنا يتوسّع الرصيد بعد أن اكتمل فكّ الشيفرة.
  */
@@ -346,7 +378,8 @@ function accentOf(node, group) {
   if (node.type === 'garden') return accentForGarden(node.garden);
   if (node.type === 'ladder') return SENTENCE_ACCENT;
   if (node.type === 'library') return STORY_ACCENT;
-  if (node.type === 'skill' || node.type === 'story' || node.type === 'gate') return PAUSE_ACCENT;
+  if (node.type === 'skill' || node.type === 'story' || node.type === 'gate'
+    || node.type === 'contrast') return PAUSE_ACCENT;
   return accentFor(group);
 }
 
@@ -524,6 +557,9 @@ async function render() {
   } else if (name === 'gate' && arg1) {
     if (!guard(`gate:${decodeURIComponent(arg1)}`)) return;
     screen = renderGate(decodeURIComponent(arg1)) || renderMap();
+  } else if (name === 'contrast' && arg1) {
+    if (!guard(`contrast:${decodeURIComponent(arg1)}`)) return;
+    screen = renderContrast(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'garden' && arg1) {
     if (!guard(`garden:${decodeURIComponent(arg1)}`)) return;
     screen = renderGarden(decodeURIComponent(arg1)) || renderMap();

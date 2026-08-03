@@ -178,6 +178,83 @@ def parse_skills(src: str) -> list:
     return out
 
 
+def parse_contrasts(src: str) -> list:
+    """يقرأ محطات «ميّز بين» (الحزمة ١٣): كل محطة بموضعها وأزواجها المتشابهة.
+
+    الفصل بين المحطات بـ`id` يتبعه `after` مباشرةً — فلا يلتبس معرّف المحطة
+    بمعرّفات أزواجها (وهي `id` أيضاً، يتبعها `letters`).
+    """
+    marks = [(m.start(), m.group(1), m.group(2))
+             for m in re.finditer(r"id:\s*'([^']+)',\s+after:\s*'([^']+)'", src)]
+    out = []
+    for i, (pos, ident, after) in enumerate(marks):
+        chunk = src[pos:(marks[i + 1][0] if i + 1 < len(marks) else len(src))]
+        out.append({
+            "id": ident,
+            "after": after,
+            "title": one(r"title:\s*'([^']*)'", chunk, ""),
+            "face": one(r"face:\s*'([^']*)'", chunk, ""),
+            "hint": one(r"hint:\s*'([^']*)'", chunk, ""),
+            "pairs": [{"id": m.group(1), "letters": re.findall(r"'([^']*)'", m.group(2))}
+                      for m in re.finditer(r"id:\s*'([^']+)',\s*letters:\s*\[([^\]]*)\]", chunk)],
+        })
+    return out
+
+
+def check_contrasts(contrasts, groups, letters) -> tuple:
+    """مفكوكية محطات المواجهة: لا يُواجَه الطفل بحرفٍ لم يُدرَّس بعد.
+
+    المحطة تُعرض بعد مجموعتها، فحصيلتُه عندها = حروف المجموعات حتى تلك المجموعة —
+    وزوجٌ فيه حرفٌ من مجموعةٍ تالية (د/ض بعد السادسة مثلاً، والضاد في السابعة)
+    كسرٌ صريح للقاعدة يُفشل الفحص. ويعود معه كلُّ ما تنطقه المحطات (حرف × حركة).
+    """
+    errors, warnings, spoken = [], [], []
+    group_ids = [g["id"] for g in groups]
+    seen_pairs = {}
+    taught = set()
+    by_group = {g["id"]: [c for c in contrasts if c["after"] == g["id"]] for g in groups}
+
+    for c in contrasts:
+        if c["after"] not in group_ids:
+            errors.append(f"[ميّز بين {c['id']}] موضعها بعد مجموعة مجهولة: «{c['after']}»")
+
+    for g in groups:
+        taught |= set(g["letters"])
+        for c in by_group.get(g["id"], []):
+            label = f"[ميّز بين {c['id']}]"
+            if not c["pairs"]:
+                errors.append(f"{label}: محطة بلا أزواج")
+            if not c["title"] or not c["hint"]:
+                errors.append(f"{label}: بلا عنوان أو سطر توجيه")
+            for pair in c["pairs"]:
+                chars = pair["letters"]
+                if len(chars) < 2:
+                    errors.append(f"{label}: الزوج «{pair['id']}» أقلّ من حرفين")
+                if len(set(chars)) != len(chars):
+                    errors.append(f"{label}: الزوج «{pair['id']}» فيه حرف مكرَّر")
+                key = "".join(sorted(chars))
+                if key in seen_pairs:
+                    errors.append(f"{label}: الزوج «{pair['id']}» مكرَّر مع "
+                                  f"«{seen_pairs[key]}» — مواجهةٌ واحدة تكفي")
+                seen_pairs[key] = pair["id"]
+                for ch in chars:
+                    if ch not in letters:
+                        errors.append(f"{label}: «{ch}» ليس حرفاً معرَّفاً في LETTERS")
+                    elif ch not in taught:
+                        errors.append(f"{label}: الزوج «{pair['id']}» فيه حرف غير مدروس "
+                                      f"عند موضعها ({c['after']}): «{ch}»")
+                    else:
+                        spoken += [ch + mark for mark in ("َ", "ِ", "ُ")]
+
+    # المتشابهات التي أعلنها المنهج (METHOD §٢.٥) وليس لها مواجهة — تنبيهٌ لا خطأ
+    for a, b in (("ت", "ط"), ("س", "ص"), ("ذ", "ظ"), ("ك", "ق"), ("ه", "ح")):
+        if not any(a in p["letters"] and b in p["letters"]
+                   for c in contrasts for p in c["pairs"]):
+            warnings.append(f"[ميّز بين] الزوج المتشابه «{a}/{b}» (METHOD §٢.٥) بلا محطة مواجهة")
+
+    return errors, warnings, spoken
+
+
 def parse_stories(src: str) -> list:
     out = []
     for ident, chunk in chunks_by_id(src):
@@ -605,7 +682,8 @@ def text_errors(text, label, taught, letters, allowed):
     return errors
 
 
-def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran=None):
+def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran=None,
+          contrasts=()):
     errors, warnings = [], []
     seen_letters = set()   # الحروف المدروسة تراكمياً
     audio_texts = set()
@@ -727,6 +805,13 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
                 audio_texts.update(sentence["words"])
                 audio_texts.add(" ".join(sentence["words"]))
 
+    # ٣ب. محطات «ميّز بين» (الحزمة ١٣): مواجهة المتشابهات بعد أن باعد المنهج بينها.
+    if contrasts:
+        c_errors, c_warnings, c_spoken = check_contrasts(contrasts, groups, letters)
+        errors += c_errors
+        warnings += c_warnings
+        audio_texts.update(c_spoken)
+
     # ٣ج. المرحلة القرآنية (§١.٢ و§٥.٦): خاتمة الرحلة — حصيلة الطفل فيها كاملة.
     quran_literals = set()
     if quran:
@@ -762,7 +847,10 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
             seen_literals |= {st["title"], st["emoji"],
                               *[w for sen in st["sentences"] for w in sen["words"]],
                               *[sen["emoji"] for sen in st["sentences"]]}
-        for name in ("SKILLS", "STORIES"):
+        for c in contrasts:
+            seen_literals |= {c["title"], c["face"], c["hint"],
+                              *[ch for p in c["pairs"] for ch in p["letters"]]}
+        for name in ("SKILLS", "STORIES", "CONTRASTS"):
             for lit in re.findall(r"'([^']*)'", parts.get(name, "")):
                 if re.search(r"[ء-ي]", lit) and lit not in seen_literals:
                     errors.append(f"[{name}] نصّ لم يقرأه الفاحص: «{lit}» — راجع محلّل الملف")
@@ -821,8 +909,10 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
     # ٥. التقرير
     total_words = sum(len(g["words"]) for g in groups)
     total_sentences = sum(len(s["sentences"]) for s in stories)
+    total_pairs = sum(len(c["pairs"]) for c in contrasts)
     print(f"المجموعات: {len(groups)} | الحروف: {len(letters)} | الكلمات: {total_words} "
           f"| المهارات: {len(skills)} | القصص: {len(stories)} (في {total_sentences} جملة) "
+          f"| ميّز بين: {len(contrasts)} محطة (في {total_pairs} زوجاً) "
           f"| نصوص الصوت المطلوبة: {len(audio_texts)}")
     if quran:
         print(f"المرحلة القرآنية: {len(quran['surahs'])} سور "
@@ -847,7 +937,7 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
     return 0
 
 
-def self_test(letters, skills, stories, parts, quran=None) -> int:
+def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=()) -> int:
     """يتحقّق أن الفاحص نفسه يُمسك المخالفات (فاحص لا يفشل أبداً لا يحرس شيئاً)."""
     fails = 0
 
@@ -895,6 +985,37 @@ def self_test(letters, skills, stories, parts, quran=None) -> int:
         check(letters, [], [], parse_stories(fake), {"SKILLS": "", "STORIES": fake}, quiet=True)
     ok("لم يقرأه الفاحص" in report.getvalue(),
        "وحارس المحلّل يمسك نصّاً عربياً لم يقرأه أحد (لا يمرّ محتوى دون فحص)")
+
+    # ————— محطات «ميّز بين» (الحزمة ١٣) —————
+    if contrasts and groups:
+        ok(len(contrasts) == 2 and [c["after"] for c in contrasts] == ["g6", "g7"],
+           f"محلّل «ميّز بين» يقرأ محطتين بعد المجموعتين ٦ و٧ "
+           f"({'، '.join(c['id'] + '@' + c['after'] for c in contrasts)})")
+        ok([len(c["pairs"]) for c in contrasts] == [3, 4]
+           and all(len(p["letters"]) >= 2 for c in contrasts for p in c["pairs"]),
+           f"بأزواجها ({[len(c['pairs']) for c in contrasts]}) وحروفِ كل زوج")
+        c_errors, _, c_spoken = check_contrasts(contrasts, groups, letters)
+        ok(not c_errors, f"وتمرّ نظيفةً{'' if not c_errors else ': ' + c_errors[0]}")
+        ok(len(set(c_spoken)) == 3 * len({ch for c in contrasts for p in c["pairs"]
+                                          for ch in p["letters"]}),
+           f"وكلّ ما تنطقه حرفٌ بحركة ({len(set(c_spoken))} نصاً — لا نصّ جديد)")
+
+        # عبث مقصود: زوجٌ يسبق حرفَه، وزوجٌ مكرَّر
+        broken = json.loads(json.dumps(contrasts))
+        broken[0]["pairs"].append({"id": "dal-dad", "letters": ["د", "ض"]})
+        ok(any("غير مدروس عند موضعها" in e for e in check_contrasts(broken, groups, letters)[0]),
+           "وزوجٌ فيه حرفٌ من مجموعةٍ تالية يُمسَك (د/ض بعد السادسة والضاد في السابعة)")
+
+        broken = json.loads(json.dumps(contrasts))
+        broken[1]["pairs"].append(dict(broken[0]["pairs"][0]))
+        ok(any("مكرَّر" in e for e in check_contrasts(broken, groups, letters)[0]),
+           "وزوجٌ مكرَّر في محطتين يُمسَك (مواجهةٌ واحدة تكفي)")
+
+        broken = json.loads(json.dumps(contrasts))
+        for c in broken:
+            c["pairs"] = [p for p in c["pairs"] if "ك" not in p["letters"]]
+        ok(any("بلا محطة مواجهة" in w for w in check_contrasts(broken, groups, letters)[1]),
+           "ومتشابهٌ أعلنه المنهج بلا مواجهة يُنبَّه عليه (METHOD §٢.٥)")
 
     # ————— المرحلة القرآنية —————
     if quran:
@@ -972,10 +1093,12 @@ def main():
     letters, groups, parts = parse_curriculum(CURRICULUM.read_text(encoding="utf-8"))
     skills = parse_skills(parts.get("SKILLS", ""))
     stories = parse_stories(parts.get("STORIES", ""))
+    contrasts = parse_contrasts(parts.get("CONTRASTS", ""))
     quran = parse_quran(parts.get("QURAN", ""))
     if args.self_test:
-        sys.exit(self_test(letters, skills, stories, parts, quran))
-    sys.exit(check(letters, groups, skills, stories, parts, quiet=args.quiet, quran=quran))
+        sys.exit(self_test(letters, skills, stories, parts, quran, contrasts, groups))
+    sys.exit(check(letters, groups, skills, stories, parts, quiet=args.quiet, quran=quran,
+                   contrasts=contrasts))
 
 
 if __name__ == "__main__":
