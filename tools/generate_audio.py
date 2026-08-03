@@ -432,6 +432,62 @@ def write_manifest(manifest: dict) -> None:
         json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8"
     )
     print(f"الفهرس: {OUT_DIR / 'manifest.json'} ({len(manifest)} نصاً)")
+    write_versions(manifest)
+
+
+# ————————————————————— بصمات المحتوى (كسر كاش الصوت) —————————————————————
+#
+# **العيب الذي تعالجه**: اسم الملف مشتقّ من **نصّه** لا من محتواه، فاستبدال
+# صوتٍ تحت المفتاح نفسه (edge ← Sulafat، وانتقاء المدود…) لا يغيّر الرابط —
+# والجهاز الذي خزّن النسخة القديمة في عامل الخدمة يبقى عليها إلى الأبد، فيُسمع
+# الحرفُ الواحد بصوتين مختلفين بحسب تاريخ أول طلبٍ لكل جهاز.
+#
+# **الحلّ**: بصمة **البايتات** (أول ٨ من sha1) في بيانٍ مجاور، يطلب بها التطبيق
+# `<key>.mp3?v=<بصمة>` — فتبديل المحتوى يكسر كاش ذلك الملف وحده، ويبقى ما لم
+# يُبدَّل مخزوناً كما هو (لا إعادة تنزيل ٢٥٥ ملفاً على كل تبديل).
+#
+# **ولماذا بيانٌ مجاور لا حقلٌ في الفهرس؟** الفهرس «مفتاح ← نصّ» يقرؤه ستة
+# فاحصين وأدوات، وتغيير شكله يكسرها جميعاً ويجعل كتابةً واحدة بشيفرة قديمة
+# (والمصرِّف عمليةٌ حيّة) تُسقِط الجميع. الملف المجاور يتحمّل الغياب: بلا بصمة
+# يعمل كل شيء كما كان — بلا وسمٍ فقط.
+#
+# **ولا تُبنى البصمات تراكمياً أبداً**: كل كتابةٍ تعيد اشتقاق البيان كلِّه من
+# بايتات القرص، فأيّ استبدالٍ سبق بشيفرةٍ قديمة يُشفى من تلقائه في التصريف
+# التالي — ولا يُترك ملفٌ ببصمةٍ كاذبة (وهي أخطر من غيابها).
+
+def fingerprint(path: Path) -> str:
+    """بصمة محتوى الملف — أول ٨ خانات من sha1 بايتاته."""
+    return hashlib.sha1(path.read_bytes()).hexdigest()[:8]
+
+
+def versions_map(manifest: dict) -> dict:
+    """مفتاح ← بصمة محتواه، مشتقّاً من القرص (ما لا ملف له لا بصمة له)."""
+    out = {}
+    for key in sorted(manifest):
+        path = OUT_DIR / f"{key}.mp3"
+        if path.exists():
+            out[key] = fingerprint(path)
+    return out
+
+
+def write_versions(manifest: dict) -> dict:
+    """كتابة `versions.json` **ذرّياً** (ملف مؤقت فاستبدال): المصرِّف عملية حيّة،
+    فلا يقرأ التطبيقُ ولا فاحصٌ بياناً نصفَ مكتوب."""
+    versions = versions_map(manifest)
+    path = OUT_DIR / "versions.json"
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(versions, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    tmp.replace(path)
+    print(f"البصمات: {path} ({len(versions)} ملفاً)")
+    return versions
+
+
+def stale_versions(manifest: dict) -> list:
+    """مفاتيح بصمتُها في البيان تخالف بايتات ملفها (أو غائبة) — عيب الخلط عائداً."""
+    if not (OUT_DIR / "versions.json").exists():
+        return sorted(k for k in manifest if (OUT_DIR / f"{k}.mp3").exists())
+    have = json.loads((OUT_DIR / "versions.json").read_text(encoding="utf-8"))
+    return sorted(k for k, v in versions_map(manifest).items() if have.get(k) != v)
 
 
 def recitation_texts() -> dict:
@@ -499,6 +555,9 @@ def verify(texts: dict, pending: dict | None = None, min_bytes: int = 1500) -> i
     known = keys | {key_for(t) for t in pending} | {key_for(t) for t in recitations}
     for orphan in sorted(on_disk - known):
         problems.append(f"يتيم (لا نصّ له في المنهج ولا في القائمة): {orphan}.mp3")
+    # بصمةٌ تخالف بايتاتِ ملفها = رابطٌ لا يتغيّر باستبدال المحتوى = عيب الخلط عائداً
+    for key in stale_versions({key_for(t): t for t in texts}):
+        problems.append(f"بصمة قديمة ({key}.mp3) — أصلحها بـ`--sync-versions` قبل النشر")
 
     long_ones = duration_outliers(texts)
 
@@ -1280,6 +1339,8 @@ def main():
     ap.add_argument("--queue-status", action="store_true",
                     help="عرض حالة القائمة ونصوصها المنتظِرة (JSON) بلا أي طلب")
     ap.add_argument("--verify-only", action="store_true", help="تحقّق ختامي بلا توليد")
+    ap.add_argument("--sync-versions", action="store_true",
+                    help="إعادة اشتقاق بصمات المحتوى من ملفات القرص — بلا شبكة ولا توليد")
     ap.add_argument("--archive-current", metavar="DIR", nargs="?", const="archive/audio-edge",
                     help="نسخ أصوات app/audio الحالية إلى مجلد أرشيف ثم الخروج")
     ap.add_argument("--audition", action="store_true", help="توليد صفحة مفاضلة الأصوات")
@@ -1326,6 +1387,11 @@ def main():
         print(f"قائمة الانتظار ({QUEUE_FILE.relative_to(ROOT)}): "
               f"{len(waiting)} منتظِراً، {len(queue) - len(waiting)} مُصرَّفاً.")
         print(json.dumps([e["text"] for _i, e in waiting], ensure_ascii=False))
+        return
+    if args.sync_versions:
+        # بلا شبكة ولا توليد: يقرأ البايتات ويكتب البصمات — لجلسات التطوير أيضاً
+        # (نظير `fetch_recitation.py --sync-only`)، ولا يمسّ الفهرس ولا أي mp3.
+        write_versions(manifest_map())
         return
     if args.verify_only:
         sys.exit(1 if verify(texts, pending) else 0)

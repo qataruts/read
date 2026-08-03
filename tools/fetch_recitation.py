@@ -57,6 +57,11 @@ def key_for(text: str) -> str:
     return hashlib.sha1(text.encode("utf-8")).hexdigest()[:12]
 
 
+def fingerprint(path: Path) -> str:
+    """بصمة محتوى الملف — أول ٨ خانات من sha1 بايتاته (لكسر الكاش عند الاستبدال)."""
+    return hashlib.sha1(path.read_bytes()).hexdigest()[:8]
+
+
 def surahs_from_curriculum() -> list:
     """نصوص الآيات من مصدر الحقيقة نفسه (لا تُكتب هنا يدوياً أبداً)."""
     js = ("import('file://%s').then(m => console.log(JSON.stringify("
@@ -110,6 +115,11 @@ def write_manifests(record: list, reciter: str) -> None:
 
     المختصر «مفتاح ← نصّ» على صورة `app/audio/manifest.json` نفسِها — فمَن يعرف
     أحدَهما يعرف الآخر، ويبقى نصّ المصحف **خارج فهرس الأصوات المولّدة** كما أُمر.
+
+    ومعه `v`: **بصمة محتوى** كل ملف (أول ٨ من sha1 بايتاته) — بها يطلب
+    `app/js/recitation.js` رابطاً موسوماً، فلو استُبدلت تلاوةٌ (قارئٌ آخر، أو
+    ملفٌ أفضل) كُسِر كاشُ ذلك الملف وحده على كل جهاز. ونظيرها للمولَّد في
+    `app/audio/versions.json` — والمساران منفصلان هنا كما هما هناك.
     """
     RECITATIONS.write_text(json.dumps(record, ensure_ascii=False, indent=1) + "\n",
                            encoding="utf-8")
@@ -117,6 +127,8 @@ def write_manifests(record: list, reciter: str) -> None:
         "reciter": reciter,
         "reciterName": RECITER_NAMES.get(reciter, reciter),
         "ayat": {Path(e["file"]).stem: e["text"] for e in record},
+        "v": {Path(e["file"]).stem: fingerprint(OUT_DIR / e["file"])
+              for e in record if (OUT_DIR / e["file"]).exists()},
     }
     APP_MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     APP_MANIFEST.write_text(json.dumps(app_manifest, ensure_ascii=False, indent=1) + "\n",

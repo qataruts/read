@@ -2,11 +2,24 @@
 // اسم كل ملف = sha1 لنصّه العربي (أول ١٢ خانة) — نفس الاشتقاق هنا وفي بايثون،
 // فاستبدال أي ملف بتسجيل بشري لاحقاً لا يمسّ الشيفرة.
 // عند غياب الملف: احتياط بـ Web Speech API حتى لا يصمت الدرس أبداً.
+//
+// **وسمُ المحتوى (`?v=`)**: الاسم من النصّ لا من المحتوى، فاستبدال الصوت تحت
+// المفتاح نفسه لا يغيّر الرابط — والجهاز الذي خزّن القديم في عامل الخدمة يبقى
+// عليه، فيُسمع الحرفُ الواحد بصوتين بحسب تاريخ أول طلب. لذلك نطلب الملف موسوماً
+// ببصمة بايتاته من `audio/versions.json` (يكتبها المولّد): تبديلُ المحتوى يغيّر
+// الرابط فيُكسَر كاشُ ذلك الملف **وحده**، وما لم يُبدَّل يبقى مخزوناً كما هو.
+// وغيابُ البيان لا يُعطّل شيئاً — رابطٌ بلا وسم كما كان.
 
 const AUDIO_URL = new URL('../audio/', import.meta.url);
 const MANIFEST_URL = new URL('manifest.json', AUDIO_URL);
+const VERSIONS_URL = new URL('versions.json', AUDIO_URL);
+
+// الوسم على http(s) وحده: بعض المتصفّحات ترفض عنوان `file:` بسلسلة استعلام،
+// ولا كاش هناك أصلاً — فلا حاجة إلى الوسم ولا خسارة بتركه.
+const TAGGABLE = typeof location !== 'undefined' && /^https?:$/.test(location.protocol);
 
 let manifestKeys = null;   // Set لمفاتيح الملفات الموجودة (null = لم يُقرأ الفهرس بعد)
+let versions = null;       // مفتاح ← بصمة محتواه (null = لا بيان بصمات)
 let manifestLoad = null;
 let current = null;        // آخر عنصر صوت شُغِّل (لإيقافه قبل التالي)
 const cache = new Map();   // نص → مفتاح (تفادي إعادة حساب sha1)
@@ -57,19 +70,29 @@ export function keyFor(text) {
   return key;
 }
 
-/** قراءة فهرس الأصوات مرة واحدة — لمعرفة الموجود قبل محاولة تشغيله. */
+/** قراءة فهرس الأصوات مرة واحدة — لمعرفة الموجود قبل محاولة تشغيله.
+ *  ومعه بيانُ البصمات: غيابُه لا يمنع التشغيل (روابط بلا وسم)، فلا يُربَط
+ *  سماعُ الطفل بملفٍّ ثانٍ قد يتأخّر. */
 export function ready() {
   if (!manifestLoad) {
-    manifestLoad = fetch(MANIFEST_URL)
+    const index = fetch(MANIFEST_URL)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
       .then((m) => { manifestKeys = new Set(Object.keys(m)); })
       .catch(() => { manifestKeys = null; });   // بلا فهرس: نجرّب الملف ثم نحتاط بالنطق
+    const tags = fetch(VERSIONS_URL)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      .then((v) => { versions = v; })
+      .catch(() => { versions = null; });
+    manifestLoad = Promise.all([index, tags]).then(() => undefined);
   }
   return manifestLoad;
 }
 
 function urlFor(text) {
-  return new URL(`${keyFor(text)}.mp3`, AUDIO_URL).href;
+  const key = keyFor(text);
+  const href = new URL(`${key}.mp3`, AUDIO_URL).href;
+  const tag = TAGGABLE && versions ? versions[key] : null;
+  return tag ? `${href}?v=${tag}` : href;
 }
 
 /** هل للنص ملف مولَّد؟ (null = الفهرس غير مقروء بعد — نادِ ready() أولاً). */

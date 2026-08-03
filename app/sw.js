@@ -8,17 +8,26 @@
 // استراتيجيتان لا ثالثة:
 //   • الهيكل (HTML/CSS/JS/الفهارس): اعرض المخزون فوراً وحدِّثه في الخلفية
 //     (stale-while-revalidate) — فتحٌ فوريّ، والتحديث يظهر في الفتحة التالية.
-//   • الصوت (mp3): من المخزون دائماً — اسم كل ملف sha1 نصّه، فمحتواه لا يتغيّر
-//     تحت اسمه أبداً، وأيّ تسجيل بشري بديل يأتي باسم جديد أو بترقية النسخة أدناه.
+//   • الصوت (mp3): من المخزون دائماً — **بالرابط الموسوم ببصمة محتواه**.
 //
-// والصوت هنا **بيانان لا واحد**: فهرس الأصوات المولّدة (`audio/manifest.json`)
-// وبيان التلاوة بصوت القارئ (`data/recitations.json`) — منفصلان عمداً (نصّ المصحف
-// ممنوع من فهرس المولَّد)، ويُخزَن كلاهما فتعمل التلاوة دون إنترنت كبقية الأصوات.
+// **ولماذا الوسم؟** اسم ملف الصوت sha1 **نصّه** لا محتواه، فاستبدال الصوت تحت
+// المفتاح نفسه (edge ← Sulafat، وانتقاء المدود، وأيّ تسجيل بشري بديل) لا يغيّر
+// الرابط — والجهاز الذي خزّن النسخة القديمة يبقى عليها إلى الأبد، فيُسمع الحرف
+// الواحد بصوتين بحسب تاريخ أول طلبٍ لكل جهاز (بلاغ المالك، ٥ أغسطس ٢٠٢٦).
+// فصار التطبيق يطلب `<key>.mp3?v=<بصمة البايتات>` من `audio/versions.json`
+// و`data/recitations.json`، وهنا **يُخزَن بالرابط الموسوم ويُنظَّف الوسم الأقدم
+// لذلك الملف وحده** — فتبديل ملفٍّ واحد لا يُسقِط مخزون البقية.
+//
+// والصوت هنا **بيانان لا واحد**: فهرس الأصوات المولّدة (`audio/manifest.json`
+// وبصماتُه `audio/versions.json`) وبيان التلاوة بصوت القارئ مع بصماته
+// (`data/recitations.json`) — منفصلان عمداً (نصّ المصحف ممنوع من فهرس المولَّد)،
+// ويُخزَن كلاهما فتعمل التلاوة دون إنترنت كبقية الأصوات.
 //
 // عند تغيير أي ملف من ملفات الهيكل: ارفع VERSION فيُمحى المخزون القديم كله.
-// ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/.
+// ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
+// و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v7';   // v7: «اقرأ لي» — وحدتا التسجيل والمخزن (الحزمة ١٠)
+const VERSION = 'v8';   // v8: وسم بصمة المحتوى للصوت (إصلاح خلط القديم بالجديد)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -58,6 +67,7 @@ const SHELL = [
   'js/ui.js',
   'js/words.js',
   'audio/manifest.json',
+  'audio/versions.json',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/maskable-512.png',
@@ -79,17 +89,33 @@ async function precacheStories() {
     cache.add(new URL(`data/stories/${id}.json`, self.registration.scope)).catch(() => {})));
 }
 
+/** رابط ملف صوتٍ موسوماً ببصمة محتواه (بلا بصمة: الرابط كما هو). */
+function audioUrl(key, tags) {
+  const href = new URL(`audio/${key}.mp3`, self.registration.scope).href;
+  return tags[key] ? `${href}?v=${tags[key]}` : href;
+}
+
 /** خزن الأصوات كلها من بياناتها — بعدها لا يحتاج التطبيق شبكةً البتّة.
- *  البيانان: فهرس المولَّد، وبيان التلاوة بصوت القارئ (كلاهما «مفتاح ← نصّ»). */
+ *  البيانان: فهرس المولَّد، وبيان التلاوة بصوت القارئ (كلاهما «مفتاح ← نصّ»)،
+ *  ومع كلٍّ بصماتُ محتواه فيُخزَن بالرابط الذي يطلبه التطبيق نفسِه.
+ *  ثم **تُكنَس الأوسمة الغابرة**: كل مخزونٍ ليس في المتوقَّع اليوم (وسمٌ أقدم
+ *  لملفٍ استُبدل، أو رابطٌ بلا وسم خُزن قبل قراءة البصمات) يُحذف — فلا يبقى في
+ *  الجهاز أثرٌ للصوت القديم يُسمَع من طريقٍ آخر. */
 async function precacheAudio() {
   const cache = await caches.open(AUDIO_CACHE);
-  const [generated, recitations] = await Promise.all([
-    json('audio/manifest.json'), json('data/recitations.json'),
+  const [generated, versions, recitations] = await Promise.all([
+    json('audio/manifest.json'), json('audio/versions.json'), json('data/recitations.json'),
   ]);
+  const tags = { ...(versions || {}), ...(recitations?.v || {}) };
   const keys = [...Object.keys(generated || {}), ...Object.keys(recitations?.ayat || {})];
-  const urls = keys.map((key) => new URL(`audio/${key}.mp3`, self.registration.scope).href);
+  const urls = keys.map((key) => audioUrl(key, tags));
   // واحداً واحداً: ملفٌ ناقص لا يُسقِط الخزن كله (بخلاف cache.addAll)
   await Promise.all(urls.map((url) => cache.add(url).catch(() => {})));
+
+  if (!generated) return;            // بيانٌ لم يصل: لا نكنس على غير علم
+  const wanted = new Set(urls);
+  const stale = (await cache.keys()).filter((request) => !wanted.has(request.url));
+  await Promise.all(stale.map((request) => cache.delete(request)));
 }
 
 self.addEventListener('install', (event) => {
@@ -125,13 +151,32 @@ async function staleWhileRevalidate(request) {
   return cached || (await network) || Response.error();
 }
 
+/**
+ * الصوت: المخزون أولاً **بالرابط الموسوم**.
+ * وسمٌ جديد = مفتاحُ خزنٍ جديد = طلبُ شبكةٍ لهذا الملف وحده، وبعد خزنه يُحذف
+ * وسمُه الأقدم فوراً (فلا نسختان لملفٍ واحد، ولا يعود القديم من باب خلفيّ).
+ * وإن سقطت الشبكة ولم يكن الوسمُ الجديد مخزوناً: نسخةٌ بوسمٍ أقدم خيرٌ من صمتٍ
+ * في أذن الطفل — نُخرجها ولا نخزنها بالوسم الجديد، فتُصحَّح أول اتصال.
+ */
 async function cacheFirst(request) {
   const cache = await caches.open(AUDIO_CACHE);
   const cached = await cache.match(request);
   if (cached) return cached;
   const response = await fetch(request).catch(() => null);
-  if (response && response.ok) cache.put(request, response.clone());
-  return response || Response.error();
+  if (response && response.ok) {
+    await cache.put(request, response.clone());
+    await dropOtherTags(cache, request);
+    return response;
+  }
+  return (await cache.match(request, { ignoreSearch: true })) || response || Response.error();
+}
+
+/** حذف ما خُزن لهذا الملف بأوسمةٍ أخرى (أو بلا وسم) — إبقاءُ الجديد وحده. */
+async function dropOtherTags(cache, request) {
+  const siblings = await cache.keys(request, { ignoreSearch: true });
+  await Promise.all(siblings
+    .filter((other) => other.url !== request.url)
+    .map((other) => cache.delete(other)));
 }
 
 self.addEventListener('fetch', (event) => {

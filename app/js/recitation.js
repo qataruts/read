@@ -17,8 +17,12 @@ const AUDIO_URL = new URL('../audio/', import.meta.url);
 const MANIFEST_URL = new URL('../data/recitations.json', import.meta.url);
 
 let ayat = null;            // Set لمفاتيح الآيات المسجَّلة (null = لم يُقرأ البيان بعد)
+let tags = null;            // مفتاح ← بصمة محتوى ملفه (وسمُ كسر الكاش — انظر audio.js)
 let reciterName = '';
 let manifestLoad = null;
+
+// كما في `audio.js`: الوسم على http(s) وحده.
+const TAGGABLE = typeof location !== 'undefined' && /^https?:$/.test(location.protocol);
 
 let players = null;         // مشغّلان يتناوبان (الجلب المسبق — انظر playSequence)
 let active = 0;
@@ -32,6 +36,7 @@ export function ready() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
       .then((m) => {
         ayat = new Set(Object.keys(m.ayat || {}));
+        tags = m.v || null;
         reciterName = m.reciterName || '';
       })
       .catch(() => { ayat = null; });     // بلا بيان: لا تلاوة (ولا نطق آلي بديلاً)
@@ -47,7 +52,13 @@ export function has(text) {
   return ayat ? ayat.has(keyFor(text)) : null;
 }
 
-const urlFor = (text) => new URL(`${keyFor(text)}.mp3`, AUDIO_URL).href;
+/** رابط الملف موسوماً ببصمة محتواه إن عُرفت — فاستبدال تلاوةٍ يكسر كاشَها وحدها. */
+function urlFor(text) {
+  const key = keyFor(text);
+  const href = new URL(`${key}.mp3`, AUDIO_URL).href;
+  const tag = TAGGABLE && tags ? tags[key] : null;
+  return tag ? `${href}?v=${tag}` : href;
+}
 
 function pair() {
   if (!players) players = [new Audio(), new Audio()];
