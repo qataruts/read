@@ -10,3 +10,5 @@ shots/
 tools/gcloud-sa.json
 tools/gcloud-oauth.json
 tools/gcloud-token.json
+!app/welcome/shots/
+!app/welcome/shots/**
