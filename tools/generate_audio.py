@@ -27,6 +27,7 @@ import json
 import os
 import re
 import shutil
+import statistics
 import subprocess
 import sys
 import time
@@ -308,6 +309,48 @@ def pcm_to_mp3(pcm: bytes, rate: int, path: Path) -> None:
     path.write_bytes(enc.encode(pcm) + enc.flush())
 
 
+# ————————————————————————— مدة mp3 (بلا مكتبات ولا ffmpeg) —————————————————————————
+
+BITRATES_V1L3 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0]
+BITRATES_V2L3 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0]
+RATES = {3: [44100, 48000, 32000], 2: [22050, 24000, 16000], 0: [11025, 12000, 8000]}
+
+
+def mp3_duration(path: Path) -> float:
+    """مدة الملف بالثواني من إطاراته (يتخطّى ID3 ويعدّ الإطارات فعلياً)."""
+    data = path.read_bytes()
+    i = 0
+    if data[:3] == b"ID3":
+        size = ((data[6] & 0x7F) << 21 | (data[7] & 0x7F) << 14
+                | (data[8] & 0x7F) << 7 | (data[9] & 0x7F))
+        i = 10 + size
+    total = 0.0
+    n = len(data)
+    while i + 4 <= n:
+        if data[i] != 0xFF or (data[i + 1] & 0xE0) != 0xE0:
+            i += 1
+            continue
+        ver = (data[i + 1] >> 3) & 0x03          # 3=MPEG1, 2=MPEG2, 0=MPEG2.5
+        layer = (data[i + 1] >> 1) & 0x03        # 1 = Layer III
+        bidx = (data[i + 2] >> 4) & 0x0F
+        ridx = (data[i + 2] >> 2) & 0x03
+        pad = (data[i + 2] >> 1) & 0x01
+        if layer != 1 or ver == 1 or bidx in (0, 15) or ridx == 3:
+            i += 1
+            continue
+        rate = RATES[ver][ridx]
+        kbps = (BITRATES_V1L3 if ver == 3 else BITRATES_V2L3)[bidx]
+        spf = 1152 if ver == 3 else 576
+        length = (spf // 8 * kbps * 1000) // rate + pad
+        if length <= 4:
+            i += 1
+            continue
+        total += spf / rate
+        i += length
+    return total
+
+
+
 # ————————————————————————— التوليد —————————————————————————
 
 def is_same_as(path: Path, ref_dir: Path) -> bool:
@@ -406,6 +449,33 @@ def recitation_texts() -> dict:
     return {e["text"]: f"{e['surah']:03d}:{e['ayah']:03d}" for e in data if e.get("text")}
 
 
+CORE_CATEGORIES = ("letter_name", "letter_haraka", "syllable")
+DURATION_RATIO = 1.7        # مدة تتجاوز هذا × وسيط فئتها = شذوذ يُبلَّغ
+
+
+def duration_outliers(texts: dict) -> list:
+    """شواذ المدة في فئات النواة — حارسٌ دائم ضد التكرار الداخلي في الملف.
+
+    بلاغ المالك (٤ أغسطس ٢٠٢٦): «بعض أصوات الحروف منطوقة مرتين». الملف المكرر
+    يطول عن نظائره، فالمدة كاشفٌ رخيص يُشغَّل مع كل تحقّق. (التصنيف القاطع
+    — نطقتان أم طول طبيعي — في `tools/audio_audit.py --analyze`.)
+    """
+    by_cat = {}
+    for text, cat in texts.items():
+        if cat not in CORE_CATEGORIES:
+            continue
+        p = OUT_DIR / f"{key_for(text)}.mp3"
+        if p.exists():
+            by_cat.setdefault(cat, []).append((text, mp3_duration(p)))
+    out = []
+    for cat, items in by_cat.items():
+        med = statistics.median(s for _t, s in items)
+        if not med:
+            continue
+        out += [(t, cat, s, med) for t, s in items if s > DURATION_RATIO * med]
+    return sorted(out, key=lambda r: -r[2] / r[3])
+
+
 def verify(texts: dict, pending: dict | None = None, min_bytes: int = 1500) -> int:
     """تحقّق ختامي: لكل نص متوقَّع ملف، ولا ملف يتيم، ولا ملف أصغر من الحد المعقول.
 
@@ -430,7 +500,12 @@ def verify(texts: dict, pending: dict | None = None, min_bytes: int = 1500) -> i
     for orphan in sorted(on_disk - known):
         problems.append(f"يتيم (لا نصّ له في المنهج ولا في القائمة): {orphan}.mp3")
 
+    long_ones = duration_outliers(texts)
+
     print(f"\nالتحقّق الختامي: {len(texts)} نصاً متوقَّعاً، {len(on_disk)} ملفاً على القرص.")
+    for text, cat, sec, med in long_ones:
+        print(f"  ⚠ شذوذ مدة ({CATEGORY_AR[cat]}): «{text}» {sec:.2f}ث "
+              f"= {sec / med:.1f}× وسيط فئته ({med:.2f}ث) — يُسمَع للتحقّق من تكرار داخلي")
     if recitations:
         print(f"  🎧 {len(recitations)} تلاوةً بصوت قارئ (خارج الفهرس عمداً — لا تولَّد).")
     if pending:
