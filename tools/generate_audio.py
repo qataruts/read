@@ -18,6 +18,7 @@
 """
 
 import argparse
+import array
 import asyncio
 import base64
 import collections
@@ -363,8 +364,44 @@ _HAVE_FFMPEG = shutil.which("ffmpeg")
 _ENCODER = None
 
 
-def pcm_to_mp3(pcm: bytes, rate: int, path: Path) -> None:
+SILENCE_RATIO = 0.02        # ٢٪ من الذروة يُعدّ صمتاً
+SILENCE_PAD_MS = 60         # هامش يبقى قبل الصوت وبعده
+
+
+def trim_pcm(pcm: bytes, rate: int) -> bytes:
+    """قصّ صمت الطرفين من PCM خام (١٦ بت أحادي) قبل الترميز.
+
+    المولّد يعيد أحياناً صمتاً طويلاً قبل النطق (بلغ ١٫٢٨ث في «عَا») — والطفل
+    ينقر فينتظر. القصّ هنا في الأنبوب: بلا حصة، وينفع كل ملف يُولَّد بعده.
+    """
+    samples = array.array("h")
+    samples.frombytes(pcm[:len(pcm) - len(pcm) % 2])
+    if sys.byteorder == "big":
+        samples.byteswap()
+    if not samples:
+        return pcm
+    peak = max(max(samples), -min(samples))
+    if peak == 0:
+        return pcm
+    thr = peak * SILENCE_RATIO
+    start, end = 0, len(samples) - 1
+    while start < len(samples) and abs(samples[start]) < thr:
+        start += 1
+    while end > start and abs(samples[end]) < thr:
+        end -= 1
+    pad = int(rate * SILENCE_PAD_MS / 1000)
+    cut = samples[max(0, start - pad):min(len(samples), end + pad + 1)]
+    if len(cut) < rate * 0.1:          # لا تقصّ إلى لا شيء (نصّ صامت غالباً عيب آخر)
+        return pcm
+    if sys.byteorder == "big":
+        cut.byteswap()
+    return cut.tobytes()
+
+
+def pcm_to_mp3(pcm: bytes, rate: int, path: Path, trim: bool = True) -> None:
     """تحويل PCM (l16 mono) إلى mp3 — ffmpeg إن وُجد، وإلا lameenc داخل بايثون."""
+    if trim:
+        pcm = trim_pcm(pcm, rate)
     path.parent.mkdir(parents=True, exist_ok=True)
     if _HAVE_FFMPEG:
         subprocess.run(
@@ -715,6 +752,23 @@ def mark_done(text: str, model: str) -> None:
     return changed
 
 
+def mark_failed(text: str, model: str) -> None:
+    """يقيّد إخفاق نصٍّ على نموذج — دمجاً لا استبدالاً كـ`mark_done`.
+
+    به يُنفَّذ بند `docs/AUDIO_QUEUE.md`: «وما فشل في أي نموذج يعود تلقائياً لـ3.1»؛
+    وبلا هذا القيد يعود التصريف كل يوم إلى النصّ العصيّ نفسه فيحرق محاولتين عليه.
+    """
+    disk = load_queue()
+    changed = False
+    for e in disk:
+        if e.get("text") == text and e.get("status", "pending") != "done":
+            e["failCount"] = e.get("failCount", 0) + 1
+            e["lastFailModel"] = model
+            changed = True
+    if changed:
+        save_queue(disk)
+
+
 def queue_pending(queue: list) -> list:
     """المصفوفون بالأولوية (الأصغر أسبق) ثم بالأقدمية (ترتيب الإضافة)."""
     pending = [(i, e) for i, e in enumerate(queue) if e.get("status", "pending") != "done"]
@@ -778,6 +832,8 @@ def route_model(entry: dict, lexicon_ok: bool | None = None) -> str:
         lexicon_ok = is_approved(MODEL_LEXICON)
     if entry.get("category") in SHORT_CATEGORIES:
         return MODEL_CORE                        # القصير كله على 3.1 — بلا استثناء
+    if entry.get("failCount") and entry.get("lastFailModel") != MODEL_CORE:
+        return MODEL_CORE                        # «ما فشل في نموذج يعود لـ3.1» (السياسة)
     if entry.get("priority", 100) <= URGENT_PRIORITY:
         return MODEL_CORE                        # إصلاح عيب مسموع: الأمتن المجرَّب
     if entry.get("category") == "sentence":
@@ -869,6 +925,7 @@ def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
                   file=sys.stderr)
         except EmptyAudio as e:
             failed += 1
+            mark_failed(text, m)
             empty_streak[m] += 1
             print(f"  ✗ {label}: {e}", file=sys.stderr)
             if empty_streak[m] >= EMPTY_STREAK_LIMIT:
@@ -880,7 +937,8 @@ def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
                     break
         except Exception as e:  # noqa: BLE001
             failed += 1
-            print(f"  ✗ {label}: {e}", file=sys.stderr)
+            mark_failed(text, m)
+            print(f"  ✗ {label}: [{type(e).__name__}] {e}", file=sys.stderr)
 
     if dry_run:
         print(f"\nسيُصرَّف: {made} (تجربة جافّة — لم يُطلب شيء)")
@@ -1007,9 +1065,11 @@ MADD_DIR = ROOT / "scratch" / "madd_pick"
 MADD_STYLE = ("انطق الحرف ممدوداً مدّاً طبيعياً حركتين، صوتاً واحداً متصلاً، "
               "بتأنٍّ ووضوح لطفل يتعلم القراءة: ")
 MADD_VARIANTS = 3
+MADD_IDEAL_SEC = 1.5     # طول المدّ المثالي بأذن المالك (٤ أغسطس ٢٠٢٦)
+MADD_APPLIED = ROOT / "scratch" / "madd_pick" / "applied.json"   # ما حُسم ومَن حسمه
 
 
-def madd_targets() -> list:
+def madd_targets(include_existing: bool = False) -> list:
     """مدودٌ يستعملها التطبيق فعلاً ولا ملف لها — لا التوسعة الآلية ٢٨×٣.
 
     التوسعة الميكانيكية تُنتج مستحيلاً («اَا» والألف نفسها حرف مدّ)، فيؤخذ من
@@ -1022,19 +1082,21 @@ def madd_targets() -> list:
         if cat not in ("syllable", "letter_haraka"):
             continue
         if len(text) == 3 and text[1] in HARAKAT.values() and text[2] in "اوي":
-            if not (OUT_DIR / f"{key_for(text)}.mp3").exists():
+            # `include_existing`: المدّ قد يكون وُلِّد ضمن القائمة بالتعليمة العامة،
+            # وأمرُ المدير أن يُعاد بتعليمة المدّ المشددة ثلاثَ مرات لينتقي المالك.
+            if include_existing or not (OUT_DIR / f"{key_for(text)}.mp3").exists():
                 out.append(text)
     return sorted(out)
 
 
 def madd_batch(api_key, voice: str, variants: int = MADD_VARIANTS,
-               dry_run: bool = False) -> int:
+               dry_run: bool = False, include_existing: bool = False) -> int:
     """ثلاث محاولات لكل مدّ ناقص على نموذج النواة وحده (2.5-pro موثَّق فشلُه في «بَا»).
 
     المخرجات في `scratch/madd_pick/` وصفحة انتقاء — لا يدخل `app/audio` شيء حتى
     يختار المالك بأذنه (`--apply-madd-pick`).
     """
-    targets = madd_targets()
+    targets = madd_targets(include_existing)
     if not targets:
         print("لا مدّ ناقصاً — لا حاجة للاحتياط التوليدي.")
         return 0
@@ -1080,8 +1142,11 @@ def write_madd_page(targets: list, variants: int) -> None:
                 if (MADD_DIR / f"{key_for(text)}__{v}.mp3").exists()]
         if not have:
             continue
+        durs = {v: mp3_duration(MADD_DIR / f) for v, f in have}
+        best = min(durs, key=lambda v: abs(durs[v] - MADD_IDEAL_SEC))   # الأقرب للمثالي
         btns = "".join(
-            f'<button data-src="{f}">▶ {v}</button>'
+            f'<button data-src="{f}"{" class=\"near\"" if v == best else ""}>▶ {v}'
+            f'<small>{durs[v]:.2f}ث{" ★" if v == best else ""}</small></button>'
             f'<button class="pick" data-text="{text}" data-variant="{v}">اختر {v}</button>'
             for v, f in have)
         rows.append(f'<tr data-text="{text}"><th>{text}</th><td>{btns}</td>'
@@ -1100,6 +1165,8 @@ def write_madd_page(targets: list, variants: int) -> None:
  button {{ font-family:inherit; font-size:.95rem; padding:.3rem .7rem; margin:0 .15rem; cursor:pointer;
            border:1px solid #c9bba6; border-radius:.45rem; background:#fdfaf4 }}
  button.pick {{ background:#eef3fb; border-color:#a9bcd6; font-size:.8rem }}
+ button small {{ display:block; font-size:.6rem; color:#8a7a66; font-family:system-ui }}
+ button.near {{ border-color:#2f7d4f; border-width:2px }}
  button.playing {{ background:#2f7d4f; color:#fff }}
  td.chosen {{ font-family:system-ui; font-size:.9rem; color:#2f7d4f; min-width:5rem }}
  #out {{ position:sticky; bottom:0; background:#241f1a; color:#fdfaf4; padding:.8rem 1rem;
@@ -1108,6 +1175,7 @@ def write_madd_page(targets: list, variants: int) -> None:
 </style></head><body>
 <h1>انتقاء المدود — ثلاث محاولات لكل نصّ</h1>
 <p class="note">اسمع الثلاث واختر أوضحها مدّاً (حركتان، صوت واحد متصل بلا قطع).
+المعلَّم بـ★ هو الأقرب إلى الطول المثالي ({MADD_IDEAL_SEC}ث بأذن المالك) — دلالةٌ لا حكم، والأذن تقدَّم عليه.
 ما لم تختر له شيئاً يبقى بلا ملف ويُعاد توليده.
 <br>بعد الفراغ: اضغط «انسخ الاختيارات» وأعطِني النصّ المنسوخ لأطبّقه.</p>
 <table><tbody>{"".join(rows)}</tbody></table>
@@ -1141,7 +1209,50 @@ document.addEventListener('click', (e) => {{
     (MADD_DIR / "index.html").write_text(html, encoding="utf-8")
 
 
-def apply_madd_pick(spec: str) -> int:
+def load_applied() -> dict:
+    if not MADD_APPLIED.exists():
+        return {}
+    try:
+        return json.loads(MADD_APPLIED.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def record_applied(text: str, variant: int, by: str) -> None:
+    """يقيّد ما حُسم ومَن حسمه — فلا يدهس المعيارُ اختياراً بالأذن."""
+    data = load_applied()
+    data[text] = {"variant": int(variant), "by": by, "at": TODAY}
+    MADD_APPLIED.parent.mkdir(parents=True, exist_ok=True)
+    MADD_APPLIED.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def apply_madd_auto() -> int:
+    """يطبّق معيار المالك (الأقرب إلى MADD_IDEAL_SEC) على ما لم يُحسم بالأذن بعد.
+
+    إذنُ المالك (٤ أغسطس ٢٠٢٦): «طبّق بالمعيار». وما اختاره بأذنه لا يُمَسّ.
+    """
+    applied = load_applied()
+    picks = {}
+    for text in madd_targets(include_existing=True):
+        if text in applied:
+            continue
+        variants = {v: MADD_DIR / f"{key_for(text)}__{v}.mp3"
+                    for v in range(1, MADD_VARIANTS + 1)}
+        variants = {v: p for v, p in variants.items() if p.exists()}
+        if not variants:
+            continue
+        durs = {v: mp3_duration(p) for v, p in variants.items()}
+        best = min(durs, key=lambda v: abs(durs[v] - MADD_IDEAL_SEC))
+        picks[text] = best
+        print(f"  ★ «{text}» ← المحاولة {best} ({durs[best]:.2f}ث، "
+              f"الأقرب إلى {MADD_IDEAL_SEC}ث من {len(durs)} محاولات)")
+    if not picks:
+        print("لا مدّ جديداً يحتاج تطبيق المعيار.")
+        return 0
+    return apply_madd_pick(json.dumps(picks, ensure_ascii=False), by="criterion")
+
+
+def apply_madd_pick(spec: str, by: str = "ear") -> int:
     """يطبّق اختيار المالك: {"بَا": 2, …} — ملفاً أو نصّاً JSON."""
     raw = Path(spec).read_text(encoding="utf-8") if Path(spec).exists() else spec
     picks = json.loads(raw)
@@ -1153,8 +1264,10 @@ def apply_madd_pick(spec: str) -> int:
             continue
         shutil.copy2(src, OUT_DIR / f"{key_for(text)}.mp3")
         mark_done(text, f"{MODEL_CORE}#madd-{variant}")
+        record_applied(text, variant, by)
         n += 1
-        print(f"  ✓ «{text}» ← المحاولة {variant}")
+        print(f"  ✓ «{text}» ← المحاولة {variant}"
+              + ("" if by == "ear" else " (بالمعيار)"))
     if n:
         write_manifest(manifest_map())
     print(f"\nطُبِّق {n} اختياراً.")
@@ -1412,6 +1525,10 @@ def main():
     ap.add_argument("--madd-batch", action="store_true",
                     help="احتياط المدود: ٣ محاولات لكل مدّ ناقص على نموذج النواة")
     ap.add_argument("--madd-variants", type=int, default=MADD_VARIANTS)
+    ap.add_argument("--madd-force", action="store_true",
+                    help="مع --madd-batch: اشمل المدود التي لها ملف (أُنتجت بتعليمة عامة)")
+    ap.add_argument("--apply-madd-auto", action="store_true",
+                    help="تطبيق معيار الطول المثالي على ما لم يُحسم بالأذن (إذن المالك)")
     ap.add_argument("--apply-madd-pick", metavar="JSON",
                     help="تطبيق اختيار المالك: ملف أو نصّ JSON {\"بَا\": 2}")
     ap.add_argument("--seam-audition", action="store_true",
@@ -1441,6 +1558,9 @@ def main():
     if args.archive_current:
         archive_current(ROOT / args.archive_current)
         return
+
+    if args.apply_madd_auto:
+        sys.exit(apply_madd_auto())
 
     if args.apply_madd_pick:
         sys.exit(apply_madd_pick(args.apply_madd_pick))
@@ -1492,8 +1612,8 @@ def main():
         if not api_key and not args.dry_run:
             sys.exit("الاحتياط التوليدي يحتاج GEMINI_API_KEY")
         set_rpm(args.rpm)
-        sys.exit(1 if madd_batch(pool, args.tts_voice,
-                                 args.madd_variants, args.dry_run) else 0)
+        sys.exit(1 if madd_batch(pool, args.tts_voice, args.madd_variants,
+                                 args.dry_run, args.madd_force) else 0)
 
     if args.model_audition:
         if not api_key:

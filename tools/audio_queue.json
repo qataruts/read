@@ -51,8 +51,9 @@
     "category": "syllable",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سُكَّرْ",
@@ -68,32 +69,36 @@
     "category": "syllable",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سُلَّمْ",
     "category": "word",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "دُكْ كَانْ",
     "category": "syllable",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "دُكَّانْ",
     "category": "word",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "التنوين نون ساكنة في آخر الكلمة، تُنطق ولا تُكتب.",
@@ -163,8 +168,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْقَمَرْ",
@@ -225,16 +231,18 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "سَامِي وَلَدْ",
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "سَامِي",
@@ -259,8 +267,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "بَيْتُ",
@@ -285,8 +294,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْبَيْتِ",
@@ -302,8 +312,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "مَعَ",
@@ -328,8 +339,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْكَلْبُ",
@@ -354,16 +366,18 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "حَسَنٌ وَلَدٌ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "حَسَنٌ",
@@ -379,8 +393,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "لِحَسَنٍ",
@@ -396,16 +411,18 @@
     "category": "story_word",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "الْجَمَلُ يَحْمِلُ الْحَلِيبْ",
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْجَمَلُ",
@@ -439,8 +456,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "يُحِبُّ",
@@ -465,16 +483,18 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "طَلَعَتِ الشَّمْسْ",
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "طَلَعَتِ",
@@ -490,16 +510,18 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "زَيْدٌ",
     "category": "story_word",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "يَلْعَبُ",
@@ -524,8 +546,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "نَزَلَ",
@@ -550,8 +573,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "رَجَعَ",
@@ -576,8 +600,9 @@
     "category": "sentence",
     "requestedBy": "session-4",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "سَعِيدْ",
@@ -593,8 +618,9 @@
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "مَاءْ",
@@ -610,8 +636,9 @@
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "إِصْبَعْ",
@@ -626,8 +653,9 @@
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "شَجَرَةْ",
@@ -650,32 +678,36 @@
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "كِتَابْ",
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "نُورْ",
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "سَمَاءْ",
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "جَنَّةْ",
@@ -690,112 +722,126 @@
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "عَسَلْ",
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "نَمْلْ",
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "زَيْتُونْ",
     "category": "word",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "المصحف يُكتب برسم خاص فيه علامات صغيرة ترشد القارئ، وحروفه هي حروفك التي تعرفها.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ألف تنطقها إذا ابتدأت بها، وتصلها بما قبلها فلا تنطقها.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ألف صغيرة فوق الحرف: تمدّها ألفاً وإن لم تُكتب كبيرة.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "علامة فوق الحرف تعني مدّاً أطول من المدّ الطبيعي.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الياء في آخر الكلمة تُكتب في المصحف بلا نقطتين، وتُقرأ ياءً.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "واو صغيرة بعد الهاء: تمدّ بها الضمة.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ميم صغيرة ترشد القارئ إلى نطق التنوين ميماً.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "في أوائل بعض السور حروف تُقرأ بأسمائها لا بأصواتها: تقول أَلِف لَام مِيم ولا تقول أَلَمْ.",
     "category": "sentence",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "هَا",
     "category": "syllable",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "يَا",
     "category": "syllable",
     "requestedBy": "session-6",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "غُرْفَةْ",
@@ -810,8 +856,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مَطْبَخْ",
@@ -835,16 +882,18 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "رِي",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَافِذَةْ",
@@ -859,16 +908,18 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مَقْعَدْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "قْ",
@@ -884,16 +935,18 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "تَا",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "حْ",
@@ -909,32 +962,36 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "سَا",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِصْبَاحْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "صْ",
@@ -950,48 +1007,54 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "كُوبْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "كُو",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِلْعَقَةْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "قَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سِكِّينْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "كْ",
@@ -1007,8 +1070,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "حَمَّامْ",
@@ -1023,32 +1087,36 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "بُو",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سَلَّةْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "لَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِكْنَسَةْ",
@@ -1063,24 +1131,27 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "تِلْفَازْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "فَا",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "زْ",
@@ -1096,32 +1167,36 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "حَدِيقَةْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "دِي",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "جِدَارْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "وِسَادَةْ",
@@ -1136,56 +1211,63 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِرْوَحَةْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "حَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "خِزَانَةْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "زَا",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِظَلَّةْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "قِدْرْ",
@@ -1208,48 +1290,54 @@
     "category": "letter_haraka",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِي",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "أَبِي",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "أَ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بِي",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "جَدِّي",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "جَدَّةْ",
@@ -1264,40 +1352,45 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "أَخْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "عَمِّي",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "خَالْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "خَا",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "طِفْلْ",
@@ -1312,40 +1405,45 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "صَدِيقْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "جَارْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "جَا",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "طَبِيبْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "شُرْطَةْ",
@@ -1360,16 +1458,18 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "فَلَّاحْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "خَبَّازْ",
@@ -1384,8 +1484,9 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "جْ",
@@ -1409,56 +1510,63 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "ضَيْفْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "ضَيْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عَجُوزْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "جُو",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "زَمِيلْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "حَفِيدْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "أُسْرَةْ",
@@ -1473,24 +1581,27 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "صَيَّادْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "صَيْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "رَأْسْ",
@@ -1505,8 +1616,9 @@
     "category": "letter_haraka",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "أُذُنْ",
@@ -1651,8 +1763,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "دَمْعْ",
@@ -1724,8 +1837,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "ضَحِكْ",
@@ -1805,16 +1919,18 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "تُفَّاحَةْ",
@@ -1837,8 +1953,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بُرْتُقَالْ",
@@ -1853,8 +1970,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بَطِّيخْ",
@@ -1869,8 +1987,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "فَرَاوِلَةْ",
@@ -1893,16 +2012,18 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مُو",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "جَزَرْ",
@@ -1965,8 +2086,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "قَهْوَةْ",
@@ -1981,8 +2103,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عَصِيرْ",
@@ -1997,8 +2120,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "كَعْكْ",
@@ -2021,8 +2145,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "فُولْ",
@@ -2037,8 +2162,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "زُبْدَةْ",
@@ -2069,8 +2195,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "حِصَانْ",
@@ -2149,8 +2276,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بَطَّةْ",
@@ -2173,8 +2301,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عُصْفُورْ",
@@ -2213,8 +2342,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عَنْكَبُوتْ",
@@ -2237,8 +2367,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "قُنْفُذْ",
@@ -2286,8 +2417,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "دُلْفِينْ",
@@ -2334,8 +2466,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "رِيحْ",
@@ -2374,8 +2507,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "زَهْرَةْ",
@@ -2462,8 +2596,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَخْلَةْ",
@@ -2502,8 +2637,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "ضَبَابْ",
@@ -2582,8 +2718,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِسْطَرَةْ",
@@ -2606,8 +2743,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "لَوْحْ",
@@ -2622,8 +2760,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "طَبَاشِيرْ",
@@ -2638,8 +2777,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "قِصَّةْ",
@@ -2654,8 +2794,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مَكْتَبَةْ",
@@ -2686,8 +2827,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "وَاجِبْ",
@@ -2710,8 +2852,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "صَمْغْ",
@@ -2871,8 +3014,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "جَزْمَةْ",
@@ -2895,8 +3039,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "خَاتَمْ",
@@ -2943,8 +3088,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "خَيْطْ",
@@ -2959,8 +3105,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "إِبْرَةْ",
@@ -2975,8 +3122,9 @@
     "category": "letter_haraka",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "صُوفْ",
@@ -2991,8 +3139,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "شُورْتْ",
@@ -3023,8 +3172,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَعْلْ",
@@ -3055,16 +3205,18 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "يَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سِوَارْ",
@@ -3087,8 +3239,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "حَافِلَةْ",
@@ -3119,8 +3272,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سَفِينَةْ",
@@ -3167,8 +3321,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عِيَادَةْ",
@@ -3279,8 +3434,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مَكْتَبْ",
@@ -3431,8 +3587,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَشِيدْ",
@@ -3479,8 +3636,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بَالُونْ",
@@ -3495,8 +3653,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "حَاسُوبْ",
@@ -3535,16 +3694,18 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "السَّرِيرُ نَظِيفْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "السَّرِيرُ",
@@ -3567,24 +3728,27 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمَقْعَدُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمِفْتَاحُ فِي الْبَابْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمِفْتَاحُ",
@@ -3599,32 +3763,36 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمِصْبَاحُ مُنِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الصَّحْنُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْكُوبُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْكُوبُ",
@@ -3647,48 +3815,54 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "السِّكِّينُ حَادَّةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْحَمَّامُ نَظِيفْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "السَّلَّةُ كَبِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمِكْنَسَةُ فِي الْغُرْفَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "التِّلْفَازُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "التِّلْفَازُ",
@@ -3703,24 +3877,27 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْحَدِيقَةُ جَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْوِسَادَةُ نَاعِمَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْوِسَادَةُ",
@@ -3743,24 +3920,27 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْخِزَانَةُ كَبِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمِظَلَّةُ مَفْتُوحَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "مَفْتُوحَةْ",
@@ -3775,112 +3955,126 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أُمِّي فِي الْمَطْبَخْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أُمِّي تُحِبُّنِي",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أَبِي كَرِيمْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "جَدِّي كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْجَدَّةُ طَيِّبَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أُخْتِي صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أَخِي طَوِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "عَمِّي كَرِيمْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "خَالِي فِي الدَّارْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الطِّفْلُ يَبْكِي",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الرَّجُلُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "صَدِيقِي كَرِيمْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْجَارُ طَيِّبْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْجَارُ",
@@ -3903,24 +4097,27 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الشُّرْطَةُ قَرِيبَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْفَلَّاحُ يَزْرَعْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْفَلَّاحُ",
@@ -3943,40 +4140,45 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "النَّجَّارُ مَاهِرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمُهَنْدِسُ يَبْنِي",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "التَّاجِرُ يَبِيعْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الضَّيْفُ فِي الْبَيْتْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الضَّيْفُ",
@@ -3991,104 +4193,117 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "زَمِيلِي مُجْتَهِدْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْحَفِيدُ يَلْعَبْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْأُسْرَةُ كَبِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الصَّيَّادُ صَبُورْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "رَأْسِي كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أُذُنِي تَسْمَعْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "أَنْفِي صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "فَمِي نَظِيفْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ذِرَاعِي قَوِيَّةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "رِجْلِي تَمْشِي",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "قَدَمِي صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "شَعْرِي طَوِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "طَوِيلْ",
@@ -4103,88 +4318,99 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "قَلْبِي يَنْبِضْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "وَجْهِي جَمِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "كَتِفِي عَرِيضْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْعَظْمُ صُلْبْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "صَوْتِي جَمِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الدَّمْعُ نَازِلْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْعَرَقُ كَثِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ضِرْسِي صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-03",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الصِّحَّةُ غَالِيَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْمَرَضُ صَعْبْ",
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْحُقْنَةُ سَرِيعَةْ",
@@ -12222,6 +12448,134 @@
     "text": "النَّرْدَ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "أَرْضْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَوْمْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غَنَمْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَصْرْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَعْبَةْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَاقَةْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَيْمَةْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ذُبَابْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَرَادْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَوْكَبْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دِرْهَمْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِيزَانْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَدِينَةْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثُعْبَانْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَعُوضَةْ",
+    "category": "word",
+    "requestedBy": "session-12",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَاقُوتْ",
+    "category": "word",
+    "requestedBy": "session-12",
     "priority": 100,
     "status": "pending",
     "doneAt": null
