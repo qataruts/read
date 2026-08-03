@@ -144,8 +144,10 @@ try {
   const hChips = $$('.vchip');
   hChips.find((c) => c.querySelector('.vchip-face').textContent !== hTarget).click();   // خطأ مقصود
   await sleep(120);
+  const hMark = played.length;
   hChips.find((c) => c.querySelector('.vchip-face').textContent === hTarget).click();
   await waitFor(() => $('.next'), 'زر تابع بعد الإجابة');
+  ok(played.length === hMark, 'الإجابة الصحيحة في خطوة الحركات لا تُعاد قراءتها (DESIGN §٥.٢)');
 
   const afterHaraka = stored().skills;
   const hKeys = Object.keys(afterHaraka).filter((k) => k.endsWith('|haraka'));
@@ -160,16 +162,22 @@ try {
   await waitFor(() => $('canvas.trace'), 'لوح التتبّع');
   btn('تمّ').click();                                    // ٤ ميّز بأذنك
   await waitFor(() => $$('.vchip--big').length, 'جولات التمييز');
+  // `mark` تُحدَّث قبل النقرة الصحيحة لا في رأس الجولة: الصواب صار صامتاً ونداءُ
+  // الجولة التالية مؤجَّلاً، فالتقاطها في الرأس قد يقع بعد النداء فينتظر صوتاً لا يأتي.
+  let mark = played.length;
   for (let round = 1; round <= 3; round++) {
     await waitFor(() => $$('.vchip--big').length, `جولة ${round}`);
-    const mark = played.length;
     const heard = await heardTarget(texts('.vchip--big'), mark);
     if (round === 1) {                                   // خطأ مقصود في الجولة الأولى
       $$('.vchip--big').find((c) => c.textContent !== heard).click();
       await sleep(600);
     }
-    $$('.vchip--big').find((c) => c.textContent === heard).click();
-    await sleep(900);
+    const chip = $$('.vchip--big').find((c) => c.textContent === heard);
+    mark = played.length;
+    chip.click();
+    await sleep(300);
+    ok(played.length === mark, `الجولة ${round}: الصواب لا يُعاد نطقه (DESIGN §٥.٢)`);
+    await sleep(700);
   }
   await waitFor(() => $('.celebrate'), 'ختام الدرس');
   const quizKeys = Object.keys(stored().skills).filter((k) => k.endsWith('|quiz'));
@@ -211,13 +219,17 @@ try {
 
   const kinds = [];
   let firstWrongLetter = null;
+  // نقطة الصمت: كل صوت بعدها صوت التمرين التالي. تُحدَّث عند فراغ التمرين من أصواته
+  // لا في رأس الحلقة — فالانتقال بعد الصواب صار صامتاً ومؤجَّلاً (DESIGN §٥.٢).
+  // (mark نفسها المعلنة أعلاه — إعلان ثانٍ بـlet في النطاق ذاته يقتل السكربت صياغةً)
+  mark = played.length;
   for (let i = 0; i < 6; i++) {
     await waitFor(() => $('.vchip') || $('.tiles'), `التمرين ${i + 1}`);
-    const mark = played.length;                          // كل صوت بعد هذا هو صوت هذا التمرين
     assertDecodable(STUDIED, `التمرين ${i + 1}`);
 
     if ($('.tiles')) {                                   // تركيب كلمة
       kinds.push('build');
+      mark = played.length;
       const say = $('.wgame-pic').getAttribute('aria-label').replace('اسمع كلمة ', '');
       const word = WORDS.find((w) => w.say === say);
       ok(!!word && [...bare(word.tiles.join(''))].every((c) => STUDIED.includes(c)),
@@ -233,6 +245,7 @@ try {
       }
       await waitFor(() => played.includes(say), `صوت «${say}»`);
       ok(true, `التمرين ${i + 1}: «${say}» بُنيت وسُمعت كاملة`);
+      mark = played.length;                              // فرغ التمرين من أصواته
     } else {                                             // تمييز حرف أو حركة
       const big = $$('.vchip--big').length > 0;
       kinds.push(big ? 'quiz' : 'haraka');
@@ -257,8 +270,14 @@ try {
         await sleep(400);
         ok(lastPlayed() === heard, 'ويُعاد الصوت ليقارن (بلا تلقين الجواب)');
       }
-      chips[faces.indexOf(heard)].click();
-      await sleep(950);
+      const rightChip = chips[faces.indexOf(heard)];
+      mark = played.length;
+      rightChip.click();
+      await sleep(300);
+      // DESIGN §٥.٢: صوابُ التمرين السماعيّ أثرٌ بصريّ لا صوت — والتمرين التالي بعد مهلة
+      ok(played.length === mark && rightChip.classList.contains('good'),
+        `التمرين ${i + 1}: الإجابة الصحيحة تُعلَّم ولا تشغّل صوتاً`);
+      await sleep(700);
     }
   }
 

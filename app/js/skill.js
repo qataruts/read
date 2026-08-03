@@ -17,7 +17,7 @@ import * as audio from './audio.js';
 import { starsForErrors } from './lesson.js';
 import {
   h, toast, go, arNum, starsRow, topbar,
-  PAUSE_ACCENT, mascot, shuffle, pick, shake, DEV,
+  PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, DEV,
 } from './ui.js';
 
 const ROUNDS = 3;
@@ -179,9 +179,10 @@ export function renderSkillLesson(skillId) {
     function onPick(text, btn, r) {
       if (locked) return;
       if (text === r.target) {
+        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — أثرٌ بصريّ، ثم نداء الجولة التالية بمهلة.
         locked = true;
         btn.classList.add('good');
-        audio.play(text);
+        pop(btn);
         setTimeout(() => {
           state.round++;
           if (state.round < rounds.length) startRound();

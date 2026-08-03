@@ -18,7 +18,7 @@ import * as audio from './audio.js';
 import { buildBoard } from './words.js';
 import {
   h, toast, go, arNum, arCount, starsRow, topbar, letterTitle, wordText,
-  mascot, shuffle, pick, shake, DEV,
+  mascot, shuffle, pick, shake, pop, DEV,
 } from './ui.js';
 
 export const SESSION_SIZE = 6;    // جلسة قصيرة تُنجَز في دقائق (لا تُرهق طفل السادسة)
@@ -232,6 +232,13 @@ export function renderReview() {
     if (replay) setTimeout(replay, 450);
   }
 
+  /** صواب في تمرين سماعيّ: أثرٌ بصريّ بلا إعادة قراءة، ثم التمرين التالي (DESIGN §٥.٢). */
+  function right(btn) {
+    btn.classList.add('good');
+    pop(btn);
+    setTimeout(next, 750);   // ثم ٢٥٠ م.ث قبل نداء التمرين التالي: فاصلٌ يُسمع
+  }
+
   // ————— ١) ميّز بأذنك: أيَّ حرف سمعت؟ —————
 
   function quizView(item) {
@@ -248,9 +255,7 @@ export function renderReview() {
           score(item, item.letter, item.haraka, correct);
           if (!correct) return wrong(btn, play);
           locked = true;
-          btn.classList.add('good');
-          audio.play(text);
-          setTimeout(next, 750);
+          right(btn);
         },
       }, h('span', { class: 'vchip-face' }, text));
       return btn;
@@ -281,9 +286,7 @@ export function renderReview() {
           score(item, item.letter, item.haraka, correct);
           if (!correct) return wrong(btn, play);
           locked = true;
-          btn.classList.add('good');
-          audio.play(text);
-          setTimeout(next, 750);
+          right(btn);
         },
       },
         h('span', { class: 'vchip-face' }, text),

@@ -11,7 +11,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import {
   h, toast, go, arNum, starsRow, topbar, letterTitle, wordText,
-  accentFor, mascot, shuffle, pick, shake, DEV,
+  accentFor, mascot, shuffle, pick, shake, pop, DEV,
 } from './ui.js';
 
 const ROUNDS = 3;              // جولات «ميّز بأذنك»
@@ -193,10 +193,12 @@ export function renderLesson(groupId, letter) {
       // القياس على مستوى (حرف × حركة × تمرين) — METHOD §٦
       progress.recordAttempt(letter, target.key, progress.KINDS.HARAKA, item.text === target.text);
       if (item.text === target.text) {
+        // لا إعادة قراءةٍ للصواب (DESIGN §٥.٢): أثرٌ بصريّ وتقدُّم — والصوت الذي سمعه
+        // كافٍ، وإعادته هنا تصطدم بنداءٍ لاحق فتلتبس على الطفل.
         solved = true;
         btn.classList.add('good');
+        pop(btn);
         prompt.textContent = `أحسنت! هذه ${target.name} ✓`;
-        audio.play(item.text);
         foot.replaceChildren(nextButton());
       } else {
         state.errors++;
@@ -346,9 +348,11 @@ export function renderLesson(groupId, letter) {
       if (locked) return;
       progress.recordAttempt(r.target, HARAKA_BY_MARK[r.mark], progress.KINDS.QUIZ, ch === r.target);
       if (ch === r.target) {
+        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — وإلا لتلاصق بنداء الجولة التالية.
+        // المهلة قبل النداء ٧٥٠ م.ث ثم ٢٥٠ داخل الجولة: فاصلٌ يُسمع.
         locked = true;
         btn.classList.add('good');
-        audio.play(ch + r.mark);
+        pop(btn);
         setTimeout(() => {
           state.round++;
           if (state.round < rounds.length) startRound();
