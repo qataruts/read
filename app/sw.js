@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v11';  // v11: صقل الجهاز — التصفيف العرضي وتوسيط الحرف البطل
+const VERSION = 'v12';  // v12: «أكمل الجملة» — الخيار يُعرض بالرمز الذي يملأ الفراغ
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];

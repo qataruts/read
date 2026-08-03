@@ -81,6 +81,79 @@ def raised(base):
     return base            # «يَمْشِي» و«تَقْطَعُ»: لا يظهر عليهما التغيير
 
 
+def possessed(base):
+    """المضاف إلى ياء المتكلم: «أُذُنْ» ← «أُذُنِي»، والتاء المربوطة تُبسَط تاءً
+    («جَدَّةْ» ← «جَدَّتِي») — وهي صيغةُ عشر جملٍ في المادّة المعتمدة."""
+    body = strip_end(base)
+    return (body[:-1] + "ت" if body.endswith("ة") else body) + KASRA + "ي"
+
+
+# ————— لباس الموضع: به تُلبَس مشتّتاتُ «أكمل الجملة» ثوبَ الهدف —————
+#
+# خيار «أكمل» يُعرض **بالرمز الذي سيملأ الفراغ** (حكم المدير، ٦ أغسطس ٢٠٢٦)، فيلزم
+# أن يلبس المشتّتان ثوبَ الهدف نفسَه. والثوب لا يُكتب في بياناتٍ ولا يُخمَّن: يُستنبَط
+# **بالمقايسة** — أيُّ اشتقاقٍ من هذه الأربعة يعيد بناء رمز الفراغ حرفاً بحرف.
+# ونظيرُها في التطبيق `dressOf`/`dressed` في `app/js/sentences.js`.
+
+DRESSES = {
+    "none": lambda base, mark: base,                    # آخرُ الجملة موقوفاً كما في المعجم
+    "def": definite,                                    # «الـ» وعلامة الموضع
+    "bare": lambda base, mark: strip_end(base) + mark,  # نكرةٌ بعلامة الموضع (المضاف)
+    "poss": lambda base, mark: possessed(base),         # مضافٌ إلى ياء المتكلم
+}
+
+
+def dress_of(base, token):
+    """ثوبُ الموضع (النوع، علامة الآخر) — أو `None` إن عجزت الأربعة عن بنائه."""
+    mark = token[-1] if token and token[-1] in END_MARKS else ""
+    for kind, wear in DRESSES.items():
+        try:
+            if wear(base, mark) == token:
+                return kind, mark
+        except (IndexError, ValueError):
+            continue
+    return None
+
+
+def dressed(base, dress):
+    """كلمةُ معجمٍ ← صيغتُها في ذلك الموضع."""
+    return DRESSES[dress[0]](base, dress[1]) if dress else base
+
+
+def dressless(data):
+    """كلماتُ المعجم التي **لا تلبس ثوباً**، والمعجمُ هو الذي يعلنها لا تخمينُ صرفٍ:
+    الكلمة التي تظهر في **جملتها هي** بصيغتها المفردة إمّا مضافةٌ إلى ياء المتكلم
+    («أَبِي كَرِيمْ») أو صفةٌ خبر («الْبَحْرُ أَزْرَقْ») — وكلتاهما لا تُعرَّف ولا تُضاف
+    («الْأَبِيُ» و«أَحْمَرِي» ليستا عربيتين). (نظيرتها `DRESSLESS` في `sentences.js`.)
+    """
+    out = set()
+    for entry in data.get("words", []):
+        token = blank_token(entry.get("word", ""), entry.get("sentence", ""))
+        dress = dress_of(entry["word"], token) if token else None
+        if not dress or dress[0] == "none":
+            out.add(entry["word"])
+    return out
+
+
+def wearable(base, dress, naked=frozenset()):
+    """هل تقبل هذه الكلمةُ لباسَ الموضع؟ (`naked` = خرجُ `dressless`)"""
+    return not dress or dress[0] == "none" or base not in naked
+
+
+def blank_token(target, text):
+    """رمزُ الفراغ: كلمةُ الهدف في جملتها. تُطابَق بجذعها، وإلا فبما بُني عليه
+    («أُخْتْ» ← «أُخْتِي») — نظيرةُ `blankIndex` في `app/js/sentences.js`."""
+    words = str(text or "").split()
+    root = stem(target)
+    for word in words:
+        if stem(word) == root:
+            return word
+    for word in words:
+        if stem(word).startswith(root):
+            return word
+    return ""
+
+
 def render(token, bases):
     """رمزُ المؤلِّف ← صيغتُه في الجملة. يرفض أي كلمة أساسٍ غير معلَنة."""
     base, _, role = token.partition("~")
@@ -477,6 +550,32 @@ def self_test(data):
     ok(raised("تَنَامْ") == "تَنَامُ" and raised("يَمْشِي") == "يَمْشِي"
        and raised("تَقْطَعُ") == "تَقْطَعُ",
        "والفعل يُرفع في وسط الجملة، والمعتلُّ الآخر لا يتغيّر")
+    ok(possessed("أُذُنْ") == "أُذُنِي" and possessed("جَدَّةْ") == "جَدَّتِي",
+       f"والمضاف إلى ياء المتكلم تُبسَط تاؤه: جَدَّةْ ← {possessed('جَدَّةْ')}")
+
+    # لباس الموضع: يُقاس على **كل جملة في المنظومة** (مثالٍ ومتدرّجة) — فرمزُ فراغها
+    # يُعاد بناؤه من كلمة معجمها وثوبِ موضعها حرفاً بحرف، وإلا كذب خيارُ «أكمل».
+    sentences_all = [(w["word"], w["sentence"]) for w in data["words"]]
+    sentences_all += [(s["word"], s["text"]) for s in (data.get(SENTENCE_FIELD) or [])]
+    naked, kinds = [], {}
+    for target, text in sentences_all:
+        token = blank_token(target, text)
+        dress = dress_of(target, token) if token else None
+        if not dress or dressed(target, dress) != token:
+            naked.append(f"«{target}» ← «{token}» في «{text}»")
+            continue
+        kinds[dress[0]] = kinds.get(dress[0], 0) + 1
+    ok(not naked and sum(kinds.values()) == len(sentences_all),
+       f"ولباسُ الموضع يعيد بناء رمز الفراغ في {sum(kinds.values())} جملة "
+       f"({'، '.join(f'{k}: {n}' for k, n in sorted(kinds.items()))})"
+       + (f" — عارٍ: {naked[:3]}" if naked else ""))
+    naked = dressless(data)
+    ok(not wearable("أَبِي", ("def", DAMMA), naked)
+       and not wearable("أَحْمَرْ", ("poss", ""), naked)
+       and wearable("سَرِيرْ", ("def", DAMMA), naked),
+       f"ولا يُلبَس ثوباً ثانياً ما أعلنه المعجمُ مفرداً في جملته "
+       f"({len(naked)} كلمة: مضافٌ إلى ياء المتكلم أو صفةٌ خبر — «الْأَبِيُ» و«أَحْمَرِي» "
+       "ليستا عربيتين)")
     ok(stem(definite("سَرِيرْ", KASRA)) == stem("سَرِيرْ"),
        "وكلُّ مشتقٍّ يعود بجذعه إلى كلمة أساسه (به يعرفه الفاحص)")
 

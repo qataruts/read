@@ -8,7 +8,8 @@
 //      في الجلسة ٦: الحكم على القراءة لا على السمع).
 //   ٢) **رتّب الجملة** — كلماتٌ مبعثرة تُبنى بالترتيب، ببلاطات لعبة الكلمات نفسِها
 //      (`buildBoard`) بمشتّتاتها: فلا يكفي الترتيب، بل تُقرأ الكلمة قبل وضعها.
-//   ٣) **أكمل الجملة** — فراغٌ مكان الكلمة المصوَّرة ← ثلاث كلمات مصوَّرة من البستان.
+//   ٣) **أكمل الجملة** — فراغٌ مكان الكلمة المصوَّرة ← ثلاث كلمات مصوَّرة من البستان،
+//      **كلُّها بصيغة الموضع** (الخيار هو الرمز الذي سيملأ الفراغ حرفاً بحرف).
 //
 // **القياس** (بند الحزمة ٨): «رتّب» وحده يُقاس، وعلى **الكلمة المطلوبة في موضعها** لا
 // على ما لمسه الطفل — كما يُقاس المقطع المطلوب في `words.js`. ومهارتها أول حرف متحرّك
@@ -17,7 +18,7 @@
 // فلا قياس فيهما (امتداد قرارات الجلسات ٤ و٦ والحزمة ٧ المُقرَّة).
 
 import { wordSkill } from './curriculum.js';
-import { rungById, orderPool, MECHANIC_TITLES } from './sentences.js';
+import { rungById, orderPool, optionPool, fillText, MECHANIC_TITLES } from './sentences.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard, starsForGame } from './words.js';
@@ -37,14 +38,13 @@ export const nodeIdOf = (rungId) => `ladder:${rungId}`;
  * في «أكمل» يُفضَّل المخالف في التأنيث (وَاسِعَةْ ← غُرْفَة لا سَرِير) كي يكون الجواب
  * **مقروءاً من النصّ** لا مخمَّناً من المعنى؛ وفي «اقرأ ونفّذ» يكفي اختلاف الصور.
  *
- * و**الكلمةُ غير المصوَّرة لا تكون مشتّتاً مصوَّراً** (مبدأ «صدق الصورة» — DESIGN §٦):
- * صورةٌ لا تصدُق على كلمتها تُغري الطفلَ بالخطأ كما تظلمه لو كانت جواباً.
+ * والحوضُ نفسُه في `sentences.js` (`optionPool`): غيرُ المصوَّرة لا تكون مشتّتاً مصوَّراً
+ * (مبدأ «صدق الصورة» — DESIGN §٦)، وفي «أكمل» لا يدخله ما لا يقبل لباس الموضع.
  * أمّا الهدفُ فيحرسه `sentences.js`: لا يُعطى غيرُ المصوَّر ميكانيكيةً تصوِّر جوابَه.
  */
 export function pickOptions(sentence, rnd = Math.random, byGender = false) {
   const target = sentence.target;
-  const pool = sentence.rung.garden.words
-    .filter((w) => w !== target && w.pictured !== false);
+  const pool = optionPool(sentence);
   const feminine = (w) => w.word.includes('ة');
   const near = byGender ? pool.filter((w) => feminine(w) !== feminine(target)) : [];
   const rest = pool.filter((w) => !near.includes(w));
@@ -208,7 +208,11 @@ export function renderLadder(rungId) {
     let locked = false;
     const options = pickOptions(sentence, Math.random, true);
     const line = sentenceEl(sentence, sentence.blank);
-    audio.preload([sentence.text, ...options.map((w) => w.say)]);
+    // **الخيار يُعرض بالرمز الذي سيملأ الفراغ** (إصلاح عيب ٦ أغسطس ٢٠٢٦): كان يُعرض
+    // بصيغته المعجمية «غُرْفَةْ» ثم يملأ الفراغ «الْغُرْفَةُ» — تحوّلٌ صامت يربك القارئ
+    // المبتدئ. فصار الثلاثةُ بصيغة الموضع، اشتقاقاً في `sentences.js` لا كتابةً.
+    const faces = new Map(options.map((word) => [word, fillText(sentence, word)]));
+    audio.preload([sentence.text, ...faces.values()]);
 
     // هدفٌ لا تصوّره صورةٌ صادقة ⇒ **لا صورةَ على أيّ خيار** (لا على المشتّتات وحدها،
     // فالخيار العاري بين مصوَّرَين يفضح نفسه). تصير الجولة قراءةً خالصة — وهي أشدُّ
@@ -216,12 +220,13 @@ export function renderLadder(rungId) {
     const bare = sentence.target.pictured === false;
 
     const row = h('div', { class: 'row vrow' }, options.map((word) => {
+      const face = faces.get(word);
       const btn = h('button', {
         class: 'vchip vchip--pic',
-        'aria-label': word.word,
+        'aria-label': face,
         onclick: () => {
           if (locked) return;
-          if (word !== sentence.target) return wrong(btn, word.say);
+          if (word !== sentence.target) return wrong(btn, face);   // يُسمعه ما قرأه هو
           locked = true;
           btn.classList.add('good');
           line.replaceChildren(...sentence.words.map((w, i) => h('span', {
@@ -231,7 +236,7 @@ export function renderLadder(rungId) {
         },
       },
         !bare && h('span', { class: 'vchip-pic' }, word.emoji),
-        h('span', { class: 'vchip-face' }, word.word),
+        h('span', { class: 'vchip-face' }, face),
       );
       return btn;
     }));

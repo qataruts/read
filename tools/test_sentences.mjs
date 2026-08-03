@@ -1,16 +1,18 @@
 // اختبار «سلّم الجمل» (الحزمة ٨) بلا متصفّح:
 //   node tools/test_sentences.mjs
 //
-// المحروس هنا ستة:
+// المحروس هنا سبعة:
 //   ١) بنية السلّم: كل جملة في درجةٍ واحدة، والدرجات بعد باقات بستانها على الخريطة.
 //   ٢) **لا كلمة خارج المدروس**: كل كلمة في كل جملة إمّا كلمة معجمٍ من باقةٍ **سبقتها
 //      في الرحلة فعلاً** (لا في بستانها فحسب)، أو كلمة منهجٍ درسها، أو من المعجم
 //      المساند المعلَن في `lexicon.json` — يُقاس على ترتيب `allNodes()` نفسه.
 //   ٣) الميكانيكيات الثلاث بالتناوب، وثباتُها (عليه تُبنى قائمة الصوت).
 //   ٤) سلامة كل جولة: خيارات «اقرأ ونفّذ» و«أكمل»، وألواح «رتّب» في كل جملة.
-//   ٥) **القياس موصول**: لكل كلمةٍ مهارةٌ تُسجَّل، ومهارةُ «رتّب» تجد تمرينها في
+//   ٥) **لباس الموضع** (إصلاح عيب ٦ أغسطس ٢٠٢٦): نصُّ الخيار الصحيح في «أكمل الجملة»
+//      هو الرمز الذي يستقرّ في الفراغ **حرفاً بحرف**، في كل جمل «أكمل» لا في عيّنة.
+//   ٦) **القياس موصول**: لكل كلمةٍ مهارةٌ تُسجَّل، ومهارةُ «رتّب» تجد تمرينها في
 //      مراجعة اليوم (وإلا لبقيت في صندوق ليتنر الأول فكذبت لوحةُ وليّ الأمر).
-//   ٦) الصوت: كل منطوق له ملف مولَّد أو مكان في قائمة الانتظار — ولا مولّد يُشغَّل.
+//   ٧) الصوت: كل منطوق له ملف مولَّد أو مكان في قائمة الانتظار — ولا مولّد يُشغَّل.
 
 import { readFileSync } from 'node:fs';
 
@@ -28,7 +30,7 @@ const { GROUPS, SKILLS, QURAN, bareLetters, wordSkill, skillExamples } =
 const { GARDENS, GRADED, WORDS } = await import(new URL('lexicon.js', APP));
 const {
   LADDERS, RUNGS, SENTENCES, MECHANICS, RUNG_MAX, ORDER_MAX_WORDS, stemOf, ladderOf, rungById,
-  orderPool, ladderTexts,
+  orderPool, ladderTexts, optionPool, fillText, fillOptionTexts, dressed, dressOf, wearable,
 } = await import(new URL('sentences.js', APP));
 const { LIBRARY } = await import(new URL('library.js', APP));
 const LIBRARY_LAST = LIBRARY.filter((s) => s.garden === GARDENS.at(-1).id).length;
@@ -236,6 +238,66 @@ ok(true, `خياراتٌ وألواحٌ سليمة في كل الجمل (${round
 ok(starsForGame(0, 9) === 3 && starsForGame(9, 9) === 2 && starsForGame(10, 9) === 1,
   'ونجوم الدرجة بعتبة «زلّة لكل جملة» (كالباقة واللعبة)');
 
+// ————— ٥ب. لباس الموضع: الخيار هو الرمز الذي يملأ الفراغ (إصلاح عيب ٦ أغسطس ٢٠٢٦) —————
+//
+// كان الخيار يُعرض بصيغته المعجمية «غُرْفَةْ» ثم يملأ الفراغ «الْغُرْفَةُ» — تحوّلٌ صامت
+// يخرق «ما تراه هو ما يحدث». والحارس هنا **على كل جملة لا على عيّنة**، وعلى المسار
+// الذي تسلكه الشاشة نفسِه (`pickOptions` ثم `fillText` — وهما اللذان يبنيان الأزرار).
+
+const fills = SENTENCES.filter((s) => s.mechanic === 'fill');
+const naked = SENTENCES.filter((s) => !s.dress);
+ok(naked.length === 0 && fills.length > 100,
+  `ثوبُ الموضع مستنبَطٌ لكل جملة في السلّم (${SENTENCES.length} جملة، منها ${fills.length} «أكمل»)`
+  + `${naked.length ? ' — عارٍ: ' + naked.slice(0, 3).map((s) => s.text).join('، ') : ''}`);
+
+const liars = fills.filter((s) => fillText(s, s.target) !== s.words[s.blank]);
+ok(liars.length === 0,
+  `ونصُّ الخيار الصحيح هو رمزُ الفراغ حرفاً بحرف في «أكمل» كلها (${fills.length} جملة)`
+  + `${liars.length ? ' — يكذب: ' + liars.slice(0, 3).map((s) => `«${fillText(s, s.target)}»≠«${s.words[s.blank]}»`).join('، ') : ''}`);
+
+const kinds = {};
+for (const s of SENTENCES) kinds[s.dress.kind] = (kinds[s.dress.kind] || 0) + 1;
+ok(dressed('غُرْفَةْ', { kind: 'def', mark: 'ُ' }) === 'الْغُرْفَةُ'
+  && dressed('سَرِيرْ', { kind: 'def', mark: 'ُ' }) === 'السَّرِيرُ'
+  && dressed('جَدَّةْ', { kind: 'poss', mark: '' }) === 'جَدَّتِي',
+  `والاشتقاق نظيرُ المولّد: القمريّ والشمسيّ وياءُ الإضافة `
+  + `(${Object.entries(kinds).map(([k, n]) => `${k}: ${n}`).join('، ')})`);
+ok(dressOf('غُرْفَةْ', 'الْغُرْفَةُ').kind === 'def' && dressOf('غُرْفَةْ', 'غُرْفَةْ').kind === 'none'
+  && dressOf('غُرْفَةْ', 'مِفْتَاحْ') === null,
+  'والثوبُ يُستنبَط بالمقايسة لا بالتخمين — وما لا يُبنى يعود null فيمسكه الحارس');
+ok(!wearable('أَبِي', { kind: 'def', mark: 'ُ' }) && !wearable('أَحْمَرْ', { kind: 'poss', mark: '' })
+  && wearable('سَرِيرْ', { kind: 'def', mark: 'ُ' }) && wearable('أَحْمَرْ', { kind: 'none', mark: '' }),
+  'ولا يُلبَس ثوباً ثانياً ما أعلنه المعجمُ مفرداً في جملته (مضافٌ إلى ياء المتكلم أو صفة)');
+
+let dressedRounds = 0;
+for (const sentence of fills) {
+  const blank = sentence.words[sentence.blank];
+  const pool = optionPool(sentence);
+  if (pool.some((w) => !wearable(w.word, sentence.dress))) {
+    bad(`[${sentence.id}] مشتّتٌ لا يقبل لباس الموضع في الحوض`);
+  }
+  for (let seed = 1; seed <= 4; seed++) {
+    const options = pickOptions(sentence, rng(seed * 29 + sentence.id.length), true);
+    const faces = options.map((w) => fillText(sentence, w));
+    dressedRounds++;
+    if (faces[options.indexOf(sentence.target)] !== blank) {
+      bad(`[${sentence.id}] الخيار الصحيح «${faces[options.indexOf(sentence.target)]}» ≠ الفراغ «${blank}»`);
+    }
+    if (new Set(faces).size !== faces.length) bad(`[${sentence.id}] صيغتان متطابقتان بين الخيارات`);
+    if (faces.filter((f) => f === blank).length !== 1) bad(`[${sentence.id}] أكثر من خيارٍ يملأ الفراغ`);
+    for (const [i, w] of options.entries()) {
+      if (dressOf(w.word, faces[i])?.kind !== sentence.dress.kind) {
+        bad(`[${sentence.id}] «${faces[i]}» ليس على ثوب الموضع`);
+      }
+    }
+  }
+}
+ok(true, `والثلاثةُ على ثوبٍ واحد في كل جولة، ولا يملأ الفراغَ إلا الصواب `
+  + `(${dressedRounds} جولة «أكمل»)`);
+const forms = new Set(SENTENCES.flatMap(fillOptionTexts));
+ok(forms.size > 400 && [...forms].every((t) => t && !t.includes(' ')),
+  `وصيغُ المشتّتات الممكنة كلها مفردةٌ معلومة (${forms.size} صيغة — يفحص مفكوكيتَها check_lexicon.py)`);
+
 // ————— ٦. القياس موصول: مهارة «رتّب» تجد تمرينها في المراجعة —————
 
 const orderSentences = SENTENCES.filter((s) => s.mechanic === 'order');
@@ -296,12 +358,14 @@ ok(orphan.length === 0,
 ok(texts.length === new Set(texts).size, 'ولا تكرار في قائمة نصوصه');
 
 // ما تنطقه الشاشة فعلاً: الجملة في كل ميكانيكية، وكلماتُها في «رتّب» وحدها،
-// وكلمات المعجم المفردة في خطأ الاختيار (لها أصواتها من الحزمة ٧).
+// وكلمةُ المعجم المفردة في خطأ «اقرأ ونفّذ» (لها صوتها من الحزمة ٧)،
+// **وصيغةُ الخيار الملبوسة في خطأ «أكمل»** — فهو يُسمَع ما قرأه هو لا كلمةَ معجمٍ أخرى.
 const screenTexts = new Set(SENTENCES.flatMap((s) => [
   s.text,
   s.target.say,
   ...(s.mechanic === 'order' ? s.words : []),
-  ...s.rung.garden.words.map((w) => w.say),
+  ...(s.mechanic === 'read' ? s.rung.garden.words.map((w) => w.say) : []),
+  ...fillOptionTexts(s),
 ]));
 const silent = [...screenTexts].filter((t) => !voiced(t));
 ok(silent.length === 0,

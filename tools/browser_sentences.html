@@ -184,34 +184,42 @@ async function playOrder(sentence, { mistake = false, verbose = false } = {}) {
   }
 }
 
-/** جولة «أكمل الجملة»: فراغ ← ثلاث كلمات مصوّرة. */
+/** جولة «أكمل الجملة»: فراغ ← ثلاث كلمات مصوّرة **بصيغة الموضع**. */
 async function playFill(sentence, { mistake = false, verbose = false } = {}) {
   await waitFor(() => $$('.vchip--pic').length === 3, 'خيارات أكمل الجملة');
+  // رمزُ الفراغ هو نصُّ الخيار الصحيح بعينه (إصلاح عيب ٦ أغسطس ٢٠٢٦): كان يُعرض
+  // «غُرْفَةْ» ثم يملأ الفراغ «الْغُرْفَةُ»، فصار المعروضُ هو الواقعَ حرفاً بحرف.
+  const blank = sentence.words[sentence.blank];
   if (verbose) {
     ok(!!$('.sentence-blank') && texts('.sentence-word').length === sentence.words.length - 1,
-      `أكمل الجملة: فراغٌ مكان الكلمة المصوَّرة («${sentence.words[sentence.blank]}»)`);
-    ok(!texts('.sentence-word').includes(sentence.words[sentence.blank]),
+      `أكمل الجملة: فراغٌ مكان الكلمة المصوَّرة («${blank}»)`);
+    ok(!texts('.sentence-word').includes(blank),
       'ولا تظهر الكلمة الناقصة في الجملة');
-    ok(texts('.vchip-face').includes(sentence.target.word),
-      `وكلمتها بين الخيارات الثلاث (${texts('.vchip-face').join('|')})`);
+    ok(texts('.vchip-face').includes(blank),
+      `وكلمتها بين الخيارات الثلاث **بصيغة الفراغ** (${texts('.vchip-face').join('|')})`);
+    ok(!texts('.vchip-face').includes(sentence.target.word) || sentence.target.word === blank,
+      `ولا تُعرض بصيغتها المعجمية «${sentence.target.word}» ثم تنقلب بعد الاختيار`);
     checkTargets('أكمل الجملة');
   }
   const faces = texts('.vchip-face');
   if (mistake) {
-    const wrong = $$('.vchip--pic')[faces.findIndex((f) => f !== sentence.target.word)];
+    const at = faces.findIndex((f) => f !== blank);
+    const wrong = $$('.vchip--pic')[at];
     wrong.click();
     await sleep(120);
     ok(wrong.classList.contains('bad'), 'والخطأ يُعلَّم ولا يملأ الفراغ');
     ok(!!$('.sentence-blank'), 'والفراغ باقٍ');
+    ok(lastHeard() === faces[at],
+      `ويُسمعه الصيغة المعروضة عليه لا كلمةَ معجمٍ أخرى (${lastHeard()})`);
     await sleep(250);
   }
-  $$('.vchip--pic')[texts('.vchip-face').indexOf(sentence.target.word)].click();
+  $$('.vchip--pic')[texts('.vchip-face').indexOf(blank)].click();
   await sleep(150);
   if (verbose) {
     ok(!$('.sentence-blank') && texts('.sentence-word').join(' ') === sentence.text,
       `والصواب يملأ الفراغ بصورتها في الجملة («${texts('.sentence-word').join(' ')}»)`);
-    ok($('.sentence-word--filled')?.textContent.trim() === sentence.words[sentence.blank],
-      'وتُعلَّم الكلمة التي أكملها');
+    ok($('.sentence-word--filled')?.textContent.trim() === blank,
+      `وما استقرّ في الفراغ هو نصُّ الخيار الذي لمسه («${blank}»)`);
   }
 }
 

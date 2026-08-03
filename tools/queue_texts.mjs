@@ -31,7 +31,7 @@ const {
   quranSpokenTexts, quranMushafTexts,
 } = await import(new URL('app/js/curriculum.js', ROOT));
 const { GARDENS } = await import(new URL('app/js/lexicon.js', ROOT));
-const { RUNGS } = await import(new URL('app/js/sentences.js', ROOT));
+const { RUNGS, fillOptionTexts } = await import(new URL('app/js/sentences.js', ROOT));
 const { LIBRARY } = await import(new URL('app/js/library.js', ROOT));
 
 const REQUESTED_BY = process.env.QUEUE_BY || 'session-7';
@@ -81,12 +81,16 @@ function newTexts() {
       }
     }
   }
-  // سلّم الجمل: الجملة كاملةً، وكلماتُها مفردةً في «رتّب» وحدها (بها تُنقر الكلمة).
+  // سلّم الجمل: الجملة كاملةً، وكلماتُها مفردةً في «رتّب» وحدها (بها تُنقر الكلمة)،
+  // **وصيغُ خيارات «أكمل» الملبوسة** — فالخيار يُعرض بالرمز الذي يملأ الفراغ
+  // («الْغُرْفَةُ» لا «غُرْفَةْ»)، وعند الخطأ يُسمع الطفلُ ما قرأه هو. تُحصى على حوض
+  // البستان كلِّه لأن المشتّت يُختار منه عشوائياً في كل جولة.
   // بستاناً بستاناً ودرجةً درجة — يلي كلماتِ بستانه، فيكتمل البستان صوتاً قبل ما بعده.
   for (const rung of RUNGS) {
     for (const sentence of rung.sentences) {
       add(sentence.text, 'sentence');
       if (sentence.mechanic === 'order') for (const word of sentence.words) add(word, 'story_word');
+      for (const text of fillOptionTexts(sentence)) add(text, 'story_word');
     }
   }
   // مكتبة القصص: العنوان، ثم كل جملة، ثم كلماتُها مفردةً — فكلُّ كلمةٍ زرٌّ يُسمعها

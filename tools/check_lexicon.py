@@ -93,6 +93,7 @@ PICTURED = "pictured"
 SUPPORT_FIELD = "support"  # معجم الجمل المساند: ما ليس كلمةَ معجمٍ ولا كلمةَ منهج
 SENTENCE_FIELD = "sentences"   # الجمل المتدرجة (٣–٥ كلمات) — الحزمة ٩أ
 LADDER_WORDS = (3, 5)          # طول الجملة المتدرجة: أطولُ من جملة الكلمة (كلمتان)
+FILL_OPTIONS = 3               # خيارات «أكمل الجملة» (نظير `OPTIONS` في app/js/ladder.js)
 
 # ————— عقد «مصنع القصص» (الحزمة ٩ · ROADMAP §المرحلة د) —————
 #
@@ -359,6 +360,7 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
     for entry in words:
         lex_place.setdefault(stem(entry.get("word", "")), theme_place(themes, entry.get("theme")))
     deferred = []
+    ladder_items = []    # (هدف، نصّ، موضعُها من البساتين، وسمُها) — لفحص صيغ «أكمل»
 
     def sentence_place(parts_, base_place, label):
         """موضعُ جملةٍ في السلّم، وتسجيلُ خطأِ كلِّ مفردةٍ خارج المعلَن.
@@ -489,6 +491,7 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
         place = sentence_place(parts, base, label)
         if place != base:
             deferred.append((word, entry["theme"], theme_id(themes, place)))
+        ladder_items.append((word, sentence, place, label))
 
     # ٢و. الجمل المتدرجة (الحزمة ٩أ): ٣–٥ كلمات تُؤلَّف بمولّد مقيَّد
     # (`tools/make_sentences.py`) لا بيد — والفاحص يحكم عليها بقواعد الجمل نفسها،
@@ -542,6 +545,48 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
         place = sentence_place(parts, base, label)
         if place != base:
             deferred.append((text, item.get("theme"), theme_id(themes, place)))
+        ladder_items.append((target, text, place, label))
+
+    # ٢ح. صيغ خيارات «أكمل الجملة» (إصلاح عيب ٦ أغسطس ٢٠٢٦): الخيار يُعرض **بالرمز
+    # الذي سيملأ الفراغ**، والمشتّتان يلبسان ثوبَه اشتقاقاً. فيُفحَص هنا شيئان:
+    #   ١) ثوبُ الموضع يعيد بناء رمز الفراغ من كلمة المعجم حرفاً بحرف — وإلا كذب الخيار.
+    #   ٢) كلُّ صيغةٍ **قد** تُعرَض مشتّتاً مفكوكةٌ ومن حصيلة الطفل: تُحصى على حوض
+    #      البستان كلِّه (لا على المختار عشوائياً)، **وموضعُها موضعُ الجملة نفسِه** —
+    #      فالمشتّت من بستان الجملة، وقد أتمّ الطفل باقاته قبل درجتها.
+    # ولا يُفحَص هنا ما هو «أكمل» فعلاً: الميكانيكية موضعٌ في السلّم يملكه التطبيق،
+    # فيُفحَص **كل** جملة — احتياطٌ يصمد إذا نقلها تناوبُ الميكانيكيات غداً.
+    #
+    # والاشتقاق مستوردٌ من المولّد (هو مالكُ القاعدة)، **واستيرادٌ مؤجَّل** لأنه يستورد
+    # هذا الملفَّ نفسَه: عند النداء يكون قد اكتمل تحميله فلا حلقةَ استيرادٍ مفرغة.
+    from make_sentences import (   # noqa: PLC0415
+        blank_token, dress_of, dressed, dressless, wearable,
+    )
+
+    by_garden = {}
+    for entry in words:
+        by_garden.setdefault(entry.get("theme"), []).append(entry)
+    naked = dressless(data)
+    dressed_forms, dress_kinds = set(), {}
+    for target, text, place, label in ladder_items:
+        token = blank_token(target, text)
+        dress = dress_of(target, token) if token else None
+        if not dress or dressed(target, dress) != token:
+            errors.append(f"{label}: لا يُشتقّ «{token or '?'}» من «{target}» — "
+                          "وخيارُ «أكمل الجملة» يُعرض بالرمز الذي يملأ الفراغ، "
+                          "فثوبٌ لا يُستنبَط يعني خياراً يكذب على الطفل")
+            continue
+        dress_kinds[dress[0]] = dress_kinds.get(dress[0], 0) + 1
+        pool = [e for e in by_garden.get(theme_id(themes, place), [])
+                if e.get("word") != target and e.get(PICTURED) is not False
+                and wearable(e.get("word", ""), dress, naked)]
+        if len(pool) < FILL_OPTIONS - 1:
+            errors.append(f"{label}: حوضُ «أكمل الجملة» {len(pool)} كلمة "
+                          f"(المطلوب {FILL_OPTIONS - 1} مشتّتين يلبسان ثوب الموضع)")
+        for entry in pool:
+            form = dressed(entry["word"], dress)
+            dressed_forms.add(form)
+            errors += text_errors(form, f"{label} مشتّت «{entry['word']}»",
+                                  taught, letters, allowed)
 
     # ٢ز. معجم الجمل المساند: معلَنٌ كلُّه مستعمَل (لا مفردة ميتة تمرّ بلا مراجعة)
     idle = sorted(support_set - used_support)
@@ -594,6 +639,9 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
           f"| مؤجَّلة إلى بستان لاحق: {len(deferred)}"
           + (" (" + "، ".join(f"«{w}» {a}←{b}" for w, a, b in deferred[:4])
              + ("…" if len(deferred) > 4 else "") + ")" if deferred else ""))
+    print(f"لباس «أكمل الجملة»: {len(dressed_forms)} صيغة مشتقّة مفكوكة "
+          f"من حوض البساتين (" + "، ".join(f"{k}: {n}" for k, n in sorted(dress_kinds.items()))
+          + ")")
 
     if warnings and not quiet:
         print(f"\nتنبيهات ({len(warnings)}):")

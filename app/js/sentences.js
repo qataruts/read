@@ -67,6 +67,70 @@ export function stemOf(text) {
 /** كلمات الجملة كما تُعرض وتُنطق — لا مصدر ثانٍ لها (الفراغ يفصلها). */
 export const sentenceWords = (text) => String(text ?? '').split(/\s+/).filter(Boolean);
 
+// ————— لباس الموضع: صيغة كلمة المعجم في الجملة (إصلاح عيب «أكمل الجملة») —————
+//
+// كلمةُ المعجم مفردةٌ موقوفة («غُرْفَةْ») وفي الجملة تلبس ثوب موضعها («الْغُرْفَةُ»).
+// وكان خيار «أكمل الجملة» يُعرض بالصيغة المعجمية ثم يملأ الفراغ بصيغة الجملة — تحوّلٌ
+// صامت يخرق «ما تراه هو ما يحدث». فصار **الخيار يُعرض بالرمز الحرفي الذي سيملأ
+// الفراغ**، والمشتّتان يلبسان الثوب نفسه اشتقاقاً.
+//
+// والاشتقاق **نظير `definite`/`strip_end` في `tools/make_sentences.py`** — هو مالكُ
+// القاعدة، وهذه صورتُها في التطبيق (كما `stemOf` نظيرةُ `stem`). ولا تُصدَّق الصورة
+// بالوعد: `dressOf` تستنبط الثوبَ **بالمقايسة** — أيُّ اشتقاقٍ يعيد بناء رمز الفراغ
+// حرفاً بحرف — فإن عجزت الأربعةُ كلُّها عن رمزِ فراغٍ واحد سقط الفاحصُ والاختبار
+// (`check_lexicon.py` و`test_sentences.mjs`) قبل أن يبلغ الشاشةَ خيارٌ يكذب.
+
+const SUN = new Set('تثدذرزسشصضطظلن');   // الحروف الشمسية: تُدغم فيها لام «ال»
+const FATHA = 'َ', KASRA = 'ِ', DAMMA = 'ُ';
+const SUKUN = 'ْ', TANWEEN = 'ًٌٍ';
+/** ما يقع آخر الكلمة: حركةٌ أو سكونٌ أو تنوين (نظير `END_MARKS` في المولّد). */
+const END_MARKS = new Set([FATHA, KASRA, DAMMA, SUKUN, ...TANWEEN]);
+
+/** نزع علامة الآخر (سكون الوقف أو حركة أو تنوين) — وما عداها يبقى. */
+const stripEnd = (base) => (END_MARKS.has(base.slice(-1)) ? base.slice(0, -1) : base);
+
+/**
+ * «الـ» + الكلمة + علامة الآخر، بالإدغام الشمسي كما تُكتب في المصادر:
+ * قمريّ بلامٍ ساكنة («الْغُرْفَةُ»)، وشمسيّ بلامٍ بلا حركة وشدّةٍ بعد حركة أوّله
+ * («السَّرِيرُ») — وهو عين ما يقبله فاحص المفكوكية بعد درس اللام الشمسية.
+ */
+function definite(base, mark) {
+  const body = stripEnd(base);
+  if (SUN.has(body[0])) return `ال${body[0]}${body[1]}${SHADDA}${body.slice(2)}${mark}`;
+  return `ال${SUKUN}${body}${mark}`;
+}
+
+/** المضاف إلى ياء المتكلم: «أُذُنْ» ← «أُذُنِي»، والتاء المربوطة تُبسَط («جَدَّةْ» ← «جَدَّتِي»). */
+function possessed(base) {
+  const body = stripEnd(base);
+  return `${body.endsWith('ة') ? `${body.slice(0, -1)}ت` : body}${KASRA}ي`;
+}
+
+/** الأثواب الأربعة، بترتيب المقايسة: ما تلبسه كلمةُ المعجم في مواضع جملنا كلها. */
+const DRESSES = {
+  none: (base) => base,                             // آخرُ الجملة موقوفاً كما في المعجم
+  def: definite,                                    // «الـ» وعلامة الموضع
+  bare: (base, mark) => stripEnd(base) + mark,      // نكرةٌ بعلامة الموضع (المضاف)
+  poss: possessed,                                  // مضافٌ إلى ياء المتكلم
+};
+
+/**
+ * ثوبُ هذا الموضع مستنبَطاً بالمقايسة: أيُّ اشتقاقٍ يبني رمزَ الفراغ من كلمة المعجم.
+ * ويعود `null` إن عجزت الأربعة، فتعود الثلاثةُ إلى صيغتها المعجمية كما كانت قبل
+ * الإصلاح — **ولا تبلغ الشاشةَ مادّةٌ كهذه**: `check_lexicon.py` يرفض جملةً لا
+ * يُستنبَط ثوبُها (كلَّ جملةٍ في الملف لا جملَ «أكمل» وحدها)، ويسقط بها الاختبار.
+ */
+export function dressOf(base, token) {
+  const mark = END_MARKS.has(token.slice(-1)) ? token.slice(-1) : '';
+  for (const kind of Object.keys(DRESSES)) {
+    if (DRESSES[kind](base, mark) === token) return { kind, mark };
+  }
+  return null;
+}
+
+/** كلمةُ معجمٍ ← صيغتُها في ذلك الموضع. */
+export const dressed = (base, dress) => (dress ? DRESSES[dress.kind](base, dress.mark) : base);
+
 // ————— بناء السلّم —————
 
 const gardenIndex = new Map(GARDENS.map((garden, i) => [garden.id, i]));
@@ -120,6 +184,25 @@ function blankIndex(target, words) {
   return exact >= 0 ? exact : words.findIndex((w) => stemOf(w).startsWith(stem));
 }
 
+/**
+ * كلماتُ المعجم التي **لا تلبس ثوباً** — والمعجمُ هو الذي يعلنها، فلا تخمينَ صرفٍ
+ * هنا: الكلمة التي تظهر في **جملتها هي** بصيغتها المفردة إمّا مضافةٌ إلى ياء المتكلم
+ * («أَبِي كَرِيمْ») أو صفةٌ خبر («الْبَحْرُ أَزْرَقْ») — وكلتاهما لا تُعرَّف ولا تُضاف
+ * («الْأَبِيُ» و«أَحْمَرِي» ليستا عربيتين). فلا تكون واحدةٌ منها مشتّتاً ملبوساً.
+ *
+ * وخطؤُه — إن وقع — يضيّق الحوض ولا يُخرج صيغةً فاسدة: أسوأُ ما فيه مشتّتٌ أقلّ.
+ * وحيث الثوبُ «none» يعود الحوضُ كلَّه (وهناك الألوان أحسنُ مشتّتٍ لبعضها بعضاً).
+ */
+const DRESSLESS = new Set(WORDS.filter((word) => {
+  const words = sentenceWords(word.sentence);
+  const at = blankIndex(word, words);
+  const dress = at >= 0 ? dressOf(word.word, words[at]) : null;
+  return !dress || dress.kind === 'none';
+}).map((word) => word.word));
+
+/** هل تقبل هذه الكلمةُ لباسَ الموضع؟ (انظر `DRESSLESS` أعلاه) */
+export const wearable = (base, dress) => !dress || dress.kind === 'none' || !DRESSLESS.has(base);
+
 // جمل كل بستان مرتَّبةً **بالطول** — به يتدرّج سلّمه: كلمتان ← ثلاث ← أربع فخمس.
 // الفرز مستقرّ، فالمتساويات تبقى بترتيب مصدرها (لا عشوائية في موضع جملة).
 const byPlace = GARDENS.map(() => []);
@@ -152,13 +235,16 @@ export const LADDERS = GARDENS.map((garden, index) => {
       // و**استبدالٌ موضعيّ لا تخطٍّ**: العدّاد لا يُزحزَح، فلا تتبدّل ميكانيكيةُ جملةٍ
       // أخرى ولا يدخل قائمةَ الصوت نصٌّ جديد — الاستثناء يقع حيث وقع ولا يتعدّاه.
       if (mechanic === 'read' && item.target.pictured === false) mechanic = 'fill';
+      const blank = blankIndex(item.target, words);
       return {
         id: item.id,
         rung,
         target: item.target,
         text: item.text,
         words,
-        blank: blankIndex(item.target, words),
+        blank,
+        // ثوبُ الهدف في هذا الموضع — به تُلبَس المشتّتات مثلَه في «أكمل الجملة»
+        dress: blank >= 0 ? dressOf(item.target.word, words[blank]) : null,
         slot,
         mechanic,
       };
@@ -188,9 +274,33 @@ export function orderPool(garden) {
 }
 
 /**
+ * حوضُ خيارات الجملة: كلمات بستانها المصوَّرة سوى هدفها (`pickOptions` تسحب منه).
+ * وفي «أكمل الجملة» يُزاد شرطٌ: أن تقبل الكلمةُ لباسَ الموضع — فالمضاف إلى ياء
+ * المتكلم لا يُعرَّف («الْأَبِيُ» ليست عربية)، ولا يصحّ عرضُه بصيغته وحده بين
+ * ملبوسَين فيفضح نفسه.
+ */
+export function optionPool(sentence) {
+  return sentence.rung.garden.words.filter((w) => w !== sentence.target
+    && w.pictured !== false
+    && (sentence.mechanic !== 'fill' || wearable(w.word, sentence.dress)));
+}
+
+/**
+ * نصُّ خيارٍ في «أكمل الجملة» — **هو بعينه ما سيستقرّ في الفراغ**: الهدفُ يعود
+ * برمز الفراغ حرفاً بحرف (يثبته الاختبار في كل جملة)، والمشتّتُ يلبس ثوبَه نفسه.
+ */
+export const fillText = (sentence, word) => dressed(word.word, sentence.dress);
+
+/** ما قد يُسمعه الطفلُ من خيارات «أكمل» عند الخطأ: صيغُ مشتّتاتها الملبوسة. */
+export const fillOptionTexts = (sentence) => (sentence.mechanic === 'fill'
+  ? optionPool(sentence).map((w) => fillText(sentence, w))
+  : []);
+
+/**
  * كل ما ينطقه السلّم، بترتيب لقاء الطفل به (وهو ترتيب تصريف قائمة الانتظار):
- * الجملة كاملةً في كل ميكانيكية، وكلماتُها مفردةً في «رتّب» وحدها — فما سواها
- * لا يُنقر فيه على كلمة (الخيارات صورٌ أو كلمات المعجم المفردة ولها أصواتها).
+ * الجملة كاملةً في كل ميكانيكية، وكلماتُها مفردةً في «رتّب»، **وصيغُ خيارات «أكمل»
+ * الملبوسة** — فبها يُسمَع الطفلُ ما اختاره عند الخطأ، وهي غيرُ كلمة المعجم المفردة.
+ * وما سوى هذين لا يُنقر فيه على كلمة (خيارات «اقرأ ونفّذ» صورٌ لها أصواتُ معجمها).
  */
 export function ladderTexts() {
   const out = [];
@@ -198,6 +308,7 @@ export function ladderTexts() {
     for (const sentence of rung.sentences) {
       out.push(sentence.text);
       if (sentence.mechanic === 'order') out.push(...sentence.words);
+      out.push(...fillOptionTexts(sentence));
     }
   }
   return [...new Set(out)];
