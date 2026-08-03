@@ -8,3 +8,5 @@ scratch/
 archive/
 shots/
 tools/gcloud-sa.json
+tools/gcloud-oauth.json
+tools/gcloud-token.json
