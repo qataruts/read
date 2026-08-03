@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار «اقرأ لي» — تسجيل صوت الطفل (الحزمة ١٠)</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 170000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 8000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+/** انتظارُ شرطٍ غير متزامن (قراءة المخزن) — الوعدُ نفسُه صحيحٌ دائماً فلا يصلح `waitFor`. */
+async function waitUntil(fn, label = '', ms = 10000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = await fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(50);
+  }
+}
+
+const { LIBRARY } = await import('./js/library.js');
+const { allNodes } = await import('./js/progress.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+
+const played = [], spoken = [], heardLog = [], jsErrors = [];
+const netCalls = [];        // كل طلب شبكة من داخل التطبيق (المطلوب: صفرٌ في دورة التسجيل)
+let micCalls = 0;           // كم مرة طُلب الميكروفون
+let micDenied = false;      // لمحاكاة رفض وليّ الأمر
+let win, doc;
+
+// ————— مخزن التسجيلات (نفس الأصل، فيُقرأ من هنا كما يكتبه التطبيق) —————
+
+const DB = 'muallim.recordings';
+const openDb = () => new Promise((resolve, reject) => {
+  const request = indexedDB.open(DB, 1);
+  request.onupgradeneeded = () => {
+    const db = request.result;
+    if (!db.objectStoreNames.contains('clips')) {
+      db.createObjectStore('clips', { keyPath: 'id', autoIncrement: true }).createIndex('at', 'at');
+    }
+  };
+  request.onsuccess = () => resolve(request.result);
+  request.onerror = () => reject(request.error);
+});
+
+async function storedClips() {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const request = db.transaction('clips', 'readonly').objectStore('clips').getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+    db.close ? request.transaction.addEventListener('complete', () => db.close()) : null;
+  });
+}
+
+async function addStoredClip(record) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('clips', 'readwrite');
+    tx.objectStore('clips').add(record);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+const dropDb = () => new Promise((resolve) => {
+  const request = indexedDB.deleteDatabase(DB);
+  request.onsuccess = request.onerror = request.onblocked = () => resolve();
+});
+
+// ————— الإطار: أصواتٌ مزيّفة، وحارسُ شبكةٍ يعدّ كل طلب —————
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+
+  const realFetch = win.fetch.bind(win);
+  win.fetch = (input, init) => {
+    netCalls.push(String(input && input.url ? input.url : input));
+    return realFetch(input, init);
+  };
+  const realOpen = win.XMLHttpRequest.prototype.open;
+  win.XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+    netCalls.push(`xhr:${url}`);
+    return realOpen.call(this, method, url, ...rest);
+  };
+  Object.defineProperty(win.navigator, 'sendBeacon', {
+    configurable: true, value: (url) => { netCalls.push(`beacon:${url}`); return false; },
+  });
+  win.WebSocket = class { constructor(url) { netCalls.push(`ws:${url}`); } };
+  win.EventSource = class { constructor(url) { netCalls.push(`sse:${url}`); } };
+
+  // الميكروفون: نعدّ طلباته، ونحاكي رفض الإذن عند الحاجة
+  const realMic = win.navigator.mediaDevices.getUserMedia.bind(win.navigator.mediaDevices);
+  Object.defineProperty(win.navigator.mediaDevices, 'getUserMedia', {
+    configurable: true,
+    value: (constraints) => {
+      micCalls++;
+      if (micDenied) return Promise.reject(new DOMException('رُفض', 'NotAllowedError'));
+      return realMic(constraints);
+    },
+  });
+
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').replace('.mp3', '');
+      const text = this.src.startsWith('blob:') ? `صوت الطفل (${this.src.slice(0, 5)})` : manifest[key] ?? `?${key}`;
+      played.push(text);
+      heardLog.push(text);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class {
+    constructor(text) { this.text = text; spoken.push(text); heardLog.push(text); }
+  };
+  const synth = { cancel() {}, speak(u) { setTimeout(() => u.onend && u.onend(), 5); } };
+  Object.defineProperty(win, 'speechSynthesis', { configurable: true, get: () => synth });
+}
+
+function idsBefore(id) {
+  const out = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out;
+    out.push(node.id);
+  }
+  return out;
+}
+
+async function seed(nodeIds, extra = {}) {
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, records: [], mic: false, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(), ...extra,
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(200);
+}
+
+const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const lastHeard = () => heardLog[heardLog.length - 1];
+const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
+const height = (el) => el.getBoundingClientRect().height;
+const resources = () => win.performance.getEntriesByType('resource').map((e) => e.name);
+
+async function goto(hash) {
+  win.location.hash = hash;
+  await sleep(200);
+}
+
+function checkTargets(where) {
+  const small = $$('.screen-card button')
+    .map((el) => [el, el.getBoundingClientRect()])
+    .filter(([, r]) => r.width && (r.height < 48 || r.width < 48))
+    .map(([el]) => el.className);
+  ok(small.length === 0, `${where}: أهداف اللمس ≥٤٨ بكسل${small.length ? ' — ' + small.join('،') : ''}`);
+  ok(doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1,
+    `${where}: لا تمرير أفقي (DESIGN §٤)`);
+}
+
+/** بوابةُ وليّ الأمر: تُقرأ عمليةُ الضرب من الشاشة ويُكتب ناتجُها. */
+function answerGate(scope) {
+  const [a, b] = scope.querySelector('.giant').textContent.split('×')
+    .map((part) => Number(part.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+  scope.querySelector('input').value = String(a * b);
+  scope.querySelector('.gate-go').click();
+}
+
+try {
+  await dropDb();
+  const story = LIBRARY[0];
+
+  // ————— ١) الزرّ: ثانويٌّ هندسيّ بلا مؤقّت —————
+  await seed(idsBefore(`library:${story.id}`));
+  await goto(`#/library/${encodeURIComponent(story.id)}`);
+  await waitFor(() => $('.story'), 'شاشة القصة');
+
+  ok(!!$('.record .rec-mic'), `شاشة قصة «${story.title}» فيها زرّ التسجيل`);
+  ok(!!$('.rec-mic .mic-icon svg') && !/[\u{1F300}-\u{1FAFF}]/u.test($('.rec-mic').textContent),
+    'وأيقونتُه شكلٌ هندسيّ (SVG) لا إيموجي — DESIGN §٦');
+  ok(height($('.rec-mic')) >= 48 && height($('.foot .next')) >= 64
+    && height($('.rec-mic')) < height($('.foot .next')),
+    `وهو فعلٌ ثانويّ لا يزاحم «أتممتُ القراءة» (${Math.round(height($('.rec-mic')))} مقابل `
+    + `${Math.round(height($('.foot .next')))} بكسل)`);
+  ok($('.record').previousElementSibling.classList.contains('karaoke'),
+    'وموضعه تحت «اسمع القصة كاملة»: يسمعها بصوتنا ثم يقرؤها بصوته');
+  ok(!/[0-9٠-٩]/.test($('.record').textContent), 'ولا رقم ولا مؤقّت فيه (DESIGN §٥.٦)');
+  checkTargets('شاشة القصة');
+
+  // ————— ٢) الإذن: بوابة وليّ الأمر أول مرة —————
+  const netMark = netCalls.length;
+  const resMark = resources().length;
+  $('.rec-mic').click();
+  await waitFor(() => $('.overlay .gate'), 'بوابة وليّ الأمر');
+  ok(micCalls === 0 && !$('.rec-mic--on'),
+    'أول ضغطة تفتح بوابة وليّ الأمر ولا تطلب الميكروفون بعد (بند الحزمة ١٠/٤)');
+
+  const gate = $('.overlay');
+  gate.querySelector('input').value = '3';
+  gate.querySelector('.gate-go').click();
+  await sleep(120);
+  ok(!!$('.overlay .gate') && micCalls === 0, 'وجوابٌ خاطئ يعيد السؤال ولا يفتح شيئاً');
+
+  answerGate($('.overlay'));
+  await waitFor(() => $('.rec-mic--on'), 'بدء التسجيل بعد البوابة', 10000);
+  ok(!$('.overlay') && stored().mic === true,
+    'والجواب الصحيح يغلق البوابة ويحفظ الإذن (فلا تُسأل في كل مرة)');
+  ok(micCalls === 1 && !!$('.rec-dot'),
+    'ويبدأ التسجيل فوراً — نقطةٌ تنبض بلا عدّاد ولا رقم');
+  ok(!/[0-9٠-٩]/.test($('.record').textContent), 'وأثناء التسجيل: لا مؤقّت يراه الطفل');
+  checkTargets('أثناء التسجيل');
+
+  // ————— ٣) الدورة: سجّل ← يسمع نفسه فوراً —————
+  await sleep(1300);
+  const beforeStop = heardLog.length;
+  $('.rec-mic--on').click();
+  await waitFor(() => $('.rec-hear'), 'ظهور «اسمع صوتك» بعد التسجيل', 10000);
+
+  // الحفظ يجري خلف السماع (يسمع الطفل نفسه أولاً)، فيُنتظَر وصولُه إلى المخزن
+  const clips = await waitUntil(async () => {
+    const all = await storedClips();
+    return all.length === 1 ? all : null;
+  }, 'حفظ التسجيل في المخزن');
+  ok(clips.length === 1, `والتسجيل محفوظ في IndexedDB (${clips.length})`);
+  const clip = clips[0];
+  ok(clip.node === `library:${story.id}` && clip.title === story.title && clip.day,
+    `ببطاقته: القصة «${clip.title}» وعقدتُها ${clip.node} وتاريخُها ${clip.day}`);
+  ok(clip.seconds >= 0.5 && clip.seconds <= 6 && clip.size > 0,
+    `ومدّتُه ملتقَطةٌ ضمنياً (${clip.seconds} ثانية · ${clip.size} بايت) — بلا مؤقّت ظاهر`);
+  ok(heardLog.length > beforeStop && String(lastHeard()).includes('صوت الطفل'),
+    'ويسمع الطفل نفسه فوراً بعد التوقف (أحبُّ صوتٍ إليه صوتُه)');
+  ok($('.rec-mic').textContent.includes('سجّل من جديد'),
+    'وزرُّ «سجّل من جديد» حاضر — إعادة القراءة هي بناء الطلاقة');
+
+  const log = stored().records;
+  ok(log.length === 1 && log[0].node === clip.node && log[0].seconds === clip.seconds,
+    'والحدث مسجَّل في التقدّم (قصة × تاريخ × مدّة)');
+  ok(Object.keys(stored().skills || {}).length === 0,
+    'ولا مهارة حرفية تُسجَّل — القراءة الجهرية ليست امتحاناً');
+
+  // المادة نفسها: صوتٌ حقيقيّ يُفكّ لا بلوب فارغ
+  const decoded = await new AudioContext().decodeAudioData(await clip.blob.arrayBuffer());
+  ok(decoded.duration > 0.3,
+    `والمحفوظ صوتٌ يُفكّ فعلاً في متصفّح حقيقي (${decoded.duration.toFixed(2)} ثانية · ${clip.type})`);
+
+  const beforeReplay = heardLog.length;
+  $('.rec-hear').click();
+  await sleep(150);
+  ok(heardLog.length > beforeReplay && String(lastHeard()).includes('صوت الطفل'),
+    'و«اسمع صوتك» يعيده متى شاء');
+
+  // ————— ٤) الإعادة: بلا بوابة هذه المرة —————
+  $('.rec-mic').click();
+  await waitFor(() => $('.rec-mic--on'), 'التسجيل الثاني', 10000);
+  ok(!$('.overlay') && micCalls === 2, 'والإعادة لا تمرّ ببوابةٍ ثانية — الإذن مرة واحدة');
+  await sleep(900);
+  $('.rec-mic--on').click();
+  await waitFor(() => stored().records.length === 2, 'حفظ التسجيل الثاني', 10000);
+  ok((await storedClips()).length === 2,
+    'وقراءتان للقصة نفسها صوتاً وسجلّاً — منهما يُبنى منحنى الطلاقة');
+
+  // ————— ٥) الحصة القصوى: يُقلَّم الأقدم تلقائياً —————
+  const filler = new Blob([new Uint8Array(64)], { type: 'audio/webm' });
+  for (let i = 0; i < 21; i++) {
+    await addStoredClip({
+      node: `library:${story.id}`, title: 'قراءة قديمة', seconds: 30 + i,
+      at: 1000 + i, day: '2026-01-01', size: filler.size, type: filler.type, blob: filler,
+    });
+  }
+  ok((await storedClips()).length === 23, 'قبل التقليم: ٢٣ تسجيلاً في المخزن');
+
+  $('.rec-mic').click();
+  await waitFor(() => $('.rec-mic--on'), 'تسجيل يتجاوز الحصة', 10000);
+  await sleep(700);
+  $('.rec-mic--on').click();
+  await waitUntil(async () => (await storedClips()).length === 20, 'تقليم الأقدم');
+  const after = await storedClips();
+  ok(after.length === 20, `وبعد تسجيلٍ جديد: الحصة ٢٠ بالضبط (${after.length})`);
+  ok(!after.some((c) => c.at <= 1003) && after.some((c) => c.node === `library:${story.id}`
+    && c.title === story.title),
+    'وسقط الأقدم فالأقدم وبقي الأحدث — جهاز الطفل ليس أرشيفاً');
+
+  // ————— ٦) لوحة وليّ الأمر: يسمع ويحذف ويرى المنحنى —————
+  await goto('#/parent');
+  await waitFor(() => $('.gate'), 'بوابة اللوحة');
+  answerGate(doc);
+  await waitFor(() => $('.recs .rec-row'), 'قائمة التسجيلات في اللوحة', 10000);
+  ok($$('.audit h3').some((el) => el.textContent.includes('تسجيلات طفلي')),
+    'اللوحة فيها قسم «تسجيلات طفلي»');
+  ok($$('.rec-row').length === 20, `وفيه ${arNum($$('.rec-row').length)} تسجيلاً بأزراره`);
+  ok($$('.rec-row')[0].textContent.includes(story.title)
+    && /ثانية|ثوان|دقيقة/.test($$('.rec-row')[0].textContent),
+    `وكل سطر بقصته وتاريخه ومدّته («${$$('.rec-row')[0].querySelector('.rec-what').textContent.trim()}»)`);
+  checkTargets('لوحة وليّ الأمر');
+
+  const beforePlay = heardLog.length;
+  $('.rec-play').click();
+  await waitFor(() => heardLog.length > beforePlay, 'تشغيل تسجيل من اللوحة');
+  ok(String(lastHeard()).includes('صوت الطفل'), 'ووليّ الأمر يسمع قراءة طفله بضغطة');
+
+  ok(!!$('.rec-chart svg polyline'), 'ومنحنى المدد مرسوم لقصةٍ قُرئت أكثر من مرة');
+  ok($('.rec-fluency .hint').textContent.includes('الأولى')
+    && $('.rec-fluency .hint').textContent.includes('الأخيرة'),
+    `ومعه سطرٌ يقرؤه الوالد («${$('.rec-fluency .hint').textContent.trim()}»)`);
+
+  $('.rec-del').click();
+  await waitUntil(async () => (await storedClips()).length === 19, 'حذف تسجيل');
+  await waitFor(() => $$('.rec-row').length === 19, 'اختفاء سطره');
+  ok(true, 'وحذفُ تسجيلٍ يمحوه من الجهاز ومن اللوحة معاً');
+
+  const charts = $$('.rec-fluency').length;
+  $$('.recs .btn').find((b) => b.textContent.includes('احذف كل')).click();
+  await waitUntil(async () => (await storedClips()).length === 0, 'محو كل التسجيلات');
+  await waitFor(() => !$('.rec-row'), 'خلوّ القائمة');
+  ok($$('.rec-fluency').length === charts && stored().records.length >= 3,
+    'ومحوُ الصوت كلِّه لا يمحو منحنى المدد — بيانٌ نصيّ يبقى لوليّ الأمر');
+
+  // ————— ٧) الخصوصية: صفر طلبات شبكية في دورة التسجيل كلها —————
+  // النافذة المقيسة: من أول ضغطة على الميكروفون إلى محو التسجيلات من اللوحة —
+  // فيها التسجيلُ والحفظُ والسماعُ والإعادةُ والتقليمُ والعرضُ والحذف.
+  const cycleNet = netCalls.slice(netMark);
+  ok(cycleNet.length === 0,
+    '**صفر طلبات شبكية** في دورة التسجيل كلها (fetch/XHR/beacon/WS/SSE)'
+    + `${cycleNet.length ? ' — ' + cycleNet.slice(0, 5).join('، ') : ''}`);
+  const cycleRes = resources().slice(resMark).filter((url) => !url.startsWith('blob:'));
+  ok(cycleRes.length === 0,
+    'ولا موردَ واحداً في سجلّ شبكة الصفحة إلا عناوين blob المحلية'
+    + `${cycleRes.length ? ' — ' + cycleRes.slice(0, 5).join('، ') : ''}`);
+  // ————— ٨) الرفض والغياب لا يكسران شيئاً —————
+  await goto(`#/library/${encodeURIComponent(story.id)}`);
+  await waitFor(() => $('.rec-mic'), 'زرّ التسجيل من جديد');
+  micDenied = true;
+  $('.rec-mic').click();
+  await waitFor(() => !$('.rec-mic'), 'اختفاء الزرّ بعد الرفض', 10000);
+  ok(!$('.rec-mic') && !!$('.story') && !!$('.foot .next'),
+    'رفضُ إذن الميكروفون يُخفي الزرّ بهدوء ولا يكسر القصة');
+  micDenied = false;
+
+  await seed(idsBefore(`library:${story.id}`), { mic: true });
+  win.MediaRecorder = undefined;
+  await goto(`#/library/${encodeURIComponent(story.id)}`);
+  await waitFor(() => $('.story'), 'شاشة القصة بلا مسجّل');
+  ok(!$('.record') && !!$('.karaoke .read-all'),
+    'وجهازٌ بلا مسجّل: لا يظهر الزرّ أصلاً والقصة تعمل كاملة');
+
+  // ————— ٩) ولا شيء يخرج عن أصل التطبيق في الجلسة كلها —————
+  const external = (url) => /^https?:\/\//.test(url) && !url.startsWith(location.origin);
+  const foreignCalls = netCalls.filter(external);
+  ok(foreignCalls.length === 0,
+    `ولا طلبَ واحداً خارج أصل التطبيق في الجلسة كلها (${netCalls.length} طلباً، كلها ملفاته)`
+    + `${foreignCalls.length ? ' — ' + foreignCalls.slice(0, 3).join('، ') : ''}`);
+  const foreignRes = resources().filter((url) => external(url));
+  ok(foreignRes.length === 0,
+    `ولا موردَ من مضيفٍ آخر (${resources().length} مورداً في الإطار الأخير)`
+    + `${foreignRes.length ? ' — ' + foreignRes.slice(0, 3).join('، ') : ''}`);
+
+  // ————— ١٠) الصوت والأخطاء —————
+  const missing = played.filter((t) => t.startsWith('?'));
+  ok(missing.length === 0, `وكل ما شُغِّل من ملفات المنهج له ملف مولَّد (${played.length} تشغيلاً)`);
+  const stray = spoken.filter((t) => !pendingAudio.has(t));
+  ok(stray.length === 0,
+    `والنطق الآلي لم يُستعمل إلا لنصوص تنتظر التصريف (${spoken.length} نصاً)`
+    + `${stray.length ? ' — خارج القائمة: ' + [...new Set(stray)].slice(0, 6).join('، ') : ''}`);
+  ok(!spoken.some((t) => t.includes('صوت الطفل')),
+    'ولم يُنطق صوتُ الطفل آلياً قطّ — وحدتُه لا تعرف النطق الآلي أصلاً');
+
+  ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, 'استثناء: ' + ((e && e.stack) || e));
+}
+
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

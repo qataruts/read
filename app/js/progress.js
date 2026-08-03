@@ -32,6 +32,8 @@ function blank() {
     skills: {},       // «حرف|حركة|تمرين» ← {right, wrong, box, due, seen}
     days: {},         // «YYYY-MM-DD» ← ثوانٍ من الاستعمال الفعلي
     reviews: {},      // «YYYY-MM-DD» ← {items, right, at}
+    records: [],      // «اقرأ لي»: [{node, title, seconds, day, at}] — بيانٌ نصيّ لا صوت
+    mic: false,       // إذنُ وليّ الأمر بالتسجيل (يُعطى مرة واحدة خلف بوابته)
     seconds: 0,
     startedAt: Date.now(),
     updatedAt: Date.now(),
@@ -478,6 +480,75 @@ export function reviewStreak(today = new Date()) {
     else if (i > 0 || streak) break;
   }
   return streak;
+}
+
+// ————— «اقرأ لي»: سجلّ القراءة الجهرية وإذن وليّ الأمر (الحزمة ١٠) —————
+//
+// **بيانٌ نصيّ لا صوت**: صوتُ الطفل في IndexedDB (`recordings.js`) بحصةٍ تُقلَّم،
+// وهنا مدّةُ كل قراءة وتاريخُها وحدهما — خفيفتان فتبقيان بعد تقليم الصوت، فلا ينقطع
+// منحنى الطلاقة الذي يقرؤه الوالد بانقطاع ما يسمعه.
+//
+// و**لا قياس حرفيّ هنا البتّة**: وحدةُ §٦ حرفٌ بحركة في تمرين، والقراءة الجهرية
+// ليست امتحاناً — لا خطأ يُسجَّل ولا مهارة (امتداد المُقَرّ في الجلسات ٤ و٦ والحزم ٧–٩).
+
+export const RECORD_LOG_MAX = 400;   // ~نصف سنة من قراءتين في اليوم
+
+/** هل أذن وليّ الأمر بالتسجيل؟ (البوابة الحسابية تُمرَّر مرة واحدة لا كل جلسة). */
+export function micAllowed() {
+  return Boolean(state.mic);
+}
+
+export function allowMic(allowed = true) {
+  state.mic = Boolean(allowed);
+  save();
+  return state.mic;
+}
+
+/** سجلّ القراءات الجهرية بالترتيب الزمني — الأقدم أولاً. */
+export function recordingLog() {
+  return Array.isArray(state.records) ? [...state.records] : [];
+}
+
+/**
+ * تسجيل حدث قراءة جهرية: قصة × تاريخ × مدّة (بند الحزمة ١٠/٥).
+ * ويُقلَّم أقدمُ السجلّ عند بلوغ سقفه كما يُقلَّم الصوت — بلا تضخّم في localStorage.
+ */
+export function logRecording({ node, title = '', seconds = 0, at = Date.now(), day = dayKey() }) {
+  if (!node) return null;
+  const entry = { node, title, seconds: Math.max(0, Math.round(seconds * 100) / 100), day, at };
+  const log = recordingLog();
+  log.push(entry);
+  state.records = log.slice(-RECORD_LOG_MAX);
+  save();
+  return entry;
+}
+
+/**
+ * منحنى الطلاقة لوليّ الأمر: لكل قصة قراءاتُها بالترتيب الزمني ومدّةُ كل واحدة.
+ * القصةُ الواحدة تُقرأ مراراً، وتناقصُ مدّتها عبر الأيام هو **مؤشّر الطلاقة** —
+ * ولا يراه الطفل (اللوحة خلف بوابة)، فلا يستحيل عندَه سباقاً.
+ */
+export function fluencyByStory() {
+  const byNode = new Map();
+  for (const entry of recordingLog()) {
+    const acc = byNode.get(entry.node) || { node: entry.node, title: entry.title, reads: [] };
+    if (entry.title) acc.title = entry.title;   // آخر عنوان معروف للعقدة
+    acc.reads.push(entry);
+    byNode.set(entry.node, acc);
+  }
+  return [...byNode.values()]
+    .map((story) => {
+      const reads = [...story.reads].sort((a, b) => a.at - b.at);
+      return {
+        ...story,
+        reads,
+        first: reads[0].seconds,
+        last: reads[reads.length - 1].seconds,
+        best: Math.min(...reads.map((r) => r.seconds)),
+        lastAt: reads[reads.length - 1].at,
+      };
+    })
+    .sort((a, b) => b.lastAt - a.lastAt);
 }
 
 // ————— إدارة —————

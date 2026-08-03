@@ -18,7 +18,7 @@
 // عند تغيير أي ملف من ملفات الهيكل: ارفع VERSION فيُمحى المخزون القديم كله.
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/.
 
-const VERSION = 'v6';   // v6: مكتبة «مصنع القصص» — `library.js` وقصصها المشتقّة من فهرسها
+const VERSION = 'v7';   // v7: «اقرأ لي» — وحدتا التسجيل والمخزن (الحزمة ١٠)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -48,6 +48,8 @@ const SHELL = [
   'js/progress.js',
   'js/quran.js',
   'js/recitation.js',
+  'js/recorder.js',
+  'js/recordings.js',
   'js/review.js',
   'js/screens.js',
   'js/sentences.js',

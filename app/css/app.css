@@ -994,6 +994,66 @@ button {
 .ask { text-align: center; }
 .ask .sentence { margin-top: 1rem; }
 
+/* ————— «اقرأ لي» (الحزمة ١٠): يقرأ الطفل بصوته ثم يسمع نفسه ————— */
+/* فعلٌ ثانويّ (≥٤٨ بكسل) تحت الكاريوكي، والفعل الرئيس يبقى «أتممتُ القراءة» (≥٦٤). */
+
+.record { flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+
+.rec-mic {
+  min-height: 3.25rem;
+  font-family: var(--font-ui);
+  color: color-mix(in srgb, var(--accent) 80%, var(--ink));
+}
+
+.rec-hear { min-height: 3.25rem; font-family: var(--font-ui); }
+
+.mic-icon { display: inline-flex; width: 1.4rem; height: 1.4rem; flex: none; }
+.mic-icon svg { width: 100%; height: 100%; }
+
+/* حالُ التسجيل: نقطةٌ تنبض بلا رقم ولا عدّاد (DESIGN §٥.٦ — القراءة ليست سباقاً) */
+.rec-mic--on {
+  border-color: var(--err);
+  background: color-mix(in srgb, var(--err) 12%, var(--mix));
+  color: var(--err-text);
+}
+
+.rec-dot {
+  width: .85rem;
+  height: .85rem;
+  border-radius: 50%;
+  background: var(--err);
+  animation: breathe 1.4s ease-in-out infinite;
+}
+
+@keyframes breathe { 50% { opacity: .3; transform: scale(.75); } }
+
+.rec-hint { margin: 0; align-self: center; }
+
+/* نافذة بوابة وليّ الأمر فوق شاشة القصة (إذن الميكروفون أول مرة) */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  /* حجابٌ يُعتِم ما خلفه في الوضعين: `--ink` يفتحّ في الليلي فلا يصلح حجاباً */
+  background: rgba(61, 52, 40, .55);
+}
+
+.overlay-card {
+  width: min(26rem, 100%);
+  max-height: 90dvh;
+  overflow: auto;
+  padding: 1.25rem 1rem 1.5rem;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.gate .giant { width: min(11rem, 46vw); height: min(11rem, 46vw); }
+
 /* ————— المرحلة القرآنية (خاتمة الرحلة) — وقار خاص بذهبي مطفأ ————— */
 
 .station--quran {
@@ -1394,6 +1454,42 @@ button {
 
 .chip:active { transform: scale(.95); }
 .chip--missing { border: 2px solid var(--err); }
+
+/* ————— لوحة وليّ الأمر: «تسجيلات طفلي» ومنحنى الطلاقة (الحزمة ١٠) ————— */
+
+.audit h4 { margin: 1.25rem 0 .5rem; font-size: 1rem; color: var(--ink-soft); }
+
+.rec-list { display: flex; flex-direction: column; gap: .5rem; }
+
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .35rem .5rem;
+  border-radius: var(--radius-btn);
+  background: color-mix(in srgb, var(--accent) 6%, var(--mix));
+  border: 1px solid var(--line);
+}
+
+.rec-row--on { border-color: var(--accent); }
+.rec-play, .rec-del { min-width: 3rem; padding: .5rem .75rem; flex: none; }
+.rec-del { color: var(--err-text); }
+
+.rec-what { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.5; }
+.rec-what small { color: var(--ink-soft); }
+
+.rec-charts { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+.rec-fluency {
+  flex: 1 1 16rem;
+  padding: .6rem .8rem;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--line);
+}
+
+.rec-fluency .hint { margin: .25rem 0 0; font-size: .9rem; }
+.rec-chart { display: block; margin-top: .35rem; }
+.rec-chart svg { width: 100%; max-width: 20rem; height: auto; }
 
 /* ————— رسالة عابرة ————— */
 

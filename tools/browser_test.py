@@ -9,7 +9,8 @@
     python3 tools/browser_test.py --garden     # بساتين الموضوعات (حديقة الكلمات)
     python3 tools/browser_test.py --sentences  # سلّم الجمل (المرحلة ج)
     python3 tools/browser_test.py --stories    # مكتبة «مصنع القصص» (المرحلة د)
-    python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories]
+    python3 tools/browser_test.py --record     # «اقرأ لي»: تسجيل صوت الطفل (المرحلة و)
+    python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record]
     python3 tools/browser_test.py --show       # بمتصفّح مرئي لتتبّع ما يجري
 
 كيف يعمل: خادم صغير يخدم مجلد app/ ويضيف صفحات الاختبار وحدها من هذا المجلد
@@ -54,7 +55,12 @@ PAGES = {
     "/__sentences_shots.html": TOOLS / "browser_sentences_shots.html",
     "/__stories.html": TOOLS / "browser_stories.html",
     "/__stories_shots.html": TOOLS / "browser_stories_shots.html",
+    "/__record.html": TOOLS / "browser_record.html",
+    "/__record_shots.html": TOOLS / "browser_record_shots.html",
 }
+# أعلامُ جهازٍ وهميّ للميكروفون (اختبار «اقرأ لي»): مجرى صوتٍ مولَّد من Chrome نفسه
+# وقبولٌ تلقائيّ للإذن — فتُختبر دورةُ التسجيل كاملةً بلا ميكروفون حقيقي ولا تفاعل بشري.
+FAKE_MEDIA = ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"]
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 QUEUE_FILE = ROOT / "tools" / "audio_queue.json"
 
@@ -139,6 +145,7 @@ def main():
     ap.add_argument("--garden", action="store_true", help="بساتين الموضوعات (حديقة الكلمات)")
     ap.add_argument("--sentences", action="store_true", help="سلّم الجمل (المرحلة ج)")
     ap.add_argument("--stories", action="store_true", help="مكتبة «مصنع القصص» (المرحلة د)")
+    ap.add_argument("--record", action="store_true", help="«اقرأ لي»: تسجيل صوت الطفل (المرحلة و)")
     ap.add_argument("--show", action="store_true", help="متصفّح مرئي")
     args = ap.parse_args()
 
@@ -152,7 +159,8 @@ def main():
         if args.shots:
             out = Path(args.shots).resolve()
             out.unlink(missing_ok=True)   # وإلا لعُدَّت لقطةُ تشغيلٍ سابق نجاحاً فوريّاً
-            page, size = (("__stories_shots.html", "1100,4200") if args.stories
+            page, size = (("__record_shots.html", "1100,3200") if args.record
+                          else ("__stories_shots.html", "1100,4200") if args.stories
                           else ("__sentences_shots.html", "1100,3400") if args.sentences
                           else ("__review_shots.html", "1100,3050") if args.review
                           else ("__garden_shots.html", "1100,5200") if args.garden
@@ -161,7 +169,8 @@ def main():
                           else ("__words_shots.html", "980,2100") if args.words
                           else ("__shots.html", "980,2650"))
             proc = run_chrome(f"{base}/{page}?dev=1", profile,
-                              [f"--screenshot={out}", f"--window-size={size}", "--hide-scrollbars"],
+                              [f"--screenshot={out}", f"--window-size={size}", "--hide-scrollbars"]
+                              + (FAKE_MEDIA if args.record else []),
                               args.show)
             deadline = time.time() + args.timeout
             while time.time() < deadline and not out.exists():
@@ -174,8 +183,10 @@ def main():
                 else "__quran.html" if args.quran else "__garden.html" if args.garden
                 else "__sentences.html" if args.sentences
                 else "__stories.html" if args.stories
+                else "__record.html" if args.record
                 else "__words.html" if args.words else "__test.html")
-        proc = run_chrome(f"{base}/{page}", profile, ["--hide-scrollbars"], args.show)
+        proc = run_chrome(f"{base}/{page}", profile,
+                          ["--hide-scrollbars"] + (FAKE_MEDIA if args.record else []), args.show)
         deadline = time.time() + args.timeout
         while time.time() < deadline:
             time.sleep(0.5)

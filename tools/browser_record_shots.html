@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>لقطات «اقرأ لي» (الحزمة ١٠)</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; align-items: start; }
+    .cell { position: relative; background: rgba(255,255,255,.35); border-radius: 24px; padding: .5rem; }
+    .cell > h4 { margin: .2rem 0 .4rem; text-align: center; color: #1971c2; }
+    .app { max-width: none; padding: 0; }
+    .dev { display: none; }
+    /* نافذة البوابة ثابتةٌ على الشاشة في التطبيق — تُحبَس في خليّتها داخل اللقطة وحدها */
+    .cell .overlay { position: absolute; border-radius: 24px; }
+  </style>
+</head>
+<body>
+<div id="toast" class="toast" hidden></div>
+<div class="grid" id="grid"></div>
+
+<script>
+  // إن سقطت الصفحة فليُرَ سببُه في اللقطة نفسها (وإلا صارت لقطةً بيضاء بلا تفسير)
+  window.addEventListener('error', (e) => boom(e.message));
+  window.addEventListener('unhandledrejection', (e) => boom(e.reason?.stack || e.reason));
+  function boom(what) {
+    const box = document.createElement('pre');
+    box.style.cssText = 'background:#fdd;border:3px solid red;font:20px monospace;'
+      + 'padding:1rem;white-space:pre-wrap';
+    box.textContent = 'خطأ في صفحة اللقطات: ' + what;
+    document.body.prepend(box);
+  }
+
+  // **التهيئة كلّها هنا** — قبل تحميل الوحدات: لقطةُ Chrome تُلتقط بعد أول رسمٍ بقليل،
+  // فكلُّ عملٍ غير متزامن قبل بناء الخلايا يعني لقطةً فارغة. فالمدد تُكتب في التخزين
+  // جاهزةً، والأصوات تُزرع في IndexedDB بالتوازي مع تحميل الوحدات لا بعده.
+  const DAY = 24 * 3600 * 1000;
+  const now = Date.now();
+  const SERIES = [
+    ['library:miftah-sami', 'مِفْتَاحُ سَامِي', [58, 51, 44, 37]],
+    ['library:jaddat-hasan', 'جَدَّةُ حَسَنْ', [71, 63]],
+  ];
+  const records = SERIES.flatMap(([node, title, list]) => list.map((seconds, i) => ({
+    node, title, seconds, at: now - (list.length - 1 - i) * DAY,
+    day: new Date(now - (list.length - 1 - i) * DAY).toISOString().slice(0, 10),
+  })));
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2, stars: {}, skills: {}, days: {}, reviews: {}, records, mic: false, seconds: 0,
+    startedAt: now, updatedAt: now,
+  }));
+
+  const request = indexedDB.open('muallim.recordings', 1);
+  request.onupgradeneeded = () => {
+    const db = request.result;
+    if (!db.objectStoreNames.contains('clips')) {
+      db.createObjectStore('clips', { keyPath: 'id', autoIncrement: true }).createIndex('at', 'at');
+    }
+  };
+  request.onsuccess = () => {
+    const tx = request.result.transaction('clips', 'readwrite');
+    const blob = new Blob([new Uint8Array(8192)], { type: 'audio/webm' });
+    for (const entry of records.slice(-3)) tx.objectStore('clips').add({ ...entry, blob, size: blob.size, type: blob.type });
+  };
+
+  // مسجّلٌ صوريّ: اللقطة تريد حالاتِ الشاشة لا صوتاً حقيقياً، فتُلتقط في لحظتها
+  window.MediaRecorder = class {
+    static isTypeSupported() { return true; }
+    constructor(stream, options = {}) {
+      this.mimeType = options.mimeType || 'audio/webm';
+      this.state = 'inactive';
+      this.handlers = {};
+    }
+    addEventListener(type, fn) { (this.handlers[type] ||= []).push(fn); }
+    start() { this.state = 'recording'; }
+    stop() {
+      this.state = 'inactive';
+      const data = new Blob([new Uint8Array(4096)], { type: this.mimeType });
+      for (const fn of this.handlers.dataavailable || []) fn({ data });
+      for (const fn of this.handlers.stop || []) fn();
+    }
+  };
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: { getUserMedia: async () => ({ getTracks: () => [] }) },
+  });
+</script>
+
+<script type="module">
+import { renderLibraryStory } from './js/story.js';
+import { renderParent } from './js/parent.js';
+import { LIBRARY } from './js/library.js';
+import * as progress from './js/progress.js';
+import * as recorder from './js/recorder.js';
+import * as audio from './js/audio.js';
+
+await audio.ready();
+
+// صوتٌ لا ينتهي: تُجمَّد الحالة المعروضة فلا تُلتقط الشاشة في منتصف حركة.
+// (وله `addEventListener` لأن مشغّل صوت الطفل يستمع إلى `ended` كسائر المشغّلات.)
+window.Audio = class extends EventTarget {
+  constructor(src = '') { super(); this.src = src; }
+  play() { return new Promise(() => {}); }
+  pause() {}
+};
+window.SpeechSynthesisUtterance = class { constructor(text) { this.text = text; } };
+const synth = { cancel() {}, speak() {} };
+Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => synth });
+
+const grid = document.getElementById('grid');
+const $ = (root, sel) => root.querySelector(sel);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+/** دورةُ مهامٍ دقيقة (microtask): يقطعها الوعدُ ولا يقطعها الرسم — فلا تفوت اللقطة. */
+const settle = async (times = 20) => { for (let i = 0; i < times; i++) await Promise.resolve(); };
+const story = LIBRARY[0];
+
+function cell(title, node, order) {
+  const box = document.createElement('div');
+  box.className = 'cell';
+  box.style.order = order;
+  box.innerHTML = `<h4>${title}</h4>`;
+  const app = document.createElement('div');
+  app.className = 'app';
+  app.append(node);
+  box.append(app);
+  grid.append(box);
+  return app;
+}
+
+// ٥) لوحة وليّ الأمر — **تُبنى أولاً وتُعرض أخيراً** (`order`): قراءةُ المخزن غير
+// متزامنة، فبدؤها قبل بناء بقية الخلايا يجعلها تصل قبل أول رسمة.
+const host = document.createElement('div');
+cell('٥ — لوحة وليّ الأمر: تسجيلاتُ طفلي ومنحنى المدد', host, 5);
+const draw = () => host.replaceChildren(renderParent(draw));
+draw();
+const gate = host.querySelector('.gate');
+if (gate) {
+  const [a, b] = gate.querySelector('.giant').textContent.split('×')
+    .map((part) => Number(part.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+  gate.querySelector('input').value = String(a * b);
+  gate.querySelector('.gate-go').click();
+}
+// تشذيبُ اللوحة إلى قسمها الجديد وحده (بقيّتُها في لقطات جلسة المراجعة) — متزامناً
+// قبل أي انتظار، وإلا خرج المنحنى عن حدّ اللقطة.
+const audit = host.querySelector('.audit');
+if (audit) {
+  const kept = [...audit.children];
+  const from = kept.findIndex((el) => el.tagName === 'H3' && el.textContent.includes('تسجيلات'));
+  if (from > 0) audit.replaceChildren(kept[0], ...kept.slice(from));
+}
+
+// ١) الزرّ في شاشة القصة: فعلٌ ثانويّ تحت «اسمع القصة كاملة»
+cell(`١ — «اقرأ لي» في قصة «${story.title}»`, renderLibraryStory(story.id), 1);
+
+// ٢) بوابة وليّ الأمر: أول استعمالٍ للميكروفون وحده
+const gated = cell('٢ — إذن وليّ الأمر أول مرة (البوابة الحسابية نفسها)',
+  renderLibraryStory(story.id), 2);
+$(gated, '.rec-mic').click();
+
+// ٣) أثناء التسجيل: نقطةٌ تنبض بلا مؤقّت ولا عدّاد
+progress.allowMic();
+const live = cell('٣ — أثناء التسجيل: بلا مؤقّت (DESIGN §٥.٦)', renderLibraryStory(story.id), 3);
+$(live, '.rec-mic').click();
+await settle();
+// المسجّل واحدٌ في التطبيق كلّه: يُطلَق هنا لتبقى صورةُ الخليّة كما هي وتعمل التالية
+recorder.release();
+
+// ٤) بعد التسجيل: يسمع نفسه، ويعيد القراءة متى شاء
+const done = cell('٤ — بعده: «اسمع صوتك» و«سجّل من جديد»', renderLibraryStory(story.id), 4);
+$(done, '.rec-mic').click();
+await settle();
+$(done, '.rec-mic--on')?.click();
+for (let i = 0; i < 60 && !$(done, '.rec-hear'); i++) await wait(5);
+recorder.release();
+
+for (let i = 0; i < 60 && !host.querySelector('.rec-row'); i++) await wait(5);
+await wait(300);
+</script>
+</body>
+</html>

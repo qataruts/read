@@ -174,6 +174,22 @@ const LANDMARKS = {
   book: '<path d="M32 16v26" /><path d="M32 16q-9-6-22-4v26q13-2 22 4" /><path d="M32 16q9-6 22-4v26q-13-2-22 4" /><path d="M8 44h48" />',
 };
 
+// ميكروفون «اقرأ لي» (الحزمة ١٠): شكلٌ هندسيّ لا إيموجي (DESIGN §٦)، يتبع لون زرّه.
+const MIC_SVG = `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+  stroke-linecap="round" stroke-linejoin="round" role="img">
+  <rect x="9" y="2" width="6" height="11" rx="3"/>
+  <path d="M5 11a7 7 0 0 0 14 0"/>
+  <path d="M12 18v3"/><path d="M9 21h6"/>
+</svg>`;
+
+/** أيقونة الميكروفون — زرُّ القراءة الجهرية في شاشة القصة. */
+export function micIcon() {
+  const el = h('span', { class: 'mic-icon', 'aria-hidden': 'true' });
+  el.innerHTML = MIC_SVG;
+  return el;
+}
+
 /** معلم المحطة على الخريطة — زخرفة صامتة بلون المرحلة (DESIGN §٦). */
 export function landmark(kind) {
   if (!LANDMARKS[kind]) return null;
