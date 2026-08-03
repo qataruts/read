@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار الخريطة: الجبهة والطيّ وقياس السرعة</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+// إصلاح بطء الخريطة (بلاغ المالك، ٥ أغسطس ٢٠٢٦): يقيس هذا الملفّ ما أُصلح فعلاً —
+//   (أ) كلفة القفل: «جبهة الفتح» مقابل القاعدة القديمة (مسحُ كل السوابق لكل عقدة)،
+//       تُنفَّذان على الحالة نفسها في اللحظة نفسها، فالمقارنة عادلة لا مزعومة.
+//   (ب) كلفة الرسم: الخريطة كسولةً مقابل الخريطة مفرودةً كلها (بنية ما قبل الإصلاح).
+//   (ج) سلوك الطيّ: لا محطة تختفي، ولا عقدة تبعد أكثر من نقرتين، والقفل كما كان.
+// والقياس عند تقدّم ~٩٠٪ لأن العيب يشتدّ كلما تقدّم الطفل (التوقف المبكر يفلت للمبتدئ).
+
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 120000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 5000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const frame = document.getElementById('frame');
+const jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() { setTimeout(() => this.dispatchEvent(new Event('ended')), 5); return Promise.resolve(); }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { this.text = text; } };
+}
+
+async function seed(nodeIds) {
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(200);
+}
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
+const round = (n) => Math.round(n * 100) / 100;
+
+/**
+ * رسمةٌ كاملة للخريطة بزمنها. `render` مربوطة بـ`hashchange` وتعمل متزامنةً في
+ * مسار الخريطة، فبثُّ الحدث يعيد بناء الصفحة كما يفعل رجوعُ الطفل من أي درس؛
+ * وقراءةُ الارتفاع تُلزِم المتصفّح بالتخطيط فلا يُخبَّأ ثمنُه خارج القياس.
+ */
+function paintMs(times = 6) {
+  win.dispatchEvent(new win.Event('hashchange'));      // إحماء
+  void doc.body.offsetHeight;
+  const t0 = performance.now();
+  for (let i = 0; i < times; i++) {
+    win.dispatchEvent(new win.Event('hashchange'));
+    void doc.body.offsetHeight;
+  }
+  return (performance.now() - t0) / times;
+}
+
+const mapNodes = () => doc.querySelectorAll('.map *').length;
+const unfoldAll = () => { for (const b of $$('.station-head--fold')) b.click(); };
+
+try {
+  // ————— حالة الطفل المتقدّم: ٩٠٪ من الرحلة —————
+  const P = await import('./js/progress.js?map=0');
+  const ALL = P.allNodes();
+  const NINETY = Math.floor(ALL.length * 0.9);
+  await seed(ALL.slice(0, NINETY).map((n) => n.id));
+  const p = await import(`./js/progress.js?map=${Date.now()}`);   // نسخةٌ تقرأ الحالة المزروعة
+  const sections = p.journey();
+  ok(p.unlockFrontier() === NINETY,
+    `الحالة المزروعة: ${arNum(NINETY)} عقدة من ${arNum(ALL.length)} (~٩٠٪) والجبهة عندها`);
+
+  await waitFor(() => $('.station'), 'الخريطة');
+  ok($$('.station').length === sections.length,
+    `الخريطة تعرض محطات الرحلة كلها (${arNum($$('.station').length)} محطة) — الطيّ لا يُخفي محطة`);
+
+  // ————— ١) الطيّ: ما حول الجبهة مفرودٌ وما بَعُد مطويّ —————
+  const stationEls = $$('.station');
+  const nextEl = await waitFor(() => $('[data-next]'), 'عقدة «تابع من هنا»');
+  const focus = stationEls.findIndex((s) => s.contains(nextEl));
+  ok(focus >= 0 && !stationEls[focus].classList.contains('station--folded'),
+    `محطة جبهة الطفل مفرودة ابتداءً (المحطة ${arNum(focus + 1)}) وعقدتُه التالية ظاهرة بلا نقرة`);
+  const near = [focus - 2, focus - 1, focus, focus + 1, focus + 2].filter((i) => stationEls[i]);
+  ok(near.every((i) => !stationEls[i].classList.contains('station--folded')),
+    `ومعها محطتان قبلها ومحطتان بعدها (${arNum(near.length)} مفرودة حول الجبهة)`);
+  const far = stationEls.filter((s) => s.classList.contains('station--folded'));
+  ok(far.length === sections.length - near.length,
+    `وكلّ ما بَعُد عنها مطويّ (${arNum(far.length)} محطة مطوية)`);
+  ok(far.every((s) => !s.querySelector('.node')),
+    'ولا عقدة واحدة مبنيّة في المطويّ (وهو لبّ الإصلاح: DOM لا يُبنى لما لا يُنظر إليه)');
+
+  // ————— ٢) البطاقة المطوية تبقى بطاقةَ عنوانٍ يقرؤها الطفل —————
+  const card = far[0];
+  ok(!!card.querySelector('.station-num') && !!card.querySelector('h2')
+    && !!card.querySelector('.station-letters') && !!card.querySelector('.station-meta'),
+    'البطاقة المطوية تُبقي رقمها وعنوانها وما فيها ونجومها');
+  ok(stationEls[0].classList.contains('station--done')
+    && stationEls.at(-1).classList.contains('station--locked'),
+    'وحال المحطة كما هي في الطيّ: المنجَزة منجَزة والمقفلة مقفلة');
+  const foldBtn = card.querySelector('.station-head--fold');
+  const box = foldBtn.getBoundingClientRect();
+  ok(box.height >= 48 && box.width >= 48,
+    `وزرّ فردها هدفُ لمسٍ لإصبع طفل (${Math.round(box.width)}×${Math.round(box.height)} بكسل)`);
+
+  // ————— ٣) نقرتان إلى أبعد عقدة: افرِد المحطة ثم اختر العقدة —————
+  const backEl = stationEls[Math.max(0, focus - 5)];   // محطة منجَزة بعيدة خلف الجبهة
+  ok(backEl.classList.contains('station--folded'), 'محطةٌ خمسُ محطاتٍ خلف الجبهة مطويّة');
+  backEl.querySelector('.station-head--fold').click();          // النقرة الأولى
+  await sleep(60);
+  ok(!backEl.classList.contains('station--folded') && backEl.querySelectorAll('.node').length > 0,
+    `النقرة الأولى تفرد المحطة فتظهر عقدها (${arNum(backEl.querySelectorAll('.node').length)} عقدة)`);
+  ok(!!backEl.querySelector('.station-mark svg'), 'ويعود معلمها البصري على الدرب (DESIGN §٦)');
+  const target = backEl.querySelector('.node--done');
+  target.click();                                               // النقرة الثانية
+  await sleep(150);
+  ok(!$('.map'), 'والنقرة الثانية تفتح العقدة — فلا عقدة أبعد من نقرتين');
+
+  win.location.hash = '#/';
+  await waitFor(() => $('.station'), 'العودة للخريطة');
+  ok(!$$('.station')[Math.max(0, focus - 5)].classList.contains('station--folded'),
+    'وما فرده الطفل يبقى مفروداً حين يعود (لا تُطوى تحت يده)');
+
+  // ————— ٤) القفل كما كان: عقدةٌ مقفلة في محطة مطوية تُفرد فتبقى مقفلة —————
+  const lockedEl = $$('.station').at(-1);
+  lockedEl.querySelector('.station-head--fold')?.click();
+  await sleep(60);
+  const lockedNode = lockedEl.querySelector('.node--locked');
+  ok(!!lockedNode, 'آخر محطة تُفرد فتظهر عقدها مقفلةً');
+  lockedNode.click();
+  await sleep(120);
+  ok(!!$('.map') && doc.getElementById('toast')?.hidden === false,
+    'والنقر عليها يبقيه على الخريطة برسالة «أكمِل ما قبله أولاً» (القفل لم يتغيّر)');
+
+  // ————— ٥) القياس (أ): كلفة القفل — الجبهة مقابل القاعدة القديمة —————
+  // القاعدة القديمة حرفاً بحرف: لكل عقدة، ابنِ سوابقها وامسحها كلها.
+  const oldRule = (id) => {
+    const nodes = p.allNodes();
+    const i = nodes.findIndex((n) => n.id === id);
+    return i >= 0 && nodes.slice(0, i).every((n) => p.isDone(n.id));
+  };
+  const timeIt = (fn, times) => {
+    fn(); const t0 = performance.now();
+    for (let i = 0; i < times; i++) fn();
+    return (performance.now() - t0) / times;
+  };
+  const ids = ALL.map((n) => n.id);
+  const oldLock = timeIt(() => { for (const id of ids) oldRule(id); }, 8);
+  const newLock = timeIt(() => { for (const id of ids) p.isNodeUnlockedById(id); }, 8);
+  ok(oldLock / newLock >= 4,
+    `قياس القفل لرسمةٍ واحدة (${arNum(ALL.length)} عقدة): القديم ${arNum(round(oldLock))} م.ث `
+    + `← الجبهة ${arNum(round(newLock))} م.ث (أسرع ${arNum(Math.round(oldLock / newLock))} أضعاف)`);
+
+  // ————— ٦) القياس (ب): رسم الخريطة كسولةً مقابل مفرودةً كلها —————
+  const lazyDom = mapNodes();
+  const lazyMs = paintMs();
+  unfoldAll();                       // بنية ما قبل الإصلاح: كل المحطات مفرودة
+  await sleep(60);
+  win.dispatchEvent(new win.Event('hashchange'));
+  const fullDom = mapNodes();
+  const fullMs = paintMs();
+  ok($$('.station--folded').length === 0 && fullDom > lazyDom * 2.5,
+    `حجم DOM للخريطة عند ٩٠٪: مفرودةً ${arNum(fullDom)} عنصراً ← كسولةً ${arNum(lazyDom)} `
+    + `(أصغر ${arNum(Math.round(fullDom / lazyDom))} أضعاف)`);
+  ok(lazyMs < fullMs,
+    `وزمن الرسمة الواحدة: مفرودةً ${arNum(round(fullMs))} م.ث ← كسولةً ${arNum(round(lazyMs))} م.ث`);
+  ok($$('.node').length === ALL.length,
+    `والمفرودة كلها تعرض عقد الرحلة كلها (${arNum($$('.node').length)} عقدة) — الطيّ عرضٌ لا حذف`);
+
+  ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, 'استثناء: ' + ((e && e.stack) || e));
+}
+
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

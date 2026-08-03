@@ -55,7 +55,7 @@ function attach() {
   win.Audio = class extends win.EventTarget {
     constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
     play() {
-      const key = (this.src.split('/').pop() || '').replace('.mp3', '');
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
       const text = manifest[key] ?? `?${key}`;
       played.push(text);
       heardLog.push(text);
@@ -100,6 +100,9 @@ const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
 const lastHeard = () => heardLog[heardLog.length - 1];
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
+// الخريطة كسولة (إصلاح بطء الخريطة): محطاتٌ بعيدة عن جبهة الطفل تُرسم بطاقاتِ عناوين
+// مطوية. وفحوص هذه الصفحة تعدّ عقد الرحلة كلها، فتفردها أولاً — والفرد بنقرة واحدة.
+const unfoldAll = () => { for (const b of $$('.station-head--fold')) b.click(); };
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 const lineWords = (i) => [...$$('.line')[i].querySelectorAll('.story-word')];
 
@@ -130,6 +133,7 @@ try {
     'وكل مكتبة تلي سلّم جملها مباشرةً (كلماتُ البستان ← جملُه ← قصةٌ تجمعها)');
   ok($$('.station--library').every((s) => s.classList.contains('station--locked')),
     'وكلها مقفلة في بداية الرحلة');
+  unfoldAll();
   ok($$('.station--library .node').length === LIBRARY.length,
     `وعقدُها قصصُ المكتبة كلها (${arNum(LIBRARY.length)} قصة)`);
   ok(!!$('.station--library .station-mark svg'), 'ولها معلمها البصري على الدرب (DESIGN §٦)');
@@ -242,6 +246,7 @@ try {
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
+  unfoldAll();
   ok($$('.station--library').at(-1).querySelectorAll('.node--done').length === 1,
     'والخريطة تُظهر القصة المقروءة في مكتبتها');
 

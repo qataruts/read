@@ -54,7 +54,7 @@ function attach() {
   win.Audio = class extends win.EventTarget {
     constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
     play() {
-      const key = (this.src.split('/').pop() || '').replace('.mp3', '');
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
       if (key in recitations.ayat) {
         recited.push(recitations.ayat[key]);
         heardLog.push(recitations.ayat[key]);
@@ -106,6 +106,9 @@ const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
 const lastHeard = () => heardLog[heardLog.length - 1];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
+// الخريطة كسولة (إصلاح بطء الخريطة): محطاتٌ بعيدة عن جبهة الطفل تُرسم بطاقاتِ عناوين
+// مطوية. وفحوص هذه الصفحة تعدّ عقد الرحلة كلها، فتفردها أولاً — والفرد بنقرة واحدة.
+const unfoldAll = () => { for (const b of $$('.station-head--fold')) b.click(); };
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 
 async function goto(hash) {
@@ -159,6 +162,7 @@ try {
   ok(stationEls.slice(0, stationEls.indexOf($('.station--quran')))
       .every((s) => !s.classList.contains('station--garden')),
     'وموضعها بعد محطات الحروف كلها وقبل بساتين الحزمة ٧');
+  unfoldAll();
   ok($$('.station--quran .node').length === QURAN.surahs.length + 4,
     `وفيها ${arNum(QURAN.surahs.length + 4)} عقد (حرفان، كلمات، رسم، مقطَّعة، وأربع سور)`);
 
@@ -395,13 +399,17 @@ try {
 
   const audioName = (await win.caches.keys()).find((n) => n.startsWith('muallim-audio'));
   const audioCache = audioName && await win.caches.open(audioName);
-  const cachedAudio = audioCache
-    ? new Set((await audioCache.keys()).map((r) => new URL(r.url).pathname.split('/').pop()))
-    : new Set();
+  const audioKeys = audioCache ? await audioCache.keys() : [];
+  const cachedAudio = new Set(audioKeys.map((r) => new URL(r.url).pathname.split('/').pop()));
   const offline = Object.keys(recitations.ayat).filter((k) => cachedAudio.has(`${k}.mp3`));
   ok(offline.length === Object.keys(recitations.ayat).length,
     `وتلاواتُ القارئ كلها مخزونة فتعمل دون إنترنت (${offline.length}/`
     + `${Object.keys(recitations.ayat).length} في ${audioName})`);
+  // وسمُ بصمة المحتوى: بلا وسمٍ يبقى الجهاز على صوتٍ قديم أبداً بعد أي استبدال
+  const untagged = audioKeys.filter((r) => !new URL(r.url).search.startsWith('?v='));
+  ok(audioKeys.length > 0 && untagged.length === 0,
+    `وكلُّ مخزونٍ صوتيّ بوسم بصمة محتواه (${audioKeys.length} ملفاً`
+    + `${untagged.length ? '، بلا وسم: ' + untagged.length : ''}) — فاستبدالُ ملفٍ يكسر كاشَه وحده`);
 
   // ————— ١٠) التلاوة نفسها: ملفٌّ حقيقيّ يفكّه Chrome (لا مشغّل مزيّف) —————
   // القسم السابق يفحص الوصل بمشغّل مزيَّف؛ وهذا يفحص المادة: كل تلاوةٍ تُفكّ فعلاً

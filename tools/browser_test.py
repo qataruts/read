@@ -10,7 +10,8 @@
     python3 tools/browser_test.py --sentences  # سلّم الجمل (المرحلة ج)
     python3 tools/browser_test.py --stories    # مكتبة «مصنع القصص» (المرحلة د)
     python3 tools/browser_test.py --record     # «اقرأ لي»: تسجيل صوت الطفل (المرحلة و)
-    python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record]
+    python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
+    python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record|--map]
     python3 tools/browser_test.py --show       # بمتصفّح مرئي لتتبّع ما يجري
 
 كيف يعمل: خادم صغير يخدم مجلد app/ ويضيف صفحات الاختبار وحدها من هذا المجلد
@@ -57,6 +58,8 @@ PAGES = {
     "/__stories_shots.html": TOOLS / "browser_stories_shots.html",
     "/__record.html": TOOLS / "browser_record.html",
     "/__record_shots.html": TOOLS / "browser_record_shots.html",
+    "/__map.html": TOOLS / "browser_map.html",
+    "/__map_shots.html": TOOLS / "browser_map_shots.html",
 }
 # أعلامُ جهازٍ وهميّ للميكروفون (اختبار «اقرأ لي»): مجرى صوتٍ مولَّد من Chrome نفسه
 # وقبولٌ تلقائيّ للإذن — فتُختبر دورةُ التسجيل كاملةً بلا ميكروفون حقيقي ولا تفاعل بشري.
@@ -146,6 +149,7 @@ def main():
     ap.add_argument("--sentences", action="store_true", help="سلّم الجمل (المرحلة ج)")
     ap.add_argument("--stories", action="store_true", help="مكتبة «مصنع القصص» (المرحلة د)")
     ap.add_argument("--record", action="store_true", help="«اقرأ لي»: تسجيل صوت الطفل (المرحلة و)")
+    ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
     ap.add_argument("--show", action="store_true", help="متصفّح مرئي")
     args = ap.parse_args()
 
@@ -159,7 +163,8 @@ def main():
         if args.shots:
             out = Path(args.shots).resolve()
             out.unlink(missing_ok=True)   # وإلا لعُدَّت لقطةُ تشغيلٍ سابق نجاحاً فوريّاً
-            page, size = (("__record_shots.html", "1100,3200") if args.record
+            page, size = (("__map_shots.html", "1100,2600") if args.map
+                          else ("__record_shots.html", "1100,3200") if args.record
                           else ("__stories_shots.html", "1100,4200") if args.stories
                           else ("__sentences_shots.html", "1100,3400") if args.sentences
                           else ("__review_shots.html", "1100,3050") if args.review
@@ -179,7 +184,8 @@ def main():
             print(f"اللقطة: {out}" if out.exists() else "تعذّرت اللقطة")
             return 0 if out.exists() else 1
 
-        page = ("__review.html" if args.review else "__story.html" if args.story
+        page = ("__map.html" if args.map
+                else "__review.html" if args.review else "__story.html" if args.story
                 else "__quran.html" if args.quran else "__garden.html" if args.garden
                 else "__sentences.html" if args.sentences
                 else "__stories.html" if args.stories

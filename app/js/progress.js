@@ -25,6 +25,14 @@ export const MASTERED_BOX = 3;       // من بلغه في كل تمارينه �
 
 const listeners = new Set();
 
+// ————— ذاكرة البنية والجبهة —————
+// بنية الرحلة ثابتة وقت التشغيل (بيانات منهج لا حالة طفل)، فتُبنى مرّة واحدة في
+// الجلسة. وحدها «جبهة الفتح» تتحرّك بالنجوم، فتُبطَل مع كل حفظ لا مع كل قراءة.
+let journeyCache = null;
+let nodesCache = null;
+let indexCache = null;      // معرّف العقدة ← موضعها في الرحلة (بحثٌ بزمن ثابت)
+let frontierCache = null;   // موضع أول عقدة ناقصة — null = يحتاج حساباً
+
 function blank() {
   return {
     v: VERSION,
@@ -61,6 +69,7 @@ function load() {
 let state = load();
 
 function save() {
+  frontierCache = null;   // النجوم وحدها تحرّك الجبهة، وكل تغيّر فيها يمرّ من هنا
   state.updatedAt = Date.now();
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(state));
@@ -166,6 +175,7 @@ export function libraryNodes(garden) {
  * المرحلة القرآنية ← (بستان ← سلّم جمله ← قصصه) × البساتين.
  */
 export function journey() {
+  if (journeyCache) return journeyCache;
   const out = [];
   for (const group of GROUPS) {
     out.push({ kind: 'group', id: group.id, group, nodes: groupNodes(group) });
@@ -184,10 +194,9 @@ export function journey() {
       out.push({ kind: 'library', id: `library:${garden.id}`, garden, nodes: stories });
     }
   }
+  journeyCache = out;
   return out;
 }
-
-let nodesCache = null;   // بيانات المنهج ثابتة وقت التشغيل، فتُبنى القائمة مرة واحدة
 
 /** كل عقد الرحلة بالترتيب — عليها يقوم القفل التسلسلي وحساب النجوم. */
 export function allNodes() {
@@ -195,8 +204,16 @@ export function allNodes() {
   return nodesCache;
 }
 
+/** موضع العقدة في الرحلة أو ‑١ — من فهرسٍ مبنيّ مرّة، لا بمسح القائمة في كل نداء. */
+function indexOf(id) {
+  if (!indexCache) indexCache = new Map(allNodes().map((n, i) => [n.id, i]));
+  const index = indexCache.get(id);
+  return index === undefined ? -1 : index;
+}
+
 export function findNode(id) {
-  return allNodes().find((n) => n.id === id) || null;
+  const index = indexOf(id);
+  return index < 0 ? null : allNodes()[index];
 }
 
 // ————— النجوم —————
@@ -243,13 +260,31 @@ export function maxTotalStars() {
 // ————— القفل التسلسلي —————
 // قاعدة واحدة تحكم الرحلة كلها: العقدة تُفتح بإتمام كل ما قبلها في `allNodes()`.
 // فينتظم في حبل واحد: حروف المجموعة، ثم لعبة كلماتها، ثم مهارات ما بعدها وقصصه.
+//
+// والحبلُ الواحد يختصر القاعدة في رقم: ما دام كل ما قبل العقدة يجب أن يكون منجَزاً،
+// فيكفي موضعُ **أول عقدة ناقصة** — «جبهة الفتح». وبها صار القفل قراءةَ رقمٍ لكل
+// عقدة بدل مسحِ كل سوابقها (١٦٢ عقدة كانت تُكلّف الرسمة الواحدة عشرات الآلاف من
+// المقارنات، وتزداد كلما تقدّم الطفل — بلاغ بطء الخريطة على آيباد قديم).
 
-/** العقدة مفتوحة = كل ما سبقها في الرحلة مُنجَز. */
+/**
+ * «جبهة الفتح»: موضع أول عقدة لم تُنجَز (وطولُ الرحلة إن أُتمّت كلها).
+ * كل ما قبلها منجَزٌ بالضرورة، فالعقدة مفتوحة إن كان موضعها ≤ الجبهة — وهي عينُ
+ * القاعدة الأصلية لا تقريبٌ لها. تُحسب كسولاً مرّةً وتُبطَل مع كل حفظ.
+ */
+export function unlockFrontier() {
+  if (frontierCache === null) {
+    const nodes = allNodes();
+    let i = 0;
+    while (i < nodes.length && isDone(nodes[i].id)) i++;
+    frontierCache = i;
+  }
+  return frontierCache;
+}
+
+/** العقدة مفتوحة = كل ما سبقها في الرحلة مُنجَز (أي: موضعها ≤ الجبهة). */
 export function isNodeUnlockedById(id) {
-  const nodes = allNodes();
-  const index = nodes.findIndex((n) => n.id === id);
-  if (index < 0) return false;
-  return nodes.slice(0, index).every((n) => isDone(n.id));
+  const index = indexOf(id);
+  return index >= 0 && index <= unlockFrontier();
 }
 
 /** المجموعة مكتملة = كل حروفها ولعبة كلماتها أُنجزت. */
@@ -270,7 +305,7 @@ export function isNodeUnlocked(groupId, part) {
 
 /** أول عقدة لم تُنجَز في الرحلة — «تابع من هنا». */
 export function nextNode() {
-  return allNodes().find((n) => !isDone(n.id)) || null;   // null = اكتملت الرحلة
+  return allNodes()[unlockFrontier()] || null;   // خارج القائمة = اكتملت الرحلة
 }
 
 // ————— حصيلة الطفل (ما يجوز أن يظهر له في المراجعة) —————

@@ -57,7 +57,7 @@ function attach() {
   win.Audio = class extends win.EventTarget {
     constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
     play() {
-      const key = (this.src.split('/').pop() || '').replace('.mp3', '');
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
       const text = manifest[key] ?? `?${key}`;
       played.push(text);
       heardLog.push(text);

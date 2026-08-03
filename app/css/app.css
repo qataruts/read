@@ -323,6 +323,35 @@ button {
 .station-meta { margin-inline-start: auto; text-align: end; font-size: .9rem; color: var(--ink-soft); }
 .station-meta b { color: var(--star-text); }
 
+/* الخريطة الكسولة: ما بَعُد عن جبهة الطفل بطاقةُ عنوانٍ وحدها، تُفرد بنقرة.
+   العنوان والنجوم والقفل تبقى كما هي — يتغيّر ما تحتها لا ما يقرؤه الطفل. */
+.station--folded { padding-bottom: 1rem; }
+.station--folded .station-head { margin-bottom: 0; }
+
+.station-head--fold {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0;
+  text-align: start;
+}
+
+/* علامة الفرد: دائرةٌ تُشبه رقم المحطة فتُقرأ زرّاً — لا سهمٌ باهت يضيع على طفل */
+.fold-sign {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  margin-inline-start: .5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 14%, var(--mix));
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  transition: transform .15s ease;
+}
+
+.station-head--fold:active .fold-sign { transform: translateY(2px); }
+
 .track {
   display: flex;
   flex-wrap: wrap;

@@ -176,8 +176,9 @@ ok(codeOf(read('js/main.js')).includes('recorder.release()'),
   'والتوجيه يُطلق الميكروفون عند مغادرة الشاشة (لا يتبع الطفلَ إلى غيرها)');
 
 const sw = read('sw.js');
-ok(sw.includes("'js/recorder.js'") && sw.includes("'js/recordings.js'") && sw.includes("VERSION = 'v7'"),
-  'ووحدتا التسجيل في مخزون العمل دون إنترنت بنسخةٍ مرفوعة (v7)');
+const swVersion = Number((sw.match(/VERSION = 'v(\d+)'/) || [])[1]);
+ok(sw.includes("'js/recorder.js'") && sw.includes("'js/recordings.js'") && swVersion >= 7,
+  `ووحدتا التسجيل في مخزون العمل دون إنترنت بنسخةٍ مرفوعة (v${swVersion} ≥ v7)`);
 ok(!/recordings|clips|blob/i.test(codeOf(sw).replace(/js\/recordings\.js/g, '')),
   'ولا يمرّ صوتُ الطفل بعامل الخدمة أصلاً — لا خزنَ له ولا اعتراض');
 

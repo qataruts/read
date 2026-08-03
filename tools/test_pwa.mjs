@@ -38,7 +38,8 @@ walk('./');
 
 // ملفات الهيكل: كل ما في app/ عدا ما يُخزَن من فهرسه (الأصوات وقصص المكتبة)
 // وعامل الخدمة نفسه. القصةُ الجديدة تدخل المخزون بفهرسها لا بسطرٍ يدويّ في sw.js.
-const wanted = onDisk.filter((p) => !p.startsWith('audio/') || p === 'audio/manifest.json')
+const wanted = onDisk.filter((p) => !p.startsWith('audio/')
+    || p === 'audio/manifest.json' || p === 'audio/versions.json')
   .filter((p) => !p.startsWith('data/stories/') || p === 'data/stories/index.json')
   .filter((p) => p !== 'sw.js');
 
@@ -68,7 +69,13 @@ ok(dead.length === 0, `كل وحدات js مستوردة من شجرة main.js${
 
 // ————— ٢. الاستراتيجيتان: الأصوات من المخزون، والهيكل يُحدَّث في الخلفية —————
 
-ok(/AUDIO_RE\s*=\s*\/.*audio.*mp3/.test(sw), 'الأصوات لها مسار خزنٍ خاص (اسمها sha1 فلا يتغيّر محتواها)');
+ok(/AUDIO_RE\s*=\s*\/.*audio.*mp3/.test(sw), 'الأصوات لها مسار خزنٍ خاص (اسمها sha1 نصِّها)');
+// اسمُ الملف من نصّه لا من محتواه، فالخزن بالرابط وحده يُبقي جهازاً على صوتٍ
+// قديم بعد أي استبدال — التفصيل والسيناريو الكامل في tools/test_audio_cache.mjs
+ok(shell.includes('audio/versions.json') && sw.includes("json('audio/versions.json')"),
+  'وبيانُ بصمات المحتوى مخزونٌ ومقروء (كسر الكاش عند استبدال صوتٍ تحت مفتاحه)');
+ok(/\?v=\$\{tags\[key\]\}/.test(sw) && sw.includes('dropOtherTags'),
+  'والخزن بالرابط الموسوم مع كنس الوسم الأقدم لذلك الملف وحده');
 ok(sw.includes('cacheFirst') && sw.includes('staleWhileRevalidate'),
   'واستراتيجيتان: المخزون أولاً للصوت، والتحديث في الخلفية للهيكل');
 ok(sw.includes('precacheAudio') && sw.includes('audio/manifest.json'),

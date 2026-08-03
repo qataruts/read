@@ -51,7 +51,7 @@ function attach() {
   win.Audio = class extends win.EventTarget {
     constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
     play() {
-      const key = (this.src.split('/').pop() || '').replace('.mp3', '');
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
       const text = manifest[key] ?? `?${key}`;
       played.push(text);
       heardLog.push(text);
@@ -97,6 +97,9 @@ const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
 const lastHeard = () => heardLog[heardLog.length - 1];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
+// الخريطة كسولة (إصلاح بطء الخريطة): محطاتٌ بعيدة عن جبهة الطفل تُرسم بطاقاتِ عناوين
+// مطوية. وفحوص هذه الصفحة تعدّ عقد الرحلة كلها، فتفردها أولاً — والفرد بنقرة واحدة.
+const unfoldAll = () => { for (const b of $$('.station-head--fold')) b.click(); };
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 
 async function goto(hash) {
@@ -208,6 +211,7 @@ try {
     'وموضعها بعد محطة الخاتمة القرآنية');
   ok($$('.station--garden').every((s) => s.classList.contains('station--locked')),
     'وكلها مقفلة في بداية الرحلة');
+  unfoldAll();
   ok($$('.station--garden .node').length === GARDENS.reduce((s, g) => s + g.bundles.length, 0),
     `وعقدها باقات المعجم كلها (${arNum(GARDENS.reduce((s, g) => s + g.bundles.length, 0))} باقة)`);
 
@@ -261,6 +265,7 @@ try {
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
+  unfoldAll();
   const done = $$('.station--garden')[1].querySelectorAll('.node--done').length;
   ok(done === 1, `والخريطة تُظهر الباقة المُنجَزة في بستانها (${arNum(done)})`);
 

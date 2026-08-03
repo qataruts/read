@@ -163,8 +163,13 @@ const selfObj = {
   clients: { claim: async () => {} },
 };
 
-vm.runInContext(read('app/sw.js'),
+const swSource = read('app/sw.js');
+vm.runInContext(swSource,
   vm.createContext({ self: selfObj, caches, fetch: fakeFetch, URL, Request, Response, console }));
+
+// اسم المخزون من `sw.js` نفسِه لا مكتوباً هنا: كل جلسة تمسّ ملفات الهيكل ترفع
+// VERSION (قاعدة sw.js)، فلو ثبّتناه هنا لاحمرّ هذا الفحص في وجه كل إصلاح.
+const SW_VERSION = swSource.match(/const VERSION = '([^']+)'/)[1];
 
 const fire = async (type) => {
   let waited;
@@ -179,7 +184,7 @@ const request = async (path) => {
   });
   return answer ? answer : null;
 };
-const audioCache = async () => caches.open('muallim-audio-v8');
+const audioCache = async () => caches.open(`muallim-audio-${SW_VERSION}`);
 const cachedUrls = async () => [...(await audioCache()).entries.keys()].sort();
 
 // ——— التركيب الأول: تُخزَن الأصوات بروابطها الموسومة ———
@@ -191,7 +196,7 @@ ok(first.length === 3 && first.every((u) => u.includes('?v=')),
   `التركيب يخزن الأصوات الثلاثة بروابط موسومة (${first.length})`);
 ok(first.includes(`${SCOPE}audio/${KEY_A}.mp3?v=1111aaaa`), 'ومنها ملف ألف بوسمه القديم');
 ok(first.includes(`${SCOPE}audio/${KEY_R}.mp3?v=3333cccc`), 'وتلاوةُ القارئ بوسمها من بيانها');
-const shellCache = await caches.open('muallim-shell-v8');
+const shellCache = await caches.open(`muallim-shell-${SW_VERSION}`);
 ok([...shellCache.entries.keys()].some((u) => u.endsWith('audio/versions.json')),
   'وبيان البصمات نفسه مخزون في الهيكل (فيُقرأ دون إنترنت)');
 

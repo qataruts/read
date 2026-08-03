@@ -24,6 +24,21 @@ import {
 const app = document.getElementById('app');
 
 // ————— خريطة الرحلة —————
+//
+// **الخريطة كسولة** (بلاغ المالك: بطء أواخر الرحلة على آيباد قديم): الرحلة عشرات
+// المحطات و١٦٢ عقدة، ورسمُها كلها في كل مرة يُثقل الجهاز بما لا ينظر إليه الطفل.
+// فالبعيد عن جبهته بطاقةُ عنوانٍ مطوية تُفرد بنقرة — ينكمش DOM الصفحة أضعافاً،
+// ولا تبعد أيّ عقدة عن الطفل أكثر من نقرتين (افرِد المحطة، ثم اختر العقدة).
+
+const FOLD_NEAR = 2;          // محطتان قبل جبهة الطفل ومحطتان بعدها مفرودتان ابتداءً
+const unfolded = new Set();   // ما فرده الطفل بيده — يبقى مفروداً ما دامت الجلسة
+
+/** المحطة التي عليها جبهة الطفل — وآخرُ محطة إن أتمّ الرحلة كلها. */
+function focusIndex(sections, next) {
+  if (!next) return sections.length - 1;
+  const index = sections.findIndex((s) => s.nodes.includes(next));
+  return index < 0 ? 0 : index;
+}
 
 function renderMap() {
   const earned = progress.totalStars();
@@ -66,16 +81,20 @@ function renderMap() {
   }
 
   // الدرب المتعرج: انعطافة خيط بين كل محطتين، يمنةً مرة ويسرةً مرة (DESIGN §٦)
+  const sections = progress.journey();
+  const focus = focusIndex(sections, next);
   let groupIndex = 0;
   let stations = 0;
-  for (const section of progress.journey()) {
+  for (const [index, section] of sections.entries()) {
     if (stations++) main.append(trailEl(stations % 2 === 0));
-    main.append(section.kind === 'group' ? stationEl(section, groupIndex++, next)
-      : section.kind === 'quran' ? quranEl(section, next)
-        : section.kind === 'garden' ? gardenEl(section, next)
-          : section.kind === 'ladder' ? ladderEl(section, next)
-            : section.kind === 'library' ? libraryEl(section, next)
-              : interludeEl(section, next));
+    // المطويّ: ما بَعُد عن جبهة الطفل ولم يفرده بيده في هذه الجلسة
+    const folded = Math.abs(index - focus) > FOLD_NEAR && !unfolded.has(section.id);
+    main.append(section.kind === 'group' ? stationEl(section, groupIndex++, next, folded)
+      : section.kind === 'quran' ? quranEl(section, next, folded)
+        : section.kind === 'garden' ? gardenEl(section, next, folded)
+          : section.kind === 'ladder' ? ladderEl(section, next, folded)
+            : section.kind === 'library' ? libraryEl(section, next, folded)
+              : interludeEl(section, next, folded));
   }
 
   if (DEV) {
@@ -126,13 +145,15 @@ function reviewCard() {
   );
 }
 
-function stationEl(section, index, next) {
+function stationEl(section, index, next, folded) {
   const group = section.group;
   const unlocked = progress.isGroupUnlocked(group.id);
   const stats = progress.groupStars(group);
   const complete = progress.isGroupComplete(group);
 
   return trackEl({
+    id: section.id,
+    folded,
     className: `station${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: ACCENTS[index % ACCENTS.length],
     mark: 'house',
@@ -150,12 +171,14 @@ function stationEl(section, index, next) {
  * محطة ما بين المجموعتين: دروس العلامات والقصص (§٥ من المنهج).
  * تُميَّز بلونها وشكلها كي يعرف الطفل — ووليّ أمره — أنها استراحة من الحروف.
  */
-function interludeEl(section, next) {
+function interludeEl(section, next, folded) {
   const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
   const complete = section.nodes.every((n) => progress.isDone(n.id));
   const earned = section.nodes.reduce((sum, n) => sum + progress.getStars(n.id), 0);
 
   return trackEl({
+    id: section.id,
+    folded,
     className: `station station--pause${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: PAUSE_ACCENT,
     mark: 'bridge',
@@ -175,12 +198,14 @@ function interludeEl(section, next) {
  * محطة الخاتمة: المرحلة القرآنية (§١.٢ و§٥.٦). خضرتها تميّزها عن كل ما قبلها،
  * ولا تُفتح إلا بإتمام الرحلة كلها — فهي تتويج التأسيس لا بديل عنه.
  */
-function quranEl(section, next) {
+function quranEl(section, next, folded) {
   const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
   const complete = section.nodes.every((n) => progress.isDone(n.id));
   const earned = section.nodes.reduce((sum, n) => sum + progress.getStars(n.id), 0);
 
   return trackEl({
+    id: section.id,
+    folded,
     className: `station station--quran${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: QURAN_ACCENT,
     mark: 'dome',
@@ -200,13 +225,15 @@ function quranEl(section, next) {
  * بستان موضوعات (الحزمة ٧): محطةٌ لكل موضوع، عقدها باقات من خمس كلمات.
  * تأتي بعد المرحلة القرآنية — هنا يتوسّع الرصيد بعد أن اكتمل فكّ الشيفرة.
  */
-function gardenEl(section, next) {
+function gardenEl(section, next, folded) {
   const garden = section.garden;
   const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
   const complete = section.nodes.every((n) => progress.isDone(n.id));
   const earned = section.nodes.reduce((sum, n) => sum + progress.getStars(n.id), 0);
 
   return trackEl({
+    id: section.id,
+    folded,
     className: `station station--garden${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: accentForGarden(garden),
     mark: 'garden',
@@ -229,7 +256,7 @@ function gardenEl(section, next) {
  * محطة «سلّم الجمل» (الحزمة ٨): درجاتٌ بعد كل بستان — من الكلمة إلى الجملة.
  * لونها لون القصص (قراءة متصلة)، ومعلمها سلّم يميّزها عن بستانها الزيتوني.
  */
-function ladderEl(section, next) {
+function ladderEl(section, next, folded) {
   const garden = section.garden;
   const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
   const complete = section.nodes.every((n) => progress.isDone(n.id));
@@ -237,6 +264,8 @@ function ladderEl(section, next) {
   const sentences = section.ladder.rungs.reduce((sum, r) => sum + r.sentences.length, 0);
 
   return trackEl({
+    id: section.id,
+    folded,
     className: `station station--ladder${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: SENTENCE_ACCENT,
     mark: 'ladder',
@@ -257,7 +286,7 @@ function ladderEl(section, next) {
  * محطة «مكتبة القصص» (الحزمة ٩): قصةٌ لكل عقدة، بعد سلّم جمل بستانها — بها يُتوَّج
  * البستان: كلماتُه ثم جملُه ثم قصةٌ تجمعها. لونها لون القصص، ومعلمها كتابٌ مفتوح.
  */
-function libraryEl(section, next) {
+function libraryEl(section, next, folded) {
   const garden = section.garden;
   const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
   const complete = section.nodes.every((n) => progress.isDone(n.id));
@@ -265,6 +294,8 @@ function libraryEl(section, next) {
   const levels = [...new Set(section.nodes.map((n) => n.story.level))];
 
   return trackEl({
+    id: section.id,
+    folded,
     className: `station station--library${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: STORY_ACCENT,
     mark: 'book',
@@ -291,31 +322,60 @@ function accentOf(node, group) {
   return accentFor(group);
 }
 
-/** انعطافة خيط الدرب بين محطتين — زخرفة صامتة. */
+/**
+ * انعطافة خيط الدرب بين محطتين — زخرفة صامتة. تتكرّر أربعين مرة في كل رسمة،
+ * فيُحلَّل رسمها مرة واحدة ثم يُستنسخ (تحليل HTML أغلى من نسخ عقدة جاهزة).
+ */
+let trailTemplate = null;
 function trailEl(flip) {
-  const el = h('div', { class: `trail${flip ? ' trail--flip' : ''}`, 'aria-hidden': 'true' });
-  el.innerHTML = `<svg viewBox="0 0 72 36" fill="none">
-    <path d="M14 2 C 40 10, 32 26, 58 34" stroke="var(--ink-soft)" stroke-width="3"
-      stroke-linecap="round" stroke-dasharray="1 8" opacity=".55"/></svg>`;
+  if (!trailTemplate) {
+    trailTemplate = h('div', { class: 'trail', 'aria-hidden': 'true' });
+    trailTemplate.innerHTML = `<svg viewBox="0 0 72 36" fill="none">
+      <path d="M14 2 C 40 10, 32 26, 58 34" stroke="var(--ink-soft)" stroke-width="3"
+        stroke-linecap="round" stroke-dasharray="1 8" opacity=".55"/></svg>`;
+  }
+  const el = trailTemplate.cloneNode(true);
+  if (flip) el.classList.add('trail--flip');
   return el;
 }
 
-function trackEl({ className, accent, mark, label, badge, title, sub, meta, nodes, next }) {
-  const station = h('section', { class: className, css: { '--accent': accent }, 'aria-label': label },
-    h('div', { class: 'station-head' },
+/**
+ * محطة على الدرب. المطويّة تُرسَم عنواناً وحده في زرّ يفردها — فيبقى الطفل يرى
+ * أين هو ومَن حوله (اسم المحطة ونجومها وقفلها كما هي)، ولا يُبنى من العقد إلا ما
+ * يقع تحت بصره. وفرْدُها يبقى ما دامت الجلسة، فلا تُطوى تحت يده كلما عاد إليها.
+ */
+function trackEl({ id, folded, className, accent, mark, label, badge, title, sub, meta, nodes, next }) {
+  const station = h('section', { class: className, css: { '--accent': accent }, 'aria-label': label });
+  let open = !folded;
+
+  function paint() {
+    station.classList.toggle('station--folded', !open);
+    const inner = [
       h('span', { class: 'station-num' }, badge),
       h('div', {},
         h('h2', {}, title),
         h('p', { class: 'station-letters' }, sub),
       ),
       h('div', { class: 'station-meta' }, meta),
-    ),
-  );
+    ];
 
-  const track = h('ol', { class: 'track' });
-  for (const node of nodes) track.append(h('li', {}, nodeButton(node, next)));
-  station.append(track);
-  if (mark) station.append(landmark(mark));
+    if (!open) {
+      station.replaceChildren(h('button', {
+        class: 'station-head station-head--fold',
+        'aria-expanded': 'false',
+        'aria-label': `${label} · انقر لعرض عقدها`,
+        onclick: () => { unfolded.add(id); open = true; paint(); },
+      }, inner, h('span', { class: 'fold-sign', 'aria-hidden': 'true' }, '▾')));
+      return;
+    }
+
+    const track = h('ol', { class: 'track' });
+    for (const node of nodes) track.append(h('li', {}, nodeButton(node, next)));
+    station.replaceChildren(h('div', { class: 'station-head' }, inner), track);
+    if (mark) station.append(landmark(mark));
+  }
+
+  paint();
   return station;
 }
 

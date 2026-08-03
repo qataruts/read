@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>لقطات الخريطة الكسولة</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: start; }
+    .cell { background: rgba(255,255,255,.35); border-radius: 24px; padding: .5rem; }
+    .cell > h4 { margin: .2rem 0 .4rem; text-align: center; color: #1971c2; }
+    .app { max-width: none; padding: 0; }
+    .dev { display: none; }
+  </style>
+</head>
+<body>
+<div id="toast" class="toast" hidden></div>
+<div class="grid" id="grid"></div>
+
+<script type="module">
+// الخريطة الكسولة (إصلاح بطء الخريطة): البعيد عن جبهة الطفل بطاقةُ عنوانٍ مطوية
+// تُفرد بنقرة، وما حول الجبهة مفرودٌ ابتداءً — في أوّل الرحلة كما في آخرها.
+import * as progress from './js/progress.js';
+
+window.Audio = class { play() { return new Promise(() => {}); } pause() {} };
+Element.prototype.scrollIntoView = () => {};
+
+const grid = document.getElementById('grid');
+function cell(title) {
+  const box = document.createElement('div');
+  box.className = 'cell';
+  box.innerHTML = `<h4>${title}</h4>`;
+  const app = document.createElement('div');
+  app.className = 'app';
+  box.append(app);
+  grid.append(box);
+  return app;
+}
+
+const lazy = cell('١ — عند ٩٠٪: البعيد بطاقةُ عنوانٍ مطوية');
+const opened = cell('٢ — نقرةٌ واحدة تفرد المحطة فتظهر عقدها');
+const start = cell('٣ — أول الرحلة: الجبهة عند أولها');
+start.id = 'app';
+
+/** الرحلة أطول من أي لقطة: بطاقتا الرأس ونافذةٌ حول جبهة الطفل. */
+function trim(around = 8, after = 5) {
+  const track = document.querySelector('#app .map');
+  const kids = [...track.children];
+  const at = kids.indexOf(track.querySelector('[data-next]').closest('.station'));
+  track.replaceChildren(
+    ...kids.filter((el) => el.classList.contains('continue')),
+    ...kids.slice(Math.max(0, at - around), at + after),
+  );
+  return track;
+}
+
+const all = progress.allNodes();
+for (const node of all.slice(0, Math.floor(all.length * 0.9))) progress.setStars(node.id, 3);
+await import('./js/main.js');
+
+lazy.append(trim().cloneNode(true));                             // الحال كما تُرسم للطفل
+document.querySelector('#app .station-head--fold').click();      // ثم أثر النقرة الواحدة
+opened.append(document.querySelector('#app .map').cloneNode(true));
+
+progress.reset();                                                // ثم طفلٌ في أول يوم
+window.dispatchEvent(new Event('hashchange'));
+trim(0, 6);
+</script>
+</body>
+</html>

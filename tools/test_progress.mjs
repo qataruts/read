@@ -61,6 +61,49 @@ ok(reloaded.stars['g1:ا'] === 3, 'الحالة محفوظة ويمكن استر
 p.reset();
 ok(p.totalStars() === 0 && !p.isGroupUnlocked('g2'), 'المحو يعيد كل شيء');
 
+// ————— «جبهة الفتح»: القاعدة نفسها بحسابٍ واحد لا بمسحٍ لكل عقدة —————
+// (إصلاح بطء الخريطة) الاختبار هنا ليس على السلوك الجديد بل على **أنه لا جديد**:
+// تُقاس الجبهة على القاعدة الأصلية حرفياً — مسحُ كل السوابق لكل عقدة — في أحوال
+// الرحلة كلها: أوّلها، ووسطها، وآخرها، ونجمةٍ متقدّمة لا تخرق التسلسل.
+
+const all = p.allNodes();
+const before = (id) => {   // القاعدة الأصلية كما كانت قبل الإصلاح، حرفاً بحرف
+  const index = all.findIndex((n) => n.id === id);
+  return index >= 0 && all.slice(0, index).every((n) => p.isDone(n.id));
+};
+const agrees = (where) => {
+  const bad = all.filter((n) => p.isNodeUnlockedById(n.id) !== before(n.id));
+  ok(bad.length === 0, `الجبهة = القاعدة الأصلية في كل عقدة ${where}`
+    + (bad.length ? ` — خالفت في ${bad.length} عقدة (${bad[0].id})` : ''));
+};
+
+ok(p.journey() === p.journey() && p.allNodes() === p.allNodes(),
+  'بنية الرحلة تُبنى مرة واحدة (لا إعادة بناءٍ مع كل رسمة)');
+ok(p.unlockFrontier() === 0 && p.nextNode() === all[0], 'الجبهة عند الصفر في بداية الرحلة');
+agrees('في بدايتها');
+
+const ninety = Math.floor(all.length * 0.9);
+for (const node of all.slice(0, ninety)) p.setStars(node.id, 3);
+ok(p.unlockFrontier() === ninety && p.nextNode() === all[ninety],
+  `وتتقدّم مع الطفل (عند ٩٠٪: العقدة ${ninety} من ${all.length})`);
+agrees('عند تقدّمٍ ٩٠٪');
+
+p.setStars(all[all.length - 1].id, 3);   // نجمة متقدّمة خلف الجبهة (تعبئة تجريبية أو بيانات قديمة)
+ok(!p.isNodeUnlockedById(all[all.length - 1].id) && p.unlockFrontier() === ninety,
+  'ونجمةٌ على عقدةٍ خلف الجبهة لا تفتحها ولا تحرّك الجبهة');
+agrees('ومعها نجمةٌ متقدّمة');
+
+for (const node of all) p.setStars(node.id, 3);
+ok(p.unlockFrontier() === all.length && p.nextNode() === null,
+  'وبإتمام الرحلة تبلغ الجبهة آخرها فلا «تابع من هنا»');
+agrees('بعد إتمامها');
+
+p.reset();
+ok(p.unlockFrontier() === 0 && !p.isNodeUnlockedById(all[1].id),
+  'والمحو يُرجع الجبهة إلى أولها (الذاكرة تُبطَل مع كل حفظ)');
+ok(p.findNode(all.at(-1).id) === all.at(-1) && p.findNode('لا-وجود-لها') === null,
+  'والبحث عن عقدة بفهرسها يصيب آخر الرحلة ويردّ المجهولة');
+
 // ————— الجلسة ٥: سجلّ المهارات والتكرار المتباعد —————
 
 const today = p.dayNumber();

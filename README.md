@@ -29,13 +29,17 @@ python3 -m http.server 8000 -d app
 ## الأصوات
 
 كل نصّ في المنهج له ملف `app/audio/<key>.mp3` واسمه sha1 لنصّه العربي — فاستبدال أي
-ملف بتسجيل بشري لا يمسّ سطراً من الشيفرة.
+ملف بتسجيل بشري لا يمسّ سطراً من الشيفرة. ولأنّ الاسم من **النصّ** لا من المحتوى،
+يكتب المولّد مع الفهرس بيانَ **بصمات المحتوى** `app/audio/versions.json` (أول ٨ من
+sha1 البايتات) يطلب به التطبيق `<key>.mp3?v=<بصمة>` — فيكسر استبدالُ صوتٍ كاشَ ملفه
+وحده على كل جهاز، ولولاه بقي مَن خزّن القديم على القديم أبداً.
 
 ```bash
 .venv/bin/python tools/generate_audio.py                 # الناقص فقط (Gemini TTS)
 .venv/bin/python tools/generate_audio.py --force         # إعادة توليد الكل
 .venv/bin/python tools/generate_audio.py --audition      # صفحة مفاضلة أصوات
-.venv/bin/python tools/generate_audio.py --verify-only   # تحقّق: لا ناقص ولا يتيم ولا مبتور
+.venv/bin/python tools/generate_audio.py --verify-only   # تحقّق: لا ناقص ولا يتيم ولا مبتور ولا بصمة قديمة
+.venv/bin/python tools/generate_audio.py --sync-versions  # إعادة اشتقاق بصمات المحتوى (بلا شبكة)
 .venv/bin/python tools/generate_audio.py --engine edge   # المحرّك الاحتياطي (مايكروسوفت)
 
 .venv/bin/python tools/generate_audio.py --queue-status   # قائمة الانتظار (docs/AUDIO_QUEUE.md)
@@ -60,10 +64,12 @@ node tools/test_review.mjs           # جلسة المراجعة (مفكوكيت
 node tools/test_quran.mjs            # المرحلة القرآنية وأصالة نصّ المصحف
 node tools/test_lexicon.mjs          # المعجم والبساتين ووصل قياسها بالمراجعة
 node tools/test_pwa.mjs              # العمل دون إنترنت
+node tools/test_audio_cache.mjs      # بصمات المحتوى وكسر كاش الصوت (سيناريو استبدال كامل)
 python3 tools/browser_test.py        # درس الحرف في Chrome حقيقي
 python3 tools/browser_test.py --words    # لعبة الكلمات في Chrome حقيقي (المجموعات السبع)
 python3 tools/browser_test.py --review   # المراجعة اليومية ولوحة وليّ الأمر في Chrome حقيقي
 python3 tools/browser_test.py --story    # دروس المهارات وشاشة قراءة القصص
 python3 tools/browser_test.py --quran    # المرحلة القرآنية والعمل دون إنترنت
 python3 tools/browser_test.py --garden   # بساتين الموضوعات (حديقة الكلمات)
+python3 tools/browser_test.py --map      # الخريطة: جبهة الفتح والطيّ الكسول وقياس سرعتهما
 ```
