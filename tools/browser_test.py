@@ -63,7 +63,19 @@ PAGES = {
     "/__map_shots.html": TOOLS / "browser_map_shots.html",
     "/__gate.html": TOOLS / "browser_gate.html",
     "/__gate_shots.html": TOOLS / "browser_gate_shots.html",
+    "/__device.html": TOOLS / "browser_device.html",
 }
+# نافذة Chrome بلا واجهة تحجز ٨٧ بكسلاً لإطارٍ وهميّ فوق المنظور — فلولا تعويضها لقِسنا
+# جهازاً أقصر من الجهاز. والصفحة تعيد منظورها الحقيقي، والعدّاء يرفض أي انحرافٍ عن المطلوب.
+VIEWPORT_PAD = 87
+# مقاسات الجهاز الحقيقية (بكسل CSS) — بلاغ المالك عن الآيباد جاء من هذه الأرقام لا من نافذة سطح مكتب
+DEVICE_SIZES = [
+    ("آيباد ٩٫٧ طولي", "768,1024"),
+    ("آيباد ١٠٫٩ طولي", "820,1180"),
+    ("آيباد ٩٫٧ عرضي", "1024,768"),
+    ("آيباد ١٠٫٩ عرضي", "1180,820"),
+    ("آيباد ميني عرضي", "1133,744"),
+]
 # أعلامُ جهازٍ وهميّ للميكروفون (اختبار «اقرأ لي»): مجرى صوتٍ مولَّد من Chrome نفسه
 # وقبولٌ تلقائيّ للإذن — فتُختبر دورةُ التسجيل كاملةً بلا ميكروفون حقيقي ولا تفاعل بشري.
 FAKE_MEDIA = ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"]
@@ -139,6 +151,137 @@ def run_chrome(url: str, profile: Path, extra: list, show: bool):
     return subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+# الشاشات التي **يجب** أن تسع الوضع العرضي بلا سحب: خطوات الدرس والمهارة والبوابة —
+# بطلاتُ «الصندوق الكبير» وشقيقاتُها. وما عداها (قصة، مراجعة، بستان) قوائمُ تطول بطبعها
+# فالسحب فيها أصلٌ لا عطب.
+LANDSCAPE_MUST_FIT = {
+    "lesson-listen", "lesson-harakat", "lesson-trace", "lesson-quiz",
+    "skill-rule", "skill-compare", "skill-quiz", "gate",
+}
+
+
+# الحروف الممثِّلة لأصناف الأجرام (بلاغ المهمة): ألفٌ طويلة، باءٌ منقوطة تحت، ميمٌ نازلة،
+# عينٌ وسطى، غينٌ منقوطة فوق — عليها تُحكَّم المعايرة بالعين بعد أن يحكم عليها العدد.
+SAMPLE_LETTERS = "ابمعغ"
+# أقصى بقيّةٍ مقبولة بعد الرفعة (بكسل، عند ١٤٤ بكسل حجم خط الصندوق) — تدوير الوحدات لا أكثر.
+LIFT_TOLERANCE = 1.0
+
+
+def report_metrics(results) -> int:
+    """معايرة توسيط الحرف: انزياح مركز الحبر عن مركز الصندوق، حرفاً حرفاً."""
+    if not results:
+        print("لم تصل نتيجة المعايرة من المتصفّح.")
+        return 1
+    m = results[0]
+    rows = m["rows"]
+    print(f"الخط: {m['font']}")
+    print(f"مقاييسه: صعود {m['asc']:.1f} · هبوط {m['desc']:.1f}"
+          f" → خط الأساس تحت مركز السطر بـ{m['base']:.1f}px\n")
+    print("الحروف الممثِّلة — انزياح الحبر قبل الرفعة / الرفعة المطبَّقة / ما بقي:")
+    for ch in SAMPLE_LETTERS:
+        r = next((x for x in rows if x["ch"] == ch), None)
+        if r:
+            print(f"  {ch}: {r['off']:+7.1f}px → رفعة {r['ty']:+7.1f}px → بقي {r['rest']:+5.1f}px")
+    worst = max(rows, key=lambda r: abs(r["rest"]))
+    print(f"\nأسوأ بقيّةٍ في {len(rows)} حرفاً: {worst['ch']} بـ{worst['rest']:+.1f}px")
+    ok = abs(worst["rest"]) <= LIFT_TOLERANCE
+    print(("✓ " if ok else "✗ ") + f"حبر كل حرفٍ في مركز صندوقه ضمن السماح {LIFT_TOLERANCE}px"
+          if ok else f"✗ البقيّة تتجاوز السماح {LIFT_TOLERANCE}px — راجع giantInk في ui.js")
+    return 0 if ok else 1
+
+
+def window_of(size: str) -> str:
+    """مقاس نافذةٍ يعطي منظوراً بمقاس الجهاز المطلوب تماماً."""
+    w, h = (int(x) for x in size.split(","))
+    return f"{w},{h + VIEWPORT_PAD}"
+
+
+def device_main(args):
+    """صفحة الجهاز: قياس الفائض الرأسي بمقاسات آيباد حقيقية، أو لقطة شاشةٍ واحدة."""
+    results = []
+    server = make_server(args.port, results)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    profile = Path(tempfile.mkdtemp(prefix="muallim-chrome-"))
+    base = f"http://127.0.0.1:{args.port}"
+
+    try:
+        if args.shots:
+            out = Path(args.shots).resolve()
+            out.unlink(missing_ok=True)
+            url = (f"{base}/__device.html?screen={args.screen or 'lesson-listen'}"
+                   + ("&flat=1" if args.flat else ""))
+            proc = run_chrome(url, profile,
+                              [f"--screenshot={out}", f"--window-size={window_of(args.size or '1180,820')}",
+                               "--hide-scrollbars"],
+                              args.show)
+            deadline = time.time() + args.timeout
+            while time.time() < deadline and not out.exists():
+                time.sleep(0.4)
+            proc.kill()
+            print(f"اللقطة: {out}" if out.exists() else "تعذّرت اللقطة")
+            return 0 if out.exists() else 1
+
+        if args.metrics:
+            proc = run_chrome(f"{base}/__device.html?metrics=1", profile,
+                              [f"--window-size={window_of(args.size or '1180,820')}", "--hide-scrollbars"],
+                              args.show)
+            deadline = time.time() + args.timeout
+            while time.time() < deadline and not results:
+                time.sleep(0.4)
+            proc.kill()
+            return report_metrics(results)
+
+        sizes = [("مقاس مطلوب", args.size)] if args.size else DEVICE_SIZES
+        runs = []
+        for label, size in sizes:
+            results.clear()
+            proc = run_chrome(f"{base}/__device.html", profile,
+                              [f"--window-size={window_of(size)}", "--hide-scrollbars"], args.show)
+            deadline = time.time() + args.timeout
+            while time.time() < deadline and not results:
+                time.sleep(0.4)
+            proc.kill()
+            if not results:
+                print(f"لم تصل نتيجة من المقاس {label} ({size})")
+                return 1
+            runs.append((label, size, list(results)))
+    finally:
+        server.shutdown()
+        shutil.rmtree(profile, ignore_errors=True)
+
+    bad = []
+    for label, size, rows in runs:
+        vw, vh = (int(x) for x in size.split(","))
+        wide = vw > vh
+        got = f"{rows[0]['vw']}×{rows[0]['vh']}"
+        print(f"\n— {label} ({vw}×{vh}) {'عرضي' if wide else 'طولي'} —")
+        if (rows[0]["vw"], rows[0]["vh"]) != (vw, vh):
+            print(f"  ✗ المنظور الفعليّ {got} لا يطابق المطلوب — عايِر VIEWPORT_PAD")
+            bad.append((label, "المنظور", f"جاء {got}"))
+        for r in rows:
+            if r.get("error"):
+                print(f"  ✗ {r['label']}: عطب — {r['error']}")
+                bad.append((label, r["id"], r["error"]))
+                continue
+            over, over_x = r["over"], r["overX"]
+            must = wide and r["id"] in LANDSCAPE_MUST_FIT
+            fail = over_x > 0 or (must and over > 0)
+            if fail:
+                bad.append((label, r["id"], f"فائض رأسي {over}px" if over else f"فائض أفقي {over_x}px"))
+            mark = "✗" if fail else ("·" if over else "✓")
+            note = f"الطول {r['h']}px" + (f" — فائض رأسي {over}px" if over else " — يسع الشاشة")
+            print(f"  {mark} {r['label']}: {note}"
+                  + (f" — فائض أفقي {over_x}px" if over_x else ""))
+
+    if bad:
+        print(f"\n{len(bad)} إخفاق:")
+        for label, sid, why in bad:
+            print(f"  ✗ {label} · {sid}: {why}")
+        return 1
+    print("\nكل الشاشات المحروسة تسع الوضع العرضي بلا سحب، ولا فائض أفقي في أي مقاس.")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8790)
@@ -154,8 +297,19 @@ def main():
     ap.add_argument("--record", action="store_true", help="«اقرأ لي»: تسجيل صوت الطفل (المرحلة و)")
     ap.add_argument("--gate", action="store_true", help="بوابتا الإتقان: العبور والإخفاق والإعادة والترحيل")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
+    ap.add_argument("--device", action="store_true",
+                    help="قياس الفائض الرأسي بمقاسات جهاز حقيقي في الوضعين (ومعه --shots --screen للقطة)")
+    ap.add_argument("--screen", help="اسم شاشةٍ واحدة في صفحة الجهاز (مع --device --shots)")
+    ap.add_argument("--metrics", action="store_true",
+                    help="معايرة توسيط الحرف البطل في صندوقه (مع --device)")
+    ap.add_argument("--flat", action="store_true",
+                    help="لقطةٌ بلا رفعة الحرف — صورة «قبل» للمقارنة (مع --device --shots)")
+    ap.add_argument("--size", help="مقاس النافذة W,H لصفحة الجهاز (مع --device)")
     ap.add_argument("--show", action="store_true", help="متصفّح مرئي")
     args = ap.parse_args()
+
+    if args.device:
+        return device_main(args)
 
     results = []
     server = make_server(args.port, results)

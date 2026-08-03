@@ -11,7 +11,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import {
   h, toast, go, arNum, starsRow, topbar, letterTitle, wordText,
-  accentFor, mascot, shuffle, pick, shake, pop, DEV,
+  accentFor, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
 } from './ui.js';
 
 const ROUNDS = 3;              // جولات «ميّز بأذنك»
@@ -119,14 +119,15 @@ export function renderLesson(groupId, letter) {
       h('span', { class: 'form-face' }, text),
       h('small', {}, label));
 
-    return h('div', {},
+    return heroStep([
       mascot('mascot mascot--hello'),
       h('h2', {}, letterTitle(letter)),
       h('button', {
         class: 'giant',
         'aria-label': `اسمع صوت ${letterTitle(letter)}`,
         onclick: () => audio.play(letter + FATHA),
-      }, letter),
+      }, giantInk(letter)),
+    ], [
       h('div', { class: 'row' },
         h('button', {
           class: 'btn',
@@ -161,7 +162,7 @@ export function renderLesson(groupId, letter) {
         h('p', { class: 'hint' }, 'اضغط الكلمة لتسمعها'),
       ),
       nextButton(),
-    );
+    ]);
   }
 
   // ————— ٢) الحركات: استماع ثم «أيها سمعت؟» —————
@@ -252,8 +253,12 @@ export function renderLesson(groupId, letter) {
       ctx.fillStyle = accent;
       ctx.font = `${Math.round(box.height * 0.72)}px ${font || 'serif'}`;
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(letter, box.width / 2, box.height / 2);
+      // مركز الحبر في مركز اللوح لا خطُّ الأساس (كتوسيط الحرف البطل في `ui.js`):
+      // `middle` تجلس الحرف على منتصف مربّع الخطّ، فتهبط الباء بنقطتها تحت المنتصف.
+      ctx.textBaseline = 'alphabetic';
+      const m = ctx.measureText(letter);
+      const mid = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+      ctx.fillText(letter, box.width / 2, box.height / 2 + (Number.isFinite(mid) ? mid : 0));
       ctx.restore();
     }
 

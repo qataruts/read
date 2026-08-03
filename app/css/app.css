@@ -507,6 +507,13 @@ button {
 
 .giant:active { transform: scale(.96); }
 
+/* حبر الحرف مرفوعاً إلى مركز الصندوق بصرياً — القيمة تُقاس بحبر الحرف نفسِه في
+   `ui.js` (giantInk)، والرفعة على الحبر لا على الصندوق كي لا تصطدم بوثبة الضغط. */
+.giant-ink {
+  display: block;
+  transform: translateY(var(--letter-lift, 0));
+}
+
 .hint { color: var(--ink-soft); margin: .25rem 0 1.25rem; }
 
 .note {
@@ -581,6 +588,10 @@ button {
 .lesson .sub { margin: 1.75rem 0 .6rem; font-size: 1rem; color: var(--ink-soft); }
 .lesson .foot { margin-top: 1.25rem; }
 .lesson .next { max-width: 22rem; margin: 1.5rem auto 0; }
+
+/* شقّا الخطوة (`heroStep` في `ui.js`): في الطولي — وهو المرجع الأول — يذوبان فلا
+   يبقى لهما أثرٌ في التخطيط، ولا يصطفّان جنباً إلى جنب إلا في العرضيّ القصير (أسفلَه). */
+.hero-side, .hero-rest { display: contents; }
 
 /* أشكال الحرف الأربعة */
 .forms {
@@ -1597,4 +1608,46 @@ button {
 @media (max-width: 26rem) {
   :root { --node-size: 4.6rem; }
   .station { padding: .85rem .7rem 1rem; }
+}
+
+/* ————— الوضع العرضي القصير (بلاغ المالك بصور الآيباد، ٦ أغسطس ٢٠٢٦) —————
+
+   الطولي هو المرجع الأول ولا يُمسّ. أما العرضيّ فيفيض عمودياً فيحوج الطفل إلى سحبٍ
+   ليبلغ «تابع» — والعرض عنده فائضٌ ضائع. فهنا وحدَه: الخطوة شقّان جنباً إلى جنب،
+   والإيقاع الرأسي يُشدّ، والصناديق المربّعة تُقاس بالارتفاع كما تُقاس بالعرض.
+   والحدّ ٦٨rem يشمل الآيباد كلَّه عرضياً (٧٤٤ · ٧٦٨ · ٨٢٠ · ١٠٢٤) ويترك ما فوقه بسعته. */
+
+@media (orientation: landscape) and (max-height: 68rem) {
+  .hero-step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+  }
+  .hero-side, .hero-rest { display: block; }
+  .hero-side { flex: 0 0 auto; }
+  .hero-rest { flex: 1 1 24rem; min-width: 0; max-width: 34rem; }
+
+  /* الصناديق المربّعة: الارتفاع قيدٌ كالعرض، وإلا خنق الحرفُ الكبيرُ ما تحته */
+  .giant {
+    width: min(15rem, 62vw, 46vh);
+    height: min(15rem, 62vw, 46vh);
+    margin: .5rem auto;
+    font-size: min(9rem, 38vw, 26vh);
+  }
+  .trace { width: min(20rem, 78vw, 44vh); height: min(20rem, 78vw, 44vh); margin-top: .5rem; }
+
+  /* إيقاعٌ أضيق — بلا مساس بأهداف اللمس (DESIGN §٤: الرئيس ≥ ٦٤ بكسل) */
+  .topbar { padding-top: .5rem; padding-bottom: .5rem; }
+  .app { padding-bottom: 1.25rem; }
+  .screen-card { padding: 1rem 1.25rem 1.25rem; }
+  .steps { margin-bottom: .75rem; }
+  .mascot--hello { width: 3rem; }
+  .lesson .sub { margin-top: 1rem; }
+  .lesson .next { margin-top: 1rem; }
+  .lesson .foot { margin-top: .75rem; }
+  .example { margin-top: 1rem; }
+  .rule { margin-top: .75rem; }
+  .vrow { margin-top: .5rem; }
+  .pairs { margin-top: .5rem; }
 }

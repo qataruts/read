@@ -195,6 +195,71 @@ export function micIcon() {
   return el;
 }
 
+// ————— توسيط الحرف البطل في صندوقه (بلاغ المالك ٦ أغسطس ٢٠٢٦) —————
+
+/**
+ * انزياح مركز حبر النصّ عن مركز سطره، بوحدة `em` فيصلح لكل مقاس.
+ *
+ * الخطّ العربي يُجلس الحرف على خطّ أساسٍ لا في وسط سطره: مع `line-height: 1` يقع خطّ
+ * الأساس أسفلَ مركز السطر بمقدار `(صعود − هبوط) ÷ ٢` من مقاييس الخط، ثم يتوزّع حبرُ
+ * الحرف حول خطّ الأساس بحسب جِرمه — فألفٌ صاعدة تعلو المركز، وباءٌ منقوطةٌ تحت تهبط
+ * عنه، وميمٌ نازلة أشدّ هبوطاً. فالتوسيط الهندسي وحده يكذب على العين، والصادق أن
+ * يُرفع كلُّ حرفٍ بمقدار انزياح حبره هو.
+ *
+ * موجبُ الناتج يعني أن الحبر يجلس **تحت** المركز، فالرفعة سالبُه.
+ */
+const LIFT_PROBE = 200;                       // مقاس قياسٍ ثابت: النسبة واحدة في كل الأحجام
+const liftCache = new Map();
+let liftCtx;
+
+export function inkLift(text, family = 'Noto Naskh Arabic') {
+  const key = `${family}|${text}`;
+  if (liftCache.has(key)) return liftCache.get(key);
+  let em = 0;
+  try {
+    liftCtx ??= document.createElement('canvas').getContext('2d');
+    liftCtx.font = `${LIFT_PROBE}px "${family}", serif`;
+    liftCtx.textBaseline = 'alphabetic';
+    const m = liftCtx.measureText(text);
+    const base = (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2;
+    const ink = (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+    if (Number.isFinite(base + ink)) em = (base + ink) / LIFT_PROBE;
+  } catch {
+    em = 0;                                   // متصفّح بلا canvas: توسيطٌ هندسيّ كما كان
+  }
+  liftCache.set(key, em);
+  return em;
+}
+
+/**
+ * حبرُ الصندوق الكبير: نصٌّ مرفوعٌ إلى مركز الصندوق بصرياً.
+ *
+ * والقياس يُعاد مرةً واحدة بعد وصول الخطّ (`font-display: swap` يرسم بخطٍّ احتياطيّ
+ * أولاً، ومقاييسه غير مقاييس النسخ) — فلا يُثبَّت على الشاشة رقمُ خطٍّ ليس المعروض.
+ */
+export function giantInk(text) {
+  const span = h('span', { class: 'giant-ink' }, text);
+  const apply = () => span.style.setProperty('--letter-lift', `${(-inkLift(text)).toFixed(4)}em`);
+  apply();
+  const fonts = typeof document !== 'undefined' && document.fonts;
+  if (fonts && !fonts.check(`${LIFT_PROBE}px "Noto Naskh Arabic"`)) {
+    fonts.ready.then(() => { liftCache.clear(); apply(); });
+  }
+  return span;
+}
+
+/**
+ * خطوةٌ بطلُها صندوقٌ كبير: شقٌّ للبطل وشقٌّ لعُدّته.
+ *
+ * في الوضع الطولي — وهو المرجع الأول — الشقّان `display: contents` فيذوبان، ويبقى
+ * الترتيب على الشاشة كما كان حرفاً بحرف. وفي الوضع العرضيّ القصير وحدَه يصطفّان
+ * جنباً إلى جنب فتسع الخطوةُ الشاشةَ بلا سحب (بلاغ المالك ٦ أغسطس ٢٠٢٦، `app.css`).
+ */
+export const heroStep = (hero, rest) => h('div', { class: 'hero-step' },
+  h('div', { class: 'hero-side' }, hero),
+  h('div', { class: 'hero-rest' }, rest),
+);
+
 /** معلم المحطة على الخريطة — زخرفة صامتة بلون المرحلة (DESIGN §٦). */
 export function landmark(kind) {
   if (!LANDMARKS[kind]) return null;

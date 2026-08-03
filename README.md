@@ -76,4 +76,12 @@ python3 tools/browser_test.py --quran    # المرحلة القرآنية وا�
 python3 tools/browser_test.py --garden   # بساتين الموضوعات (حديقة الكلمات)
 python3 tools/browser_test.py --gate     # بوابتا الإتقان (عبور وإخفاق وإعادة وترحيل)
 python3 tools/browser_test.py --map      # الخريطة: جبهة الفتح والطيّ الكسول وقياس سرعتهما
+python3 tools/browser_test.py --device   # مقاسات آيباد حقيقية: لا سحبَ في الوضع العرضي ولا فائض أفقي
+python3 tools/browser_test.py --device --metrics   # معايرة توسيط الحرف البطل في صندوقه
+```
+
+ولقطةُ شاشةٍ واحدة بمقاس جهاز (للمراجعة البصرية، و`--flat` تعطّل رفعة الحرف لصورة «قبل»):
+
+```bash
+python3 tools/browser_test.py --device --shots out.png --screen lesson-listen --size 1180,820
 ```

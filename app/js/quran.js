@@ -22,7 +22,7 @@ import { starsForStory } from './story.js';
 import { steppedScreen, readQuizStep, nextButton } from './screens.js';
 import {
   h, toast, go, arNum, arCount, starsRow, topbar,
-  QURAN_ACCENT, shuffle, shake, DEV,
+  QURAN_ACCENT, shuffle, shake, giantInk, heroStep, DEV,
 } from './ui.js';
 
 const QUIZ_OPTIONS = 3;
@@ -45,17 +45,18 @@ const stepped = ({ part, pill, face, steps, celebrate }) => steppedScreen({
   nodeId: nodeIdOf(part), className: 'quran', accent: QURAN_ACCENT, pill, face, steps, celebrate,
 });
 
-const ruleHead = (title, face, rule) => [
+const ruleHead = (title, face, rule) => [heroStep([
   h('h2', {}, title),
   h('button', {
     class: 'giant',
     'aria-label': `اسمع: ${rule}`,
     onclick: () => audio.play(rule),
-  }, face),
+  }, giantInk(face)),
+], [
   h('p', { class: 'rule' }, rule),
   h('div', { class: 'row' },
     h('button', { class: 'btn btn--primary', onclick: () => audio.play(rule) }, '🔊 اسمع القاعدة')),
-];
+])];
 
 /** كلمة إملائية تُنطق بنقرة (لا شيء من المصحف يمرّ من هنا). */
 const spokenWord = (word) => h('button', {

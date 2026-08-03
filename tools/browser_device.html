@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>قياس الجهاز: الطول والوضعان</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    /* لا زينةَ في هذه الصفحة: هي شاشةُ التطبيق نفسُها بمقاس الجهاز، وإلا كذب القياس */
+    html, body { margin: 0; }
+    /* لوح المعايرة وحدَه: خطُّ منتصف الصندوق هندسياً تُقاس إليه كتلةُ الحبر بالعين */
+    .giant--probe { position: relative; }
+    .giant--probe::after {
+      content: ''; position: absolute; inset-inline: 0; top: 50%;
+      height: 1px; background: rgba(200, 0, 0, .55);
+    }
+  </style>
+</head>
+<body>
+<div id="app" class="app" aria-live="polite"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+// عطبٌ في الصفحة يُكتب فيها — فاللقطة البيضاء الصامتة تحيّر
+const shout = (what) => {
+  const box = document.createElement('pre');
+  box.style.cssText = 'color:#b00;font:14px/1.6 monospace;white-space:pre-wrap';
+  box.textContent = 'عطب: ' + what;
+  document.body.prepend(box);
+};
+window.addEventListener('error', (e) => shout(e.message));
+window.addEventListener('unhandledrejection', (e) => shout(e.reason?.stack || e.reason));
+</script>
+
+<!-- تقدّم مزروع قبل تحميل الوحدات: طفلٌ بلغ البوابة وفي سجلّه ضعيفٌ وقويّ -->
+<script>
+  const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+  const skill = (right, wrong, box, due) => ({ right, wrong, box, due: day + due, seen: day });
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: {}, skills: {
+      'ك|fatha|quiz': skill(1, 4, 0, 0),
+      'ق|kasra|quiz': skill(0, 3, 0, 0),
+      'ط|damma|haraka': skill(2, 3, 0, 0),
+      'ص|fatha|quiz': skill(1, 2, 0, 0),
+      'ض|fatha|haraka': skill(3, 1, 1, 1),
+      'ظ|kasra|quiz': skill(4, 0, 4, 8),
+      'ب|fatha|build': skill(2, 2, 0, 0),
+      'م|sukun|read': skill(1, 3, 0, 0),
+    },
+    days: {}, reviews: {}, records: [], mic: false, seconds: 30 * 60,
+    startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+</script>
+
+<script type="module">
+import { renderLesson } from './js/lesson.js';
+import { renderSkillLesson } from './js/skill.js';
+import { renderGate } from './js/gate.js';
+import { renderQuran } from './js/quran.js';
+import { renderWordsGame } from './js/words.js';
+import { renderGarden } from './js/garden.js';
+import { renderLadder } from './js/ladder.js';
+import { renderStory } from './js/story.js';
+import { renderReview } from './js/review.js';
+import * as progress from './js/progress.js';
+import { LETTERS } from './js/curriculum.js';
+import { GARDENS } from './js/lexicon.js';
+import { RUNGS } from './js/sentences.js';
+import { h, giantInk, accentFor } from './js/ui.js';
+
+/** أول باقةٍ في أول بستان — معرّفُها مشتقٌّ لا مكتوب، فلا يبلى بتغيّر المعجم. */
+const firstBundleId = () => GARDENS[0].bundles[0].id;
+
+/** أول درجةٍ في سلّم الجمل — بمعرّفها المشتقّ كذلك. */
+const firstRungId = () => RUNGS[0].id;
+
+// صوت لا ينتهي أبداً: تُجمَّد الحالة المعروضة فلا تنتقل الخطوة تلقائياً قبل القياس
+window.Audio = class { play() { return new Promise(() => {}); } pause() {} };
+
+for (const node of progress.allNodes()) progress.setStars(node.id, 3);
+
+const $$ = (root, sel) => [...root.querySelectorAll(sel)];
+const hit = (app, label) => $$(app, 'button').find((b) => b.textContent.includes(label))?.click();
+
+/** درس الحرف عند خطوةٍ بعينها (القيادة عينُها في `browser_shots.html`). */
+function lessonAt(step) {
+  const el = renderLesson('g1', 'ب');
+  const drives = [
+    () => el.querySelector('.next').click(),
+    () => {
+      hit(el, 'أيها سمعت');
+      $$(el, '.vchip').forEach((c) => c.click());     // إحداها الصحيحة فيظهر «تابع»
+      el.querySelector('.next').click();
+    },
+    () => hit(el, 'تمّ'),
+  ];
+  for (let i = 0; i < step; i++) drives[i]();
+  return el;
+}
+
+function skillAt(id, step) {
+  const el = renderSkillLesson(id);
+  for (let i = 0; i < step; i++) hit(el, 'تابع');
+  return el;
+}
+
+// الحروف الممثِّلة لأصناف الأجرام: ألفٌ طويلة، باءٌ منقوطة تحت، ميمٌ نازلة،
+// عينٌ وسطى، غينٌ منقوطة فوق — وعليها تُحكَّم المعايرة بالعين.
+const SAMPLE = [...'ابمعغ'];
+
+/** لوح المعايرة: صناديق الحرف البطل وفيها خطُّ المنتصف — تُحكَّم عليه العين. */
+function lettersRow() {
+  return h('div', { class: 'screen lesson', css: { '--accent': accentFor() } },
+    h('main', { class: 'screen-card' },
+      h('h2', {}, 'معايرة توسيط الحرف البطل'),
+      h('p', { class: 'hint' }, 'الخطّ الأحمر منتصفُ الصندوق هندسياً — والحبر يُقارَن به'),
+      h('div', { class: 'row', css: { 'flex-wrap': 'wrap', 'justify-content': 'center' } },
+        SAMPLE.map((ch) => h('div', { class: 'giant giant--probe', css: { width: '11rem', height: '11rem', 'font-size': '6.5rem' } },
+          giantInk(ch)))),
+    ));
+}
+
+// الشاشات المقيسة: بطلاتُ «الصندوق الكبير» أولاً، ثم شقيقاتُها الأطول في الرحلة
+export const SCREENS = [
+  ['lesson-listen', 'الدرس ١ — اسمع وشاهد', () => lessonAt(0)],
+  ['lesson-harakat', 'الدرس ٢ — الحركات', () => lessonAt(1)],
+  ['lesson-trace', 'الدرس ٣ — تتبّع', () => lessonAt(2)],
+  ['lesson-quiz', 'الدرس ٤ — ميّز بأذنك', () => lessonAt(3)],
+  ['skill-rule', 'المهارة ١ — القاعدة', () => skillAt('madd-alif', 0)],
+  ['skill-compare', 'المهارة ٢ — قارِن بأذنك', () => skillAt('shadda', 1)],
+  ['skill-quiz', 'المهارة ٣ — ميّز بأذنك', () => skillAt('tanween', 2)],
+  ['quran-letters', 'القرآنية — الهمزة والتاء', () => renderQuran('letters')],
+  ['quran-rasm', 'القرآنية — الرسم', () => renderQuran('rasm')],
+  ['gate', 'بوابة المصحف', () => renderGate('quran')],
+  ['words', 'لعبة تركيب الكلمات', () => renderWordsGame('g1')],
+  ['garden', 'بستان المعجم', () => renderGarden(firstBundleId())],
+  ['ladder', 'سلّم الجمل', () => renderLadder(firstRungId())],
+  ['story', 'قراءة قصة', () => renderStory('st1')],
+  ['review', 'المراجعة اليومية', () => renderReview()],
+  ['letters', 'لوح معايرة الحرف', () => lettersRow()],
+];
+
+const app = document.getElementById('app');
+const params = new URLSearchParams(location.search);
+
+// `?flat=1` يعطّل رفعة الحرف — به تُلتقط لقطةُ «قبل» بعد التعديل فتُقارَن بـ«بعد»
+if (params.get('flat')) {
+  const off = document.createElement('style');
+  off.textContent = '.giant-ink { transform: none !important; }';
+  document.head.append(off);
+}
+
+function show(build) {
+  const node = build();
+  // شاشةٌ تعود بـ`null` (معرّفٌ مجهول) تُقاس صفحةً خاوية فتُقال «تسع الشاشة» كذباً
+  if (!node || !node.nodeType) throw new Error('لم تُبنَ الشاشة (معرّف مجهول؟)');
+  app.replaceChildren(node);
+  document.querySelectorAll('.dev').forEach((d) => d.remove());   // أدوات التجربة لا تُقاس
+}
+
+/**
+ * معايرة توسيط الحرف البطل في صندوقه.
+ *
+ * الخطّ العربي يُجلس الحرف على خطّ أساسٍ لا في وسط سطره: مع `line-height: 1` يقع خطّ
+ * الأساس أسفلَ مركز السطر بمقدار `(صعود − هبوط) ÷ ٢` من مقاييس الخطّ نفسِه. وحبرُ الحرف
+ * يتوزّع حول خطّ الأساس بحسب جِرمه (ألفٌ صاعدة، ميمٌ نازلة، باءٌ منقوطة تحت). فمركز
+ * الحبر من مركز الصندوق = (صعود − هبوط)÷٢ + (هبوطُ الحبر − صعودُه)÷٢، وموجبُه يعني
+ * أن الحرف يجلس **تحت** المنتصف — وهو عينُ ما رآه المالك على الآيباد.
+ */
+function metrics() {
+  // الصناديق تُبنى بالطريق نفسِه الذي يبنيه الدرس (`giantInk`) ثم يُقرأ **الأثر المطبَّق**
+  // من الشاشة لا من الحساب — فيُختبَر السلك كلُّه: القياس، ووحدة em، وترجمة CSS.
+  const boxes = Object.keys(LETTERS).map((ch) => {
+    const el = h('div', { class: 'giant' }, giantInk(ch));
+    return { ch, el };
+  });
+  app.replaceChildren(h('div', {}, boxes.map((b) => b.el)));
+
+  const cs = getComputedStyle(boxes[0].el);
+  const size = parseFloat(cs.fontSize);
+  const font = `${size}px ${cs.fontFamily}`;
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = font;
+  ctx.textBaseline = 'alphabetic';
+  const probe = ctx.measureText('ب');
+  const asc = probe.fontBoundingBoxAscent, desc = probe.fontBoundingBoxDescent;
+
+  const rows = boxes.map(({ ch, el }) => {
+    const m = ctx.measureText(ch);
+    const off = (asc - desc) / 2 + (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+    // الأثر المطبَّق: `matrix(a, b, c, d, tx, ty)` — والسادس هو الرفعة بالبكسل
+    const t = getComputedStyle(el.firstChild).transform;
+    const ty = t && t.startsWith('matrix') ? parseFloat(t.slice(t.indexOf('(') + 1).split(',')[5]) : 0;
+    return { ch, off, ty, rest: off + ty };
+  });
+  app.replaceChildren();
+  return { font, size, asc, desc, base: (asc - desc) / 2, rows };
+}
+
+if (params.get('metrics')) {
+  // الصفحة تبدأ خاليةً فلا يُطلَب خطُّ النسخ من تلقائه — ولا تصحّ المعايرة بخطٍّ احتياطيّ
+  document.fonts.load('200px "Noto Naskh Arabic"', 'اب')
+    .then(() => fetch('/result', { method: 'POST', body: JSON.stringify([metrics()]) }));
+} else if (params.get('screen')) {
+  const found = SCREENS.find(([id]) => id === params.get('screen'));
+  if (!found) shout('لا شاشة بهذا الاسم: ' + params.get('screen'));
+  else show(found[2]);
+} else {
+  // وضع القياس: شاشةً شاشةً، ويُرسَل الفائض الرأسي والأفقي بمقاس النافذة الحالي
+  const out = [];
+  const vw = innerWidth, vh = innerHeight;
+  const orient = vw > vh ? 'عرضي' : 'طولي';
+  for (const [id, label, build] of SCREENS) {
+    try {
+      show(build);
+      const doc = document.documentElement;
+      out.push({
+        id, label, orient, vw, vh,
+        h: doc.scrollHeight,
+        over: Math.max(0, doc.scrollHeight - vh),
+        overX: Math.max(0, doc.scrollWidth - vw),
+      });
+    } catch (e) {
+      out.push({ id, label, orient, vw, vh, error: String(e && e.message || e) });
+    }
+  }
+  app.replaceChildren();
+  fetch('/result', { method: 'POST', body: JSON.stringify(out) });
+}
+</script>
+</body>
+</html>

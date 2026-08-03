@@ -17,7 +17,7 @@ import * as audio from './audio.js';
 import { starsForErrors } from './lesson.js';
 import {
   h, toast, go, arNum, starsRow, topbar,
-  PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, DEV,
+  PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
 } from './ui.js';
 
 const ROUNDS = 3;
@@ -99,14 +99,15 @@ export function renderSkillLesson(skillId) {
   // ————— ١) القاعدة وأمثلتها —————
 
   function stepRule() {
-    return h('div', {},
+    return heroStep([
       mascot('mascot mascot--hello'),
       h('h2', {}, skill.title),
       h('button', {
         class: 'giant',
         'aria-label': `اسمع قاعدة ${skill.title}`,
         onclick: () => audio.play(skill.rule),
-      }, skill.face),
+      }, giantInk(skill.face)),
+    ], [
       h('p', { class: 'rule' }, skill.rule),
       h('div', { class: 'row' },
         h('button', {
@@ -124,7 +125,7 @@ export function renderSkillLesson(skillId) {
         h('span', { class: 'word-text' }, word.text),
       ))),
       nextButton(),
-    );
+    ]);
   }
 
   // ————— ٢) قارِن بأذنك: طرفا كل زوج جنباً إلى جنب —————
