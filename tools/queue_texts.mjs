@@ -28,7 +28,7 @@ const MANIFEST = new URL('app/audio/manifest.json', ROOT);
 
 const {
   SKILLS, STORIES, QURAN, skillExamples, sentenceText, bareLetters,
-  quranSpokenTexts, quranMushafTexts,
+  quranSpokenTexts, quranMushafTexts, contrastTexts,
 } = await import(new URL('app/js/curriculum.js', ROOT));
 const { GARDENS } = await import(new URL('app/js/lexicon.js', ROOT));
 const { RUNGS, fillOptionTexts } = await import(new URL('app/js/sentences.js', ROOT));
@@ -58,6 +58,9 @@ function newTexts() {
     for (const text of skill.compare.pairs.flat()) add(text, 'word');
     for (const word of skillExamples(skill)) add(word.say, 'word');
   }
+  // «ميّز بين» (الحزمة ١٣): حروفٌ بحركاتها لها ملفاتها منذ الجلسة ١ — تُعَدّ هنا
+  // إعلاناً لا طلباً، فلا يُضيف تشغيلُ `--add` منها شيئاً (صفر إضافة، يثبته test_contrast).
+  for (const text of contrastTexts()) add(text, 'letter_haraka');
   for (const story of STORIES) {
     add(story.title, 'sentence');
     for (const sentence of story.sentences) {

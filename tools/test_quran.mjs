@@ -17,11 +17,12 @@ globalThis.localStorage = {
 };
 
 const {
-  GROUPS, SKILLS, STORIES, GATES, QURAN, quranParts, surahById,
-  quranSpokenTexts, quranMushafTexts, bareLetters,
+  GROUPS, SKILLS, STORIES, GATES, CONTRASTS, QURAN, quranParts, surahById,
+  quranSpokenTexts, quranMushafTexts, quranWordTexts, quranWordItems, surahWords,
+  surahWordsPart, surahOfWordsPart, quranWordLevel, bareLetters,
 } = await import(new URL('curriculum.js', APP));
 const { keyFor } = await import(new URL('audio.js', APP));   // مفتاح النصّ نفسه في كل المشروع
-const { buildRasmRounds } = await import(new URL('quran.js', APP));
+const { buildRasmRounds, buildFindRounds } = await import(new URL('quran.js', APP));
 // «اقرأ واختر» انتقلت إلى screens.js في الحزمة ٧ (تشترك فيها المرحلة القرآنية والبساتين)
 const { buildReadRounds } = await import(new URL('screens.js', APP));
 const { starsForStory } = await import(new URL('story.js', APP));
@@ -45,14 +46,44 @@ function rng(seed) {
 ok(QURAN.after === GROUPS.at(-1).id, `المرحلة القرآنية بعد المجموعة الأخيرة (${QURAN.after})`);
 
 const parts = quranParts().map((x) => x.part);
-ok(parts.join(' ← ') === 'letters words rasm muqattaat s1 s112 s113 s114'.split(' ').join(' ← '),
+ok(parts.join(' ← ') === ('letters words1 words2 words3 rasm muqattaat '
+  + 'sw-s1 s1 sw-s112 s112 sw-s113 s113 sw-s114 s114').split(' ').join(' ← '),
   `درجاتها بالترتيب: ${parts.join(' ← ')}`);
-ok(parts.indexOf('letters') < parts.indexOf('words'),
+ok(parts.indexOf('letters') < parts.indexOf('words1'),
   'درس الحرفين قبل الكلمات (كلماتها تستعملهما)');
 ok(parts.indexOf('rasm') < parts.indexOf('muqattaat')
   && parts.indexOf('muqattaat') < parts.indexOf('s1'),
   'ودرس الرسم قبل كل نصّ عثماني — الحروف المقطَّعة ثم السور');
 ok(quranParts().every((x) => x.title && x.face), 'ولكل عقدة عنوانها ووجهها على الخريطة');
+
+// ————— ١ب. الجسر القرآني (الحزمة ١٢): لا سورة قبل كلماتها، والكلمات على درجات —————
+
+ok(QURAN.words.levels.length >= 3 && quranWordItems().length >= 24,
+  `كلمات القرآن على ${QURAN.words.levels.length} درجات في ${quranWordItems().length} كلمة`
+  + ' (كانت ثمانياً في درجة واحدة)');
+const sizes = QURAN.words.levels.map((l) => l.size);
+ok(sizes.join('<') === [...sizes].sort((a, b) => a - b).join('<')
+  && new Set(sizes).size === sizes.length,
+  `وحدودها صاعدة بعدد الحروف (${sizes.join(' ← ')})`);
+const last = sizes.at(-1);
+const misfit = QURAN.words.levels.flatMap((l) => l.items
+  .filter((w) => (l.size === last ? bareLetters(w.read).length < l.size
+    : bareLetters(w.read).length !== l.size))
+  .map((w) => `${w.read}@${l.id}`));
+ok(misfit.length === 0,
+  `وكل كلمة في درجتها بعدد حروفها${misfit.length ? ' — ' + misfit.join('، ') : ''}`);
+ok(QURAN.words.levels.every((l) => quranWordLevel(l.id) === l)
+  && quranWordLevel('words') === null,
+  'ودرجةُ الكلمات تُقرأ بمعرّفها وحده (لا يلتبس `words1` بـ`words`)');
+
+for (const surah of QURAN.surahs) {
+  const at = parts.indexOf(surahWordsPart(surah.id));
+  ok(at >= 0 && parts[at + 1] === surah.id,
+    `محطة «كلمات سورة ${surah.name}» تسبق سورتها مباشرةً — لا سورة قبل كلماتها`);
+}
+ok(QURAN.surahs.every((s) => surahOfWordsPart(surahWordsPart(s.id)) === s)
+  && surahOfWordsPart('words1') === null && surahOfWordsPart('s1') === null,
+  'ومحطةُ الكلمات تُميَّز عن سورتها وعن درجات الكلمات بمعرّفها');
 
 const nodes = p.allNodes();
 const ids = nodes.map((n) => n.id);
@@ -69,7 +100,7 @@ ok(ids[quranStart - 1] === 'gate:quran',
   'ويسبقها مباشرةً بوابة الإتقان — لا مصحف بحروف هشّة (الحزمة ١٤)');
 // عقد التأسيس: حروف المجموعات ولعبها + المهارات + القصص + البوابتان + المرحلة القرآنية
 const CORE = GROUPS.reduce((s, g) => s + g.letters.length + 1, 0)
-  + SKILLS.length + STORIES.length + GATES.length + quranParts().length;
+  + SKILLS.length + STORIES.length + CONTRASTS.length + GATES.length + quranParts().length;
 ok(p.maxTotalStars() === nodes.length * p.MAX_STARS
   && nodes.length === CORE + BUNDLES + RUNGS.length + LIBRARY.length,
   `سقف النجوم يشمل الخاتمة والبوابتين والبساتين والسلالم والمكتبة (${nodes.length} عقدة، ${p.maxTotalStars()} نجمة)`);
@@ -96,11 +127,12 @@ ok(p.nextNode()?.id === ids[quranStart + parts.length],
 
 // ————— ٢. جولات «اقرأ واختر» و«ميّز العلامة» —————
 
-const readItems = QURAN.words.items;
+const readItems = quranWordItems();
 let rounds = 0;
 for (let seed = 1; seed <= 60; seed++) {
   const rnd = rng(seed);
-  for (const items of [readItems, QURAN.letters.signs.flatMap((s) => s.words)]) {
+  for (const items of [...QURAN.words.levels.map((l) => l.items),
+    QURAN.letters.signs.flatMap((s) => s.words)]) {
     for (const r of buildReadRounds(items, rnd)) {
       rounds++;
       if (r.options.length !== 3) { fails++; console.log('  ✗ خيارات ≠ ٣'); }
@@ -120,10 +152,11 @@ for (let seed = 1; seed <= 60; seed++) {
 }
 ok(true, `جولات سليمة في ٦٠ بذرة عشوائية (${rounds} جولة قراءة + جولات الرسم)`);
 // غيرُ المصوَّرة لا تكون هدفاً وتبقى خياراً مكتوباً («صدق الصورة»، DESIGN §٦)
-const pictured = readItems.filter((w) => w.pictured !== false);
-ok(buildReadRounds(readItems).length === pictured.length,
-  `كل كلمة مصوَّرة تأتي دورها مرة (${pictured.length} من ${readItems.length} كلمة)`);
-ok(buildReadRounds(readItems).every((r) => r.target.pictured !== false),
+const level1 = QURAN.words.levels[0].items;
+const pictured = level1.filter((w) => w.pictured !== false);
+ok(buildReadRounds(level1).length === pictured.length,
+  `كل كلمة مصوَّرة تأتي دورها مرة (${pictured.length} من ${level1.length} كلمة في الدرجة الأولى)`);
+ok(buildReadRounds(level1).every((r) => r.target.pictured !== false),
   'ولا غيرَ مصوَّرةٍ هدفاً — الصورة هي السؤال كلُّه في «اقرأ واختر»');
 ok(buildReadRounds([{ read: 'أ', emoji: '' }]).length === 0
   && buildRasmRounds([QURAN.rasm.signs[0]]).length === 0,
@@ -134,7 +167,7 @@ ok(buildReadRounds([{ read: 'أ', emoji: '' }]).length === 0
 const taught = new Set(GROUPS.flatMap((g) => g.letters));
 const newSigns = new Set(QURAN.letters.signs.flatMap((s) => [s.sign, ...s.shapes.join('')]));
 const known = new Set([...taught, ...newSigns].filter((c) => c !== 'ـ'));
-const imla = [...QURAN.letters.signs.flatMap((s) => s.words), ...QURAN.words.items].map((w) => w.read);
+const imla = [...QURAN.letters.signs.flatMap((s) => s.words), ...quranWordItems()].map((w) => w.read);
 const outside = imla.flatMap((t) => [...bareLetters(t)].filter((c) => !known.has(c)).map((c) => `${c} في «${t}»`));
 ok(outside.length === 0,
   `كلمات المرحلة الإملائية (${imla.length}) كلها بحروف مدروسة${outside.length ? ' — ' + outside.join('، ') : ''}`);
@@ -144,7 +177,7 @@ ok(QURAN.muqattaat.items.every((m) => m.parts.every((x) => taught.has(x.ch))),
 // صورتان متطابقتان في شاشة واحدة تجعلان «اقرأ واختر» بلا جواب صحيح
 for (const [where, items] of [
   ['درس الحرفين', QURAN.letters.signs.flatMap((s) => s.words)],
-  ['كلمات القرآن', QURAN.words.items],
+  ...QURAN.words.levels.map((l) => [l.title, l.items]),
 ]) {
   const seen = items.map((w) => w.emoji);
   const dup = seen.filter((e, i) => seen.indexOf(e) !== i);
@@ -187,15 +220,63 @@ ok(quoted.every((t) => joined.includes(t)),
 ok(QURAN.rasm.signs.every((s) => s.read.includes(s.sign.replace('ـ', ''))),
   'وكل علامة رسم ظاهرة فعلاً في مثالها');
 
+// ————— ٤ب. محطات «كلمات السورة»: مشتقّةٌ من الآية، وجولاتُها موزَّعة (الحزمة ١٢) —————
+
+let stationWords = 0;
+for (const surah of QURAN.surahs) {
+  const words = surahWords(surah);
+  stationWords += words.length;
+  const strayed = words.filter((w) => surah.ayat[w.ayah - 1].split(' ')[w.pos - 1] !== w.text);
+  ok(strayed.length === 0 && words.length >= 3,
+    `كلمات سورة ${surah.name} (${words.length}) كلٌّ في موضعها من آيتها`
+    + `${strayed.length ? ' — ' + strayed.map((w) => w.text).join('، ') : ''}`);
+  // إعادةُ الوصل تعيد الآية حرفاً بحرف: الشقُّ عرضٌ لا تعديل في نصّ المصحف
+  const rebuilt = surah.ayat.map((a) => a.split(' ').join(' ')).join('|');
+  ok(rebuilt === surah.ayat.join('|'),
+    `ووصلُ كلمات ${surah.name} يعيد آياتها حرفاً بحرف (لا فراغ مزدوج ولا حذف)`);
+  ok(new Set(words.map((w) => w.text)).size === words.length,
+    `ولا بطاقةَ كلمةٍ مكرَّرة في ${surah.name}`);
+}
+ok(stationWords === quranWordTexts().length,
+  `وجملةُ ما تعرضه المحطات ${stationWords} كلمة (بلا تكرارٍ داخل السورة)`);
+
+let findRounds = 0;
+for (let seed = 1; seed <= 60; seed++) {
+  const rnd = rng(seed);
+  for (const surah of QURAN.surahs) {
+    const words = surahWords(surah);
+    const built = buildFindRounds(words, 6, rnd);
+    findRounds += built.length;
+    if (built.length !== Math.min(6, words.length)) { fails++; console.log('  ✗ عدد جولات غير متوقَّع'); }
+    if (new Set(built).size !== built.length) { fails++; console.log('  ✗ هدف مكرَّر في المحطة'); }
+    if (built.some((w) => !words.includes(w))) { fails++; console.log('  ✗ هدف من خارج السورة'); }
+    // التوزيع: ما دامت آياتُ السورة تكفي، فلا جولتان من آيةٍ واحدة
+    const ayat = built.map((w) => w.ayah);
+    if (surah.ayat.length >= built.length && new Set(ayat).size !== ayat.length) {
+      fails++; console.log(`  ✗ جولتان من آيةٍ واحدة في ${surah.name}`);
+    }
+  }
+}
+ok(true, `وجولات «جِدْها في الآية» سليمة في ٦٠ بذرة (${findRounds} جولة)`);
+ok(buildFindRounds([]).length === 0, 'ومحطةٌ بلا كلمات ⇒ لا جولات (تفشل مغلقةً)');
+
+// كلمةٌ متكرّرة في آيتها: كلُّ موضعٍ لها صواب — لا جولةَ بلا جواب
+const repeated = QURAN.surahs.flatMap((s) => s.ayat)
+  .filter((a) => new Set(a.split(' ')).size !== a.split(' ').length);
+ok(repeated.length > 0, `وفي المصحف آياتٌ تتكرّر فيها الكلمة (${repeated.length}) — تُقبل بكل مواضعها`);
+
 // ————— ٥. الصوت: مولَّدٌ له ملف أو مكان في القائمة، وعثمانيٌّ لا يُولَّد أبداً —————
 
 const manifest = JSON.parse(readFileSync(new URL('../app/audio/manifest.json', import.meta.url), 'utf8'));
 const queue = JSON.parse(readFileSync(new URL('audio_queue.json', import.meta.url), 'utf8'));
 const have = new Set(Object.values(manifest));
 const pending = new Set(queue.filter((e) => e.status !== 'done').map((e) => e.text));
+// نصٌّ صُرِّف للتوّ: ملفُّه على القرص قبل أن يُكتب الفهرس (المصرِّف عمليةٌ حيّة) — فالقرص
+// شاهدٌ ثالث مع الفهرس والقائمة، وإلا احمرّ فحصٌ لا علاقة له بما نغيّر.
+const onDisk = (t) => existsSync(new URL(`../app/audio/${keyFor(t)}.mp3`, import.meta.url));
 
 const spoken = [...new Set(quranSpokenTexts())];
-const orphan = spoken.filter((t) => !have.has(t) && !pending.has(t));
+const orphan = spoken.filter((t) => !have.has(t) && !pending.has(t) && !onDisk(t));
 ok(orphan.length === 0,
   `كل منطوق له ملف أو مكان في القائمة (${spoken.length} نصاً: ${spoken.filter((t) => have.has(t)).length} جاهز، ${spoken.filter((t) => pending.has(t)).length} منتظِر)${orphan.length ? ' — ' + orphan.join('،') : ''}`);
 
@@ -236,6 +317,21 @@ ok(!/speechSynthesis|SpeechSynthesisUtterance/.test(recitationSrc),
 const quranSrc = readFileSync(new URL('../app/js/quran.js', import.meta.url), 'utf8');
 ok(/recitation\.play|recitation\.playSequence/.test(quranSrc),
   'وشاشة السورة تتلو من `recitation.js` لا من `audio.js`');
+
+// محطة كلمات السورة: كلُّ ما تنطقه نصُّ مصحف — فلا يمرّ منها شيء على `audio.js` البتّة
+const stationSrc = quranSrc.slice(quranSrc.indexOf('function renderSurahWords'),
+  quranSrc.indexOf('// ————— ٦)'));
+ok(stationSrc.length > 500 && !/audio\.play/.test(stationSrc)
+  && /recitation\.play/.test(stationSrc),
+  'ومحطة كلمات السورة لا تمرّ بـ`audio.play` أصلاً — كلُّ ما تنطقه تلاوةُ قارئ');
+
+// وسمُ ملف الكلمة: يمنع أن يلتقي نصُّ مصحفٍ بملفٍّ مولَّد له المفتاح نفسه («مَا» و«مِنَ»)
+const clash = quranWordTexts().filter((t) => have.has(t) || pending.has(t));
+ok(/WORD_PREFIX/.test(recitationSrc) && /wbw-/.test(recitationSrc),
+  `ووسمُ \`wbw-\` يفصل ملفَّ الكلمة عن المولَّد — ${clash.length} كلمةَ مصحفٍ لها نظيرٌ مولَّد`
+  + `${clash.length ? ' (' + clash.join('، ') + ')' : ''}`);
+ok(clash.length > 0,
+  'وهو ليس احتياطاً نظرياً: في السور كلماتٌ نصُّها نصُّ كلمةٍ عربية عادية في التطبيق');
 
 // ————— ٦. النجوم —————
 

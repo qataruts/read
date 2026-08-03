@@ -15,8 +15,8 @@ globalThis.localStorage = {
 };
 
 const {
-  GROUPS, SKILLS, STORIES, GATES, quranParts, skillById, storyById, skillExamples, skillTexts,
-  storyTexts, sentenceText, bareLetters,
+  GROUPS, SKILLS, STORIES, GATES, CONTRASTS, quranParts, skillById, storyById, skillExamples,
+  skillTexts, storyTexts, sentenceText, bareLetters,
 } = await import(new URL('curriculum.js', APP));
 const { buildSkillRounds } = await import(new URL('skill.js', APP));
 const { starsForStory } = await import(new URL('story.js', APP));
@@ -109,10 +109,11 @@ const { RUNGS } = await import(new URL('sentences.js', APP));
 const { LIBRARY } = await import(new URL('library.js', APP));
 const BUNDLES = GARDENS.reduce((s, g) => s + g.bundles.length, 0);
 ok(nodes.length === GROUPS.reduce((s, g) => s + g.letters.length + 1, 0)
-  + SKILLS.length + STORIES.length + GATES.length + quranParts().length + BUNDLES + RUNGS.length
-  + LIBRARY.length,
-  `عقد الرحلة = عقد المجموعات + ${SKILLS.length} مهارات + ٣ قصص + بوابتان + خاتمة قرآنية`
-  + ` + ${BUNDLES} باقة + ${RUNGS.length} درجة جمل + ${LIBRARY.length} قصة مكتبة (${nodes.length} عقدة)`);
+  + SKILLS.length + STORIES.length + CONTRASTS.length + GATES.length + quranParts().length
+  + BUNDLES + RUNGS.length + LIBRARY.length,
+  `عقد الرحلة = عقد المجموعات + ${SKILLS.length} مهارات + ٣ قصص + ${CONTRASTS.length} محطة «ميّز بين»`
+  + ` + بوابتان + خاتمة قرآنية + ${BUNDLES} باقة + ${RUNGS.length} درجة جمل`
+  + ` + ${LIBRARY.length} قصة مكتبة (${nodes.length} عقدة)`);
 ok(ids.indexOf('skill:madd-alif') === ids.indexOf('g1:words') + 1
   && ids.indexOf('g2:ن') === ids.indexOf('skill:madd-alif') + 1,
   'مدّ الألف يدخل الخريطة بين المجموعتين ١ و٢');

@@ -21,7 +21,7 @@ globalThis.localStorage = {
   removeItem: (k) => store.delete(k),
 };
 
-const { QURAN } = await import(new URL('curriculum.js', APP));
+const { QURAN, quranWordItems } = await import(new URL('curriculum.js', APP));
 const { GARDENS, WORDS, lexiconTexts } = await import(new URL('lexicon.js', APP));
 const { buildReadRounds } = await import(new URL('screens.js', APP));
 const { buildBoard } = await import(new URL('words.js', APP));
@@ -40,7 +40,7 @@ function rng(seed) {
 
 const blind = WORDS.filter((w) => w.pictured === false);
 const blindWords = new Set(blind.map((w) => w.word));
-const quranBlind = QURAN.words.items.filter((i) => i.pictured === false);
+const quranBlind = quranWordItems().filter((i) => i.pictured === false);
 
 console.log('— المستعصيات المعلَنة —');
 ok(blind.length > 0 && quranBlind.length > 0,
@@ -145,7 +145,7 @@ ok(unvoiced.length === 0,
   'وأصواتُها ومقاطعُها كلها في نصوص البساتين (لم تخرج من قائمة الصوت)'
   + (unvoiced.length ? ` — ${unvoiced.map((w) => w.word).join('، ')}` : ''));
 
-const quranTexts = QURAN.words.items.map((i) => i.read);
+const quranTexts = quranWordItems().map((i) => i.read);
 ok(quranBlind.every((i) => quranTexts.includes(i.read)),
   `و«${quranBlind.map((i) => i.read).join('، ')}» باقيةٌ في بطاقات المرحلة القرآنية تُنقَر وتُسمع`);
 

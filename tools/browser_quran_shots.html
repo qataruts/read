@@ -26,6 +26,7 @@
 
 <script type="module">
 import { renderQuran } from './js/quran.js';
+import { surahWordsPart } from './js/curriculum.js';
 import * as progress from './js/progress.js';
 
 // صوت لا ينتهي: تُجمَّد الحالة المعروضة فلا تنتقل الخطوة تلقائياً قبل اللقطة
@@ -59,8 +60,8 @@ const step = (app, label) => $$(app, '.btn').find((b) => b.textContent.includes(
 // ١) درس الحرفين الجديدين: الهمزة والتاء المربوطة
 cell('١ — الهمزة والتاء المربوطة', renderQuran('letters'));
 
-// ٢) «اقرأ واختر» على كلمات القرآن
-const words = cell('٢ — كلمات من القرآن: اقرأ واختر', renderQuran('words'));
+// ٢) «اقرأ واختر» على كلمات القرآن (الدرجة الثالثة — أطول كلماتها)
+const words = cell('٢ — كلمات من القرآن ٣: اقرأ واختر', renderQuran('words3'));
 step(words, 'تابع');
 
 // ٣) علامات رسم المصحف بأمثلتها
@@ -69,19 +70,24 @@ cell('٣ — رسم المصحف', renderQuran('rasm'));
 // ٤) الحروف المقطَّعة بأسماء حروفها
 cell('٤ — الحروف المقطَّعة', renderQuran('muqattaat'));
 
-// ٥) سورة الفاتحة (البسملة آيتها الأولى)
-cell('٥ — سورة الفاتحة', renderQuran('s1'));
+// ٥) محطة «كلمات السورة» (الحزمة ١٢): البطاقات، ثم «جِدْها في الآية»
+cell('٥ — كلمات سورة الفاتحة: البطاقات', renderQuran(surahWordsPart('s1')));
+const find = cell('٦ — جِدْها في الآية', renderQuran(surahWordsPart('s1')));
+step(find, 'تابع');
 
-// ٦) سورة الإخلاص (البسملة سطر مستقلّ) — وهي **أثناء التلاوة**: السطر المتلوّ معلَّم
-const ikhlas = cell('٦ — سورة الإخلاص أثناء التلاوة', renderQuran('s112'));
+// ٦) سورة الفاتحة (البسملة آيتها الأولى)
+cell('٧ — سورة الفاتحة', renderQuran('s1'));
 
-// ٧) الخريطة: محطة الخاتمة القرآنية (طفل أتمّ الرحلة حتى قبلها)
+// ٧) سورة الإخلاص (البسملة سطر مستقلّ) — وهي **أثناء التلاوة**: السطر المتلوّ معلَّم
+const ikhlas = cell('٨ — سورة الإخلاص أثناء التلاوة', renderQuran('s112'));
+
+// ٩) الخريطة: محطة الخاتمة القرآنية (طفل أتمّ الرحلة حتى قبلها)
 progress.reset();
 for (const node of progress.allNodes()) {
   if (node.id === 'quran:letters') break;
   progress.setStars(node.id, 3);
 }
-const map = cell('٧ — الخريطة: المرحلة القرآنية', document.createElement('div'));
+const map = cell('٩ — الخريطة: المرحلة القرآنية', document.createElement('div'));
 map.id = 'app';
 // «تابع من هنا» يُزيح الصفحة عن أعلاها (revealNext) فتخرج اللقطة من وسطها
 Element.prototype.scrollIntoView = () => {};

@@ -245,7 +245,9 @@ try {
   ok(new Set([...firstKinds, ...kinds]).size >= 2,
     `الجلسة نوّعت تمارينها (${[...new Set([...firstKinds, ...kinds])].join('، ')})`);
 
-  const review = stored().reviews[new Date().toISOString().slice(0, 10)];
+  // مفتاح اليوم من التطبيق نفسه لا من `toISOString` (وهو بتوقيت غرينتش): بينهما ساعات
+  // يختلف فيها التاريخان، فيحمرّ فحصٌ لا علاقة له بما نغيّر.
+  const review = stored().reviews[(await import('./js/progress.js')).dayKey()];
   ok(review && review.tries > review.right,
     `ونتيجتها مسجَّلة كسائر المراجعات بوحدة المحاولة (${JSON.stringify(review)})`);
   const boxes = Object.values(stored().skills).filter((s) => s.box > 0).length;

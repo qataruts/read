@@ -67,6 +67,10 @@ TANWEEN = set("ًٌٍ")
 SUN_LETTERS = set("تثدذرزسشصضطظلن")   # الحروف الشمسية (تُدغَم فيها لام «ال»)
 SUN_RULE = "sun"                       # مفتاح تُعلنه مهارة اللام الشمسية في `marks`
 MADD_MATE = {"و": "ُ", "ي": "ِ"}       # حرف المدّ وحركته المجانسة قبله
+QUIZ_MIN_WORDS = 3                     # أقلّ ما تقوم به جولةُ اختيارٍ (هدفٌ ومشتّتان)
+# وسمُ ملفات تلاوة الكلمة المفردة — نظيرُ `WORD_PREFIX` في `app/js/recitation.js`
+# و`tools/fetch_word_recitation.py`: يمنع أن يلتقي ملفُّ مصحفٍ بملفٍّ مولَّد بمفتاحٍ واحد.
+WORD_PREFIX = "wbw-"
 
 
 def key_for(text: str) -> str:
@@ -313,6 +317,17 @@ def parse_quran(src: str) -> dict:
             "from": one(r"from:\s*'([^']*)'", chunk, ""),
         })
 
+    # درجات «كلمات من القرآن» (الحزمة ١٢): ثلاثٌ، حدُّ كلٍّ عددُ حروف كلماتها (`size`)
+    levels = []
+    for ident, chunk in chunks_by_id(region(words, "levels:")):
+        levels.append({
+            "id": ident,
+            "title": one(r"title:\s*'([^']*)'", chunk, ""),
+            "face": one(r"face:\s*'([^']*)'", chunk, ""),
+            "size": int(one(r"size:\s*(\d+)", chunk, "0")),
+            "items": worded(chunk),
+        })
+
     muq_items = []
     for chunk in chunks_by_key(region(muq, "items:"), "read"):
         muq_items.append({
@@ -340,10 +355,13 @@ def parse_quran(src: str) -> dict:
                     "face": one(r"face:\s*'([^']*)'", letters, ""),
                     "rule": one(r"rule:\s*'([^']*)'", letters, ""),
                     "signs": signs},
+        # `items` = الدرجات مجموعةً — فمن أراد الحوض كلَّه (icon_audit، check_lexicon)
+        # وجده كما كان، ومن أراد الدرجة وجدها في `levels`.
         "words": {"title": one(r"title:\s*'([^']*)'", words, ""),
                   "face": one(r"face:\s*'([^']*)'", words, ""),
                   "rule": one(r"rule:\s*'([^']*)'", words, ""),
-                  "items": worded(words)},
+                  "levels": levels,
+                  "items": [it for level in levels for it in level["items"]]},
         "rasm": {"title": one(r"title:\s*'([^']*)'", rasm, ""),
                  "face": one(r"face:\s*'([^']*)'", rasm, ""),
                  "rule": one(r"rule:\s*'([^']*)'", rasm, ""),
@@ -369,20 +387,38 @@ def quran_source() -> dict:
     return rows
 
 
+def surah_station_words(surah) -> list:
+    """كلمات محطة السورة — **مشقوقة من نصّ آياتها** كما تشقّها `surahWords` في المنهج.
+
+    لا قائمةَ كلماتٍ مكتوبة في مكانٍ ما تُقارَن بها: المحطة تعرض ما تعرضه هذه الدالّة
+    عينَه، فالمشتَقّ يُفحَص بمصدره (`quran_source.txt`) لا بنفسه — انظر `check_quran` ٦.
+    """
+    out = {}
+    for i, ayah in enumerate(surah["ayat"], 1):
+        for j, text in enumerate(ayah.split(" "), 1):
+            if text and text not in out:
+                out[text] = (text, i, j)
+    return list(out.values())
+
+
 def check_quran(quran, taught, letters, source):
     """فحص المرحلة القرآنية: مفكوكيةُ الإملائي، وأصالةُ العثماني، وحرمةُ توليد صوته.
 
-    ثلاث قواعد يفرضها هذا الفحص:
+    خمس قواعد يفرضها هذا الفحص:
     ١) كلمات هذه المرحلة بالرسم الإملائي مفكوكة كغيرها (حروف مدروسة + الحرفان الجديدان).
     ٢) كل رمز في نصّ المصحف إما حرفٌ مدروس أو علامةٌ معروضة في درس الرسم قبله —
        فسورةٌ فيها علامة بلا درس لا تمرّ، والفاحص يشتقّ «المعروض» من البيانات نفسها.
     ٣) كل نصّ عثماني يطابق tools/quran_source.txt حرفاً بحرف (لا يُكتب المصحف بيدنا).
+    ٤) **تدرّج درجات الكلمات** (الحزمة ١٢): كلُّ كلمةٍ في درجتها بعدد حروفها، والدرجات
+       صاعدة — فلا تسبق كلمةٌ أطولُ درجتَها، ولا تتكرّر كلمةٌ في درجتين.
+    ٥) **كلمات السورة ⊆ نصّ سورتها حرفاً بحرف** — تُقابَل بالمصدر المرجعي لا بالمنهج،
+       فلو كُتبت يوماً بيدٍ بدل أن تُشتقّ لَسقطت هنا.
 
     و«المصحف» المُرجَع هنا هو ما يحرم **توليدُ** صوته (METHOD §٥.٦) — لا ما يحرم
     سماعُه: تلاوتُه من تسجيل قارئ متقن مطلوبة، ويفحصها `check_recitations` أدناه.
     """
     errors, warnings = [], []
-    spoken, mushaf = [], []
+    spoken, mushaf, station = [], [], []
 
     # ١. الحرفان الجديدان يوسّعان الحروف المدروسة في هذه المرحلة وحدها
     new_signs = [s["sign"] for s in quran["letters"]["signs"]]
@@ -415,13 +451,41 @@ def check_quran(quran, taught, letters, source):
             warnings.append(f"[قرآن/{where}]: «{text}» غير مصوَّرة — "
                             "لا تكون هدفَ «اقرأ واختر» (تبقى بطاقةً تُنطق)")
 
-    for pool, items in (("درس الحرفين",
-                         [w for s in quran["letters"]["signs"] for w in s["words"]]),
-                        ("كلمات القرآن", quran["words"]["items"])):
+    pools = [("درس الحرفين", [w for s in quran["letters"]["signs"] for w in s["words"]])]
+    pools += [(level["title"], level["items"]) for level in quran["words"]["levels"]]
+    for pool, items in pools:
         shown = [w for w in items if w[2]]
         if items and not shown:
             errors.append(f"[قرآن] حوض «{pool}» بلا كلمةٍ مصوَّرة — "
                           "لا جولةَ «اقرأ واختر» فيه أصلاً")
+        if items and len(shown) < 3:
+            warnings.append(f"[قرآن] حوض «{pool}»: {len(shown)} كلمة مصوَّرة فقط — "
+                            "جولةُ «اقرأ واختر» تحتاج ثلاثة خيارات")
+
+    # ٢ب. تدرّج الدرجات: حدُّ كلٍّ عددُ حروف كلماتها، والدرجات صاعدة ولا تتكرّر كلمة
+    levels = quran["words"]["levels"]
+    if len(levels) < 2:
+        errors.append("[قرآن] «كلمات من القرآن» درجةٌ واحدة — "
+                      "التدرّج شرطُ الجسر القرآني (الحزمة ١٢)")
+    sizes = [level["size"] for level in levels]
+    if sizes != sorted(sizes) or len(set(sizes)) != len(sizes):
+        errors.append(f"[قرآن] درجات الكلمات ليست صاعدة بعدد الحروف: {sizes}")
+    last_size = sizes[-1] if sizes else 0
+    seen_words = {}
+    for level in levels:
+        if not level["items"]:
+            errors.append(f"[قرآن/{level['id']}] درجةٌ بلا كلمات")
+        if not level["size"]:
+            errors.append(f"[قرآن/{level['id']}] درجةٌ بلا حدٍّ معلَن (size)")
+        for text, _emoji, _pic in level["items"]:
+            n = len(bare(text))
+            fits = n >= level["size"] if level["size"] == last_size else n == level["size"]
+            if level["size"] and not fits:
+                errors.append(f"[قرآن/{level['id']}] «{text}» في {n} حروف "
+                              f"ودرجتُها {level['size']}")
+            if text in seen_words:
+                errors.append(f"[قرآن] «{text}» مكرَّرة في {seen_words[text]} و{level['id']}")
+            seen_words[text] = level["id"]
 
     for sign in quran["letters"]["signs"]:
         if not sign["words"]:
@@ -497,15 +561,36 @@ def check_quran(quran, taught, letters, source):
             errors += mushaf_errors(ayah, f"[قرآن/{surah['id']}:{i}]")
         mushaf += surah["ayat"]
 
+    # ٦. محطات «كلمات السورة» (الحزمة ١٢): كلماتُها من نصّ سورتها حرفاً بحرف — تُقابَل
+    #    **بالمصدر المرجعي** لا بالمنهج، فالمشتَقّ لا يُفحَص بنفسه. ولا كلمةَ سورةٍ
+    #    تُعرَض قبل درجتها: موضعُ المحطة قبل سورتها مباشرةً (يحرسه `test_quran.mjs`
+    #    على ترتيب العقد، وهذا يحرس مادّتَها).
+    for surah in quran["surahs"]:
+        words = surah_station_words(surah)
+        label = f"[قرآن/كلمات {surah['id']}]"
+        if len(words) < QUIZ_MIN_WORDS:
+            errors.append(f"{label} {len(words)} كلمة فقط — لا تكفي جولاتِ المحطة")
+        if source:
+            in_source = set()
+            for ref, text in source.items():
+                if ref.startswith(f"{surah['number']}:"):
+                    in_source |= set(text.split())
+            for text, ayah, pos in words:
+                if text not in in_source:
+                    errors.append(f"{label} «{text}» ليست من نصّ سورتها في المصدر المرجعي")
+                elif surah["ayat"][ayah - 1].split(" ")[pos - 1] != text:
+                    errors.append(f"{label} «{text}» موضعُها {ayah}:{pos} لا يطابق نصّ الآية")
+        station += [text for text, _a, _p in words]
+
     for text in (quran["letters"]["rule"], quran["words"]["rule"],
                  quran["rasm"]["rule"], quran["muqattaat"]["rule"]):
         if text:
             spoken.append(text)
 
-    return errors, warnings, spoken, [t for t in mushaf if t]
+    return errors, warnings, spoken, [t for t in mushaf if t], list(dict.fromkeys(station))
 
 
-def check_recitations(quran, mushaf_texts):
+def check_recitations(quran, recitable):
     """التلاوة بصوت قارئ متقن — الطريق المشروع الوحيد لصوت نصّ المصحف (METHOD §٥.٦).
 
     القاعدة ليست «لا صوت» بل «لا صوتَ مولَّداً»: الآية تُتلى من تسجيلٍ جُلب مرةً
@@ -517,13 +602,13 @@ def check_recitations(quran, mushaf_texts):
     ٣) **الدعوى تُصدَّق**: ما أعلن البيانُ ملفَّه فليكن على القرص؛ وما لم يُجلب بعدُ
        تنبيهٌ لا خطأ (الجلب مهمة جلسة الصوتيات — `tools/fetch_recitation.py`).
     """
-    return recitation_errors(quran, mushaf_texts, read_json(APP_RECITATIONS),
+    return recitation_errors(quran, recitable, read_json(APP_RECITATIONS),
                              read_json(RECITATIONS),
                              lambda key: not AUDIO_DIR.exists()
                              or (AUDIO_DIR / f"{key}.mp3").exists())
 
 
-def recitation_errors(quran, mushaf_texts, app_data, bayan, has_file):
+def recitation_errors(quran, recitable, app_data, bayan, has_file):
     """لبّ فحص التلاوة بلا قراءة قرص — كي يفحص `--self-test` الفاحصَ نفسه."""
     errors, warnings = [], []
     if app_data is None and bayan is None:
@@ -535,24 +620,30 @@ def recitation_errors(quran, mushaf_texts, app_data, bayan, has_file):
                       "tools/recitations.json (--sync-only يعيد بناءه)")
         return errors, warnings, 0
 
-    ayat = app_data.get("ayat") or {}
+    # الكلمةُ المفردة تلاوةٌ كالآية (الحزمة ١٢): مفتاحُها sha1 نصِّها، وملفُّها في
+    # المجلد نفسه، وتخضع لأحكام الآية الثلاثة نفسِها — والفحص واحدٌ لهما.
+    ayat = dict(app_data.get("ayat") or {}, **(app_data.get("words") or {}))
     if not app_data.get("reciter"):
         errors.append("[تلاوة] بيان التطبيق بلا اسم قارئ — التلاوة تُنسب إلى صاحبها")
+    if (app_data.get("words") or {}) and not app_data.get("wordReciterName"):
+        errors.append("[تلاوة] كلماتٌ مفردة بلا اسم قارئ — "
+                      "قارئ الكلمة قد يكون غير قارئ الآية، فيُنسب كلٌّ إلى صاحبه")
 
     for key, text in sorted(ayat.items()):
         if key != key_for(text):
             errors.append(f"[تلاوة] مفتاح لا يطابق نصّه: «{key}» لـ«{text}» "
                           f"(الصواب {key_for(text)})")
-        if text not in mushaf_texts:
+        if text not in recitable:
             errors.append(f"[تلاوة] تلاوةٌ لنصّ ليس من مصحف المنهج: «{text}»")
-        if not has_file(key):
-            errors.append(f"[تلاوة] البيان يعلن ملفاً غير موجود: {key}.mp3 «{text}»")
+        stem = key if key in (app_data.get("ayat") or {}) else f"{WORD_PREFIX}{key}"
+        if not has_file(stem):
+            errors.append(f"[تلاوة] البيان يعلن ملفاً غير موجود: {stem}.mp3 «{text}»")
 
     if bayan is not None:
         pairs = {Path(e["file"]).stem: e["text"] for e in bayan if e.get("text")}
-        if pairs != ayat:
+        if pairs != (app_data.get("ayat") or {}):
             errors.append(f"[تلاوة] البيانان لا يتطابقان: {len(pairs)} في tools/ "
-                          f"و{len(ayat)} في app/data/ (--sync-only يوحّدهما)")
+                          f"و{len(app_data.get('ayat') or {})} في app/data/ (--sync-only يوحّدهما)")
 
     # التغطية: البسملة وكل آية — ما نقص منها تنبيهٌ لجلسة الصوتيات
     wanted = [quran["basmala"]] + [a for s in quran["surahs"] for a in s["ayat"]]
@@ -561,6 +652,14 @@ def recitation_errors(quran, mushaf_texts, app_data, bayan, has_file):
     if missing:
         warnings.append(f"{len(missing)} آية بلا تلاوة (python3 tools/fetch_recitation.py): "
                         + "، ".join(missing[:5]) + ("…" if len(missing) > 5 else ""))
+
+    # وكلمات محطات السور — تنبيهٌ لا خطأ: المحطة تعمل صامتةً حتى تُجلب (الحزمة ١٢)
+    words = [t for s in quran["surahs"] for t, _a, _p in surah_station_words(s)]
+    lacking = [t for t in dict.fromkeys(words) if t not in have]
+    if lacking:
+        warnings.append(f"{len(lacking)} كلمة سورةٍ بلا تلاوة مفردة "
+                        "(python3 tools/fetch_word_recitation.py — بوّابةُ ترخيصٍ قبلها): "
+                        + "، ".join(lacking[:5]) + ("…" if len(lacking) > 5 else ""))
     return errors, warnings, len(ayat)
 
 
@@ -817,18 +916,20 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
     if quran:
         if quran["after"] != group_ids[-1]:
             errors.append(f"[قرآن] موضعها «{quran['after']}» وليس بعد المجموعة الأخيرة")
-        q_errors, q_warnings, q_spoken, q_mushaf = check_quran(quran, taught, letters, quran_source())
+        q_errors, q_warnings, q_spoken, q_mushaf, q_station = check_quran(
+            quran, taught, letters, quran_source())
         errors += q_errors
         warnings += q_warnings
         audio_texts.update(q_spoken)
         mushaf_texts.update(q_mushaf)
-        quran_literals = set(q_spoken) | set(q_mushaf) | {
+        quran_literals = set(q_spoken) | set(q_mushaf) | set(q_station) | {
             quran["title"], quran["basmala"],
             *[quran[k][f] for k in ("letters", "words", "rasm", "muqattaat") for f in ("title", "face")],
             *[s[f] for s in quran["letters"]["signs"] for f in ("sign", "name")],
             *[sh for s in quran["letters"]["signs"] for sh in s["shapes"]],
             *[t for s in quran["letters"]["signs"] for w in s["words"] for t in w[:2]],
             *[t for w in quran["words"]["items"] for t in w[:2]],
+            *[level[f] for level in quran["words"]["levels"] for f in ("title", "face")],
             *[s[f] for s in quran["rasm"]["signs"] for f in ("sign", "name", "from")],
             *[i["surah"] for i in quran["muqattaat"]["items"]],
             *[c for i in quran["muqattaat"]["items"] for p in i["parts"] for c in p],
@@ -868,7 +969,7 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
         errors.append(f"[قرآن] نصّ من المصحف في قائمة الانتظار الصوتية: «{text}»")
 
     if quran:
-        r_errors, r_warnings, r_count = check_recitations(quran, mushaf_texts)
+        r_errors, r_warnings, r_count = check_recitations(quran, mushaf_texts | set(q_station))
         errors += r_errors
         warnings += r_warnings
 
@@ -1027,10 +1128,40 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
            f"ومحلّل علامات الرسم يقرأ {len(quran['rasm']['signs'])} علامة بأمثلتها")
         ok(bool(source) and len(source) >= 22, f"والمصدر المرجعي مقروء ({len(source)} آية)")
 
-        errs, _, spoken, mushaf = check_quran(quran, all_letters, letters, source)
+        errs, _, spoken, mushaf, station = check_quran(quran, all_letters, letters, source)
         ok(not errs, f"والمرحلة القرآنية تمرّ نظيفةً{'' if not errs else ': ' + errs[0]}")
         ok(len(mushaf) > 25 and all(t not in spoken for t in mushaf),
            f"ولا نصّ مصحف واحد في المولَّد ({len(mushaf)} نصّ مصحف، {len(spoken)} مولَّداً)")
+
+        # ————— درجات الكلمات ومحطات كلمات السور (الحزمة ١٢ «الجسر القرآني») —————
+        levels = quran["words"]["levels"]
+        ok(len(levels) >= 3 and sum(len(l["items"]) for l in levels) >= 24,
+           f"محلّل الدرجات يقرأ {len(levels)} درجات في "
+           f"{sum(len(l['items']) for l in levels)} كلمة (كانت ثمانياً بلا تدرّج)")
+        ok([l["size"] for l in levels] == sorted({l["size"] for l in levels}),
+           f"وحدودُها صاعدة بعدد الحروف ({[l['size'] for l in levels]})")
+
+        broken = json.loads(json.dumps(quran))
+        broken["words"]["levels"][0]["items"].append(["زَيْتُونْ", "🫒", True])
+        ok(any("ودرجتُها" in e for e in check_quran(broken, all_letters, letters, source)[0]),
+           "وكلمةٌ أطولُ من درجتها تُمسَك (التدرّج مشتقٌّ لا مذوَّق)")
+
+        broken = json.loads(json.dumps(quran))
+        broken["words"]["levels"][1]["items"].append(list(broken["words"]["levels"][0]["items"][0]))
+        ok(any("مكرَّرة في" in e for e in check_quran(broken, all_letters, letters, source)[0]),
+           "وكلمةٌ مكرَّرة في درجتين تُمسَك")
+
+        ok(len(station) >= 60 and all(" " not in t for t in station),
+           f"وكلماتُ السور مشقوقةٌ من آياتها ({len(station)} كلمة فريدة، لا فراغ في واحدة)")
+        first = quran["surahs"][0]
+        ok(all(w in first["ayat"][a - 1].split(" ") for w, a, _p in surah_station_words(first)),
+           f"وكلُّ كلمةٍ في موضعها من آيتها ({first['name']})")
+
+        broken = json.loads(json.dumps(quran))
+        broken["surahs"][0]["ayat"][2] += " ٱلْكَوْثَرَ"     # كلمةٌ من سورةٍ أخرى
+        ok(any("ليست من نصّ سورتها" in e
+               for e in check_quran(broken, all_letters, letters, source)[0]),
+           "وكلمةٌ ليست من نصّ سورتها في المصدر المرجعي تُمسَك (بند ١٢/٤)")
 
         # عبث مقصود: آية محرَّفة، وعلامة بلا درس، وحرف جديد بلا كلمة
         broken = json.loads(json.dumps(quran))
@@ -1049,19 +1180,20 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
            "وكلمة إملائية ناقصة الشكل تُمسَك كغيرها من مادة القراءة")
 
         broken = json.loads(json.dumps(quran))
-        broken["words"]["items"] = [[t, e, False] for t, e, _ in broken["words"]["items"]]
+        broken["words"]["levels"][0]["items"] = [
+            [t, e, False] for t, e, _ in broken["words"]["levels"][0]["items"]]
         ok(any("بلا كلمةٍ مصوَّرة" in e for e in check_quran(broken, all_letters, letters, source)[0]),
            "وحوضُ «اقرأ واختر» إن فقد كلَّ كلمةٍ مصوَّرة يُمسَك (لا جولةَ فيه أصلاً)")
         ok(any("غير مصوَّرة" in w for w in check_quran(quran, all_letters, letters, source)[1]),
            "وغيرُ المصوَّرة يُنبَّه عليها ولا تُفشِل الفحص («صدق الصورة»)")
 
         # ————— التلاوة: الطريق المشروع الوحيد لصوت المصحف —————
-        mushaf = set(check_quran(quran, all_letters, letters, source)[3])
+        recitable = set(check_quran(quran, all_letters, letters, source)[3]) | set(station)
         ayah = quran["surahs"][1]["ayat"][0]
         good = {"reciter": "Husary_64kbps", "reciterName": "قارئ",
                 "ayat": {key_for(ayah): ayah}}
         recite = lambda data, have=True: recitation_errors(  # noqa: E731
-            quran, mushaf, data, None, lambda key: have)[0]
+            quran, recitable, data, None, lambda stem: have)[0]
 
         ok(not recite(good), "بيان تلاوةٍ سليم يمرّ")
         ok(any("لا يطابق نصّه" in e
@@ -1073,11 +1205,23 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
         ok(any("ملفاً غير موجود" in e for e in recite(good, have=False)),
            "ودعوى ملفٍ غير موجود تُمسَك")
         ok(any("لا يتطابقان" in e for e in recitation_errors(
-               quran, mushaf, good, [], lambda key: True)[0]),
+               quran, recitable, good, [], lambda stem: True)[0]),
            "واختلاف البيانين (tools/ عن app/data/) يُمسَك")
         ok(any("آية بلا تلاوة" in w for w in recitation_errors(
-               quran, mushaf, good, None, lambda key: True)[1]),
+               quran, recitable, good, None, lambda stem: True)[1]),
            "ونقصُ تلاوةٍ تنبيهٌ لجلسة الصوتيات لا خطأ")
+
+        word = station[0]
+        with_word = {**good, "words": {key_for(word): word}, "wordReciterName": "قارئ"}
+        ok(not recite(with_word), "وبيانٌ فيه تلاواتُ كلماتٍ مفردة يمرّ (الحزمة ١٢)")
+        ok(any("بلا اسم قارئ" in e
+               for e in recite({**with_word, "wordReciterName": ""})),
+           "وكلماتٌ مفردة بلا اسم قارئ تُمسَك (قارئ الكلمة قد يكون غير قارئ الآية)")
+        ok(any(f"{WORD_PREFIX}" in e for e in recite(with_word, have=False)),
+           "وملفُّ الكلمة يُطلَب بوسمه `wbw-` لا بمفتاحه وحده (فلا يلتقي بملفٍّ مولَّد)")
+        ok(any("كلمة سورةٍ بلا تلاوة" in w for w in recitation_errors(
+               quran, recitable, good, None, lambda stem: True)[1]),
+           "ونقصُ تلاوةِ الكلمة تنبيهٌ لا خطأ — المحطة تعمل صامتةً حتى تُجلب")
 
     print(f"\n{fails} فشل" if fails else "\n✓ الفاحص يمسك المخالفات كلها")
     return 1 if fails else 0

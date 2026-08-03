@@ -81,6 +81,7 @@ const SCOPE = 'https://muallim.test/app/';
 const KEY_A = 'aaaaaaaaaaaa';       // حرفٌ سيُستبدل صوته
 const KEY_B = 'bbbbbbbbbbbb';       // حرفٌ لن يُمسّ
 const KEY_R = 'cccccccccccc';       // آيةٌ بصوت القارئ
+const KEY_W = 'dddddddddddd';       // كلمةٌ مفردة بصوت القارئ (ملفُّها موسوم `wbw-`)
 
 const disk = new Map();
 const put = (path, body) => disk.set(path, typeof body === 'string' ? body : JSON.stringify(body));
@@ -90,13 +91,16 @@ const setSite = ({ aBody, aTag }) => {
   put('audio/versions.json', { [KEY_A]: aTag, [KEY_B]: '2222bbbb' });
   put('data/recitations.json', {
     reciter: 'Husary_64kbps', reciterName: 'الحصري',
-    ayat: { [KEY_R]: 'آية' }, v: { [KEY_R]: '3333cccc' },
+    ayat: { [KEY_R]: 'آية' },
+    words: { [KEY_W]: 'كلمة' }, wordReciterName: 'قارئ الكلمة',
+    v: { [KEY_R]: '3333cccc', [`wbw-${KEY_W}`]: '4444dddd' },
   });
   put('data/stories/index.json', { stories: ['s1'] });
   put('data/stories/s1.json', { id: 's1' });
   put(`audio/${KEY_A}.mp3`, aBody);
   put(`audio/${KEY_B}.mp3`, 'صوت باء');
   put(`audio/${KEY_R}.mp3`, 'تلاوة');
+  put(`audio/wbw-${KEY_W}.mp3`, 'تلاوة كلمة');
 };
 setSite({ aBody: 'صوت ألف — القديم (edge)', aTag: '1111aaaa' });
 
@@ -192,10 +196,13 @@ await fire('install');
 await fire('activate');
 
 const first = await cachedUrls();
-ok(first.length === 3 && first.every((u) => u.includes('?v=')),
-  `التركيب يخزن الأصوات الثلاثة بروابط موسومة (${first.length})`);
+ok(first.length === 4 && first.every((u) => u.includes('?v=')),
+  `التركيب يخزن الأصوات الأربعة بروابط موسومة (${first.length})`);
 ok(first.includes(`${SCOPE}audio/${KEY_A}.mp3?v=1111aaaa`), 'ومنها ملف ألف بوسمه القديم');
 ok(first.includes(`${SCOPE}audio/${KEY_R}.mp3?v=3333cccc`), 'وتلاوةُ القارئ بوسمها من بيانها');
+// الحزمة ١٢: تلاوةُ الكلمة المفردة ملفُّها موسوم `wbw-` — لولا خزنُها لصمتت المحطة دون إنترنت
+ok(first.includes(`${SCOPE}audio/wbw-${KEY_W}.mp3?v=4444dddd`),
+  'وتلاوةُ الكلمة المفردة كذلك باسمها الموسوم (فتعمل محطة كلمات السورة دون إنترنت)');
 const shellCache = await caches.open(`muallim-shell-${SW_VERSION}`);
 ok([...shellCache.entries.keys()].some((u) => u.endsWith('audio/versions.json')),
   'وبيان البصمات نفسه مخزون في الهيكل (فيُقرأ دون إنترنت)');
@@ -215,7 +222,7 @@ const afterSwap = await cachedUrls();
 ok(afterSwap.includes(`${SCOPE}audio/${KEY_A}.mp3?v=9999aaaa`), 'والجديد صار مخزوناً');
 ok(!afterSwap.includes(`${SCOPE}audio/${KEY_A}.mp3?v=1111aaaa`),
   'ووسمُه الأقدم حُذف — فلا نسختان لملفٍ واحد ولا يعود القديم من بابٍ خلفيّ');
-ok(afterSwap.length === 3, `والمخزون ما زال ثلاثة لا أربعة (${afterSwap.length})`);
+ok(afterSwap.length === 4, `والمخزون ما زال أربعة لا خمسة (${afterSwap.length})`);
 
 // ——— وغير المستبدل يبقى من الكاش بلا شبكة ———
 net = [];
@@ -232,7 +239,7 @@ net = [];
 const stale = await request(`audio/${KEY_A}.mp3?v=7777aaaa`);
 ok(stale && stale.ok && (await stale.text()) === 'صوت ألف — الجديد (Sulafat)',
   'وبلا شبكة: وسمٌ غير مخزون يُخدَم بأقرب نسخةٍ عندنا (لا صمت في أذن الطفل)');
-ok((await cachedUrls()).length === 3, 'ولا تُخزَّن تلك الاستجابة بالوسم الجديد (تُصحَّح أول اتصال)');
+ok((await cachedUrls()).length === 4, 'ولا تُخزَّن تلك الاستجابة بالوسم الجديد (تُصحَّح أول اتصال)');
 offline = false;
 
 // ——— الكنس: كل أثرٍ لصوتٍ قديم يزول عند التركيب التالي ———
@@ -240,7 +247,7 @@ offline = false;
 (await audioCache()).entries.set(`${SCOPE}audio/${KEY_B}.mp3?v=0000old0`, 'قديم');
 await fire('install');
 const swept = await cachedUrls();
-ok(swept.length === 3 && !swept.some((u) => !u.includes('?v=')),
+ok(swept.length === 4 && !swept.some((u) => !u.includes('?v=')),
   'والتركيب يكنس الأوسمة الغابرة والروابط بلا وسم (لا يبقى في الجهاز أثرٌ للقديم)');
 ok((await (await audioCache()).match(new Request(`${SCOPE}audio/${KEY_A}.mp3?v=9999aaaa`))) !== undefined,
   'ويُبقي المتوقَّع اليوم');

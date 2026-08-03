@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v13';  // v13: محطتا «ميّز بين» — مواجهة المتشابهات (الحزمة ١٣)
+const VERSION = 'v14';  // v14: «الجسر القرآني» — كلمات السورة ودرجات الكلمات (الحزمة ١٢)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -76,7 +76,9 @@ const SHELL = [
   'icons/apple-touch-icon.png',
 ];
 
-const AUDIO_RE = /\/audio\/[0-9a-f]{12}\.mp3$/;
+// ملفات الصوت: مفتاحٌ من ١٢ خانة، وقد يسبقه وسمُ تلاوة الكلمة المفردة `wbw-`
+// (الحزمة ١٢) — وهو يفصل ملفَّ المصحف عن ملفٍّ مولَّد له المفتاح نفسُه.
+const AUDIO_RE = /\/audio\/(wbw-)?[0-9a-f]{12}\.mp3$/;
 
 const json = (path) => fetch(new URL(path, self.registration.scope))
   .then((r) => (r.ok ? r.json() : null))
@@ -91,10 +93,10 @@ async function precacheStories() {
     cache.add(new URL(`data/stories/${id}.json`, self.registration.scope)).catch(() => {})));
 }
 
-/** رابط ملف صوتٍ موسوماً ببصمة محتواه (بلا بصمة: الرابط كما هو). */
-function audioUrl(key, tags) {
-  const href = new URL(`audio/${key}.mp3`, self.registration.scope).href;
-  return tags[key] ? `${href}?v=${tags[key]}` : href;
+/** رابط ملف صوتٍ باسمه على القرص، موسوماً ببصمة محتواه (بلا بصمة: الرابط كما هو). */
+function audioUrl(stem, tags) {
+  const href = new URL(`audio/${stem}.mp3`, self.registration.scope).href;
+  return tags[stem] ? `${href}?v=${tags[stem]}` : href;
 }
 
 /** خزن الأصوات كلها من بياناتها — بعدها لا يحتاج التطبيق شبكةً البتّة.
@@ -109,8 +111,10 @@ async function precacheAudio() {
     json('audio/manifest.json'), json('audio/versions.json'), json('data/recitations.json'),
   ]);
   const tags = { ...(versions || {}), ...(recitations?.v || {}) };
-  const keys = [...Object.keys(generated || {}), ...Object.keys(recitations?.ayat || {})];
-  const urls = keys.map((key) => audioUrl(key, tags));
+  // أسماءُ الملفات لا المفاتيح: تلاوةُ الكلمة المفردة تُخزَن باسمها الموسوم `wbw-`
+  const stems = [...Object.keys(generated || {}), ...Object.keys(recitations?.ayat || {}),
+    ...Object.keys(recitations?.words || {}).map((key) => `wbw-${key}`)];
+  const urls = stems.map((stem) => audioUrl(stem, tags));
   // واحداً واحداً: ملفٌ ناقص لا يُسقِط الخزن كله (بخلاف cache.addAll)
   await Promise.all(urls.map((url) => cache.add(url).catch(() => {})));
 

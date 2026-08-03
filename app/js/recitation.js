@@ -10,15 +10,30 @@
 // المفتاح هو المفتاح نفسه في كل المشروع (sha1 نصّه، أول ١٢ خانة)، والملفات في
 // `app/audio/` كبقية الأصوات — يجلبها `tools/fetch_recitation.py` مرةً واحدة
 // ويكتب بيانَها `app/data/recitations.json` (لا تدخل فهرسَ الأصوات المولّدة أبداً).
+//
+// **والكلمةُ المفردة كالآية** (الحزمة ١٢ «الجسر القرآني»): كلماتُ السورة تُسمَع
+// كلمةً-كلمة من تسجيل قارئ أيضاً — بيانُها `words` في الملف نفسه (يجلبها
+// `tools/fetch_word_recitation.py`)، وتشغيلُها من هنا بالدالّة نفسها: المفتاح من
+// النصّ، فلا تحتاج الشاشةُ أن تعرف أهي آيةٌ أم كلمة. وما لم يُجلب بعدُ **صمتٌ**.
+//
+// **وملفُّ الكلمة موسومٌ بـ`wbw-`** لا بمفتاحها وحده: الكلمة المفردة قد تطابق حرفياً
+// كلمةً عربية عادية لها ملفٌّ مولَّد بحقّ («مَا» و«مِنَ» في سلّم الجمل)، والمفتاح من
+// النصّ — فلولا الوسم لتشارك المصحفُ والمولَّدُ ملفاً واحداً، ولسمع الطفلُ كلمةَ الله
+// بصوت مولّد من حيث لا نشعر. الوسمُ يجعل التصادم مستحيلاً بالبناء لا بالانتباه.
 
 import { keyFor } from './audio.js';
 
 const AUDIO_URL = new URL('../audio/', import.meta.url);
 const MANIFEST_URL = new URL('../data/recitations.json', import.meta.url);
 
+/** وسمُ ملفات تلاوة الكلمة المفردة — يفصلها عن ملفات المولَّد ذاتِ المفتاح نفسه. */
+export const WORD_PREFIX = 'wbw-';
+
 let ayat = null;            // Set لمفاتيح الآيات المسجَّلة (null = لم يُقرأ البيان بعد)
+let words = null;           // Set لمفاتيح الكلمات المفردة المسجَّلة
 let tags = null;            // مفتاح ← بصمة محتوى ملفه (وسمُ كسر الكاش — انظر audio.js)
 let reciterName = '';
+let wordReciterName = '';
 let manifestLoad = null;
 
 // كما في `audio.js`: الوسم على http(s) وحده.
@@ -36,27 +51,43 @@ export function ready() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
       .then((m) => {
         ayat = new Set(Object.keys(m.ayat || {}));
+        words = new Set(Object.keys(m.words || {}));
         tags = m.v || null;
         reciterName = m.reciterName || '';
+        wordReciterName = m.wordReciterName || '';
       })
-      .catch(() => { ayat = null; });     // بلا بيان: لا تلاوة (ولا نطق آلي بديلاً)
+      .catch(() => { ayat = null; words = null; });   // بلا بيان: لا تلاوة (ولا نطق آلي بديلاً)
   }
   return manifestLoad;
 }
 
-/** اسم القارئ كما يُعرَض (فارغ قبل قراءة البيان). */
+/** اسم قارئ الآيات كما يُعرَض (فارغ قبل قراءة البيان). */
 export const reciter = () => reciterName;
 
-/** هل لهذا النصّ تلاوة مسجَّلة؟ (null = البيان لم يُقرأ بعد — نادِ ready() أولاً). */
+/** اسم قارئ الكلمة المفردة — قد يكون غير قارئ الآيات، فيُنسب كلٌّ إلى صاحبه. */
+export const wordReciter = () => wordReciterName;
+
+/**
+ * هل لهذا النصّ تلاوة مسجَّلة؟ (null = البيان لم يُقرأ بعد — نادِ ready() أولاً).
+ * الآيةُ والكلمةُ سواءٌ هنا: المفتاح من النصّ، والملفّ في المجلد نفسه.
+ */
 export function has(text) {
-  return ayat ? ayat.has(keyFor(text)) : null;
+  if (!ayat) return null;
+  const key = keyFor(text);
+  return ayat.has(key) || Boolean(words?.has(key));
+}
+
+/** اسمُ ملف النصّ: الآيةُ بمفتاحها، والكلمةُ المفردة بمفتاحها موسوماً — لا تصادمَ بينهما. */
+function stemFor(text) {
+  const key = keyFor(text);
+  return ayat?.has(key) ? key : `${WORD_PREFIX}${key}`;
 }
 
 /** رابط الملف موسوماً ببصمة محتواه إن عُرفت — فاستبدال تلاوةٍ يكسر كاشَها وحدها. */
 function urlFor(text) {
-  const key = keyFor(text);
-  const href = new URL(`${key}.mp3`, AUDIO_URL).href;
-  const tag = TAGGABLE && tags ? tags[key] : null;
+  const stem = stemFor(text);
+  const href = new URL(`${stem}.mp3`, AUDIO_URL).href;
+  const tag = TAGGABLE && tags ? tags[stem] : null;
   return tag ? `${href}?v=${tag}` : href;
 }
 

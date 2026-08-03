@@ -78,8 +78,14 @@ let state = load();
 // (نجمةٌ في عقدةٍ بعدها = عبورٌ فعليّ). ترحيلٌ بالبيانات لا برقم نسخة — فلا تُرفَع
 // `VERSION` هنا: رفعُها يُسقِط حالةَ كل طفل قائم (`migrate` لا تقبل غير ١ والحالية).
 
-/** الدرسُ المشقوق ← شطراه: من درس المدّ كلَّه فقد درس شطريه. */
-const SPLIT_NODES = { 'skill:madd': ['skill:madd-alif', 'skill:madd-waw-ya'] };
+/**
+ * الدرسُ المشقوق ← شطراه: من درس المدّ كلَّه فقد درس شطريه، ومن درس «كلمات من القرآن»
+ * الثمانَ فقد درس درجاتِها الثلاث (الحزمة ١٢ — الثمانُ موزَّعةٌ فيها كما هي).
+ */
+const SPLIT_NODES = {
+  'skill:madd': ['skill:madd-alif', 'skill:madd-waw-ya'],
+  'quran:words': ['quran:words1', 'quran:words2', 'quran:words3'],
+};
 
 function migrateJourney() {
   if (!Object.keys(state.stars).length) return;   // طفلٌ جديد: لا شيء يُرحَّل
@@ -101,9 +107,11 @@ function migrateJourney() {
     if (node.type === 'gate') {
       state.stars[node.id] = MAX_STARS;           // بوابةٌ عبَر مفصلَها قبل وجودها ⇒ مجتازة
       changed = true;
-    } else if (node.type === 'contrast') {
+    } else if (node.type === 'contrast' || node.type === 'quran') {
       // محطةٌ استحدثناها خلف موضع الطفل: نجمةُ إتمامٍ واحدة تفكّ حبسه ولا تدّعي إتقاناً —
       // فتبقى تدعوه إلى لعبها (النجوم لا تنقص، فما يكسبه حين يلعبها يعلو عليها).
+      // ويشمل ذلك محطاتِ «كلمات السورة» المستحدثة أمام سورٍ قرأها الطفل (الحزمة ١٢):
+      // القفلُ تسلسليّ، فمحطةٌ جديدة قبل سورةٍ مقروءة كانت ستُعيد قفلَ ما بعدها كلِّه.
       state.stars[node.id] = 1;
       changed = true;
     }

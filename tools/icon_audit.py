@@ -184,19 +184,22 @@ def collect() -> tuple:
     pools.append((f"القرآنية · {quran['letters']['title']}",
                   "quran.js → screens.js readQuizStep", quran_letter_words))
 
-    quran_items = []
-    for read, emoji, pictured in quran["words"]["items"]:
-        entry = Entry(
-            read, emoji, "curriculum.js",
-            f"القرآنية · {quran['words']['title']}", "أ",
-            ["quran.js «اقرأ واختر» (الصورة سؤال)", "quran.js بطاقة الكلمة"],
-            pictured,
-        )
-        entries.append(entry)
-        if pictured:
-            quran_items.append(entry)
-    pools.append((f"القرآنية · {quran['words']['title']}",
-                  "quran.js → screens.js readQuizStep", quran_items))
+    # **حوضٌ لكل درجة** (الحزمة ١٢): «اقرأ واختر» تسحب مشتّتاتها من كلمات الدرجة وحدها،
+    # فالتطابق داخل الدرجة خطأ، وبين درجتين تعارضٌ عبر الرحلة لا حوضٌ واحد.
+    for level in quran["words"]["levels"]:
+        level_items = []
+        for read, emoji, pictured in level["items"]:
+            entry = Entry(
+                read, emoji, "curriculum.js",
+                f"القرآنية · {level['title']}", "أ",
+                ["quran.js «اقرأ واختر» (الصورة سؤال)", "quran.js بطاقة الكلمة"],
+                pictured,
+            )
+            entries.append(entry)
+            if pictured:
+                level_items.append(entry)
+        pools.append((f"القرآنية · {level['title']}",
+                      "quran.js → screens.js readQuizStep", level_items))
 
     for surah in quran["surahs"]:
         entries.append(Entry(

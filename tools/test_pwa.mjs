@@ -74,7 +74,9 @@ ok(/AUDIO_RE\s*=\s*\/.*audio.*mp3/.test(sw), 'الأصوات لها مسار خ�
 // قديم بعد أي استبدال — التفصيل والسيناريو الكامل في tools/test_audio_cache.mjs
 ok(shell.includes('audio/versions.json') && sw.includes("json('audio/versions.json')"),
   'وبيانُ بصمات المحتوى مخزونٌ ومقروء (كسر الكاش عند استبدال صوتٍ تحت مفتاحه)');
-ok(/\?v=\$\{tags\[key\]\}/.test(sw) && sw.includes('dropOtherTags'),
+// اسمُ المتغيّر ليس عقداً (صار `stem` حين دخلت ملفاتُ `wbw-` في الحزمة ١٢) — المقيس
+// أن يُطلَب الرابط موسوماً ببصمة الملف، وأن يُكنَس وسمُه الأقدم.
+ok(/\?v=\$\{tags\[\w+\]\}/.test(sw) && sw.includes('dropOtherTags'),
   'والخزن بالرابط الموسوم مع كنس الوسم الأقدم لذلك الملف وحده');
 ok(sw.includes('cacheFirst') && sw.includes('staleWhileRevalidate'),
   'واستراتيجيتان: المخزون أولاً للصوت، والتحديث في الخلفية للهيكل');

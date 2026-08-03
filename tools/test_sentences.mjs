@@ -25,7 +25,7 @@ globalThis.localStorage = {
   removeItem: (k) => store.delete(k),
 };
 
-const { GROUPS, SKILLS, QURAN, bareLetters, wordSkill, skillExamples } =
+const { GROUPS, SKILLS, QURAN, quranWordItems, bareLetters, wordSkill, skillExamples } =
   await import(new URL('curriculum.js', APP));
 const { GARDENS, GRADED, WORDS } = await import(new URL('lexicon.js', APP));
 const {
@@ -113,7 +113,7 @@ const support = new Map((data.support || []).map((t) => [stemOf(t), t]));
 const curriculum = new Set([
   ...GROUPS.flatMap((g) => g.words).map((w) => bareLetters(w.tiles.join(''))),
   ...SKILLS.flatMap(skillExamples).map((w) => bareLetters(w.say)),
-  ...QURAN.words.items.map((w) => bareLetters(w.read)),
+  ...quranWordItems().map((w) => bareLetters(w.read)),
   ...QURAN.letters.signs.flatMap((s) => s.words.map((w) => bareLetters(w.read))),
 ]);
 

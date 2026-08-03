@@ -160,6 +160,9 @@ def run_chrome(url: str, profile: Path, extra: list, show: bool):
 LANDSCAPE_MUST_FIT = {
     "lesson-listen", "lesson-harakat", "lesson-trace", "lesson-quiz",
     "skill-rule", "skill-compare", "skill-quiz", "gate", "contrast-compare", "contrast-quiz",
+    # شاشةُ الحكم في «كلمات السورة» (الحزمة ١٢): الآيةُ والخياراتُ في نظرةٍ واحدة —
+    # طفلٌ يسحب ليرى بقيّة الآية يفقد سياقَ الكلمة التي يبحث عنها.
+    "surah-find",
 }
 
 

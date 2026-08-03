@@ -57,7 +57,9 @@ window.addEventListener('unhandledrejection', (e) => shout(e.reason?.stack || e.
 import { renderLesson } from './js/lesson.js';
 import { renderSkillLesson } from './js/skill.js';
 import { renderGate } from './js/gate.js';
+import { renderContrast } from './js/contrast.js';
 import { renderQuran } from './js/quran.js';
+import { surahWordsPart } from './js/curriculum.js';
 import { renderWordsGame } from './js/words.js';
 import { renderGarden } from './js/garden.js';
 import { renderLadder } from './js/ladder.js';
@@ -105,6 +107,18 @@ function skillAt(id, step) {
   return el;
 }
 
+function surahWordsAt(surahId, step) {
+  const el = renderQuran(surahWordsPart(surahId));
+  for (let i = 0; i < step; i++) hit(el, 'تابع');
+  return el;
+}
+
+function contrastAt(id, step) {
+  const el = renderContrast(id);
+  for (let i = 0; i < step; i++) hit(el, 'تابع');
+  return el;
+}
+
 // الحروف الممثِّلة لأصناف الأجرام: ألفٌ طويلة، باءٌ منقوطة تحت، ميمٌ نازلة،
 // عينٌ وسطى، غينٌ منقوطة فوق — وعليها تُحكَّم المعايرة بالعين.
 const SAMPLE = [...'ابمعغ'];
@@ -130,8 +144,14 @@ export const SCREENS = [
   ['skill-rule', 'المهارة ١ — القاعدة', () => skillAt('madd-alif', 0)],
   ['skill-compare', 'المهارة ٢ — قارِن بأذنك', () => skillAt('shadda', 1)],
   ['skill-quiz', 'المهارة ٣ — ميّز بأذنك', () => skillAt('tanween', 2)],
+  ['contrast-compare', 'ميّز بين ١ — قارِن', () => contrastAt('alike-hard', 0)],
+  ['contrast-quiz', 'ميّز بين ٢ — أيَّ حرف سمعت؟', () => contrastAt('alike-hard', 1)],
   ['quran-letters', 'القرآنية — الهمزة والتاء', () => renderQuran('letters')],
+  ['quran-words', 'القرآنية — كلمات (درجة ٣)', () => renderQuran('words3')],
   ['quran-rasm', 'القرآنية — الرسم', () => renderQuran('rasm')],
+  // أكثفُ شاشتين في الرحلة: ٢٦ بطاقةَ كلمةٍ عثمانية، ثم أطولُ آيةٍ في المصحف الصغير
+  ['surah-words', 'كلمات السورة ١ — البطاقات', () => surahWordsAt('s1', 0)],
+  ['surah-find', 'كلمات السورة ٢ — جِدْها في الآية', () => surahWordsAt('s1', 1)],
   ['gate', 'بوابة المصحف', () => renderGate('quran')],
   ['words', 'لعبة تركيب الكلمات', () => renderWordsGame('g1')],
   ['garden', 'بستان المعجم', () => renderGarden(firstBundleId())],

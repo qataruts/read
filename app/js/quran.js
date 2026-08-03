@@ -13,7 +13,10 @@
 // **الثانية**: لا قياس (كما في دروس المهارات) — المقيس في §٦ حرفٌ بحركة في تمرين،
 // والمقيس هنا علامةُ رسم أو كلمة كاملة، فلا يُبنى منه تكرارٌ متباعد لا تمرين له.
 
-import { QURAN, surahById } from './curriculum.js';
+import {
+  QURAN, SURAH_WORDS_FACE, surahById, surahWords, surahWordsPart, surahOfWordsPart,
+  quranWordLevel,
+} from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import * as recitation from './recitation.js';
@@ -28,6 +31,7 @@ import {
 const QUIZ_OPTIONS = 3;
 const RASM_ROUNDS = 3;
 const AFTER_PICK_MS = 750;
+const FIND_ROUNDS = 6;      // جولات «جِدْها في الآية» في محطة كلمات السورة
 
 const nodeIdOf = (part) => `quran:${part}`;
 
@@ -108,21 +112,20 @@ function renderQuranLetters() {
   });
 }
 
-// ————— ٢) كلمات من القرآن —————
+// ————— ٢) كلمات من القرآن — ثلاث درجات (الحزمة ١٢) —————
 
-function renderQuranWords() {
-  const data = QURAN.words;
-  const items = data.items;
+function renderQuranWords(level) {
+  const items = level.items;
 
   return stepped({
-    part: data.id,
+    part: level.id,
     pill: 'كلمات',
-    face: data.face,
+    face: level.face,
     steps: [
       {
         title: 'الكلمات',
         build: ({ next }) => h('div', {},
-          ...ruleHead(data.title, data.face, data.rule),
+          ...ruleHead(level.title, level.face, QURAN.words.rule),
           h('div', { class: 'row wordrow' }, items.map(spokenWord)),
           nextButton(next),
         ),
@@ -311,7 +314,172 @@ function renderQuranMuqattaat() {
   });
 }
 
-// ————— ٥) شاشة السورة: قراءة بالعين، وتلاوةٌ بصوت قارئ —————
+// ————— ٥) كلمات السورة — «لا سورة قبل كلماتها» (الحزمة ١٢ «الجسر القرآني») —————
+//
+// **علّةُ المحطة**: كانت الرحلة تعبر من ثمانِ كلماتٍ إملائية إلى الفاتحة رأساً —
+// خلافاً للنورانية، فهي تُكثر تدريباتِ الكلمات قبل التلاوة. فصار لكل سورةٍ محطةٌ
+// قبلها: كلماتُها **بالرسم العثماني من نصّ آياتها نفسِه** (لا تُكتب بيد أحد —
+// `surahWords` تشقّها عند الفراغ)، تُقرأ بطاقاتٍ تُسمَع كلمةً-كلمة بصوت قارئ، ثم
+// جولاتُ «جِدْها في الآية»: يقرأ الكلمة ويمسح الآية حتى يجدها.
+//
+// **والحكم على القراءة قبل السماع** (عقد `readQuizStep` نفسُه — DESIGN §٥.٢):
+// لا صوتَ قبل الاختيار، والخطأ يُسمعه **ما نقره هو** بتلاوة القارئ فيقارن، ولا
+// يُلقَّن الصواب. وكلُّ ما يُسمع هنا من `recitation.js` وحدها: نصّ مصحفٍ لا يُولَّد
+// صوتُه ولا يُنطق آلياً (METHOD §٥.٦) — وإن لم تُجلب تلاوةُ كلمةٍ بعدُ فصمتٌ.
+
+/**
+ * جولات «جِدْها في الآية»: أهدافٌ من كلمات السورة، **موزَّعةٌ على آياتها** ما أمكن
+ * (لا ثلاثُ جولاتٍ من آيةٍ واحدة والطفلُ قد حفظ موضعَها).
+ */
+export function buildFindRounds(words, rounds = FIND_ROUNDS, rnd = Math.random) {
+  const pool = shuffle(words, rnd);
+  const out = [];
+  let used = new Set();
+  while (out.length < Math.min(rounds, pool.length)) {
+    const fresh = pool.find((w) => !out.includes(w) && !used.has(w.ayah));
+    const pick = fresh || pool.find((w) => !out.includes(w));
+    if (!pick) break;
+    if (!fresh) used = new Set();          // دارت الآيات كلها: نبدأ دورةً جديدة
+    used.add(pick.ayah);
+    out.push(pick);
+  }
+  return out;
+}
+
+function renderSurahWords(surahId) {
+  const surah = surahById(surahId);
+  if (!surah) return null;
+  const words = surahWords(surah);
+  const heard = new Set();
+
+  // نسبةُ التلاوة إلى صاحبها — **قارئُ الكلمة وحده** لا قارئُ الآية: هما مصدران
+  // مختلفان قد يختلف قارئاهما، ونسبةُ تلاوةٍ إلى غير صاحبها كذبٌ على الطفل ووليّه.
+  // فما لم يُجلب بيانُ الكلمات بعدُ يبقى السطر عاماً بلا اسم (والكلماتُ صامتة).
+  const credit = h('p', { class: 'note' }, 'اضغط الكلمة لتسمعها بصوت قارئ متقن.');
+  recitation.ready().then(() => {
+    const name = recitation.wordReciter();
+    if (name) credit.textContent = `الكلمات بصوت ${name}. اضغط الكلمة لتسمعها.`;
+    recitation.prefetch(words.map((w) => w.text));
+  });
+
+  return stepped({
+    part: surahWordsPart(surah.id),
+    pill: 'كلمات السورة',
+    face: SURAH_WORDS_FACE,
+    steps: [
+      {
+        title: 'كلماتها',
+        build: ({ next }) => {
+          heard.clear();                   // إعادةُ المحطة تبدأ العدّ من جديد
+          const foot = h('p', { class: 'hint' });
+          const paintFoot = () => {
+            foot.textContent = `سمعتَ ${arNum(heard.size)} من `
+              + arCount(words.length, ['كلمة', 'كلمتين', 'كلمات', 'كلمة']);
+          };
+
+          const grid = h('div', { class: 'sw-grid' }, words.map((word) => {
+            const btn = h('button', {
+              class: 'vchip vchip--mushaf',
+              'aria-label': `اسمع كلمة ${word.text}`,
+              onclick: () => {
+                btn.classList.add('good');
+                heard.add(word.text);
+                paintFoot();
+                recitation.play(word.text);
+              },
+            }, h('span', { class: 'vchip-face mushaf' }, word.text));
+            return btn;
+          }));
+
+          paintFoot();
+          return h('div', {},
+            heroStep([
+              h('h2', {}, `كلمات سورة ${surah.name}`),
+              // زخرفةٌ صامتة لا زرّ: لا قاعدةَ منطوقة في هذه المحطة (صفر نصّ مولَّد)
+              h('span', { class: 'giant', 'aria-hidden': 'true' }, giantInk(SURAH_WORDS_FACE)),
+            ], [
+              h('p', { class: 'rule' },
+                'اقرأ كلمات السورة كلمةً كلمة، ثم اقرأ السورة كلها — كما يفعل معلّم القرآن.'),
+            ]),
+            grid,
+            foot,
+            credit,
+            nextButton(next),
+          );
+        },
+      },
+      {
+        title: 'جِدْها في الآية',
+        build: ({ next, fail }) => {
+          const rounds = buildFindRounds(words);
+          if (!rounds.length) {
+            setTimeout(next, 0);
+            return h('p', { class: 'hint' }, '…');
+          }
+          let index = 0;
+          let locked = false;
+
+          const target = h('p', { class: 'mushaf mushaf--big sw-target' });
+          const counter = h('p', { class: 'hint' });
+          const line = h('div', { class: 'sw-ayah' });
+
+          function startRound() {
+            const r = rounds[index];
+            locked = false;
+            target.textContent = r.text;
+            counter.textContent = `الجولة ${arNum(index + 1)} من ${arNum(rounds.length)}`;
+            // الآيةُ كاملةً بكلماتها أزراراً — نصُّها حرفيّ، والتقطيعُ عرضٌ لا تعديل
+            line.replaceChildren(...surah.ayat[r.ayah - 1].split(' ').map((text) => {
+              const btn = h('button', {
+                class: 'sw-word mushaf',
+                'aria-label': text,
+                onclick: () => onPick(text, btn, r),
+              }, text);
+              return btn;
+            }));
+          }
+
+          function onPick(text, btn, r) {
+            if (locked) return;
+            if (text === r.text) {         // الكلمة قد تتكرّر في الآية — وكلُّ موضعٍ لها صواب
+              locked = true;
+              btn.classList.add('good');
+              setTimeout(() => {
+                index++;
+                if (index < rounds.length) startRound();
+                else next();
+              }, AFTER_PICK_MS);
+            } else {
+              fail();
+              shake(btn);
+              btn.classList.add('bad');
+              setTimeout(() => btn.classList.remove('bad'), 700);
+              recitation.play(text);       // يسمع ما اختاره هو فيقارنه (بلا تلقين)
+            }
+          }
+
+          const screen = h('div', {},
+            h('h2', {}, 'جِدْ هذه الكلمة في الآية'),
+            target,
+            counter,
+            line,
+            h('p', { class: 'hint' }, `من سورة ${surah.name}`),
+          );
+          startRound();
+          return screen;
+        },
+      },
+    ],
+    celebrate: (state) => ({
+      stars: starsForGame(state.errors, Math.min(FIND_ROUNDS, words.length)),
+      line: state.errors === 0
+        ? `صارت كلمات سورة ${surah.name} في يدك — اقرأها الآن! 🎉`
+        : 'أعِد النظر في الكلمات، ثم اقرأ السورة على مهل.',
+    }),
+  });
+}
+
+// ————— ٦) شاشة السورة: قراءة بالعين، وتلاوةٌ بصوت قارئ —————
 
 const LISTEN = '◀';       // مثلث تشغيل هندسيّ (لا إيموجي في شاشات السور — DESIGN §٦)
 const HALT = '■';
@@ -513,7 +681,6 @@ export function renderSurah(surahId) {
 
 const SCREENS = {
   letters: renderQuranLetters,
-  words: renderQuranWords,
   rasm: renderQuranRasm,
   muqattaat: renderQuranMuqattaat,
 };
@@ -521,5 +688,9 @@ const SCREENS = {
 /** شاشة عقدة قرآنية بمعرّف جزئها — أو null إن كان مجهولاً (فيعود التوجيه بالطفل للخريطة). */
 export function renderQuran(part) {
   if (SCREENS[part]) return SCREENS[part]();
+  const level = quranWordLevel(part);
+  if (level) return renderQuranWords(level);
+  const surah = surahOfWordsPart(part);
+  if (surah) return renderSurahWords(surah.id);
   return renderSurah(part);
 }

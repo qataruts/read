@@ -173,6 +173,23 @@ ok(!JSON.parse(store.get('muallim.progress.v1')).stars['skill:madd'],
   'ولا يبقى للعقدة المحذوفة أثرٌ في المخزون');
 ok(split.getStars('g1:ا') === 3, 'وسائر نجومه كما هي');
 
+// (ج٢) الجسر القرآني (الحزمة ١٢): «quran:words» شُقّت ثلاث درجات، ومحطاتُ كلمات
+//      السور استُحدثت أمام سورٍ قرأها الطفل — فلا يُعاد قفلُ ما بعدها عليه.
+const bridged = await loadWith({ 'quran:letters': 3, 'quran:words': 2, 'quran:s1': 3 });
+ok([1, 2, 3].every((n) => bridged.getStars(`quran:words${n}`) === 2)
+  && !JSON.parse(store.get('muallim.progress.v1')).stars['quran:words'],
+  'ونجوم «كلمات من القرآن» القديمة تصير لدرجاتها الثلاث');
+ok(bridged.getStars('quran:sw-s1') === 1,
+  'ومحطةُ كلماتٍ استُحدثت خلف موضعه تُمنح نجمةَ إتمامٍ واحدة — تفكّ الحبس ولا تدّعي إتقاناً');
+ok(bridged.getStars('quran:sw-s112') === 0,
+  'وما أمام موضعه يبقى بلا نجمة — يدعوه إلى لعبه ولا يُمنَح عنه');
+// الغايةُ من الترحيل كلِّه: ألّا تبقى خلف آخر ما أنجزه عقدةٌ صفرٌ تسدّ جبهة الفتح
+const upToLast = bridged.allNodes().slice(0,
+  bridged.allNodes().findLastIndex((n) => bridged.getStars(n.id) > 0));
+ok(upToLast.filter((n) => bridged.getStars(n.id) === 0)
+  .every((n) => !['gate', 'contrast', 'quran'].includes(n.type)),
+  'ولا تبقى خلف موضعه محطةٌ مستحدثة صفرٌ تسدّ عليه الطريق');
+
 // (د) طفلٌ جديد: لا ترحيل ولا كتابة
 store.clear();
 const fresh = await import(`${new URL('progress.js', APP).href}?t=${Math.random()}`);

@@ -63,6 +63,7 @@ export function nodeTitle(node) {
   if (node.type === 'story') return `قصة «${node.story.title}»`;
   if (node.type === 'quran') return node.title;
   if (node.type === 'gate') return node.gate.title;
+  if (node.type === 'contrast') return node.contrast.title;
   if (node.type === 'garden') return `باقة ${arNum(node.bundle.index)} — ${node.garden.title}`;
   if (node.type === 'ladder') return `جمل ${node.garden.title} — درجة ${arNum(node.rung.index)}`;
   if (node.type === 'library') return `قصة «${node.story.title}»`;
@@ -76,6 +77,7 @@ export function nodeWhere(node) {
   }
   if (node.type === 'quran') return QURAN.title;
   if (node.type === 'gate') return 'بوابة الإتقان';
+  if (node.type === 'contrast') return 'محطة ميّز بين';
   if (node.type === 'garden') return `بستان ${node.garden.title}`;
   if (node.type === 'ladder') return `سلّم جمل ${node.garden.title}`;
   if (node.type === 'library') return `مكتبة ${node.garden.title}`;
@@ -90,6 +92,7 @@ export function nodeFace(node) {
   if (node.type === 'story') return node.story.emoji;
   if (node.type === 'quran') return node.face;
   if (node.type === 'gate') return node.gate.face;
+  if (node.type === 'contrast') return node.contrast.face;
   if (node.type === 'garden') return node.garden.emoji;
   if (node.type === 'ladder') return '📖';
   if (node.type === 'library') return node.story.emoji;
@@ -177,6 +180,9 @@ const LANDMARKS = {
   book: '<path d="M32 16v26" /><path d="M32 16q-9-6-22-4v26q13-2 22 4" /><path d="M32 16q9-6 22-4v26q-13-2-22 4" /><path d="M8 44h48" />',
   // البوابة: قوسٌ على عمودين ومصراعاه — معلمُ محطة الإتقان قبل المفاصل الكبرى
   gate: '<path d="M6 44h52" /><path d="M13 44V25a19 19 0 0 1 38 0v19" /><path d="M32 44V6" /><path d="M22 44V27a10 10 0 0 1 20 0v17" />',
+  // الميزان: كفّتان في مستوى واحد — معلمُ محطة «ميّز بين» (وزنُ الشبيهين بالأذن)
+  scales: '<path d="M32 8v34" /><path d="M22 42h20" /><path d="M8 18h48" /><path d="M8 18v10" />'
+    + '<path d="M56 18v10" /><path d="M2 28a6 6 0 0 0 12 0" /><path d="M50 28a6 6 0 0 0 12 0" />',
 };
 
 // ميكروفون «اقرأ لي» (الحزمة ١٠): شكلٌ هندسيّ لا إيموجي (DESIGN §٦)، يتبع لون زرّه.
