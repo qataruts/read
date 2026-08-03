@@ -42,11 +42,15 @@ const wordsOf = (text) => String(text ?? '').split(/\s+/).filter(Boolean);
 /**
  * القصة في شكلٍ تفهمه الشاشة: صفحاتُها كلماتٌ مفصولة، وخيارات سؤالها **كلمات معجمٍ**
  * بصورها (يفرض الفاحص أن الجواب في نصّ القصة وأن المشتّتين خارجه).
+ *
+ * وخياراتُ سؤال الفهم **صورٌ** لا نصّ — فالكلمةُ غير المصوَّرة تُسقِط السؤال كلَّه
+ * («صدق الصورة» — DESIGN §٦). ويرفضها `check_lexicon.py` في البيانات أصلاً،
+ * وهذا حارسُ الشاشة إن تسرّبت: سؤالٌ لا يُسأل خيرٌ من سؤالٍ يظلم.
  */
 function asStory(raw) {
   const options = [raw.question?.answer, ...(raw.question?.distractors || [])]
     .map((word) => lexiconWord(word))
-    .filter(Boolean);
+    .filter((word) => word && word.pictured !== false);
   return {
     ...raw,
     pages: (raw.pages || []).map((page) => ({ ...page, words: wordsOf(page.text) })),

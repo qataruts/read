@@ -57,6 +57,7 @@ sha1 البايتات) يطلب به التطبيق `<key>.mp3?v=<بصمة>` —
 python3 tools/check_decodable.py     # مفكوكية المنهج والتغطية
 python3 tools/check_lexicon.py       # مفكوكية المعجم ومقاطعه وتفرّده (يرث فاحص المنهج)
 python3 tools/icon_audit.py          # جرد الأيقونات وحارس التباسها (docs/REVIEW_ICONS.md)
+node tools/test_icons.mjs            # «صدق الصورة»: المستعصية لا تُسأل بصورتها وتبقى في التهجئة
 python3 tools/test_queue.py          # تصريف قائمة الانتظار الصوتية (بلا شبكة)
 node tools/test_progress.mjs         # قواعد القفل والنجوم وسجلّ المهارات والتكرار المتباعد
 node tools/test_lesson.mjs           # مفكوكية جولات درس الحرف

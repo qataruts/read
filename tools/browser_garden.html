@@ -135,8 +135,11 @@ async function playBundle(bundle, { quizMistake = -1, verbose = false } = {}) {
   $('.next').click();
 
   // ————— ٢) اقرأ واختر —————
+  // جولةٌ لكل كلمة **مصوَّرة** — وغيرُ المصوَّرة تبقى خياراً مكتوباً ولا تكون هدفاً
+  // («صدق الصورة»، DESIGN §٦: الصورة هي السؤال كلُّه في «اقرأ واختر»).
+  const shown = bundle.words.filter((w) => w.pictured !== false);
   await waitFor(() => $('.vchip--word'), 'خطوة اقرأ واختر');
-  for (let round = 1; round <= bundle.words.length; round++) {
+  for (let round = 1; round <= shown.length; round++) {
     const mark = heardLog.length;
     await waitFor(() => $$('.vchip--word').length === 3, `خيارات الجولة ${round}`);
     const emoji = $('.pick-pic').textContent.trim();
@@ -145,6 +148,8 @@ async function playBundle(bundle, { quizMistake = -1, verbose = false } = {}) {
     if (verbose && round === 1) {
       ok(!!target && faces.includes(target.read),
         `اقرأ واختر: صورة «${emoji}» وكلمتها بين الخيارات (${faces.join('|')})`);
+      ok(target.pictured !== false,
+        `والهدف كلمةٌ مصوَّرة («${target.read}») — لا يُحكَم بصورةٍ لا تصدُق`);
       ok(heardLog.length === mark, 'ولا يُسمَع شيء قبل الاختيار — الحكم على القراءة لا على السمع');
       ok(faces.every((f) => bundle.words.some((w) => w.read === f)),
         'وكل الخيارات من كلمات الباقة (مفكوكة بالضرورة)');

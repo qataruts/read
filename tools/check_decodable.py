@@ -210,7 +210,12 @@ def parse_quran(src: str) -> dict:
     surahs_src = region(rest, "surahs:")
 
     def worded(chunk):
-        return re.findall(r"read:\s*'([^']*)'\s*,\s*emoji:\s*'([^']*)'", chunk)
+        # `pictured: false` اختياريّ بعد الصورة («صدق الصورة») — الكلمةُ التي لا
+        # تصوّرها صورةٌ صادقة تبقى بطاقةً تُنطَق ولا تصير هدفَ «اقرأ واختر».
+        return [(m.group(1), m.group(2), m.group(3) != "false")
+                for m in re.finditer(
+                    r"read:\s*'([^']*)'\s*,\s*emoji:\s*'([^']*)'"
+                    r"(?:\s*,\s*pictured:\s*(true|false))?", chunk)]
 
     signs = []
     for chunk in chunks_by_key(region(letters, "signs:"), "sign"):
@@ -317,15 +322,29 @@ def check_quran(quran, taught, letters, source):
 
     # ٢. مادة القراءة بالرسم الإملائي: مفكوكة بكل قواعد المنهج
     allowed = set(MARKS) | TANWEEN | {SHADDA, SUN_RULE}
-    imla = [(text, emoji, "درس الحرفين") for s in quran["letters"]["signs"] for text, emoji in s["words"]]
-    imla += [(text, emoji, "كلمات القرآن") for text, emoji in quran["words"]["items"]]
+    imla = [(text, emoji, pic, "درس الحرفين")
+            for s in quran["letters"]["signs"] for text, emoji, pic in s["words"]]
+    imla += [(text, emoji, pic, "كلمات القرآن") for text, emoji, pic in quran["words"]["items"]]
     if len(quran["words"]["items"]) < 5:
         errors.append("[قرآن] كلمات المرحلة أقلّ من خمس")
-    for text, emoji, where in imla:
+    for text, emoji, pictured, where in imla:
         errors += text_errors(text, f"[قرآن/{where}]", quran_taught, quran_letters, allowed)
         spoken.append(text)
         if not emoji:
             warnings.append(f"[قرآن/{where}]: «{text}» بلا صورة (emoji)")
+        if not pictured:
+            # («صدق الصورة») بطاقةٌ تُنطق ولا تصير هدفَ «اقرأ واختر» — والحارس أن
+            # يبقى في الحوض ما يكفي من أهدافٍ مصوَّرة (ثلاثةٌ فأكثر: خيارُ الجولة).
+            warnings.append(f"[قرآن/{where}]: «{text}» غير مصوَّرة — "
+                            "لا تكون هدفَ «اقرأ واختر» (تبقى بطاقةً تُنطق)")
+
+    for pool, items in (("درس الحرفين",
+                         [w for s in quran["letters"]["signs"] for w in s["words"]]),
+                        ("كلمات القرآن", quran["words"]["items"])):
+        shown = [w for w in items if w[2]]
+        if items and not shown:
+            errors.append(f"[قرآن] حوض «{pool}» بلا كلمةٍ مصوَّرة — "
+                          "لا جولةَ «اقرأ واختر» فيه أصلاً")
 
     for sign in quran["letters"]["signs"]:
         if not sign["words"]:
@@ -723,8 +742,8 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
             *[quran[k][f] for k in ("letters", "words", "rasm", "muqattaat") for f in ("title", "face")],
             *[s[f] for s in quran["letters"]["signs"] for f in ("sign", "name")],
             *[sh for s in quran["letters"]["signs"] for sh in s["shapes"]],
-            *[t for s in quran["letters"]["signs"] for w in s["words"] for t in w],
-            *[t for w in quran["words"]["items"] for t in w],
+            *[t for s in quran["letters"]["signs"] for w in s["words"] for t in w[:2]],
+            *[t for w in quran["words"]["items"] for t in w[:2]],
             *[s[f] for s in quran["rasm"]["signs"] for f in ("sign", "name", "from")],
             *[i["surah"] for i in quran["muqattaat"]["items"]],
             *[c for i in quran["muqattaat"]["items"] for p in i["parts"] for c in p],
@@ -903,9 +922,16 @@ def self_test(letters, skills, stories, parts, quran=None) -> int:
            "وحذف درس علامةٍ تظهر في السور يُمسَك (المفكوكية تُشتقّ من الدروس نفسها)")
 
         broken = json.loads(json.dumps(quran))
-        broken["words"]["items"] = [["كِتَاب", "📖"]] + broken["words"]["items"][1:]
+        broken["words"]["items"] = [["كِتَاب", "📖", True]] + broken["words"]["items"][1:]
         ok(any("بلا حركة" in e for e in check_quran(broken, all_letters, letters, source)[0]),
            "وكلمة إملائية ناقصة الشكل تُمسَك كغيرها من مادة القراءة")
+
+        broken = json.loads(json.dumps(quran))
+        broken["words"]["items"] = [[t, e, False] for t, e, _ in broken["words"]["items"]]
+        ok(any("بلا كلمةٍ مصوَّرة" in e for e in check_quran(broken, all_letters, letters, source)[0]),
+           "وحوضُ «اقرأ واختر» إن فقد كلَّ كلمةٍ مصوَّرة يُمسَك (لا جولةَ فيه أصلاً)")
+        ok(any("غير مصوَّرة" in w for w in check_quran(quran, all_letters, letters, source)[1]),
+           "وغيرُ المصوَّرة يُنبَّه عليها ولا تُفشِل الفحص («صدق الصورة»)")
 
         # ————— التلاوة: الطريق المشروع الوحيد لصوت المصحف —————
         mushaf = set(check_quran(quran, all_letters, letters, source)[3])

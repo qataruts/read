@@ -113,9 +113,9 @@ def curriculum_bases():
         for text, _emoji in skill["words"]:
             out.setdefault(text, "curriculum")
     for sign in quran["letters"]["signs"]:
-        for text, _emoji in sign["words"]:
+        for text, *_ in sign["words"]:
             out.setdefault(text, "curriculum")
-    for text, _emoji in quran["words"]["items"]:
+    for text, *_ in quran["words"]["items"]:
         out.setdefault(text, "curriculum")
     return out
 

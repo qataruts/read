@@ -178,17 +178,24 @@ ok(SENTENCES.filter((s) => s.words.length >= 4).length >= GRADED.length / 2
 
 ok(SENTENCES.every((s) => s.mechanic !== 'order' || s.words.length <= ORDER_MAX_WORDS),
   `«رتّب الجملة» لا تتجاوز ${ORDER_MAX_WORDS} كلمات (ستُّ بلاطاتٍ تُرهق طفل السادسة)`);
-ok(RUNGS.every((r) => r.sentences.every((s, i) => i === 0 || r.sentences[i - 1].mechanic !== s.mechanic)),
-  'ولا تتجاور جملتان بميكانيكية واحدة');
+// الدورة تُقاس على **موضع الجملة منها** (`slot`) لا على ميكانيكيتها المعروضة:
+// هدفٌ غير مصوَّر في موضع «اقرأ ونفّذ» يُعرَض «أكمل» بلا صور («صدق الصورة») —
+// استبدالٌ موضعيّ لا يزحزح العدّاد، فالدورة تحتَه سليمةٌ كما كانت.
+ok(RUNGS.every((r) => r.sentences.every((s, i) => i === 0 || r.sentences[i - 1].slot !== s.slot)),
+  'ولا تتجاور جملتان بموضعٍ واحد من الدورة');
 const cycle = RUNGS.every((r) => r.sentences.every((s, i) => i === 0
   || s.words.length > ORDER_MAX_WORDS || r.sentences[i - 1].words.length > ORDER_MAX_WORDS
-  || MECHANICS[(MECHANICS.indexOf(r.sentences[i - 1].mechanic) + 1) % 3] === s.mechanic));
+  || MECHANICS[(MECHANICS.indexOf(r.sentences[i - 1].slot) + 1) % 3] === s.slot));
 ok(cycle, 'والدورة الثلاثية قائمةٌ حيث تصلح الثلاث (والطويلة تتخطّى «رتّب» وحدها)');
+const swapped = SENTENCES.filter((s) => s.slot !== s.mechanic);
+ok(swapped.every((s) => s.slot === 'read' && s.mechanic === 'fill' && s.target.pictured === false)
+  && SENTENCES.every((s) => s.mechanic !== 'read' || s.target.pictured !== false),
+  `والاستبدال الوحيد «اقرأ ونفّذ» ← «أكمل» لهدفٍ غير مصوَّر (${swapped.length} جملة)`);
 const counts = Object.fromEntries(MECHANICS.map((m) => [m, SENTENCES.filter((s) => s.mechanic === m).length]));
 ok(MECHANICS.every((m) => counts[m] >= SENTENCES.length / 4),
   `والثلاث متوازنة في السلّم: لا واحدة دون ربع الجمل `
   + `(${MECHANICS.map((m) => `${m}: ${counts[m]}`).join('، ')})`);
-ok(RUNGS.slice(0, 3).map((r) => r.sentences[0].mechanic).join('|') === MECHANICS.join('|'),
+ok(RUNGS.slice(0, 3).map((r) => r.sentences[0].slot).join('|') === MECHANICS.join('|'),
   'وكل درجة تبدأ بغير ما بدأت به التي قبلها (لا رتابة)');
 
 // ————— ٥. سلامة كل جولة: خيارات وألواح في كل جملة —————

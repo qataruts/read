@@ -113,8 +113,12 @@ for (let seed = 1; seed <= 60; seed++) {
   }
 }
 ok(true, `جولات سليمة في ٦٠ بذرة عشوائية (${rounds} جولة قراءة + جولات الرسم)`);
-ok(buildReadRounds(readItems).length === readItems.length,
-  `كل كلمة تأتي دورها مرة (${readItems.length} كلمة)`);
+// غيرُ المصوَّرة لا تكون هدفاً وتبقى خياراً مكتوباً («صدق الصورة»، DESIGN §٦)
+const pictured = readItems.filter((w) => w.pictured !== false);
+ok(buildReadRounds(readItems).length === pictured.length,
+  `كل كلمة مصوَّرة تأتي دورها مرة (${pictured.length} من ${readItems.length} كلمة)`);
+ok(buildReadRounds(readItems).every((r) => r.target.pictured !== false),
+  'ولا غيرَ مصوَّرةٍ هدفاً — الصورة هي السؤال كلُّه في «اقرأ واختر»');
 ok(buildReadRounds([{ read: 'أ', emoji: '' }]).length === 0
   && buildRasmRounds([QURAN.rasm.signs[0]]).length === 0,
   'ومادةٌ أقلّ من ثلاثة خيارات ⇒ لا جولات (يفشل مغلقاً)');

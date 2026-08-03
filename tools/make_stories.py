@@ -113,7 +113,9 @@ SPECS = [
             # («زَيْدٌ سَعِيدْ» ردّها حارسُ التكرار: هي خاتمةُ قصة المنهج «الشَّمْسُ وَالْمَطَرْ»)
             ("زَيْدْ~N يَشْكُرْ~v طَبِيبْ~p", "🤗"),
         ],
-        "ask": ("مَنْ يُعَالِجْ~v ضِرْسْ~p", "طَبِيبْ", ["نَجَّارْ", "خَبَّازْ"]),
+        # «نَجَّارْ» خرجت مشتّتاً: صورتها 🔨 أداةٌ لا شخص فصارت غيرَ مصوَّرة
+        # («صدق الصورة»، حكم المدير ٦ أغسطس ٢٠٢٦) — و«فَلَّاحْ» 👨‍🌾 مِهنةٌ مثلُها مصوَّرة.
+        "ask": ("مَنْ يُعَالِجْ~v ضِرْسْ~p", "طَبِيبْ", ["فَلَّاحْ", "خَبَّازْ"]),
     },
 
     # ————— المستوى ٢: خمس أو ست جمل (٢–٤ كلمات) —————
@@ -368,6 +370,7 @@ def self_test(data: dict) -> int:
     ok(len(set(texts)) == len(texts), f"ولا جملة مكرَّرة في المكتبة ({len(texts)} جملة)")
 
     lex = {w["word"] for w in data["words"]}
+    unpictured = {w["word"] for w in data["words"] if w.get("pictured") is False}
     gardens = [t["id"] for t in data["themes"]]
     place = {w["word"]: gardens.index(w["theme"]) for w in data["words"]}
     late = [f"{s['id']}: {w}" for s in stories for p in s["pages"] for w in p["text"].split()
@@ -386,6 +389,9 @@ def self_test(data: dict) -> int:
             bad_ask.append(f"{story['id']}: مشتّتٌ في النصّ")
         if {ask["answer"], *ask["distractors"]} - lex:
             bad_ask.append(f"{story['id']}: خيارٌ ليس كلمةَ معجم")
+        # خيارات السؤال صورٌ — فالكلمةُ غير المصوَّرة لا تدخلها («صدق الصورة»)
+        if blind := {ask["answer"], *ask["distractors"]} & unpictured:
+            bad_ask.append(f"{story['id']}: خيارٌ غير مصوَّر ({'، '.join(sorted(blind))})")
     ok(not bad_ask, "وسؤالُ كل قصة: جوابُه في نصّها ومشتّتاته خارجه"
        + (f" — {bad_ask[:3]}" if bad_ask else ""))
 

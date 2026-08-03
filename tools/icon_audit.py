@@ -86,21 +86,44 @@ FAMILIES = {
     "خيوط": "🧵 🧶",
     "أشخاص بلا سمة": "👤 🧍 🧑 🧔 🧓",
     "صغار": "👶 🧒 👦 👧",
+    "دجاج": "🐔 🐓",
 }
+
+
+# أزواجٌ من أسرةٍ واحدة **أقرّها المدير** في حوضها (حكم ٥، ٦ أغسطس ٢٠٢٦): فرقُها
+# حقيقيّ يقرؤه طفلٌ، فاجتماعُها ليس التباساً. تُدوَّن نصّاً كي يبقى ما عداها منبَّهاً عليه.
+ACCEPTED = [
+    ("اللَّعِب وَالأَلْوَان", "أشكال ملوّنة",
+     "الألوان الستة صورُها هي أسماؤها — دائرةٌ لكل لون عمداً لا التباساً"),
+    ("المَلَابِس", "أحذية", "الجزمة والصندل والنعل فروقٌ حقيقية يتعلّمها الطفل"),
+    ("الحَيَوَانَات", "دجاج", "الدجاجة والديك فرقٌ حقيقيّ يتعلّمه الطفل"),
+    ("الجِسْم", "وجوه مبتسمة",
+     "😁 أسنانٌ بادية والفرقُ هو الأسنان — أقرّه المدير في (😁/😊)، و«وَجْه» خرج "
+     "من الحوض بحكم الإخراج فبقي معه 😂 ضَحِك على العلّة نفسِها"),
+    ("الأسرة", "صغار",
+     "حكم المدير (٦ أغسطس ٢٠٢٦): 👧 أُخْت و👶 طِفْل فرقٌ بيّن (بنتٌ وضيع)؛ "
+     "و«حَفِيد» أُخرج بحكم الإخراج — 🧒 لا يفرّق حفيداً من طفل"),
+    ("الطبيعة", "رياح وغبار",
+     "حكم المدير (٦ أغسطس ٢٠٢٦): 🌬️ رِيح و🌪️ عَاصِفَة و🌫️ ضَبَاب فروقٌ بيّنة؛ "
+     "و«دُخَان» أُخرج بحكم الإخراج — 💨 سحابةُ اندفاعٍ لا دخان"),
+]
 
 
 class Entry:
     """زوج (كلمة، صورة) بموضعه من المنظومة ودرجة صرامته."""
 
-    __slots__ = ("word", "emoji", "source", "where", "grade", "uses")
+    __slots__ = ("word", "emoji", "source", "where", "grade", "uses", "pictured")
 
-    def __init__(self, word, emoji, source, where, grade, uses):
+    def __init__(self, word, emoji, source, where, grade, uses, pictured=True):
         self.word = word
         self.emoji = emoji
         self.source = source      # الملف الذي فيه البيانات
         self.where = where        # موضعها منه (المجموعة/البستان/القصة…)
-        self.grade = grade
+        # الكلمةُ المعلَنة `pictured: false` **تنزل من الدرجة أ إلى ب**: خرجت من
+        # مواضع الحكم فما بقي إلا بطاقتُها — وهو عينُ ما أراده العلاج الثاني.
+        self.grade = grade if pictured else ("ب" if grade == "أ" else grade)
         self.uses = uses          # الشاشات التي تعرضها، بأعلى استعمال أولاً
+        self.pictured = pictured
 
 
 def collect() -> tuple:
@@ -148,26 +171,30 @@ def collect() -> tuple:
     # المرحلة القرآنية: كلماتها الإملائية أحواضُ «اقرأ واختر» — الصورة سؤالٌ يُحكَم به
     quran_letter_words = []
     for sign in quran["letters"]["signs"]:
-        for read, emoji in sign["words"]:
+        for read, emoji, pictured in sign["words"]:
             entry = Entry(
                 read, emoji, "curriculum.js",
                 f"القرآنية · {quran['letters']['title']} — {sign['name']}", "أ",
                 ["quran.js «اقرأ واختر» (الصورة سؤال)", "quran.js بطاقة الكلمة"],
+                pictured,
             )
             entries.append(entry)
-            quran_letter_words.append(entry)
+            if pictured:
+                quran_letter_words.append(entry)
     pools.append((f"القرآنية · {quran['letters']['title']}",
                   "quran.js → screens.js readQuizStep", quran_letter_words))
 
     quran_items = []
-    for read, emoji in quran["words"]["items"]:
+    for read, emoji, pictured in quran["words"]["items"]:
         entry = Entry(
             read, emoji, "curriculum.js",
             f"القرآنية · {quran['words']['title']}", "أ",
             ["quran.js «اقرأ واختر» (الصورة سؤال)", "quran.js بطاقة الكلمة"],
+            pictured,
         )
         entries.append(entry)
-        quran_items.append(entry)
+        if pictured:
+            quran_items.append(entry)
     pools.append((f"القرآنية · {quran['words']['title']}",
                   "quran.js → screens.js readQuizStep", quran_items))
 
@@ -183,6 +210,7 @@ def collect() -> tuple:
     by_theme = defaultdict(list)
     for word in data["words"]:
         theme = themes.get(word["theme"], {})
+        pictured = word.get("pictured") is not False
         entry = Entry(
             word["word"], word["emoji"], "lexicon.json",
             f"بستان {word['theme']} — {theme.get('title', '?')}", "أ",
@@ -190,10 +218,13 @@ def collect() -> tuple:
              "ladder.js «أكمل الجملة» (الصورة خيار)",
              "garden.js «اقرأ واختر» (الصورة سؤال)",
              "story.js سؤال الفهم (الصورة خيار)",
-             "garden.js «شاهد واسمع» + «ركّب الكلمة»"],
+             "garden.js «شاهد واسمع» + «ركّب الكلمة»"]
+            if pictured else ["garden.js «شاهد واسمع» + «ركّب الكلمة» (بطاقةً لا سؤالاً)"],
+            pictured,
         )
         entries.append(entry)
-        by_theme[word["theme"]].append(entry)
+        if pictured:
+            by_theme[word["theme"]].append(entry)
 
     for theme in data["themes"]:
         entries.append(Entry(
@@ -250,10 +281,19 @@ def clashes(pools) -> list:
     return out
 
 
+def accepted(pool: str, family: str) -> str:
+    """علّةُ إقرار المدير لهذا الزوج في هذا الحوض — أو "" إن لم يُقَرّ."""
+    for where, kin, why in ACCEPTED:
+        if kin == family and where in pool:
+            return why
+    return ""
+
+
 def kin_clashes(pools) -> list:
     """التباسٌ مُتبادَل: صورتان من أُسرةٍ واحدة تجتمعان خيارين في حوضٍ واحد.
 
-    تنبيهٌ لا خطأ — الحكم فيه لعين المالك والمدير (docs/REVIEW_ICONS.md).
+    تنبيهٌ لا خطأ — الحكم فيه لعين المالك والمدير (docs/REVIEW_ICONS.md)،
+    وما حكم فيه المدير بالقبول (`ACCEPTED`) لا يُنبَّه عليه مرّةً أخرى.
     """
     family_of = {}
     for name, glyphs in FAMILIES.items():
@@ -268,7 +308,7 @@ def kin_clashes(pools) -> list:
             if family:
                 seen[family].setdefault(entry.emoji, entry.word)
         for family, members in seen.items():
-            if len(members) > 1:
+            if len(members) > 1 and not accepted(name, family):
                 pairs = "، ".join(f"{e} {w}" for e, w in members.items())
                 out.append(f"حوض «{name}»: أسرة «{family}» — {pairs}")
     return out

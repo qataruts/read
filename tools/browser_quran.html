@@ -126,7 +126,10 @@ function checkTargets(where) {
 
 /** يلعب خطوة «اقرأ واختر» كاملةً: خطأ مقصود في جولة ثم الصواب في كلٍّ. */
 async function playReadQuiz(items, { mistakeAt = 1 } = {}) {
-  for (let round = 1; round <= items.length; round++) {
+  // جولةٌ لكل كلمة **مصوَّرة** («صدق الصورة»، DESIGN §٦: الصورة هي السؤال كلُّه هنا،
+  // فكلمةٌ لا تصوّرها صورةٌ صادقة تبقى خياراً مكتوباً ولا تكون هدفاً).
+  const shown = items.filter((w) => w.pictured !== false);
+  for (let round = 1; round <= shown.length; round++) {
     const mark = heardLog.length;
     await waitFor(() => $$('.vchip--word').length === 3, `خيارات الجولة ${round}`);
     const emoji = $('.pick-pic').textContent.trim();
@@ -135,6 +138,8 @@ async function playReadQuiz(items, { mistakeAt = 1 } = {}) {
     if (round === 1) {
       ok(!!target && faces.includes(target.read),
         `الجولة ١: صورة «${emoji}» وكلمتها بين الخيارات (${faces.join('|')})`);
+      ok(shown.length < items.length ? shown.every((w) => w.pictured !== false) : true,
+        `والأهداف كلها مصوَّرة (${shown.length} من ${items.length} كلمة)`);
       ok(heardLog.length === mark,
         'ولا يُسمَع شيء قبل الاختيار — الحكم على القراءة لا على السمع');
     }

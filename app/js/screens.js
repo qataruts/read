@@ -16,10 +16,15 @@ const AFTER_PICK_MS = 750;
 /**
  * جولات «اقرأ واختر»: لكل كلمةٍ جولة، ومشتّتاتها من كلمات الشاشة نفسها (مفكوكة
  * بالضرورة)، ويُفضَّل ما شارك الكلمةَ حرفَها الأول فيقرأ الطفل الكلمة كلها لا أولها.
+ *
+ * **الكلمةُ غير المصوَّرة لا تكون هدفاً** (مبدأ «صدق الصورة» — DESIGN §٦): الصورة هنا
+ * هي السؤال كلُّه، فكلمةٌ لا تصوّرها صورةٌ صادقة لا يجوز أن يُحكَم بها على قراءة.
+ * وتبقى **خياراً مكتوباً** (مشتّتاً) فيقرؤها الطفل ويميّزها — فلا تخرج من الشاشة،
+ * وإنما يخرج الحكمُ بصورتها.
  */
 export function buildReadRounds(items, rnd = Math.random) {
   if (items.length < QUIZ_OPTIONS) return [];
-  return shuffle(items, rnd).map((target) => {
+  return shuffle(items.filter((w) => w.pictured !== false), rnd).map((target) => {
     const others = items.filter((w) => w.read !== target.read);
     const kin = others.filter((w) => w.read[0] === target.read[0]);
     const rest = others.filter((w) => w.read[0] !== target.read[0]);

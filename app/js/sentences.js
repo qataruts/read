@@ -132,7 +132,10 @@ let serial = 0;   // ترتيب الدرجة في السلّم كله — به �
  * السلالم: سلّمٌ لكل بستان، ودرجاته عقدٌ على الخريطة بعد باقاته.
  * كل درجة: جملٌ لكل واحدة ميكانيكيتها ({read, order, fill} بالتناوب) — والدورة
  * **تتخطّى «رتّب» في الجملة الطويلة** (≥٤ كلمات) فتبقى دورةَ اثنتين هناك. وبهذا
- * لا تتجاور جملتان بميكانيكية واحدة أبداً: العدّاد يتقدّم عند كل جملة.
+ * لا تتجاور جملتان بموضعٍ واحد من الدورة أبداً: العدّاد يتقدّم عند كل جملة.
+ *
+ * و`slot` موضعُ الجملة من الدورة، و`mechanic` ما يُعرَض فعلاً — ولا يفترقان إلا في
+ * حالةٍ واحدة معلَنة: هدفٌ غير مصوَّر في موضع «اقرأ ونفّذ» يُعرَض «أكمل» (انظر أدناه).
  */
 export const LADDERS = GARDENS.map((garden, index) => {
   const ladder = { id: garden.id, garden, rungs: [] };
@@ -142,6 +145,13 @@ export const LADDERS = GARDENS.map((garden, index) => {
     rung.sentences = slice.map((item) => {
       const words = sentenceWords(item.text);
       while (MECHANICS[turn % MECHANICS.length] === 'order' && words.length > ORDER_MAX_WORDS) turn++;
+      const slot = MECHANICS[turn++ % MECHANICS.length];   // موضعُ الجملة من الدورة
+      let mechanic = slot;
+      // «اقرأ ونفّذ» صورتُها هي الجوابُ كلُّه، فهدفٌ **غير مصوَّر** لا يُحكَم بها عليه
+      // («صدق الصورة» — DESIGN §٦) ⇒ «أكمل الجملة» بلا صورٍ أصلاً (انظر `ladder.js`).
+      // و**استبدالٌ موضعيّ لا تخطٍّ**: العدّاد لا يُزحزَح، فلا تتبدّل ميكانيكيةُ جملةٍ
+      // أخرى ولا يدخل قائمةَ الصوت نصٌّ جديد — الاستثناء يقع حيث وقع ولا يتعدّاه.
+      if (mechanic === 'read' && item.target.pictured === false) mechanic = 'fill';
       return {
         id: item.id,
         rung,
@@ -149,7 +159,8 @@ export const LADDERS = GARDENS.map((garden, index) => {
         text: item.text,
         words,
         blank: blankIndex(item.target, words),
-        mechanic: MECHANICS[turn++ % MECHANICS.length],
+        slot,
+        mechanic,
       };
     });
     return rung;

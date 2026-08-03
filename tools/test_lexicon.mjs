@@ -129,7 +129,14 @@ for (const bundle of bundles) {
   }
 }
 ok(true, `جولات وألواح سليمة في كل الباقات (${rounds} جولة قراءة، ${boards} لوح تركيب)`);
-ok(buildReadRounds(bundles[0].words).length === BUNDLE_SIZE, 'كل كلمة تأتي دورها مرة في باقتها');
+// كل كلمة **مصوَّرة** تأتي دورها مرة؛ وغيرُ المصوَّرة تبقى خياراً مكتوباً ولا تكون
+// هدفاً (صورتُها هي السؤال هناك — «صدق الصورة»، DESIGN §٦).
+const shown = (b) => b.words.filter((w) => w.pictured !== false).length;
+ok(bundles.every((b) => buildReadRounds(b.words).length === shown(b)),
+  `كل كلمة مصوَّرة تأتي دورها مرة في باقتها (${bundles.reduce((a, b) => a + shown(b), 0)} من `
+  + `${bundles.reduce((a, b) => a + b.words.length, 0)} كلمة)`);
+ok(bundles.every((b) => shown(b) >= 1),
+  'ولا باقةَ خلت من كلمةٍ مصوَّرة (فتفقد جولاتِها كلَّها)');
 ok(starsForGame(0, BUNDLE_SIZE) === 3 && starsForGame(BUNDLE_SIZE, BUNDLE_SIZE) === 2
   && starsForGame(BUNDLE_SIZE + 1, BUNDLE_SIZE) === 1,
   'ونجوم الباقة بعتبة «زلّة لكل كلمة» (كما لعبة الكلمات)');

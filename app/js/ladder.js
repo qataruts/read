@@ -36,10 +36,15 @@ export const nodeIdOf = (rungId) => `ladder:${rungId}`;
  * خيارات الاختيار: الهدف ومعه من كلمات بستانه.
  * في «أكمل» يُفضَّل المخالف في التأنيث (وَاسِعَةْ ← غُرْفَة لا سَرِير) كي يكون الجواب
  * **مقروءاً من النصّ** لا مخمَّناً من المعنى؛ وفي «اقرأ ونفّذ» يكفي اختلاف الصور.
+ *
+ * و**الكلمةُ غير المصوَّرة لا تكون مشتّتاً مصوَّراً** (مبدأ «صدق الصورة» — DESIGN §٦):
+ * صورةٌ لا تصدُق على كلمتها تُغري الطفلَ بالخطأ كما تظلمه لو كانت جواباً.
+ * أمّا الهدفُ فيحرسه `sentences.js`: لا يُعطى غيرُ المصوَّر ميكانيكيةً تصوِّر جوابَه.
  */
 export function pickOptions(sentence, rnd = Math.random, byGender = false) {
   const target = sentence.target;
-  const pool = sentence.rung.garden.words.filter((w) => w !== target);
+  const pool = sentence.rung.garden.words
+    .filter((w) => w !== target && w.pictured !== false);
   const feminine = (w) => w.word.includes('ة');
   const near = byGender ? pool.filter((w) => feminine(w) !== feminine(target)) : [];
   const rest = pool.filter((w) => !near.includes(w));
@@ -205,6 +210,11 @@ export function renderLadder(rungId) {
     const line = sentenceEl(sentence, sentence.blank);
     audio.preload([sentence.text, ...options.map((w) => w.say)]);
 
+    // هدفٌ لا تصوّره صورةٌ صادقة ⇒ **لا صورةَ على أيّ خيار** (لا على المشتّتات وحدها،
+    // فالخيار العاري بين مصوَّرَين يفضح نفسه). تصير الجولة قراءةً خالصة — وهي أشدُّ
+    // موافقةً لعلّة «أكمل» أصلاً: جوابٌ مقروءٌ من النصّ لا مخمَّنٌ من صورة.
+    const bare = sentence.target.pictured === false;
+
     const row = h('div', { class: 'row vrow' }, options.map((word) => {
       const btn = h('button', {
         class: 'vchip vchip--pic',
@@ -220,7 +230,7 @@ export function renderLadder(rungId) {
           sayAndGo(sentence);
         },
       },
-        h('span', { class: 'vchip-pic' }, word.emoji),
+        !bare && h('span', { class: 'vchip-pic' }, word.emoji),
         h('span', { class: 'vchip-face' }, word.word),
       );
       return btn;

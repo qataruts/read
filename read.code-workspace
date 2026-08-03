@@ -1,9 +1,15 @@
 {
   "folders": [
     {
+      "name": "read",
       "path": ".",
     },
     {
+      "name": "calc",
+      "path": "../calc",
+    },
+    {
+      "name": "quran",
       "path": "../quran",
     },
   ],

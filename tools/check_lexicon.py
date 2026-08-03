@@ -84,6 +84,11 @@ MIN_BUNDLES = 2            # بستان بأقلّ من باقتين لا يست
 SENTENCE_WORDS = (2, 5)    # جملة المثال قصيرة: من كلمتين إلى خمس
 ROOT_LETTERS = (3, 4)      # الجذر العربي ثلاثيّ أو رباعيّ
 FIELDS = ("word", "tiles", "root", "theme", "emoji", "sentence")
+# حقلٌ اختياريّ واحد: `pictured` — ولا يُكتب إلا `false` («صدق الصورة»، حكم المدير
+# ٦ أغسطس ٢٠٢٦). الأصلُ أن الكلمة مصوَّرة، فغيابُ الحقل هو الحال العامّة؛ ووجودُه
+# إعلانٌ أن **لا صورةَ صادقة لهذه الكلمة**، فلا تُعرَض إجابةً ولا خياراً مصوَّراً
+# (تستهلكه `screens.js` و`ladder.js` و`sentences.js` و`library.js`).
+PICTURED = "pictured"
 
 SUPPORT_FIELD = "support"  # معجم الجمل المساند: ما ليس كلمةَ معجمٍ ولا كلمةَ منهج
 SENTENCE_FIELD = "sentences"   # الجمل المتدرجة (٣–٥ كلمات) — الحزمة ٩أ
@@ -272,8 +277,8 @@ def taught_words() -> set:
     words = {bare("".join(w["tiles"])) for g in groups for w in g["words"]}
     for skill in parse_skills(parts.get("SKILLS", "")):
         words |= {bare(text) for text, _emoji in skill["words"]}
-    words |= {bare(text) for sign in quran["letters"]["signs"] for text, _e in sign["words"]}
-    words |= {bare(text) for text, _e in quran["words"]["items"]}
+    words |= {bare(text) for sign in quran["letters"]["signs"] for text, *_ in sign["words"]}
+    words |= {bare(text) for text, *_ in quran["words"]["items"]}
     return {w for w in words if w}
 
 
@@ -417,6 +422,12 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
         if word in seen_words:
             errors.append(f"{label}: كلمة مكرَّرة (سبقت في {seen_words[word]})")
         seen_words.setdefault(word, entry.get("theme"))
+        extra = sorted(set(entry) - set(FIELDS) - {PICTURED})
+        if extra:
+            errors.append(f"{label}: حقول زائدة: {'، '.join(extra)}")
+        if PICTURED in entry and entry[PICTURED] is not False:
+            errors.append(f"{label}: «{PICTURED}» لا يُكتب إلا `false` "
+                          "(الأصل أن الكلمة مصوَّرة، والحقل إعلانُ الاستثناء)")
         emoji = entry["emoji"]
         if emoji in seen_emoji:
             errors.append(f"{label}: الصورة «{emoji}» مستعملة في «{seen_emoji[emoji]}» "
@@ -822,6 +833,9 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
                 if theme_place(themes, item.get("theme")) > base:
                     errors.append(f"{where}: الخيار «{option}» من بستانٍ بعد «{garden}» "
                                   "(لم يبلغه الطفل بعد)")
+                if item.get(PICTURED) is False:
+                    errors.append(f"{where}: الخيار «{option}» غير مصوَّر — "
+                                  "وخيارات سؤال الفهم صورٌ («صدق الصورة»)")
                 inside = stem(option) in story_stems
                 if n == 0 and not inside:
                     errors.append(f"{where}: الجواب «{option}» ليس في نصّ القصة")
@@ -1015,6 +1029,11 @@ def self_test(letters: dict) -> int:
                                                "sentence": "الْمِصْبَاحُ مُنِيرْ"}]),
        "وصورة مكرَّرة في بستان تُمسَك (لا جواب صحيح في «اقرأ واختر»)")
     ok("موضوع مجهول" in run({"theme": "x"}), "وموضوع لا بستان له يُمسَك")
+    ok("«مِفْتَاحْ»]" not in run({PICTURED: False}),
+       "و«pictured: false» حقلٌ مقبول (إعلانُ الكلمة التي لا تصوّرها صورة)")
+    ok("لا يُكتب إلا" in run({PICTURED: True}),
+       "و«pictured: true» يُمسَك (الأصل مصوَّرة، والحقل إعلانُ الاستثناء وحده)")
+    ok("حقول زائدة" in run({"lawn": 1}), "وحقلٌ زائد يُمسَك (لا يتسرّب حقلٌ بلا حارس)")
     ok("الجذر" in run({"root": "فت"}), "وجذر بحرفين يُمسَك")
     ok("بالسكون لا بالتنوين" in run({"word": "مِفْتَاحٌ", "tiles": syllabify("مِفْتَاحٌ", letters)}),
        "وكلمة منوَّنة في المعجم تُمسَك (الوقف بالسكون)")
