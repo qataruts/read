@@ -99,11 +99,13 @@ const nodes = p.allNodes();
 const ids = nodes.map((n) => n.id);
 const { GARDENS } = await import(new URL('lexicon.js', APP));
 const { RUNGS } = await import(new URL('sentences.js', APP));
+const { LIBRARY } = await import(new URL('library.js', APP));
 const BUNDLES = GARDENS.reduce((s, g) => s + g.bundles.length, 0);
 ok(nodes.length === GROUPS.reduce((s, g) => s + g.letters.length + 1, 0)
-  + SKILLS.length + STORIES.length + quranParts().length + BUNDLES + RUNGS.length,
+  + SKILLS.length + STORIES.length + quranParts().length + BUNDLES + RUNGS.length
+  + LIBRARY.length,
   `عقد الرحلة = عقد المجموعات + ٥ مهارات + ٣ قصص + خاتمة قرآنية + ${BUNDLES} باقة`
-  + ` + ${RUNGS.length} درجة جمل (${nodes.length} عقدة)`);
+  + ` + ${RUNGS.length} درجة جمل + ${LIBRARY.length} قصة مكتبة (${nodes.length} عقدة)`);
 ok(ids.indexOf('skill:madd') === ids.indexOf('g3:words') + 1
   && ids.indexOf('skill:sukun') === ids.indexOf('skill:madd') + 1
   && ids.indexOf('g4:ع') === ids.indexOf('skill:sukun') + 1,

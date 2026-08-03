@@ -205,9 +205,11 @@ try {
   $('.next').click();
   await waitFor(() => $('.vchip--pair') && !$('.pairs'), 'خطوة التمييز');
   const pool = madd.compare.pairs.flat();
+  // نقطة الصمت `mark` تُحدَّث قبل النقرة الصحيحة لا في رأس الجولة: النقرة الصحيحة
+  // ونداءُ الجولة التالية صارا مفصولين بمهلة، فالتقاطها في الرأس قد يقع بعد النداء.
+  let mark = heardLog.length;
   for (let round = 1; round <= 3; round++) {
     await waitFor(() => $$('.vchip--pair').length === 3, `خيارات الجولة ${round}`);
-    const mark = heardLog.length;
     const faces = texts('.vchip-face');
     const heard = await waitFor(
       () => (heardLog.length > mark && faces.includes(lastHeard()) ? lastHeard() : null),
@@ -222,8 +224,14 @@ try {
       ok($$('.vchip--pair').length === 3, 'والجولة نفسها باقية');
       await sleep(900);
     }
-    $$('.vchip--pair')[texts('.vchip-face').indexOf(heard)].click();
-    await sleep(900);
+    const rightChip = $$('.vchip--pair')[texts('.vchip-face').indexOf(heard)];
+    mark = heardLog.length;
+    rightChip.click();
+    await sleep(300);
+    // DESIGN §٥.٢: الصواب في التمرين السماعيّ أثرٌ بصريّ بلا إعادة قراءة
+    ok(heardLog.length === mark && rightChip.classList.contains('good'),
+      `الجولة ${round}: الإجابة الصحيحة تُعلَّم ولا تشغّل صوتاً`);
+    await sleep(700);
   }
 
   await waitFor(() => $('.celebrate'), 'ختام درس المهارة');

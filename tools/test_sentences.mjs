@@ -30,6 +30,8 @@ const {
   LADDERS, RUNGS, SENTENCES, MECHANICS, RUNG_MAX, ORDER_MAX_WORDS, stemOf, ladderOf, rungById,
   orderPool, ladderTexts,
 } = await import(new URL('sentences.js', APP));
+const { LIBRARY } = await import(new URL('library.js', APP));
+const LIBRARY_LAST = LIBRARY.filter((s) => s.garden === GARDENS.at(-1).id).length;
 const { buildBoard, starsForGame } = await import(new URL('words.js', APP));
 const { pickOptions, nodeIdOf } = await import(new URL('ladder.js', APP));
 const { buildSession, itemTexts, MAX_ORDER } = await import(new URL('review.js', APP));
@@ -84,7 +86,8 @@ const misplaced = LADDERS.filter((ladder) => {
 });
 ok(misplaced.length === 0,
   `ودرجات كل بستان تلي باقاته مباشرةً${misplaced.length ? ' — ' + misplaced.map((l) => l.id).join('، ') : ''}`);
-ok(ids.at(-1) === rungIds.at(-1), 'وآخر الرحلة درجةُ جملٍ لا باقةُ كلمات');
+ok(ids.at(-1).startsWith('library:') && ids.indexOf(rungIds.at(-1)) === ids.length - 1 - LIBRARY_LAST,
+  'وآخرُ سلّمٍ يليه قصصُ مكتبته وحدها (الحزمة ٩)');
 ok(p.allNodes().length === ids.length && p.maxTotalStars() === ids.length * p.MAX_STARS,
   `والرحلة صارت ${ids.length} عقدة و${p.maxTotalStars()} نجمة`);
 

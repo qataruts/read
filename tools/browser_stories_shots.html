@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>لقطات مكتبة القصص</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; align-items: start; }
+    .cell { background: rgba(255,255,255,.35); border-radius: 24px; padding: .5rem; }
+    .cell > h4 { margin: .2rem 0 .4rem; text-align: center; color: #1971c2; }
+    .app { max-width: none; padding: 0; }
+    .dev { display: none; }
+  </style>
+</head>
+<body>
+<div id="toast" class="toast" hidden></div>
+<div class="grid" id="grid"></div>
+
+<script>
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2, stars: {}, skills: {}, days: {}, reviews: {}, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+</script>
+
+<script type="module">
+import { renderLibraryStory } from './js/story.js';
+import { LIBRARY } from './js/library.js';
+import * as progress from './js/progress.js';
+import * as audio from './js/audio.js';
+
+await audio.ready();
+
+// صوتٌ لا ينتهي: تُجمَّد الحالة المعروضة (تظليلُ الكاريوكي يبقى للّقطة)، ويُسرَّع
+// وقتُ السَّوق وحده. وأكثرُ نصوص المكتبة بلا ملف بعدُ — فالنطق الآلي مثلُه مجمَّد.
+const realTimeout = window.setTimeout;
+const Frozen = class { play() { return new Promise(() => {}); } pause() {} };
+const Instant = class { play() { return Promise.resolve(); } pause() {} };
+window.Audio = Frozen;
+let instant = false;
+window.SpeechSynthesisUtterance = class {
+  constructor(text) {
+    this.text = text;
+    if (instant) realTimeout(() => this.onend && this.onend(), 0);
+  }
+};
+const synth = { cancel() {}, speak() {} };
+Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => synth });
+
+for (const node of progress.allNodes()) progress.setStars(node.id, 3);
+
+const grid = document.getElementById('grid');
+const $ = (root, sel) => root.querySelector(sel);
+const $$ = (root, sel) => [...root.querySelectorAll(sel)];
+
+function cell(title, node) {
+  const box = document.createElement('div');
+  box.className = 'cell';
+  box.innerHTML = `<h4>${title}</h4>`;
+  const app = document.createElement('div');
+  app.className = 'app';
+  app.append(node);
+  box.append(app);
+  grid.append(box);
+  return app;
+}
+
+const tick = () => new Promise((r) => realTimeout(r, 0));
+
+const short = LIBRARY[0];
+const long = LIBRARY.at(-1);
+
+// ١) صفحة القراءة: القصة كلها معروضة، وكل كلمة زرٌّ يُسمعها
+const read = cell(`١ — قصة «${short.title}» (مستوى ١)`, renderLibraryStory(short.id));
+$$(read, '.line')[0].querySelectorAll('.story-word')[0].click();
+
+// ٢) الكاريوكي: الجملة المسموعة وحدها مضاءة (الصوت مجمَّد فيبقى التظليل)
+const karaoke = cell('٢ — الكاريوكي: تظليل الجملة المسموعة', renderLibraryStory(long.id));
+$$(karaoke, '.line-ear')[2].click();
+await tick();
+
+// ٣) سؤال الفهم: ثلاث صور، ولا صوت قبل الاختيار
+const ask = cell('٣ — سؤال الفهم (ثلاث صور)', renderLibraryStory(short.id));
+$(ask, '.foot .next').click();
+
+// ٤) قصة المستوى الثالث: ثماني جمل بمشاهدها
+cell(`٤ — قصة «${long.title}» — المستوى الثالث`, renderLibraryStory(long.id));
+
+// ٥) الختام: نجومٌ بمتابعةٍ وفهم
+const done = cell('٥ — الختام: متابعةٌ + نجمةُ الفهم', renderLibraryStory(short.id));
+instant = true;
+window.setTimeout = (fn) => (fn(), 0);
+$(done, '.read-all').click();
+for (let i = 0; i < 60 && $(done, '.read-all')?.dataset.on; i++) await tick();
+$(done, '.foot .next').click();
+await tick();
+const answer = $$(done, '.ask .piccard').find((c) => c.textContent.trim() === short.question.answer.emoji);
+answer?.click();
+for (let i = 0; i < 12 && !$(done, '.celebrate'); i++) await tick();
+window.setTimeout = realTimeout;
+instant = false;
+
+// ٦) الخريطة: البستان ← سلّم جمله ← مكتبته
+progress.reset();
+for (const node of progress.allNodes()) {
+  if (node.id === `library:${short.id}`) break;
+  progress.setStars(node.id, 3);
+}
+const map = cell('٦ — الخريطة: البستان ثم سلّمه ثم مكتبته', document.createElement('div'));
+map.id = 'app';
+Element.prototype.scrollIntoView = () => {};
+await import('./js/main.js');
+// توجيهُ main.js غير متزامن (`render()` تنتظر): ننتظر رسمَ الخريطة قبل تشذيبها
+for (let i = 0; i < 80 && !map.querySelector('.map'); i++) await tick();
+const track = map.querySelector('.map');
+if (track) {
+  const keep = [...track.children].filter((el) => el.classList.contains('continue')
+    || el.classList.contains('station--garden') || el.classList.contains('station--ladder')
+    || el.classList.contains('station--library'));
+  track.replaceChildren(...keep.slice(0, 5));
+}
+
+// مهلةُ استقرار قبل اللقطة: حركةُ النجوم المتتابعة (.5s + تأخّر .36s) تنتهي أولاً،
+// فلا تُلتقط الشاشةُ في منتصف الحركة (وحدةُ ES تؤخّر حدث load حتى تنتهي).
+await new Promise((r) => realTimeout(r, 1200));
+</script>
+</body>
+</html>

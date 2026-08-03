@@ -36,8 +36,10 @@ const walk = (dir, prefix = '') => {
 };
 walk('./');
 
-// ملفات الهيكل: كل ما في app/ عدا الأصوات (تُخزَن من فهرسها) وعامل الخدمة نفسه
+// ملفات الهيكل: كل ما في app/ عدا ما يُخزَن من فهرسه (الأصوات وقصص المكتبة)
+// وعامل الخدمة نفسه. القصةُ الجديدة تدخل المخزون بفهرسها لا بسطرٍ يدويّ في sw.js.
 const wanted = onDisk.filter((p) => !p.startsWith('audio/') || p === 'audio/manifest.json')
+  .filter((p) => !p.startsWith('data/stories/') || p === 'data/stories/index.json')
   .filter((p) => p !== 'sw.js');
 
 const forgotten = wanted.filter((p) => !shell.includes(p));
@@ -76,6 +78,10 @@ ok(sw.includes('data/recitations.json') && /recitations\?\.ayat/.test(sw),
   'وتلاوةُ القارئ مخزونة معها من بيانها المستقلّ '
   + `(${Object.keys(recitations.ayat).length} تلاوة — فتعمل دون إنترنت)`);
 ok(shell.includes('data/recitations.json'), 'وبيانُ التلاوة نفسه من ملفات الهيكل');
+ok(sw.includes('precacheStories') && sw.includes('data/stories/index.json'),
+  'وقصص المكتبة مخزونة من فهرسها لا من قائمة يدوية '
+  + `(${JSON.parse(read('data/stories/index.json')).stories.length} قصة — فتُقرأ دون إنترنت)`);
+ok(shell.includes('data/stories/index.json'), 'وفهرسُ المكتبة نفسه من ملفات الهيكل');
 ok(/request\.method !== 'GET'/.test(sw), 'ولا يعترض إلا طلبات GET');
 ok(sw.includes('self.location.origin'), 'ولا يمسّ أي مصدر خارجي');
 ok(/caches\.delete/.test(sw) && /VERSION/.test(sw),

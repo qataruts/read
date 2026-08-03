@@ -9,7 +9,7 @@ import { renderLesson } from './lesson.js';
 import { renderWordsGame } from './words.js';
 import { renderReview } from './review.js';
 import { renderSkillLesson } from './skill.js';
-import { renderStory } from './story.js';
+import { renderStory, renderLibraryStory } from './story.js';
 import { renderQuran } from './quran.js';
 import { renderGarden } from './garden.js';
 import { renderLadder } from './ladder.js';
@@ -61,7 +61,7 @@ function renderMap() {
     ));
   } else {
     main.append(h('p', { class: 'note' },
-      '🎉 أتممتَ الرحلة كلها — من الحرف الأول إلى المصحف وحديقة الكلمات وسلّم الجمل!'));
+      '🎉 أتممتَ الرحلة كلها — من الحرف الأول إلى المصحف والحديقة وسلّم الجمل والمكتبة!'));
   }
 
   // الدرب المتعرج: انعطافة خيط بين كل محطتين، يمنةً مرة ويسرةً مرة (DESIGN §٦)
@@ -73,7 +73,8 @@ function renderMap() {
       : section.kind === 'quran' ? quranEl(section, next)
         : section.kind === 'garden' ? gardenEl(section, next)
           : section.kind === 'ladder' ? ladderEl(section, next)
-            : interludeEl(section, next));
+            : section.kind === 'library' ? libraryEl(section, next)
+              : interludeEl(section, next));
   }
 
   if (DEV) {
@@ -251,11 +252,40 @@ function ladderEl(section, next) {
   });
 }
 
+/**
+ * محطة «مكتبة القصص» (الحزمة ٩): قصةٌ لكل عقدة، بعد سلّم جمل بستانها — بها يُتوَّج
+ * البستان: كلماتُه ثم جملُه ثم قصةٌ تجمعها. لونها لون القصص، ومعلمها كتابٌ مفتوح.
+ */
+function libraryEl(section, next) {
+  const garden = section.garden;
+  const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
+  const complete = section.nodes.every((n) => progress.isDone(n.id));
+  const earned = section.nodes.reduce((sum, n) => sum + progress.getStars(n.id), 0);
+  const levels = [...new Set(section.nodes.map((n) => n.story.level))];
+
+  return trackEl({
+    className: `station station--library${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
+    accent: STORY_ACCENT,
+    mark: 'book',
+    label: `مكتبة ${garden.title}${unlocked ? '' : ' — مقفلة'}`,
+    badge: '📚',
+    title: `مكتبة ${garden.title}`,
+    sub: `${arCount(section.nodes.length, ['قصة', 'قصتان', 'قصص', 'قصة'])} `
+      + `· مستوى ${levels.map(arNum).join('–')}`,
+    meta: unlocked
+      ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
+      : '🔒 مقفلة',
+    nodes: section.nodes,
+    next,
+  });
+}
+
 /** لون العقدة في بطاقة «تابع من هنا»: لون مجموعتها، أو لون محطتها الخاصة. */
 function accentOf(node, group) {
   if (node.type === 'quran') return QURAN_ACCENT;
   if (node.type === 'garden') return accentForGarden(node.garden);
   if (node.type === 'ladder') return SENTENCE_ACCENT;
+  if (node.type === 'library') return STORY_ACCENT;
   if (node.type === 'skill' || node.type === 'story') return PAUSE_ACCENT;
   return accentFor(group);
 }
@@ -297,7 +327,7 @@ function nodeButton(node, next) {
 
   const btn = h('button', {
     class: `node node--${node.type} node--${state}${isNext ? ' node--next' : ''}`,
-    css: node.type === 'story' ? { '--accent': STORY_ACCENT } : {},
+    css: node.type === 'story' || node.type === 'library' ? { '--accent': STORY_ACCENT } : {},
     'aria-label': `${label} — ${open ? (stars ? `${arNum(stars)} نجوم` : 'مفتوح') : 'مقفل'}`,
     onclick: () => {
       if (!open) {
@@ -407,6 +437,9 @@ async function render() {
   } else if (name === 'ladder' && arg1) {
     if (!guard(`ladder:${decodeURIComponent(arg1)}`)) return;
     screen = renderLadder(decodeURIComponent(arg1)) || renderMap();
+  } else if (name === 'library' && arg1) {
+    if (!guard(`library:${decodeURIComponent(arg1)}`)) return;
+    screen = renderLibraryStory(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'review') {
     screen = renderReview();
     if (!screen) {                       // لا حصيلة للمراجعة بعدُ

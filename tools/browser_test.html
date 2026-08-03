@@ -112,20 +112,29 @@ async function playQuiz(studied, expectedOptions) {
     ok(new Set(opts.map((o) => o.slice(1))).size === 1, `الجولة ${round}: حركة واحدة لكل الخيارات`);
     assertDecodable(studied, `الجولة ${round}`);
     if (round === 1) checkTargets('ميّز بأذنك');
-    $$('.vchip--big').find((c) => c.textContent === heard).click();
-    await sleep(900);
+    const chip = $$('.vchip--big').find((c) => c.textContent === heard);
+    const mark = played.length;
+    chip.click();
+    await sleep(300);                     // نداء الجولة التالية لا يأتي قبل ٧٥٠+٢٥٠ م.ث
+    // DESIGN §٥.٢: الصواب أثرٌ بصريّ بلا إعادة قراءة — وإلا لتلاصق صوتان
+    ok(played.length === mark, `الجولة ${round}: النقرة الصحيحة لا تشغّل صوتاً`);
+    ok(chip.classList.contains('good'), `الجولة ${round}: وأثرُها بصريّ على البلاطة`);
+    await sleep(700);
   }
 }
 
 try {
   // ————— الخريطة —————
   await waitFor(() => $('.station'), 'الخريطة');
-  ok($$('.station:not(.station--pause):not(.station--quran):not(.station--garden):not(.station--ladder)').length === 7,
+  ok($$('.station:not(.station--pause):not(.station--quran):not(.station--garden)'
+    + ':not(.station--ladder):not(.station--library)').length === 7,
     'الخريطة تعرض المحطات السبع');
   ok($$('.station--pause').length === 4,
     `ومحطات المهارات والقصص بينها (${$$('.station--pause').length})`);
   ok($$('.station--quran').length === 1, 'والمرحلة القرآنية بعدها (الجلسة ٦)');
   ok($$('.station--garden').length >= 8, `وبساتين الموضوعات بعدها (${$$('.station--garden').length} بستاناً — الحزمة ٧)`);
+  ok($$('.station--library').length === $$('.station--ladder').length,
+    `ومكتبةُ قصصٍ بعد كل سلّم (${$$('.station--library').length} مكتبة — الحزمة ٩)`);
   ok($$('.station--ladder').length === $$('.station--garden').length,
     `وسلّم جملٍ بعد كل بستان خاتمةً (${$$('.station--ladder').length} سلّماً — الحزمة ٨)`);
 
@@ -165,9 +174,11 @@ try {
   ok(wrong.classList.contains('bad'), 'الاختيار الخاطئ يُعلَّم ولا ينتقل');
   ok(!$('.next'), 'زر «تابع» لا يظهر قبل الإجابة الصحيحة');
   const right = chips.find((c) => c.querySelector('.vchip-face').textContent === target);
+  const markHaraka = played.length;
   right.click();
   await sleep(80);
   ok(right.classList.contains('good'), 'الاختيار الصحيح يُعلَّم');
+  ok(played.length === markHaraka, 'ولا يُعاد نطقه (DESIGN §٥.٢: الصواب أثرٌ بصريّ)');
   ok(!!$('.next'), 'زر «تابع» ظهر بعد الإجابة الصحيحة');
 
   // الخطوة ٣: التتبّع

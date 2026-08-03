@@ -118,7 +118,7 @@
 
 /* المراحل الفاتحة: نصّها فوق لونها حبرٌ داكن (يبقى داكناً في الليلي عمداً —
    الألوان الليلية كلها فاتحة). اللون لا يحمل المعنى وحده في الحالتين. */
-.story:not(.quran), .node--story,
+.story:not(.quran), .node--story, .node--library, .station--library,
 .garden, .station--garden, .node--garden {
   --on-accent: #3D3428;
 }
@@ -409,6 +409,7 @@ button {
 .node-stars .on { color: var(--star); }
 
 .shake { animation: shake .4s ease; }
+.pop { animation: pop .22s ease-out; }
 
 @keyframes pulse {
   50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
@@ -418,6 +419,12 @@ button {
   25% { transform: translateX(-6px); }
   50% { transform: translateX(6px); }
   75% { transform: translateX(-3px); }
+}
+
+/* وثبة الصواب: تُعلن الإصابة بالحركة حيث لا صوت (DESIGN §٥.٢) */
+@keyframes pop {
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
 }
 
 /* خيط الدرب بين المحطات: انعطافة صغيرة يمنة ويسرة */
@@ -967,6 +974,26 @@ button {
 .story .foot .hint { margin: 0; }
 .story .foot .next { max-width: 22rem; }
 
+/* الكاريوكي (الحزمة ٩): الجملة المسموعة وحدها مضاءة — يتبعها الطفل بعينه */
+.line--now {
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--mix));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 45%, var(--mix));
+}
+
+.line--now .story-word { color: color-mix(in srgb, var(--accent) 80%, var(--ink)); }
+
+.karaoke { margin-top: .9rem; }
+.karaoke .read-all { max-width: 22rem; font-family: var(--font-ui); }
+.karaoke .read-all[data-on] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--mix));
+}
+
+/* سؤال الفهم في ختام القصة — يرث «اقرأ واختر» (صورةٌ ثلاثية بلا صوت قبل الاختيار) */
+.ask { text-align: center; }
+.ask .sentence { margin-top: 1rem; }
+
 /* ————— المرحلة القرآنية (خاتمة الرحلة) — وقار خاص بذهبي مطفأ ————— */
 
 .station--quran {
@@ -1261,6 +1288,17 @@ button {
 .station--ladder .station-letters { font-family: var(--font-ui); font-size: .9rem; letter-spacing: 0; line-height: 1.7; }
 .station--ladder .station-num { font-size: 1.5rem; }
 .node--ladder .node-face { font-family: var(--font-ui); font-size: 1.9rem; }
+
+/* ————— مكتبة القصص (الحزمة ٩) — خاتمة كل بستان ————— */
+
+.station--library {
+  border-inline-start-width: 8px;
+  background: linear-gradient(180deg, var(--card) 55%, color-mix(in srgb, var(--accent) 12%, var(--mix)));
+}
+
+.station--library .station-letters { font-family: var(--font-ui); font-size: .9rem; letter-spacing: 0; line-height: 1.7; }
+.station--library .station-num { font-size: 1.5rem; }
+.node--library .node-face { font-family: var(--font-ui); font-size: 1.9rem; }
 
 /* الجملة المعروضة للقراءة — نص قراءة ≥ ٣٢ بكسل بهواءٍ لحركاته (DESIGN §٣) */
 .sentence {

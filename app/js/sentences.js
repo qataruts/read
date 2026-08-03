@@ -44,11 +44,14 @@ export const MECHANIC_TITLES = {
 const SHADDA = 'ّ';
 const AL = /^اْ?لْ?(.+)$/;   // «الْ» التعريف — والشمسية بلا سكون على لامها
 const TAIL = /[ً-ِْ]+$/;                // علامة الإعراب الأخيرة وحدها (الشدّة ليست منها)
+const ALIF_TANWEEN = /َا$/;             // ألف تنوين النصب في الوقف: «زَيْدَا» ← «زَيْد»
 
 /**
  * جذع الكلمة للمطابقة: بلا «ال» ولا شدّة الشمسية ولا علامة إعرابها.
  * «الْغُرْفَةُ» و«غُرْفَةْ» جذعُهما واحد، و«الرَّجُلُ» ← «رَجُل» لا يطابق «رِجْل»
  * — فالمطابقة على الحروف **بحركاتها** لا على الرسم المجرّد.
+ * وألفُ تنوين النصب في الوقف علامةُ آخرٍ كسائرها: «زَيْدَا» ← «زَيْد» (الحزمة ٩).
+ * (نظيرتها في الأدوات `stem` في `tools/check_lexicon.py` — القاعدة واحدة في الجهتين.)
  */
 export function stemOf(text) {
   let out = String(text ?? '');
@@ -57,6 +60,7 @@ export function stemOf(text) {
     out = rest[1];
     out = out[0] + out.slice(1, 3).replace(SHADDA, '') + out.slice(3);
   }
+  if (bareLetters(out.replace(ALIF_TANWEEN, '')).length >= 2) out = out.replace(ALIF_TANWEEN, '');
   return out.replace(TAIL, '');
 }
 

@@ -16,6 +16,7 @@ const p = await import(new URL('progress.js', APP));
 const { GROUPS, SKILLS, STORIES, quranParts } = await import(new URL('curriculum.js', APP));
 const { GARDENS } = await import(new URL('lexicon.js', APP));
 const { RUNGS } = await import(new URL('sentences.js', APP));
+const { LIBRARY } = await import(new URL('library.js', APP));
 const BUNDLES = GARDENS.reduce((s, g) => s + g.bundles.length, 0);
 
 let fails = 0;
@@ -47,9 +48,10 @@ ok(p.nextNode().id === `g2:${g2.letters[0]}`, 'التالي = أول حرف في
 
 // سقف النجوم = عقد المجموعات + عقد ما بينها (المهارات والقصص — الجلسة ٤)
 //              + عقد المرحلة القرآنية (الجلسة ٦) + باقات البساتين (الحزمة ٧)
-//              + درجات سلّم الجمل (الحزمة ٨)
+//              + درجات سلّم الجمل (الحزمة ٨) + قصص المكتبة (الحزمة ٩)
 ok(p.maxTotalStars() === GROUPS.reduce((s, g) => s + (g.letters.length + 1) * 3, 0)
-  + (SKILLS.length + STORIES.length + quranParts().length + BUNDLES + RUNGS.length) * 3,
+  + (SKILLS.length + STORIES.length + quranParts().length + BUNDLES + RUNGS.length
+    + LIBRARY.length) * 3,
   'سقف النجوم الكلي');
 ok(store.size === 1, 'الحفظ في localStorage تمّ');
 

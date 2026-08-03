@@ -8,6 +8,7 @@
 import { GROUPS, SKILLS, STORIES, QURAN, quranParts, bareLetters } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf } from './sentences.js';
+import { libraryOf } from './library.js';
 
 const STORE_KEY = 'muallim.progress.v1';
 export const VERSION = 2;            // ١ = نجوم فقط (تُرقّى تلقائياً بلا فقد)
@@ -148,8 +149,19 @@ export function ladderNodes(ladder) {
 }
 
 /**
+ * عقد «مكتبة القصص» (الحزمة ٩): قصةٌ لكل عقدة، بعد سلّم جمل بستانها —
+ * فلا تُعرض قصةٌ إلا وكلماتُها كلها مدروسة (`library.js` وفاحصُه يضمنان موضعها).
+ * وبها يكتمل تدرّج البستان: كلماتُه ← جملُه ← قصةٌ تجمعها.
+ */
+export function libraryNodes(garden) {
+  return libraryOf(garden.id).map((story) => ({
+    id: `library:${story.id}`, type: 'library', part: story.id, garden, story,
+  }));
+}
+
+/**
  * الرحلة كاملةً بأقسامها بالترتيب: مجموعة ← ما بعدها من مهارات وقصص ← … ←
- * المرحلة القرآنية ← (بستان ← سلّم جمله) × البساتين.
+ * المرحلة القرآنية ← (بستان ← سلّم جمله ← قصصه) × البساتين.
  */
 export function journey() {
   const out = [];
@@ -164,6 +176,10 @@ export function journey() {
     const ladder = ladderOf(garden.id);
     if (ladder?.rungs.length) {
       out.push({ kind: 'ladder', id: `ladder:${garden.id}`, garden, ladder, nodes: ladderNodes(ladder) });
+    }
+    const stories = libraryNodes(garden);
+    if (stories.length) {
+      out.push({ kind: 'library', id: `library:${garden.id}`, garden, nodes: stories });
     }
   }
   return out;

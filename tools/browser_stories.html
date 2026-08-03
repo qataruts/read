@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار مكتبة القصص (الحزمة ٩)</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 170000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 8000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const { LIBRARY, libraryOf } = await import('./js/library.js');
+const { GARDENS } = await import('./js/lexicon.js');
+const { allNodes } = await import('./js/progress.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+
+// بعد اعتماد المدير (٥ أغسطس ٢٠٢٦) دخلت نصوصُ المكتبة قائمةَ الانتظار، فيكفي
+// استثناءُ `pending` البروتوكوليّ وحده — ولا استثناء خاصّ بالمكتبة في هذه الصفحة.
+
+const played = [], spoken = [], heardLog = [], jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').replace('.mp3', '');
+      const text = manifest[key] ?? `?${key}`;
+      played.push(text);
+      heardLog.push(text);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class {
+    constructor(text) { this.text = text; spoken.push(text); heardLog.push(text); }
+  };
+  const synth = { cancel() {}, speak(u) { setTimeout(() => u.onend && u.onend(), 5); } };
+  Object.defineProperty(win, 'speechSynthesis', { configurable: true, get: () => synth });
+}
+
+function idsBefore(id) {
+  const out = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out;
+    out.push(node.id);
+  }
+  return out;
+}
+
+async function seed(nodeIds) {
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(200);
+}
+
+const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+const lastHeard = () => heardLog[heardLog.length - 1];
+const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
+const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
+const lineWords = (i) => [...$$('.line')[i].querySelectorAll('.story-word')];
+
+async function goto(hash) {
+  win.location.hash = hash;
+  await sleep(200);
+}
+
+function checkTargets(where) {
+  const small = $$('.screen-card button')
+    .map((el) => [el, el.getBoundingClientRect()])
+    .filter(([, r]) => r.width && (r.height < 48 || r.width < 48))
+    .map(([el]) => el.className);
+  ok(small.length === 0, `${where}: أهداف اللمس ≥٤٨ بكسل${small.length ? ' — ' + small.join('،') : ''}`);
+  ok(doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1,
+    `${where}: لا تمرير أفقي (DESIGN §٤)`);
+}
+
+try {
+  // ————— ١) الخريطة: مكتبةٌ بعد سلّم كل بستان —————
+  await seed([]);
+  await waitFor(() => $('.station'), 'الخريطة');
+  ok($$('.station--library').length === GARDENS.filter((g) => libraryOf(g.id).length).length,
+    `الخريطة فيها ${arNum($$('.station--library').length)} مكتبات — مكتبةٌ بعد كل بستان`);
+  const stations = $$('.station');
+  ok($$('.station--library').every((el, i) =>
+    stations.indexOf(el) === stations.indexOf($$('.station--ladder')[i]) + 1),
+    'وكل مكتبة تلي سلّم جملها مباشرةً (كلماتُ البستان ← جملُه ← قصةٌ تجمعها)');
+  ok($$('.station--library').every((s) => s.classList.contains('station--locked')),
+    'وكلها مقفلة في بداية الرحلة');
+  ok($$('.station--library .node').length === LIBRARY.length,
+    `وعقدُها قصصُ المكتبة كلها (${arNum(LIBRARY.length)} قصة)`);
+  ok(!!$('.station--library .station-mark svg'), 'ولها معلمها البصري على الدرب (DESIGN §٦)');
+
+  const first = LIBRARY[0];
+  await goto(`#/library/${encodeURIComponent(first.id)}`);
+  ok(!!$('.station') && !$('.story'), 'والدخول المباشر على قصة مقفلة يعيده إلى الخريطة');
+
+  // ————— ٢) أول قصة: قراءةٌ كلمةً كلمة، ثم سؤال الفهم بخطأ مقصود —————
+  await seed(idsBefore(`library:${first.id}`));
+  await waitFor(() => $('.station--library'), 'الخريطة بعد إتمام السلّم');
+  ok(!$$('.station--library')[0].classList.contains('station--locked'),
+    'أول مكتبة تُفتح بإتمام سلّم جمل بستانها كله');
+  ok(continueCard().textContent.includes(first.title),
+    `و«تابع من هنا» يشير إلى قصة «${first.title}»`);
+
+  continueCard().click();
+  await waitFor(() => $('.story'), 'شاشة القصة');
+  ok($('.story-title-text').textContent.trim() === first.title,
+    `شاشة القراءة: العنوان «${$('.story-title-text').textContent.trim()}»`);
+  ok($('.pill').textContent.includes(`مستوى ${arNum(first.level)}`),
+    `وشارتها تعلن مستواها (${$('.pill').textContent.trim()})`);
+  ok($$('.line').length === first.pages.length,
+    `وصفحاتُها كلها معروضة معاً — كتابٌ لا لعبة (${arNum($$('.line').length)} جمل)`);
+  ok(first.pages.every((page, i) =>
+    lineWords(i).map((el) => el.textContent.trim()).join(' ') === page.text),
+    'وكل جملة بكلماتها كما في ملفّها حرفاً بحرف');
+  checkTargets('شاشة القراءة');
+
+  // نقرُ كلمةٍ يُسمعها، ونقرُ كلمات الجملة كلها يعدّها مسموعة
+  const before = heardLog.length;
+  lineWords(0)[0].click();
+  await sleep(120);
+  ok(lastHeard() === first.pages[0].words[0] && heardLog.length === before + 1,
+    `ونقرُ الكلمة يُسمعها وحدها («${lastHeard()}»)`);
+  ok(lineWords(0)[0].classList.contains('story-word--said'),
+    'وتُعلَّم الكلمة المقروءة فيتتبّع الطفل موضعه');
+
+  // ————— ٣) الكاريوكي: تظليل الجملة المسموعة (بند الحزمة ٩/٥) —————
+  $$('.line-ear')[1].click();
+  await waitFor(() => $('.line--now'), 'تظليل الجملة');
+  ok($$('.line--now').length === 1 && $$('.line')[1].classList.contains('line--now'),
+    'زرُّ الجملة يُسمعها ويُظلّلها وحدها');
+  await waitFor(() => heardLog.includes(first.pages[1].text), 'سماع الجملة كاملة');
+  await waitFor(() => !$('.line--now'), 'انطفاء التظليل بعد الجملة');
+  ok(true, 'ويُطفأ التظليل بانتهائها');
+
+  $('.read-all').click();
+  await waitFor(() => $('.read-all').dataset.on, 'بدء القراءة الكاملة');
+  ok($('.read-all').textContent.includes('أوقِف'), 'و«اسمع القصة كاملة» يصير زرَّ إيقاف');
+  await waitFor(() => !$('.read-all').dataset.on, 'انتهاء القراءة الكاملة', 20000);
+  ok(first.pages.every((page) => heardLog.includes(page.text)),
+    `والقراءة الكاملة تتلو الجمل بالتتابع (${arNum(first.pages.length)} جمل)`);
+  ok(!$('.line--now'), 'ولا يبقى تظليلٌ بعد آخر جملة');
+  ok($('.foot .hint').textContent.includes(`سمعتَ ${arNum(first.pages.length)}`),
+    `وعدّاد المسموع يبلغ الجمل كلها (${$('.foot .hint').textContent.trim()})`);
+
+  // ————— ٤) سؤال الفهم: ثلاث صور، ولا صوت قبل الاختيار —————
+  const mark = heardLog.length;
+  $('.foot .next').click();
+  await waitFor(() => $('.ask'), 'سؤال الفهم');
+  ok(texts('.ask .sentence-word').join(' ') === first.question.text,
+    `سؤال الفهم معروضٌ للقراءة («${texts('.ask .sentence-word').join(' ')}»)`);
+  ok($$('.ask .piccard').length === 3 && heardLog.length === mark,
+    'وثلاث صور بلا صوت قبل الاختيار — الحكم على القراءة لا على السمع');
+  ok(texts('.ask .piccard').includes(first.question.answer.emoji),
+    'وصورة الجواب بين الصور الثلاث');
+  checkTargets('سؤال الفهم');
+
+  const cards = () => $$('.ask .piccard');
+  const wrongCard = cards().find((c) => c.textContent.trim() !== first.question.answer.emoji);
+  const wrongWord = first.question.options.find((w) => w.emoji === wrongCard.textContent.trim());
+  wrongCard.click();
+  await sleep(150);
+  ok(wrongCard.classList.contains('bad') && !!$('.ask'),
+    'والخطأ يُعلَّم ولا ينقل — لعبةٌ لا امتحان');
+  ok(lastHeard() === wrongWord.say, `ويُسمعه ما اختاره لا الصواب (${lastHeard()})`);
+  await sleep(250);
+
+  cards().find((c) => c.textContent.trim() === first.question.answer.emoji).click();
+  await waitFor(() => $('.celebrate'), 'ختام القصة', 8000);
+  ok($$('.big-stars .on').length === 2,
+    `تابع الجمل كلها وأخطأ في السؤال ⇒ نجمتان (${$$('.big-stars .on').length})`);
+  ok(stored().stars[`library:${first.id}`] === 2, 'والنجوم محفوظة بمعرّف عقدة القصة');
+
+  // ————— ٥) القياس: القراءة لا تُسجَّل مهارةً حرفية (قرار الحزمة) —————
+  ok(Object.keys(stored().skills || {}).length === 0,
+    'ولا مهارة حرفية تُسجَّل في القراءة — المقيس فيها جملةٌ وفهمٌ لا حرفٌ بحركة');
+
+  // ————— ٦) قصة من بستان آخر: أطولُ مستوى، وإصابةٌ من أول مرة —————
+  const top = LIBRARY.at(-1);
+  await seed(idsBefore(`library:${top.id}`));
+  await goto(`#/library/${encodeURIComponent(top.id)}`);
+  await waitFor(() => $('.story'), `شاشة قصة ${top.id}`);
+  ok($$('.line').length === top.pages.length && top.level === 3,
+    `قصة «${top.title}» (مستوى ${arNum(top.level)}): ${arNum($$('.line').length)} جمل`);
+  checkTargets('قصة المستوى الثالث');
+
+  $('.read-all').click();
+  await waitFor(() => !$('.read-all').dataset.on, 'انتهاء قراءتها الكاملة', 30000);
+  ok(top.pages.every((page) => heardLog.includes(page.text)),
+    'وقُرئت كاملةً بالكاريوكي جملةً جملة');
+
+  $('.foot .next').click();
+  await waitFor(() => $('.ask'), 'سؤال قصة المستوى الثالث');
+  $$('.ask .piccard').find((c) => c.textContent.trim() === top.question.answer.emoji).click();
+  await waitFor(() => $('.celebrate'), 'ختامها', 8000);
+  ok($$('.big-stars .on').length === 3 && stored().stars[`library:${top.id}`] === 3,
+    'وإصابةُ السؤال من أول مرة مع متابعة الجمل ⇒ ثلاث نجوم محفوظة');
+
+  $('.celebrate .btn--primary').click();
+  await waitFor(() => $('.station'), 'العودة للخريطة');
+  ok($$('.station--library').at(-1).querySelectorAll('.node--done').length === 1,
+    'والخريطة تُظهر القصة المقروءة في مكتبتها');
+
+  // ————— ٧) اكتمال الرحلة: بقصةٍ لا بدرجة جمل —————
+  await seed(allNodes().map((n) => n.id));
+  await waitFor(() => $('.station'), 'الخريطة بعد إتمام كل شيء');
+  ok($('.map .note')?.textContent.includes('المكتبة'),
+    `والرحلة لا تكتمل إلا بآخر قصة (${$('.map .note')?.textContent.trim()})`);
+  ok($$('.station--library.station--done').length === $$('.station--library').length,
+    'وكل المكتبات مُنجَزة');
+
+  // ————— ٨) الصوت: ملفات مولَّدة، والنطق الآلي لمنتظِرٍ أو منتظِرِ اعتماد —————
+  const missing = played.filter((t) => t.startsWith('?'));
+  ok(missing.length === 0, `كل ما شُغِّل من الملفات له ملف مولَّد (${played.length} تشغيلاً)`);
+  const stray = spoken.filter((t) => !pendingAudio.has(t));
+  ok(stray.length === 0,
+    `والنطق الآلي لم يُستعمل إلا لنصوص تنتظر التصريف (${spoken.length} نصاً)`
+    + `${stray.length ? ' — خارج القائمة: ' + [...new Set(stray)].slice(0, 6).join('، ') : ''}`);
+
+  ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, 'استثناء: ' + ((e && e.stack) || e));
+}
+
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

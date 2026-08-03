@@ -25,7 +25,13 @@
      ولا تكرارَ لجملةٍ سابقة، ولا حقلَ زائد. وتُؤلَّف بـ`tools/make_sentences.py` لا بيد.
      **ولا يحكم هذا الفاحص في المعنى ولا المطابقة** — تلك مراجعةُ المدير بالعين، وهي
      ثالثةُ خطّ الإنتاج (توليد ← فحص ← عين) لا زائدةٌ عليه.
-  ٨) تغطية الصوت: كل منطوق له ملف مولَّد أو مكان في قائمة الانتظار (تنبيه لا خطأ).
+  ٨) **حارس الوقف** (حكم المدير في مراجعة الحزمة ٩): نكرةٌ منصوبة في آخر جملة يُوقف
+     عليها بألف التنوين لا بالسكون («يُسَاعِدُ زَيْدَا» لا «يُسَاعِدُ زَيْدْ») — يُقاس على
+     جمل المعجم والسلّم والقصص جميعاً (`waqf_errors`).
+  ٩) تغطية الصوت: كل منطوق له ملف مولَّد أو مكان في قائمة الانتظار (تنبيه لا خطأ).
+  ١٠) **مكتبة القصص** (الحزمة ٩ — `app/data/stories/`): عقد «مصنع القصص» كاملاً —
+     انظر `check_stories` أدناه. تُؤلَّف بـ`tools/make_stories.py` لا بيد، ويبقى
+     الحكم في المعنى والحبكة لعين المدير في `docs/REVIEW_STORIES.md`.
 
 الاستعمال:
     python3 tools/check_lexicon.py                 # أخطاء + تنبيهات
@@ -63,6 +69,7 @@ from check_decodable import (
     parse_curriculum,
     parse_quran,
     parse_skills,
+    parse_stories,
     queue_pending,
     text_errors,
 )
@@ -81,8 +88,25 @@ FIELDS = ("word", "tiles", "root", "theme", "emoji", "sentence")
 SUPPORT_FIELD = "support"  # معجم الجمل المساند: ما ليس كلمةَ معجمٍ ولا كلمةَ منهج
 SENTENCE_FIELD = "sentences"   # الجمل المتدرجة (٣–٥ كلمات) — الحزمة ٩أ
 LADDER_WORDS = (3, 5)          # طول الجملة المتدرجة: أطولُ من جملة الكلمة (كلمتان)
+
+# ————— عقد «مصنع القصص» (الحزمة ٩ · ROADMAP §المرحلة د) —————
+#
+# حدود المستويات **يملكها الفاحص** ويطيعها المولّد (`tools/make_stories.py` يستوردها
+# من هنا): فالعقد مكتوبٌ في الحارس لا في المؤلِّف، ولا يوسّعه المؤلِّف على نفسه.
+STORIES_DIR = ROOT / "app" / "data" / "stories"
+STORY_INDEX = STORIES_DIR / "index.json"
+STORY_FIELDS = ("id", "level", "garden", "title", "emoji", "pages", "question")
+QUESTION_FIELDS = ("text", "answer", "distractors")
+STORY_LEVELS = {          # المستوى ← (عدد الصفحات، طول الجملة بالكلمات)
+    1: {"pages": (3, 3), "words": (2, 3)},
+    2: {"pages": (5, 6), "words": (2, 4)},
+    3: {"pages": (8, 8), "words": (3, 5)},
+}
+ASK_WORDS = ("مَنْ", "مَاذَا", "أَيْنَ")   # أدوات الاستفهام — وحدها لا تلزمها القصة
+QUESTION_OPTIONS = 3                       # «ثلاث صور — لعبة لا امتحان» (بند الحزمة)
 AL_RE = re.compile(r"^اْ?لْ?(.+)$")        # «الْ» التعريف (والشمسية بلا سكون)
 TAIL_RE = re.compile(r"[ً-ِْ]+$")     # علامة الإعراب الأخيرة (لا الشدّة)
+ALIF_TANWEEN_RE = re.compile(r"َا$")   # ألف تنوين النصب في الوقف: «زَيْدَا» ← «زَيْد»
 
 HARAKA_MARKS = set(MARKS) - {SUKUN}     # فتحة، كسرة، ضمة
 MADD_HARAKA = {"ا": "َ", "و": "ُ", "ي": "ِ"}   # حرف المدّ وحركته المجانسة قبله
@@ -175,7 +199,46 @@ def stem(text: str) -> str:
     if rest and len(bare(rest.group(1))) >= 2:
         out = rest.group(1)
         out = out[0] + out[1:3].replace(SHADDA, "") + out[3:]
+    # ألفُ تنوين النصب علامةُ آخرٍ كسائرها: «زَيْدَا» و«زَيْدٌ» و«زَيْدْ» جذعُها واحد
+    if len(bare(ALIF_TANWEEN_RE.sub("", out))) >= 2:
+        out = ALIF_TANWEEN_RE.sub("", out)
     return TAIL_RE.sub("", out)
+
+
+# ————— حارس الوقف: المفعول المنوَّن في آخر الجملة (حكم المدير في مراجعة الحزمة ٩) —————
+#
+# مادّتنا كلها موقوفٌ على آخرها بالسكون، وهذا صوابٌ في المرفوع والمجرور (تنوينُهما يسقط
+# في الوقف)، **وخطأٌ في المنصوب**: تنوينُ الفتح يُوقف عليه **بألف** («يُسَاعِدُ زَيْدَا»)
+# فيقرؤه الطفل كما يُنطق. والفاحص لا يُعرِب، فيمسك الحالة بعلامتَين بنيويّتين:
+# اسمٌ نكرةٌ (بلا «ال») في آخر الجملة، **مسبوقٌ بفعلٍ مرفوع**، **والفاعل قبله موجود**.
+
+DAMMA, FATHA, ALIF = "ُ", "َ", "ا"
+MUDARI = set("يتنأ")                  # حروف المضارعة — بها يُعرَف الفعل في الجملة
+NOT_SUBJECT = {"مَاذَا", "أَيْنَ"}      # أداتان لا تصلحان فاعلاً؛ و«مَنْ» تصلح (مَنْ يُسَاعِدُ…)
+
+
+def raised_verb(word: str, verb_stems: set) -> bool:
+    """فعلٌ مضارع مرفوع في وسط الجملة: حرفُ مضارعةٍ وضمّةٌ وأصلٌ معلَن («يُسَاعِدُ»)."""
+    stripped = bare(word or "")
+    return bool(stripped) and word[-1] == DAMMA and stripped[0] in MUDARI and stem(word) in verb_stems
+
+
+def waqf_errors(text: str, label: str, verb_stems: set) -> list:
+    """«علمٌ منوَّنٌ منصوب في آخر جملة لا يُوقف عليه بالسكون» — حكم المدير، مطبَّقاً على
+    كل نكرةٍ منصوبة لا على الأعلام وحدها (القاعدة واحدة: «يَأْكُلُ خُبْزَا» كـ«يُسَاعِدُ زَيْدَا»).
+    """
+    words = str(text or "").split()
+    if len(words) < 3:
+        return []
+    last = words[-1]
+    if not last.endswith(SUKUN) or bare(last).startswith("ال"):
+        return []                       # معرَّفٌ بـ«ال» أو غيرُ موقوفٍ بالسكون: لا شأن للحارس
+    if not raised_verb(words[-2], verb_stems):
+        return []                       # ليس بعد فعلٍ: خبرٌ أو مضافٌ إليه أو مجرور
+    if all(w in NOT_SUBJECT for w in words[:-2]):
+        return []                       # لا فاعل قبل الفعل ⇒ الاسمُ الأخير فاعلٌ مرفوع
+    return [f"{label}: «{text}» — الاسم الأخير مفعولٌ منوَّنٌ منصوب، والوقفُ عليه بألف "
+            f"التنوين لا بالسكون («{last}» ← «{last[:-1] + FATHA + ALIF}»)"]
 
 
 # ————— قراءة المنهج: الحروف والعلامات المتاحة للبساتين —————
@@ -405,6 +468,7 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
                           f"(المطلوب {SENTENCE_WORDS[0]}–{SENTENCE_WORDS[1]})")
         for part in parts:
             errors += text_errors(part, f"{label} جملة", taught, letters, allowed)
+        errors += waqf_errors(sentence, f"{label} جملة", set(support_by_stem))
         if bare(word) not in bare(sentence):
             errors.append(f"{label}: جملة المثال لا تحوي الكلمة «{word}»")
 
@@ -451,6 +515,7 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
                           f"{LADDER_WORDS[0]}–{LADDER_WORDS[1]} كلمات)")
         for part in parts:
             errors += text_errors(part, label, taught, letters, allowed)
+        errors += waqf_errors(text, label, set(support_by_stem))
         graded[len(parts)] = graded.get(len(parts), 0) + 1
 
         item = lex_by_word.get(target)
@@ -534,6 +599,290 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
 
     print("\n✓ المعجم مفكوك ١٠٠٪: كل كلمة وجملة داخل حصيلة الطفل، ومقاطعها مشتقّة لا مكتوبة،"
           "\n  ولا مفردة في جملةٍ خارج المعجم والمنهج والمعجم المساند المعلَن.")
+    return 0
+
+
+# ————— «مصنع القصص» (الحزمة ٩): قراءة المكتبة وفحص عقدها —————
+
+
+def load_stories() -> tuple:
+    """فهرس المكتبة وقصصها بترتيبه — وهو ترتيب لقاء الطفل بها في الرحلة."""
+    if not STORY_INDEX.exists():
+        return {SUPPORT_FIELD: [], "stories": []}, []
+    index = json.loads(STORY_INDEX.read_text(encoding="utf-8"))
+    out = []
+    for story_id in index.get("stories") or []:
+        path = STORIES_DIR / f"{story_id}.json"
+        out.append(json.loads(path.read_text(encoding="utf-8")) if path.exists()
+                   else {"id": story_id, "missing": True})
+    return index, out
+
+
+def dump_story(story: dict) -> str:
+    """ملفّ قصةٍ بسطرٍ لكل صفحة — يبقى مقروءاً للعين ومقارَناً في git."""
+    j = lambda v: json.dumps(v, ensure_ascii=False)
+    lines = ["{"]
+    for key, value in story.items():
+        if key == "pages":
+            lines.append(f"  {j(key)}: [")
+            lines.append(",\n".join(f"    {j(page)}" for page in value))
+            lines.append("  ],")
+        else:
+            lines.append(f"  {j(key)}: {j(value)},")
+    lines[-1] = lines[-1].rstrip(",")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = False,
+                  library: tuple = None) -> int:
+    """فحص عقد «مصنع القصص»: المفكوكية، والمعجم المعلَن، وحدود المستوى، والسؤال.
+
+    القصة **تُؤلَّف بمولّد مقيَّد** (`tools/make_stories.py`) لا بيد، وهذا الفاحص هو
+    ثانية خطّ الإنتاج (تأليف ← فحص ← عينُ المدير). وما لا يحكم فيه: المعنى والحبكة
+    وذوق العبارة — تلك عينُ المدير في `docs/REVIEW_STORIES.md`، وبوّابتُها إلزامية.
+
+    ما يفحصه:
+      ١) اكتمال الحقول وتفرّد المعرّفات وتطابق الفهرس مع الملفات.
+      ٢) مفكوكية ١٠٠٪ لكل عنوان وصفحة وسؤال (بنفس `text_errors` التي تحرس المنهج).
+      ٣) **معجم العقد**: كل كلمة إمّا كلمةُ معجمٍ من بستانٍ سبق، أو كلمةُ منهجٍ درسها،
+         أو مفردةٌ في `support` — معجمِ الجمل المساند أو **معجم المكتبة المعلَن** في
+         `index.json`. وما أُعلن ولم تستعمله قصةٌ يُرفض (لا معجم ميت).
+      ٤) **حدود المستوى**: عدد الصفحات وطول الجملة (`STORY_LEVELS`)، والمستوى لا
+         ينزل كلما تقدّم الطفل في الرحلة.
+      ٥) **موضعها بقاعدة «أوّل موضع تكتمل كلماته»**: أبعدُ بستانٍ تنتمي إليه كلمةٌ منها
+         هو بستانُها المعلَن — فلا تُعرض قصةٌ على طفلٍ لم يبلغ كلماتِها.
+      ٦) **لا جملة مكرَّرة في المنظومة كلها** (حارس ٩أ): جملُ القصص وجملُ السلّم
+         وجملُ قصص المنهج في ميزانٍ واحد.
+      ٧) **سؤال الفهم**: جوابه مستدلٌّ من نصّ القصة وحده — كل كلمةٍ فيه (عدا أداة
+         الاستفهام) حاضرةٌ في القصة، وجوابُه كلمةٌ حاضرةٌ فيها، ومشتّتاته **غائبةٌ
+         عنها** (وإلا صار السؤال تخميناً لا قراءة).
+      ٨) تغطية الصوت: تنبيهٌ لا خطأ — القائمة لا تُطعَم قبل حكم المدير (بند الحزمة).
+    """
+    errors, warnings = [], []
+    known = taught_words() if known is None else known
+    taught = set(letters)
+    allowed = set(MARKS) | TANWEEN | {SHADDA, SUN_RULE}
+    index, stories = library if library else load_stories()
+
+    themes = data.get("themes") or []
+    words = data.get("words") or []
+    lex_place, lex_word = {}, {}
+    for entry in words:
+        lex_place.setdefault(stem(entry.get("word", "")), theme_place(themes, entry.get("theme")))
+        lex_word.setdefault(entry.get("word"), entry)
+
+    # المعجم المساند: معجمُ الجمل (مُراجَعٌ منذ الحزمة ٨) + معجمُ المكتبة المعلَن هنا
+    library_support = list(index.get(SUPPORT_FIELD) or [])
+    support_by_stem, own_by_stem = {}, {}
+    for text in data.get(SUPPORT_FIELD) or []:
+        support_by_stem.setdefault(stem(text), text)
+    for text in library_support:
+        own_by_stem.setdefault(stem(text), text)
+    used_support = set()
+    verb_stems = set(support_by_stem) | set(own_by_stem)    # أصولُ ما قد يقع فعلاً في جملة
+
+    if not library and not STORY_INDEX.exists():
+        print("لا مكتبة قصص في app/data/stories — لم يُفحَص شيء")
+        return 0
+
+    shared = sorted(set(library_support) & set(data.get(SUPPORT_FIELD) or []))
+    if shared:
+        errors.append(f"[معجم المكتبة] {len(shared)} مفردة معلَنة مرّتين (وهي في معجم الجمل "
+                      f"أصلاً): {'، '.join(shared[:8])}")
+
+    def place_of(parts_, label):
+        """موضعُ نصٍّ في الرحلة، وتسجيلُ خطأِ كل مفردةٍ خارج المعلَن."""
+        place = 0
+        for part in parts_:
+            root_stem = stem(part)
+            if root_stem in lex_place:
+                place = max(place, lex_place[root_stem])
+            elif bare(root_stem) in known or bare(part) in known:
+                pass                       # كلمة درسها في المنهج نفسه
+            elif root_stem in own_by_stem:
+                used_support.add(own_by_stem[root_stem])
+            elif root_stem in support_by_stem:
+                pass                       # مفردةٌ من معجم الجمل المُراجَع (الحزمة ٨)
+            else:
+                errors.append(f"{label}: «{part}» ليست كلمةَ معجمٍ ولا منهجٍ ولا مفردةً "
+                              f"معلَنة في معجم المكتبة (app/data/stories/index.json)")
+        return place
+
+    # جملُ المنظومة كلها قبل القصص: جملُ المعجم والسلّم، وجملُ قصص المنهج
+    src = CURRICULUM.read_text(encoding="utf-8")
+    _letters, _groups, parts = parse_curriculum(src)
+    seen = {}
+    for text in all_sentences(data):
+        seen.setdefault(text, "سلّم الجمل")
+    for story in parse_stories(parts.get("STORIES", "")):
+        for sentence in story["sentences"]:
+            seen.setdefault(" ".join(sentence["words"]), f"قصة المنهج «{story['title']}»")
+
+    audio_texts = set()
+    seen_ids, levels, pages_count = [], [], 0
+
+    for i, story in enumerate(stories, 1):
+        story_id = story.get("id", f"?{i}")
+        label = f"[قصة «{story_id}»]"
+        if story.get("missing"):
+            errors.append(f"{label}: في الفهرس بلا ملف app/data/stories/{story_id}.json")
+            continue
+        missing = [f for f in STORY_FIELDS if f not in story]
+        if missing:
+            errors.append(f"{label}: حقول ناقصة: {'، '.join(missing)}")
+            continue
+        extra = sorted(set(story) - set(STORY_FIELDS))
+        if extra:
+            errors.append(f"{label}: حقول زائدة: {'، '.join(extra)}")
+        if story_id in seen_ids:
+            errors.append(f"{label}: معرّف مكرَّر")
+        seen_ids.append(story_id)
+
+        level = story.get("level")
+        bounds = STORY_LEVELS.get(level)
+        if not bounds:
+            errors.append(f"{label}: مستوى مجهول «{level}» (المستويات {sorted(STORY_LEVELS)})")
+            continue
+        levels.append(level)
+
+        garden = story.get("garden")
+        if garden not in [t.get("id") for t in themes]:
+            errors.append(f"{label}: بستان مجهول «{garden}»")
+            continue
+        base = theme_place(themes, garden)
+
+        # العنوان والصفحات: مفكوكة، ومن المعجم المعلَن، وبحدود مستواها
+        errors += text_errors(story.get("title", ""), f"{label} عنوان", taught, letters, allowed)
+        place = place_of(str(story.get("title", "")).split(), f"{label} عنوان")
+        audio_texts.add(story.get("title", ""))
+
+        pages = story.get("pages") or []
+        low, high = bounds["pages"]
+        if not low <= len(pages) <= high:
+            errors.append(f"{label}: {len(pages)} صفحة (المستوى {level}: {low}–{high})")
+        pages_count += len(pages)
+        for n, page in enumerate(pages, 1):
+            text = str(page.get("text", "") or "").strip()
+            where = f"{label} صفحة {n}"
+            if not text or not str(page.get("emoji", "") or "").strip():
+                errors.append(f"{where}: حقل ناقص (المطلوب: text وemoji)")
+                continue
+            if sorted(page) != ["emoji", "text"]:
+                errors.append(f"{where}: حقول زائدة: {'، '.join(sorted(set(page) - {'text', 'emoji'}))}")
+            page_words = text.split()
+            wlow, whigh = bounds["words"]
+            if not wlow <= len(page_words) <= whigh:
+                errors.append(f"{where}: «{text}» {len(page_words)} كلمة "
+                              f"(المستوى {level}: {wlow}–{whigh})")
+            for word in page_words:
+                errors += text_errors(word, where, taught, letters, allowed)
+            errors += waqf_errors(text, where, verb_stems)
+            place = max(place, place_of(page_words, where))
+            if text in seen:
+                errors.append(f"{where}: جملة مكرَّرة — سبقت في {seen[text]} («{text}»)")
+            seen.setdefault(text, f"قصة «{story_id}»")
+            audio_texts.add(text)
+            audio_texts.update(page_words)
+
+        # سؤال الفهم: جوابه مستدلٌّ من نصّ القصة وحده
+        story_stems = {stem(w) for page in pages for w in str(page.get("text", "")).split()}
+        ask = story.get("question") or {}
+        where = f"{label} سؤال"
+        if sorted(ask) != sorted(QUESTION_FIELDS):
+            errors.append(f"{where}: حقوله {sorted(ask)} (المطلوب {list(QUESTION_FIELDS)})")
+        else:
+            ask_text = str(ask.get("text", "") or "").strip()
+            ask_words = ask_text.split()
+            for word in ask_words:
+                errors += text_errors(word, where, taught, letters, allowed)
+            errors += waqf_errors(ask_text, where, verb_stems)
+            if not any(w in ASK_WORDS for w in ask_words):
+                errors.append(f"{where}: «{ask_text}» بلا أداة استفهام ({'، '.join(ASK_WORDS)})")
+            place = max(place, place_of(ask_words, where))
+            # أداةُ الاستفهام وحدها لا تلزمها القصة — وما سواها يلزمه نصُّها
+            body = [w for w in ask_words if w not in ASK_WORDS]
+            outside = [w for w in body if stem(w) not in story_stems]
+            if outside:
+                errors.append(f"{where}: «{'، '.join(outside)}» ليست في نصّ القصة — "
+                              "سؤال الفهم يُجاب من القصة وحدها لا من خارجها")
+            audio_texts.add(ask_text)
+
+            answer = str(ask.get("answer", "") or "")
+            options = [answer, *(ask.get("distractors") or [])]
+            if len(options) != QUESTION_OPTIONS:
+                errors.append(f"{where}: {len(options)} خيارات (المطلوب {QUESTION_OPTIONS} صور)")
+            if len(set(options)) != len(options):
+                errors.append(f"{where}: خيارٌ مكرَّر ({'، '.join(options)})")
+            for n, option in enumerate(options):
+                item = lex_word.get(option)
+                if item is None:
+                    errors.append(f"{where}: الخيار «{option}» ليس كلمةَ معجم (لا صورة له)")
+                    continue
+                if theme_place(themes, item.get("theme")) > base:
+                    errors.append(f"{where}: الخيار «{option}» من بستانٍ بعد «{garden}» "
+                                  "(لم يبلغه الطفل بعد)")
+                inside = stem(option) in story_stems
+                if n == 0 and not inside:
+                    errors.append(f"{where}: الجواب «{option}» ليس في نصّ القصة")
+                if n and inside:
+                    errors.append(f"{where}: المشتّت «{option}» في نصّ القصة — "
+                                  "فالسؤال يحتمل جوابين")
+            emojis = [lex_word[o]["emoji"] for o in options if o in lex_word]
+            if len(set(emojis)) != len(emojis):
+                errors.append(f"{where}: صورتان متشابهتان في الخيارات")
+
+        if place != base:
+            errors.append(f"{label}: بستانُها المعلَن «{garden}» وكلماتُها تكتمل في "
+                          f"«{theme_id(themes, place)}» (قاعدة «أوّل موضع تكتمل كلماته»)")
+
+    if levels != sorted(levels):
+        errors.append(f"[المكتبة] المستويات لا ترتفع مع الرحلة: {levels} — "
+                      "قصةٌ أطولُ قبل أقصر منها تُرهق الطفل")
+    idle = sorted(set(library_support) - used_support)
+    if idle:
+        errors.append(f"[معجم المكتبة] {len(idle)} مفردة معلَنة لا تستعملها قصة: "
+                      + "، ".join(idle[:10]) + ("…" if len(idle) > 10 else ""))
+    for text in library_support:
+        errors += text_errors(text, f"[معجم المكتبة/«{text}»]", taught, letters, allowed)
+
+    if not library and STORIES_DIR.exists():
+        on_disk = sorted(p.stem for p in STORIES_DIR.glob("*.json") if p.name != "index.json")
+        orphan = [p for p in on_disk if p not in seen_ids]
+        if orphan:
+            errors.append(f"[المكتبة] ملفات خارج الفهرس: {'، '.join(orphan)}")
+
+    # تغطية الصوت: تنبيهٌ لا خطأ — نصوص القصص لا تدخل القائمة قبل حكم المدير (بند الحزمة ٩/٤)
+    pending = queue_pending()
+    if AUDIO_DIR.exists():
+        ready = {t for t in audio_texts if (AUDIO_DIR / f"{key_for(t)}.mp3").exists()}
+        queued = sorted(t for t in audio_texts - ready if t in pending)
+        waiting = sorted(t for t in audio_texts - ready if t not in pending)
+        if queued:
+            warnings.append(f"{len(queued)} نصاً من المكتبة في قائمة الانتظار الصوتية")
+        if waiting:
+            warnings.append(f"{len(waiting)} نصاً من المكتبة بلا صوت ولا مكان في القائمة "
+                            "(بند الحزمة: لا قائمة صوت قبل اعتماد المدير)")
+
+    by_level = {lv: levels.count(lv) for lv in sorted(set(levels))}
+    print(f"\nالمكتبة: {len(stories)} قصة في {pages_count} صفحة "
+          + "(" + "، ".join(f"مستوى {lv}: {n}" for lv, n in by_level.items()) + ") "
+          + f"| معجمها المعلَن: {len(library_support)} مفردة "
+          + f"| نصوص الصوت المطلوبة: {len(audio_texts)}")
+
+    if warnings and not quiet:
+        print(f"\nتنبيهات المكتبة ({len(warnings)}):")
+        for w in warnings:
+            print(f"  ! {w}")
+    if errors:
+        print(f"\nأخطاء المكتبة ({len(errors)}):")
+        for e in errors[:40]:
+            print(f"  ✗ {e}")
+        if len(errors) > 40:
+            print(f"  … و{len(errors) - 40} خطأ آخر")
+        return 1
+    print("✓ القصص مفكوكة ١٠٠٪: لا كلمة خارج المعلَن، وحدودُ المستويات مرعيّة،"
+          "\n  ولا جملة مكرَّرة في المنظومة، وسؤالُ كل قصة يُجاب من نصّها وحده.")
     return 0
 
 
@@ -733,6 +1082,93 @@ def self_test(letters: dict) -> int:
        "— ولا يحكم الفاحص في المعنى: «الْبَابُ فِي الْمِفْتَاحْ» تمرّ عليه، "
        "وردُّها مراجعةُ المدير بالعين (وهي ثالثةُ خطّ الإنتاج لا زائدةٌ عليه)")
 
+    # ٥. عقد «مصنع القصص» (الحزمة ٩): المكتبة تُفحص بمادّةٍ مُصطنَعة لا بملفات القرص
+    story = {
+        "id": "t1", "level": 1, "garden": "t", "title": "مِفْتَاحُ سَامِي", "emoji": "🔑",
+        "pages": [{"text": "سَامِي أَمَامَ الْمِفْتَاحْ", "emoji": "🚪"},
+                  {"text": "الْمِفْتَاحُ كَبِيرْ", "emoji": "🔑"},
+                  {"text": "سَامِي يَحْمِلُ الْمِفْتَاحْ", "emoji": "🎉"}],
+        "question": {"text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِفْتَاحْ",
+                     "distractors": ["مِصْبَاحْ", "سَرِيرْ"]},
+    }
+    extra = [{**good, "word": "مِصْبَاحْ", "root": "صبح", "emoji": "💡",
+              "tiles": syllabify("مِصْبَاحْ", letters), "sentence": "الْمِصْبَاحُ مُنِيرْ"},
+             {**good, "word": "سَرِيرْ", "root": "سرر", "emoji": "🛏️",
+              "tiles": syllabify("سَرِيرْ", letters), "sentence": "السَّرِيرُ كَبِيرْ"}]
+
+    def runs(story_patch=None, support=("سَامِي", "يَحْمِلْ", "مَنْ"), stories=None):
+        lib = ({SUPPORT_FIELD: list(support)},
+               stories if stories is not None else [{**story, **(story_patch or {})}])
+        data = {"bundleSize": 1, "themes": [theme], SENTENCE_FIELD: [],
+                SUPPORT_FIELD: ["صَغِيرْ", "مُنِيرْ", "كَبِيرْ", "أَمَامَ"],
+                "words": [dict(good), *extra]}
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            check_stories(data, letters, known, quiet=True, library=lib)
+        return buf.getvalue()
+
+    ok("أخطاء المكتبة" not in runs(), "قصة سليمة لا يُسجَّل عليها خطأ")
+    ok("ليست كلمةَ معجمٍ ولا منهجٍ" in runs(support=["يَحْمِلْ", "مَنْ"]),
+       "ومفردةٌ في قصةٍ خارج المعلَن تُمسَك (سَامِي بلا إعلان)")
+    ok("لا تستعملها قصة" in runs(support=["سَامِي", "يَحْمِلْ", "مَنْ", "زَيْدْ"]),
+       "ومفردةٌ معلَنة لا تستعملها قصة تُمسَك (لا معجم ميت)")
+    ok("بلا حركة" in runs({"pages": [{"text": "سامي امام المفتاح", "emoji": "🚪"},
+                                     *story["pages"][1:]]}),
+       "وجملةٌ غير مشكولة تُمسَك")
+    ok("صفحة (المستوى" in runs({"pages": story["pages"][:2]}),
+       "وعددُ صفحاتٍ خارج حدّ المستوى يُمسَك")
+    ok("كلمة (المستوى" in runs({"pages": [{"text": "سَامِي أَمَامَ الْمِفْتَاحِ الصَّغِيرْ",
+                                           "emoji": "🚪"}, *story["pages"][1:]]}),
+       "وجملةٌ أطولُ من حدّ المستوى تُمسَك")
+    ok("المستويات لا ترتفع" in runs(stories=[{**story, "level": 2, "id": "t0",
+                                              "pages": [*story["pages"], *story["pages"][:2]]},
+                                             story]),
+       "ومستوىً أعلى قبل ما دونه يُمسَك (لا قصة أطولُ قبل أقصر)")
+    ok("جملة مكرَّرة" in runs({"pages": [story["pages"][0], story["pages"][0],
+                                        story["pages"][2]]}),
+       "وجملةٌ مكرَّرة في المنظومة تُمسَك (حارس ٩أ)")
+    ok("ليست في نصّ القصة" in runs({"question": {**story["question"],
+                                                 "text": "مَنْ يَحْمِلُ الْمِصْبَاحْ"}}),
+       "وسؤالٌ فيه كلمةٌ خارج نصّ القصة يُمسَك (الجواب يُستدلّ من القصة وحدها)")
+    ok("بلا أداة استفهام" in runs({"question": {**story["question"],
+                                                "text": "سَامِي يَحْمِلُ الْمِفْتَاحْ"}}),
+       "وسؤالٌ بلا أداة استفهام يُمسَك")
+    ok("الجواب" in runs({"question": {"text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِصْبَاحْ",
+                                      "distractors": ["مِفْتَاحْ", "سَرِيرْ"]}}),
+       "وجوابٌ ليس في نصّ القصة يُمسَك")
+    ok("المشتّت" in runs({"question": {**story["question"],
+                                       "distractors": ["مِفْتَاحْ", "سَرِيرْ"]}}),
+       "ومشتّتٌ داخل نصّ القصة يُمسَك (وإلا احتمل السؤال جوابين)")
+    ok("ليس كلمةَ معجم" in runs({"question": {**story["question"],
+                                              "distractors": ["سَامِي", "سَرِيرْ"]}}),
+       "وخيارٌ بلا صورةٍ في المعجم يُمسَك")
+    late = {"id": "t2", "title": "بستان ثانٍ", "emoji": "🌴"}
+    ok("قاعدة «أوّل موضع تكتمل كلماته»" in _late_garden(story, extra, good, theme, late,
+                                                        letters, known),
+       "وقصةٌ تستعمل كلمةً من بستان لاحق تُمسَك (لا تُعرض قبل تعلّم كلماتها)")
+
+    # حارس الوقف (حكم المدير في مراجعة الحزمة ٩): الحالة القديمة تُمسَك، والمصحَّحة تمرّ
+    verbs = {stem("يُسَاعِدْ")}
+    ok(waqf_errors("الزَّمِيلُ يُسَاعِدُ زَيْدْ", "[و]", verbs),
+       "وعلمٌ منوَّنٌ منصوب موقوفٌ بالسكون في آخر الجملة يُمسَك "
+       "(«الزَّمِيلُ يُسَاعِدُ زَيْدْ» — الحالة التي أُصلحت في مراجعة الحزمة ٩)")
+    ok(not waqf_errors("الزَّمِيلُ يُسَاعِدُ زَيْدَا", "[و]", verbs),
+       "والمصحَّحةُ بألف التنوين تمرّ («زَيْدَا»)")
+    ok(waqf_errors("سَامِي يَحْمِلُ مِفْتَاحْ", "[و]", {stem("يَحْمِلْ")}),
+       "والقاعدة على كل نكرةٍ منصوبة لا على الأعلام وحدها («يَحْمِلُ مِفْتَاحَا»)")
+    ok(not waqf_errors("أَيْنَ يُسَاعِدُ زَيْدْ", "[و]", verbs),
+       "ولا يُمسَك الفاعل المؤخَّر: «أَيْنَ» ليست فاعلاً فما بعد الفعل مرفوعٌ يُوقف بالسكون")
+    ok(waqf_errors("مَنْ يُسَاعِدُ زَيْدْ", "[و]", verbs),
+       "و«مَنْ» فاعلٌ، فما بعد فعلها مفعولٌ يلزمه الألف (سؤالُ «دَفْتَرُ زَيْدْ» نفسُه)")
+    ok(not waqf_errors("الزَّمِيلُ يُسَاعِدُ الْجَارْ", "[و]", verbs)
+       and not waqf_errors("جَدَّةُ حَسَنْ", "[و]", verbs)
+       and not waqf_errors("زَيْدٌ يَجْلِسُ فِي حَدِيقَةْ", "[و]", verbs),
+       "ولا يمسّ معرَّفاً بـ«ال» ولا مضافاً إليه ولا مجروراً")
+    ok("والوقفُ عليه بألف" in runs({"pages": [story["pages"][0],
+                                              {"text": "سَامِي يَحْمِلُ مِفْتَاحْ", "emoji": "🔑"},
+                                              story["pages"][2]]}),
+       "والحارس موصولٌ بفحص القصص لا معزولاً عنه")
+
     ok(support_texts({"words": [good], SENTENCE_FIELD: [], SUPPORT_FIELD: ["صَغِيرْ"]},
                      known) == ["صَغِيرْ"],
        "والمساند المشتقّ يُبقي المعلَن الموقوف مكانَ صورته في الجملة (الصَّغِيرُ ← صَغِيرْ)")
@@ -742,6 +1178,23 @@ def self_test(letters: dict) -> int:
 
     print(f"\n{fails} فشل" if fails else "\n✓ الفاحص والمقطِّع يمسكان المخالفات كلها")
     return 1 if fails else 0
+
+
+def _late_garden(story: dict, extra: list, good: dict, theme: dict, late: dict,
+                 letters: dict, known: set) -> str:
+    """خرج فحص المكتبة على قصةٍ في البستان الأول تستعمل كلمةً من بستانٍ بعده."""
+    words = [dict(good), extra[0], {**extra[1], "theme": "t2"}]
+    pages = [*story["pages"][:2], {"text": "سَامِي يَحْمِلُ السَّرِيرْ", "emoji": "🛏️"}]
+    ask = {"text": "مَنْ يَحْمِلُ السَّرِيرْ", "answer": "سَرِيرْ", "distractors": ["مِفْتَاحْ",
+                                                                                 "مِصْبَاحْ"]}
+    data = {"bundleSize": 1, "themes": [theme, late], SENTENCE_FIELD: [],
+            SUPPORT_FIELD: ["صَغِيرْ", "مُنِيرْ", "كَبِيرْ", "أَمَامَ"], "words": words}
+    lib = ({SUPPORT_FIELD: ["سَامِي", "يَحْمِلْ", "مَنْ"]},
+           [{**story, "pages": pages, "question": ask}])
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        check_stories(data, letters, known, quiet=True, library=lib)
+    return buf.getvalue()
 
 
 def _no_support(good: dict, theme: dict, letters: dict, known: set) -> str:
@@ -771,7 +1224,8 @@ def main():
         sys.exit(fill_tiles(data, letters))
     if args.fill_support:
         sys.exit(fill_support(data))
-    sys.exit(check(data, letters, quiet=args.quiet))
+    status = check(data, letters, quiet=args.quiet)
+    sys.exit(status | check_stories(data, letters, quiet=args.quiet))
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@
 // عند تغيير أي ملف من ملفات الهيكل: ارفع VERSION فيُمحى المخزون القديم كله.
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/.
 
-const VERSION = 'v5';   // v5: وصلة التلاوة — `recitation.js` وبيانها وملفات القارئ
+const VERSION = 'v6';   // v6: مكتبة «مصنع القصص» — `library.js` وقصصها المشتقّة من فهرسها
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -30,6 +30,7 @@ const SHELL = [
   'css/app.css',
   'data/lexicon.json',
   'data/recitations.json',
+  'data/stories/index.json',
   'fonts/NotoNaskhArabic-arabic.woff2',
   'fonts/NotoNaskhArabic-latin.woff2',
   'fonts/BalooBhaijaan2-arabic.woff2',
@@ -40,6 +41,7 @@ const SHELL = [
   'js/garden.js',
   'js/ladder.js',
   'js/lesson.js',
+  'js/library.js',
   'js/lexicon.js',
   'js/main.js',
   'js/parent.js',
@@ -66,6 +68,15 @@ const json = (path) => fetch(new URL(path, self.registration.scope))
   .then((r) => (r.ok ? r.json() : null))
   .catch(() => null);
 
+/** خزن قصص المكتبة **من فهرسها** لا من قائمة يدوية (كما تُخزَن الأصوات من بيانها):
+ *  فإضافة قصةٍ جديدة لا تحتاج سطراً في هذا الملف — الفهرس وحده مصدر الحقيقة. */
+async function precacheStories() {
+  const index = await json('data/stories/index.json');
+  const cache = await caches.open(SHELL_CACHE);
+  await Promise.all((index?.stories || []).map((id) =>
+    cache.add(new URL(`data/stories/${id}.json`, self.registration.scope)).catch(() => {})));
+}
+
 /** خزن الأصوات كلها من بياناتها — بعدها لا يحتاج التطبيق شبكةً البتّة.
  *  البيانان: فهرس المولَّد، وبيان التلاوة بصوت القارئ (كلاهما «مفتاح ← نصّ»). */
 async function precacheAudio() {
@@ -84,6 +95,7 @@ self.addEventListener('install', (event) => {
     const cache = await caches.open(SHELL_CACHE);
     await Promise.all(SHELL.map((path) =>
       cache.add(new URL(path, self.registration.scope)).catch(() => {})));
+    await precacheStories();
     await precacheAudio();
     await self.skipWaiting();
   })());

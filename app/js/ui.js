@@ -64,6 +64,7 @@ export function nodeTitle(node) {
   if (node.type === 'quran') return node.title;
   if (node.type === 'garden') return `باقة ${arNum(node.bundle.index)} — ${node.garden.title}`;
   if (node.type === 'ladder') return `جمل ${node.garden.title} — درجة ${arNum(node.rung.index)}`;
+  if (node.type === 'library') return `قصة «${node.story.title}»`;
   return '';
 }
 
@@ -75,6 +76,7 @@ export function nodeWhere(node) {
   if (node.type === 'quran') return QURAN.title;
   if (node.type === 'garden') return `بستان ${node.garden.title}`;
   if (node.type === 'ladder') return `سلّم جمل ${node.garden.title}`;
+  if (node.type === 'library') return `مكتبة ${node.garden.title}`;
   return 'محطة المهارات والقصص';
 }
 
@@ -87,6 +89,7 @@ export function nodeFace(node) {
   if (node.type === 'quran') return node.face;
   if (node.type === 'garden') return node.garden.emoji;
   if (node.type === 'ladder') return '📖';
+  if (node.type === 'library') return node.story.emoji;
   return '';
 }
 
@@ -167,6 +170,8 @@ const LANDMARKS = {
   dome: '<path d="M32 8q13 9 13 19v15H19V27q0-10 13-19z" /><path d="M32 8V4" /><circle cx="32" cy="3" r="1.6" /><path d="M10 42V22l3-7 3 7v20" /><path d="M15 42h38" />',
   garden: '<path d="M8 44h48" /><circle cx="18" cy="36" r="8" /><circle cx="46" cy="34" r="10" /><path d="M32 44V28" /><circle cx="32" cy="24" r="4.5" /><path d="M32 34q-5-1-7-5M32 38q5-1 7-5" />',
   ladder: '<path d="M20 46V6M44 46V6" /><path d="M20 38h24M20 30h24M20 22h24M20 14h24" /><path d="M10 46h44" />',
+  // المكتبة: كتابٌ مفتوح على منضدة — معلمُ محطة القصص المؤلَّفة
+  book: '<path d="M32 16v26" /><path d="M32 16q-9-6-22-4v26q13-2 22 4" /><path d="M32 16q9-6 22-4v26q-13-2-22 4" /><path d="M8 44h48" />',
 };
 
 /** معلم المحطة على الخريطة — زخرفة صامتة بلون المرحلة (DESIGN §٦). */
@@ -183,6 +188,16 @@ export function shake(el) {
   el.classList.remove('shake');
   void el.offsetWidth;   // إعادة تشغيل الحركة
   el.classList.add('shake');
+}
+
+/**
+ * وثبة قصيرة تحتفي بالصواب دون كلام — بديل الصوت في التمارين السماعية:
+ * الإجابة الصحيحة هناك لا تُعاد قراءتها (DESIGN §٥.٢)، فيبقى للمسة أثرٌ يتحرّك.
+ */
+export function pop(el) {
+  el.classList.remove('pop');
+  void el.offsetWidth;   // إعادة تشغيل الحركة
+  el.classList.add('pop');
 }
 
 // ————— عشوائية (قابلة للحقن في الاختبارات) —————
