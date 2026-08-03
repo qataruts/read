@@ -1,0 +1,295 @@
+/* الصفحة التعريفية — تنسيقها وحدها.
+   اللوح والخطوط والأزرار من `../css/app.css` (مصدر الحقيقة الوحيد للألوان، DESIGN §٢):
+   هذه الصفحة **لا تُعرّف لوناً ولا خطاً**، بل تصفّ ما عرّفه التطبيق — فما يراه المعلّم
+   هنا هو عينُ ما يراه الطفل هناك، ولا لوحان يفترقان بمرور الوقت.
+
+   وهي خارج قشرة عامل الخدمة (لا تُخزَّن ولا تُسجّل عاملاً ولا تحمل جافاسكربت أصلاً). */
+
+/* ————— الهيكل العام ————— */
+
+.w-wrap {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 4rem;
+}
+
+/* الأزرار هنا روابطُ انتقال: بهيئة أزرار التطبيق نفسِها بلا خطّ الروابط تحتها */
+.w-wrap a.btn { text-decoration: none; }
+
+/* ولونُ الفعل الرئيس يبقى لأصله في `app.css` — لذلك يُستثنى هنا */
+.w-wrap a.btn:not(.btn--primary) { color: var(--ink); }
+
+.w-section {
+  margin: 3.5rem 0 0;
+  scroll-margin-top: 1.5rem;
+}
+
+.w-section > h2 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin: 0 0 .35rem;
+}
+
+.w-section > h2::after {
+  content: '';
+  display: block;
+  width: 3.5rem;
+  height: 4px;
+  margin-top: .5rem;
+  border-radius: 2px;
+  background: var(--accent, var(--accent-letters));
+}
+
+.w-section > .w-lede { margin: .75rem 0 1.5rem; max-width: 46rem; }
+
+.w-lede { color: var(--ink-soft); font-size: 1.075rem; }
+
+/* ————— الترويسة ————— */
+
+.w-hero {
+  text-align: center;
+  padding: 3rem 0 1rem;
+}
+
+.w-hero img {
+  width: 88px;
+  height: 88px;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.w-hero h1 {
+  font-size: clamp(2.25rem, 7vw, 3.25rem);
+  margin: .75rem 0 .25rem;
+  letter-spacing: .5px;
+}
+
+.w-tagline {
+  margin: 0 auto;
+  max-width: 34rem;
+  font-size: clamp(1.05rem, 3vw, 1.25rem);
+  color: var(--ink-soft);
+}
+
+.w-hero .w-lede { max-width: 44rem; margin: 1.25rem auto; }
+
+/* الفعل الرئيس: أكبر ما في الصفحة وأوضحه (DESIGN §٥.١، وهدف اللمس ≥ ٦٤ بكسل) */
+.w-start {
+  min-height: 4rem;
+  padding: .75rem 2.5rem;
+  font-size: 1.25rem;
+  margin-top: .5rem;
+}
+
+.w-under {
+  margin: .85rem 0 0;
+  font-size: .95rem;
+  color: var(--ink-soft);
+}
+
+.w-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  justify-content: center;
+  margin-top: 1.75rem;
+}
+
+.w-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: .95rem;
+}
+
+/* ————— البطاقات ————— */
+
+.w-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.w-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.35rem;
+}
+
+.w-card h3 {
+  margin: .35rem 0 .5rem;
+  font-size: 1.15rem;
+}
+
+.w-card p { margin: 0; color: var(--ink-soft); }
+
+/* أرقام المشرق في كل الواجهة (DESIGN §٣) — وخطوات التثبيت مرقَّمة */
+.w-card ol {
+  margin: 0;
+  padding-inline-start: 1.35rem;
+  list-style-type: arabic-indic;
+  color: var(--ink-soft);
+}
+
+.w-card ol li { margin-bottom: .4rem; }
+
+.w-card .w-face { font-size: 1.9rem; line-height: 1; }
+
+/* الأسس الخمسة: رقمٌ بلونٍ من ألوان مراحل التطبيق (اللون لا يحمل معنى وحده — معه رقمه) */
+.w-basis .w-card { border-inline-start: 6px solid var(--accent, var(--accent-letters)); }
+
+.w-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--accent, var(--accent-letters));
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+/* ————— الأرقام ————— */
+
+.w-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.w-stats li {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: .6rem 1rem;
+  font-size: .95rem;
+  color: var(--ink-soft);
+}
+
+.w-stats b {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+/* ————— معرض اللقطات ————— */
+
+.w-shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.5rem 1.25rem;
+}
+
+.w-shots figure { margin: 0; }
+
+.w-shots img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: var(--paper);
+}
+
+.w-shots figcaption {
+  margin-top: .6rem;
+  font-size: .95rem;
+  color: var(--ink-soft);
+}
+
+.w-shots figcaption b { display: block; color: var(--ink); font-size: 1.05rem; }
+
+/* ————— دليل المعلم ————— */
+
+.w-guide h3 {
+  margin: 2rem 0 .5rem;
+  font-size: 1.25rem;
+}
+
+.w-guide h4 {
+  margin: 1.5rem 0 .35rem;
+  font-size: 1.05rem;
+  color: var(--accent-skills);
+}
+
+.w-guide p, .w-guide li { max-width: 46rem; }
+
+.w-scroll { overflow-x: auto; }        /* الجدول وحده يُسحب، لا الصفحة (DESIGN §٤) */
+
+.w-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 34rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.w-table th, .w-table td {
+  text-align: start;
+  padding: .6rem .9rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.w-table thead th { background: var(--paper-deep); font-size: .95rem; }
+
+.w-table tbody tr:last-child td { border-bottom: 0; }
+
+.w-table .w-stage {
+  white-space: nowrap;
+  color: var(--ink-soft);
+  font-size: .9rem;
+}
+
+.w-table .w-letters { font-family: var(--font-letter); letter-spacing: .15em; }
+
+.w-why {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-inline-start: 6px solid var(--accent-skills);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem 1.35rem;
+  margin: 1rem 0;
+}
+
+.w-why h4 { margin-top: .35rem; }
+
+.w-why p:last-child { margin-bottom: .35rem; }
+
+/* ————— الخاتمة ————— */
+
+.w-end {
+  margin-top: 3.5rem;
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.w-foot {
+  margin-top: 2.5rem;
+  color: var(--ink-soft);
+  font-size: .92rem;
+}
+
+.w-foot a { color: inherit; }
+
+/* ————— الطباعة: الدليل يُطبع ورقةً للمعلّم ————— */
+
+@media print {
+  .w-hero, .w-shots, .w-end, .w-nav { display: none; }
+  body { background: #fff; }
+  .w-card, .w-why, .w-table { box-shadow: none; }
+}

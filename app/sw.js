@@ -80,6 +80,10 @@ const SHELL = [
 // (الحزمة ١٢) — وهو يفصل ملفَّ المصحف عن ملفٍّ مولَّد له المفتاح نفسُه.
 const AUDIO_RE = /\/audio\/(wbw-)?[0-9a-f]{12}\.mp3$/;
 
+// مسار الصفحة التعريفية (`app/welcome/`) — ليست من التطبيق: لا في SHELL ولا في
+// المخزون ولا في ردّ التنقّل. مشتقٌّ من النطاق فيصحّ في أي مجلدٍ نُشر فيه التطبيق.
+const WELCOME = new URL('welcome/', self.registration.scope).pathname;
+
 const json = (path) => fetch(new URL(path, self.registration.scope))
   .then((r) => (r.ok ? r.json() : null))
   .catch(() => null);
@@ -191,6 +195,11 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;      // لا مصدر خارجياً في هذا التطبيق أصلاً
+
+  // الصفحة التعريفية خارج القشرة عمداً (جلسة الصفحة التعريفية): لا تُخزَّن، ولا
+  // يبتلعها ردُّ التنقّل أدناه — ولولا هذا السطر لفُتح التطبيقُ مكانَها على كل جهازٍ
+  // ثبّته، فلا يبلغ المعلّمُ الصفحةَ أصلاً. تُترك للشبكة كأنّ لا عاملَ خدمةٍ هنا.
+  if (url.pathname.startsWith(WELCOME)) return;
 
   if (AUDIO_RE.test(url.pathname)) {
     event.respondWith(cacheFirst(request));

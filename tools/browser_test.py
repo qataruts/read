@@ -13,6 +13,7 @@
     python3 tools/browser_test.py --gate       # بوابتا الإتقان (الحزمة ١٤)
     python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
+    python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
     python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record|--gate|--map]
     python3 tools/browser_test.py --show       # بمتصفّح مرئي لتتبّع ما يجري
 
@@ -67,6 +68,7 @@ PAGES = {
     "/__contrast.html": TOOLS / "browser_contrast.html",
     "/__contrast_shots.html": TOOLS / "browser_contrast_shots.html",
     "/__device.html": TOOLS / "browser_device.html",
+    "/__welcome.html": TOOLS / "browser_welcome.html",
 }
 # نافذة Chrome بلا واجهة تحجز ٨٧ بكسلاً لإطارٍ وهميّ فوق المنظور — فلولا تعويضها لقِسنا
 # جهازاً أقصر من الجهاز. والصفحة تعيد منظورها الحقيقي، والعدّاء يرفض أي انحرافٍ عن المطلوب.
@@ -305,6 +307,8 @@ def main():
     ap.add_argument("--contrast", action="store_true",
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
+    ap.add_argument("--welcome", action="store_true",
+                    help="الصفحة التعريفية: لا طلب خارجي، ولا يبتلعها عامل الخدمة (ومع --shots لقطتها)")
     ap.add_argument("--device", action="store_true",
                     help="قياس الفائض الرأسي بمقاسات جهاز حقيقي في الوضعين (ومعه --shots --screen للقطة)")
     ap.add_argument("--screen", help="اسم شاشةٍ واحدة في صفحة الجهاز (مع --device --shots)")
@@ -329,7 +333,9 @@ def main():
         if args.shots:
             out = Path(args.shots).resolve()
             out.unlink(missing_ok=True)   # وإلا لعُدَّت لقطةُ تشغيلٍ سابق نجاحاً فوريّاً
-            page, size = (("__contrast_shots.html", "1100,2600") if args.contrast
+            # الصفحة التعريفية تُلتقط **كما تُنشَر** (لا صفحةَ قيادةٍ لها: لا جافاسكربت فيها)
+            page, size = (("welcome/", "1100,7900") if args.welcome
+                          else ("__contrast_shots.html", "1100,2600") if args.contrast
                           else ("__gate_shots.html", "1100,2400") if args.gate
                           else ("__map_shots.html", "1100,2600") if args.map
                           else ("__record_shots.html", "1100,3200") if args.record
@@ -352,7 +358,8 @@ def main():
             print(f"اللقطة: {out}" if out.exists() else "تعذّرت اللقطة")
             return 0 if out.exists() else 1
 
-        page = ("__contrast.html" if args.contrast
+        page = ("__welcome.html" if args.welcome
+                else "__contrast.html" if args.contrast
                 else "__gate.html" if args.gate
                 else "__map.html" if args.map
                 else "__review.html" if args.review else "__story.html" if args.story

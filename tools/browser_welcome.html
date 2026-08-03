@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار الصفحة التعريفية في متصفّح حقيقي</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="welcome/" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<iframe id="app" src="index.html" style="width:420px;height:600px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+// الصفحة التعريفية في Chrome حقيقي (جلسة الصفحة التعريفية). المقيس أربعة:
+//   ١) تُفتح وتُعرض كاملةً: أقسامُها، ولقطاتُها الستّ محمَّلة، وبلا سطر جافاسكربت.
+//   ٢) **لا طلب شبكيّ خارجيّ واحد** — يُقرأ من سجلّ الأداء لا من نصّ الملف.
+//   ٣) لا تمرير أفقي في ثلاثة مقاسات، وأهدافُ اللمس على قاعدة DESIGN §٤،
+//      وزرّ البدء **ينقل إلى التطبيق فعلاً** (يُنقر ويُتحقّق من الوجهة).
+//   ٤) **عاملُ الخدمة لا يبتلعها**: بعد أن يُسجَّل ويُفعَّل من التطبيق، تبقى فتحةُ
+//      `welcome/` صفحةً تعريفية لا تطبيقاً، ولا يدخل منها شيءٌ في المخزون.
+//      (وهذا عينُ شرط القبول: «لا أثر على PWA المثبَّتة».)
+
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 110000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 5000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = await fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const frame = document.getElementById('frame');
+const appFrame = document.getElementById('app');
+const jsErrors = [];
+
+const load = (el, src) => new Promise((done) => {
+  el.addEventListener('load', done, { once: true });
+  el.src = src;
+});
+
+await waitFor(() => frame.contentDocument?.querySelector('.w-hero'), 'فتح الصفحة التعريفية');
+let doc = frame.contentDocument;
+frame.contentWindow.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+
+// ————— ١) الصفحة تُعرض كاملةً وبلا جافاسكربت —————
+
+ok(/المُعلِّم/.test(doc.title), `عنوان الصفحة: ${doc.title}`);
+for (const [id, label] of [
+  ['who', 'ما «المُعلِّم» ولمن'],
+  ['basis', 'الأسس الخمسة'],
+  ['journey', 'رحلة التعلم'],
+  ['install', 'تثبيت التطبيق'],
+  ['guide', 'دليل المعلم'],
+]) {
+  ok(!!doc.getElementById(id), `قسم «${label}» معروض`);
+}
+ok(doc.querySelectorAll('.w-basis .w-card').length === 5, 'والأسس خمس بطاقات');
+ok(doc.querySelectorAll('.w-guide .w-why').length === 4, 'ومسوّغات الدليل أربعة');
+ok(doc.querySelectorAll('.w-table tbody tr').length >= 19,
+  `وخريطةُ التسلسل كاملة (${doc.querySelectorAll('.w-table tbody tr').length} محطة في الجدول)`);
+ok(doc.scripts.length === 0, 'ولا سطر جافاسكربت في الصفحة (لا شيء فيها ينكسر)');
+ok(!doc.querySelector('link[rel="manifest"]'), 'ولا تصل بيان التطبيق (لا تُثبَّت مكانه)');
+
+// اللقطات `loading="lazy"` فلا تُطلب وهي خارج لوح الاختبار — تُستعجَل هنا، ثم
+// يُنتظر الخطُّ والصورة معاً قبل قراءة سجلّ الشبكة (وإلا قُرئ ناقصاً).
+for (const im of doc.images) im.loading = 'eager';
+await doc.fonts.ready;
+await waitFor(() => [...doc.images].every((im) => im.complete), 'تحميل الصور', 20000);
+
+const imgs = [...doc.images];
+const broken = imgs.filter((im) => !im.complete || !im.naturalWidth);
+ok(imgs.length >= 7 && broken.length === 0,
+  `وكل صورةٍ محمَّلة (${imgs.length} صورة${broken.length ? '، مكسورة: ' + broken.length : ''})`);
+const shots = imgs.filter((im) => im.src.includes('/welcome/shots/'));
+ok(shots.length === 6 && shots.every((im) => im.naturalWidth === 820),
+  `ولقطات الرحلة الستّ من التطبيق نفسه بمقاس الجهاز (${shots.length})`);
+
+// ————— ٢) لا طلب شبكيّ خارجيّ —————
+
+const entries = frame.contentWindow.performance.getEntriesByType('resource');
+const foreign = entries.filter((e) => !e.name.startsWith(location.origin));
+ok(entries.length > 0 && foreign.length === 0,
+  `لا طلب شبكيّ خارجيّ واحد (${entries.length} طلباً كلُّها محلّية)`
+  + (foreign.length ? ' — خارجيّ: ' + foreign.map((e) => e.name).join('، ') : ''));
+const failed = entries.filter((e) => e.responseStatus && e.responseStatus >= 400);
+ok(failed.length === 0,
+  `ولا طلبَ مكسور${failed.length ? ' — ' + failed.map((e) => e.name).join('، ') : ''}`);
+const fonts = entries.filter((e) => e.name.includes('/fonts/'));
+ok(fonts.length > 0, `وخطوطها من ملفات التطبيق المحلّية (${fonts.length} ملفاً)`);
+
+// ————— ٣) المقاسات وأهداف اللمس وزرّ البدء —————
+
+for (const width of [390, 820, 1280]) {
+  frame.style.width = `${width}px`;
+  await sleep(120);
+  const el = doc.documentElement;
+  ok(el.scrollWidth <= el.clientWidth + 1,
+    `لا تمرير أفقي عند عرض ${width}px (DESIGN §٤)`);
+}
+frame.style.width = '820px';
+await sleep(120);
+
+const start = [...doc.querySelectorAll('a.w-start')];
+ok(start.length >= 1 && start.every((a) => new URL(a.href).pathname === new URL('./', location.href).pathname),
+  `زرّ «ابدأ الآن» يشير إلى جذر التطبيق (${start.length} موضعاً)`);
+const tall = start.every((a) => a.getBoundingClientRect().height >= 64);
+ok(tall, 'وهدفُ لمسه ≥ ٦٤ بكسل (الفعل الرئيس — DESIGN §٤)');
+const small = [...doc.querySelectorAll('a.btn')]
+  .filter((a) => a.getBoundingClientRect().height < 48);
+ok(small.length === 0,
+  `وكل رابطٍ أزرارِيّ ≥ ٤٨ بكسل${small.length ? ' — ' + small.map((a) => a.textContent.trim()).join('، ') : ''}`);
+
+// النقر نفسه: الوجهةُ التطبيقُ لا صفحةٌ أخرى (ولا صفحةُ خطأ)
+const gone = new Promise((done) => frame.addEventListener('load', done, { once: true }));
+start[0].click();
+await gone;
+await waitFor(() => frame.contentDocument?.getElementById('app'), 'فتح التطبيق من زرّ البدء', 8000);
+ok(!!frame.contentDocument.getElementById('app')
+  && /المُعلِّم/.test(frame.contentDocument.title),
+  'ونقرُه يفتح التطبيق نفسَه (لا صفحةَ خطأ ولا وجهةً أخرى)');
+
+// ————— ٤) عاملُ الخدمة لا يبتلع الصفحة ولا يخزنها —————
+
+const reg = await waitFor(async () => {
+  const regs = await navigator.serviceWorker.getRegistrations();
+  return regs.find((r) => r.active) || null;
+}, 'تفعيل عامل الخدمة', 60000);
+ok(!!reg, `عامل الخدمة مسجَّل ونشط (${new URL(reg.scope).pathname})`);
+
+const names = await waitFor(async () => {
+  const all = await caches.keys();
+  return all.some((n) => n.startsWith('muallim-shell')) ? all : null;
+}, 'مخزون الهيكل', 30000);
+ok(names.some((n) => n.startsWith('muallim-shell')), `ومخزون التطبيق مُنشأ (${names.join('، ')})`);
+
+// أ) الفتحة بعد التفعيل: صفحةٌ تعريفية لا تطبيق (لولا الاستثناء لابتلعها ردُّ التنقّل)
+await load(frame, 'welcome/');
+await waitFor(() => frame.contentDocument?.querySelector('.w-hero'), 'إعادة فتح الصفحة', 8000);
+doc = frame.contentDocument;
+ok(!!doc.querySelector('.w-hero') && !doc.getElementById('app'),
+  'والفتحةُ بعده تعطي الصفحةَ التعريفية لا التطبيق (ردُّ التنقّل لا يبتلعها)');
+ok(!!doc.getElementById('guide'), 'وبكامل أقسامها');
+
+// ب) ولا يدخل منها شيءٌ في المخزون — لا صفحةً ولا تنسيقاً ولا لقطة
+const cachedWelcome = [];
+for (const name of await caches.keys()) {
+  const keys = await (await caches.open(name)).keys();
+  cachedWelcome.push(...keys.map((r) => new URL(r.url).pathname)
+    .filter((p) => p.includes('/welcome/')));
+}
+ok(cachedWelcome.length === 0,
+  `ولا يُخزَّن منها شيء${cachedWelcome.length ? ' — خُزن: ' + cachedWelcome.join('، ') : ''}`);
+
+// ج) والتطبيق نفسه بخير: مخزونُه قائمٌ كما كان (الاستثناء لم يمسّه)
+const shell = await caches.open((await caches.keys()).find((n) => n.startsWith('muallim-shell')));
+const shellPaths = (await shell.keys()).map((r) => new URL(r.url).pathname);
+ok(shellPaths.some((p) => p.endsWith('/index.html')) && shellPaths.some((p) => p.endsWith('/css/app.css')),
+  `والتطبيق مخزونٌ كما كان (${shellPaths.length} ملفاً)`);
+ok(!!appFrame.contentDocument?.querySelector('.map, .screen, .boot'),
+  'والتطبيق يعمل في اللوح المجاور (الصفحة لم تُفسد شيئاً)');
+
+ok(jsErrors.length === 0,
+  jsErrors.length ? 'أخطاء جافاسكربت: ' + jsErrors.join(' | ') : 'لا أخطاء جافاسكربت');
+post();
+</script>
+</body>
+</html>
