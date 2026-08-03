@@ -49,6 +49,19 @@ sha1 البايتات) يطلب به التطبيق `<key>.mp3?v=<بصمة>` —
 .venv/bin/python tools/import_recordings.py ~/rec        # استيراد التسجيلات (قصّ + تطبيع)
 ```
 
+**ونصّ المصحف خارج هذا كلّه** (METHOD §٥.٦): لا يُولَّد صوتُه ولا يُنطق آلياً — تلاوتُه من
+تسجيل قارئٍ متقن، مسارُها مستقلّ عن المولّد وعن فهرسه:
+
+```bash
+python3 tools/fetch_recitation.py                        # تلاوة الآيات (الحصري المرتّل)
+python3 tools/fetch_recitation.py --sync-only            # إعادة بناء بيانها بلا شبكة
+python3 tools/fetch_word_recitation.py --sources         # تلاوة الكلمة المفردة: حال ترخيص كل مصدر
+python3 tools/fetch_word_recitation.py --dry-run         # ما سيُجلب ومن أين (بلا شبكة)
+```
+
+جلبُ تلاوة الكلمة **مقفلٌ ببوّابة ترخيص**: لا يعمل حتى يُقِرّ إنسانٌ قرأ رخصةَ المصدر
+(`--approve-license`) ويُسنِده في `CREDITS.md`. وحتى ذلك تعمل محطات «كلمات السورة» صامتةً.
+
 المفتاح `GEMINI_API_KEY` يُقرأ من البيئة أو من `.env` (غير مُتتبَّع في git ولا يُطبع).
 
 ## الفحوص
@@ -61,10 +74,11 @@ node tools/test_icons.mjs            # «صدق الصورة»: المستعصي
 python3 tools/test_queue.py          # تصريف قائمة الانتظار الصوتية (بلا شبكة)
 node tools/test_progress.mjs         # قواعد القفل والنجوم وسجلّ المهارات والتكرار المتباعد
 node tools/test_gate.mjs             # بوابتا الإتقان: موضعهما وعتبتهما ومادّتهما والترحيل الرحيم
+node tools/test_contrast.mjs         # محطتا «ميّز بين»: أزواج المتشابهات ومفكوكيتها وقياسها
 node tools/test_lesson.mjs           # مفكوكية جولات درس الحرف
 node tools/test_words.mjs            # مفكوكية ألواح لعبة الكلمات وتغطية أصواتها
 node tools/test_review.mjs           # جلسة المراجعة (مفكوكيتها وتغطية أصواتها) واللوحة
-node tools/test_quran.mjs            # المرحلة القرآنية وأصالة نصّ المصحف
+node tools/test_quran.mjs            # المرحلة القرآنية وأصالة نصّ المصحف و«الجسر القرآني» (كلمات السورة)
 node tools/test_lexicon.mjs          # المعجم والبساتين ووصل قياسها بالمراجعة
 node tools/test_pwa.mjs              # العمل دون إنترنت
 node tools/test_audio_cache.mjs      # بصمات المحتوى وكسر كاش الصوت (سيناريو استبدال كامل)
@@ -75,6 +89,7 @@ python3 tools/browser_test.py --story    # دروس المهارات وشاشة 
 python3 tools/browser_test.py --quran    # المرحلة القرآنية والعمل دون إنترنت
 python3 tools/browser_test.py --garden   # بساتين الموضوعات (حديقة الكلمات)
 python3 tools/browser_test.py --gate     # بوابتا الإتقان (عبور وإخفاق وإعادة وترحيل)
+python3 tools/browser_test.py --contrast # محطتا «ميّز بين» (المواجهة و«اسمع الفرق»)
 python3 tools/browser_test.py --map      # الخريطة: جبهة الفتح والطيّ الكسول وقياس سرعتهما
 python3 tools/browser_test.py --device   # مقاسات آيباد حقيقية: لا سحبَ في الوضع العرضي ولا فائض أفقي
 python3 tools/browser_test.py --device --metrics   # معايرة توسيط الحرف البطل في صندوقه

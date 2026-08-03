@@ -1329,6 +1329,58 @@ button {
 .muq-head small { color: var(--ink-soft); }
 .muq-card .vrow { margin-top: .5rem; }
 
+/* ————— محطة «كلمات السورة» (الحزمة ١٢): بطاقاتٌ تُسمع، ثم «جِدْها في الآية» ————— */
+
+/* شبكةٌ تنساب: كلمات السورة كلها في مساحةٍ واحدة، أكبرها لا يُقصّ ولا يُخرج الصفحة */
+.sw-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5rem;
+  margin: 1rem 0 .5rem;
+}
+
+.vchip--mushaf { min-width: 0; padding: .45rem .7rem; }
+.vchip--mushaf .vchip-face { font-size: 1.7rem; line-height: 1.9; white-space: nowrap; }
+
+/* الكلمة المطلوبة: أكبر ما في الشاشة — هي السؤال كلُّه */
+.sw-target {
+  margin: .5rem 0 .25rem;
+  color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+}
+
+/* الآية كاملةً وكلماتُها أزرار: النصّ حرفيّ، والتقطيع عرضٌ لا تعديل */
+.sw-ayah {
+  display: flex;
+  flex-wrap: wrap;
+  /* بلا `row-reverse`: الصفحة RTL أصلاً، فالمحور يسير يمنةً-يسرة كما يُقرأ النصّ —
+     وعكسُه يقلب كلمات الآية على الشاشة (أمسكه اختبارُ المتصفّح بمواضع الأزرار). */
+  justify-content: center;
+  gap: .25rem;
+  margin: .5rem 0;
+  padding: .9rem .6rem;
+  border-radius: 18px;
+  border: 3px double color-mix(in srgb, var(--star) 60%, var(--mix));
+  background: color-mix(in srgb, var(--star) 6%, var(--card));
+}
+
+.sw-word {
+  padding: .3rem .45rem;
+  border-radius: 12px;
+  font-size: 1.9rem;
+  line-height: 2;
+  transition: background .15s ease, transform .15s ease;
+}
+
+.sw-word:active { transform: scale(.96); }
+
+.sw-word.good {
+  background: color-mix(in srgb, var(--ok) 26%, var(--mix));
+  color: var(--ok-text);
+}
+
+.sw-word.bad { background: color-mix(in srgb, var(--err) 16%, var(--mix)); }
+
 /* صفحة السورة: إطار مزدوج بالذهبي المطفأ — وقار بلا بهرجة */
 .sheet--mushaf {
   padding: 1.1rem .8rem;

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>لقطات محطتَي «ميّز بين»</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; align-items: start; }
+    .cell { background: rgba(255,255,255,.35); border-radius: 24px; padding: .5rem; }
+    .cell > h4 { margin: .2rem 0 .4rem; text-align: center; color: #b8720a; }
+    .app { max-width: none; padding: 0; }
+    .dev { display: none; }   /* أدوات التجربة تُستعمل للقيادة فقط ولا تدخل اللقطة */
+  </style>
+</head>
+<body>
+<div id="toast" class="toast" hidden></div>
+<div class="grid" id="grid"></div>
+
+<script>
+// عطبٌ في صفحة اللقطات يُكتب في الصفحة نفسها — فاللقطة البيضاء الصامتة تحيّر
+const shout = (what) => {
+  const box = document.createElement('pre');
+  box.style.cssText = 'color:#b00;font:14px/1.6 monospace;white-space:pre-wrap';
+  box.textContent = 'عطب: ' + what;
+  document.body.prepend(box);
+};
+window.addEventListener('error', (e) => shout(e.message));
+window.addEventListener('unhandledrejection', (e) => shout(e.reason?.stack || e.reason));
+</script>
+
+<script type="module">
+import { renderContrast } from './js/contrast.js';
+import * as progress from './js/progress.js';
+import * as audio from './js/audio.js';
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/** تفريغ المهامّ الدقيقة: `audio.play` تنتظر الفهرس، فلا يُعرَف المسموع قبل تفريغها. */
+const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
+
+// صوت لا ينتهي أبداً (تُجمَّد الحالة المعروضة)، **ويسجّل نصّ ما شُغِّل** كي نعرف الهدف
+// المسموع فنقود الجولة إلى خطأٍ حقيقيّ (لقطة «اسمع الفرق») لا إلى نقرةٍ عمياء.
+const manifest = await (await fetch('audio/manifest.json')).json();
+let heard = '';
+// `preload` يبني `new Audio()` بلا مصدرٍ ثم يسنده — فلو سجّلنا كلَّ بناءٍ لمحا التحميلُ
+// المسبق اسمَ الهدف المسموع، ولنُقر على غير علم. فلا يُسجَّل إلا بناءٌ بمصدرٍ حقيقيّ.
+window.Audio = class {
+  constructor(src = '') {
+    const text = manifest[(src.split('/').pop() || '').split('?')[0].replace('.mp3', '')];
+    if (text) heard = text;
+  }
+  play() { return new Promise(() => {}); }
+  pause() {}
+};
+
+const grid = document.getElementById('grid');
+const $$ = (root, sel) => [...root.querySelectorAll(sel)];
+
+function cell(title, node) {
+  const box = document.createElement('div');
+  box.className = 'cell';
+  box.innerHTML = `<h4>${title}</h4>`;
+  const app = document.createElement('div');
+  app.className = 'app';
+  app.append(node);
+  box.append(app);
+  grid.append(box);
+  return app;
+}
+
+// طفلٌ أتمّ الرحلة حتى محطة المواجهة الأولى (لم يلعبها بعد)
+for (const node of progress.allNodes()) {
+  if (node.id === 'contrast:alike') break;
+  progress.setStars(node.id, 3);
+}
+
+const hit = (app, label) => $$(app, '.btn').find((b) => b.textContent.includes(label))?.click();
+const finish = (app) =>
+  $$(app, '.dev .btn').find((b) => b.textContent.includes('إنهاء المحطة'))?.click();
+const chipOf = (app, text) =>
+  $$(app, '.vchip--big').find((c) => c.querySelector('.vchip-face').textContent === text);
+
+// **مؤقّتات فورية أثناء القيادة** (كلقطات البوابة): الجولة تُسمِع هدفها بعد ٢٥٠ م.ث،
+// ولو انتظرناها بـ`await` لالتُقطت اللقطة في منتصف البناء.
+const realTimeout = window.setTimeout;
+window.setTimeout = (fn, ms) => (typeof fn === 'function' ? (fn(), 0) : realTimeout(fn, ms));
+
+await audio.ready();                                     // الفهرس محمَّلٌ قبل أول تشغيل
+
+// ١) خطوة «قارِن»: طرفا كل زوج جنباً إلى جنب بحركة واحدة
+cell('١ — قارِن: أزواج المتشابهات', renderContrast('alike'));
+
+// ٢) جولة «أيَّ حرف سمعت؟» — الخياران هما الزوج نفسه
+const quiz = cell('٢ — أيَّ حرف سمعت؟', renderContrast('alike'));
+hit(quiz, 'تابع');
+await flush();
+
+// ٣) «اسمع الفرق»: خطأٌ مقصود — تُنقَر نقرتُه في آخر الصفحة كي يبقى أثرُ الخطأ
+// ظاهراً في اللقطة (التلوين يُرفَع بعد ٧٠٠ م.ث، فلو نُقر الآن لمُحي قبل الالتقاط).
+const diff = cell('٣ — الخطأ: اسمع الفرق', renderContrast('alike'));
+hit(diff, 'تابع');
+await flush();
+const wrongChip = $$(diff, '.vchip--big').find((c) => c !== chipOf(diff, heard));
+
+// ٤) الختام: نجومٌ بعد المواجهة
+const done = cell('٤ — ختام المحطة', renderContrast('alike-hard'));
+finish(done);
+
+window.setTimeout = realTimeout;                         // ثم تعود المؤقّتات إلى طبعها
+
+// ٥) الخريطة: محطة المواجهة بين المجموعتين ٦ و٧
+Element.prototype.scrollIntoView = () => {};
+const map = cell('٥ — الخريطة: محطة المواجهة', document.createElement('div'));
+map.id = 'app';
+await import('./js/main.js');   // يرسم الخريطة في #app (لا مسار في الرابط ⇒ الخريطة)
+
+// الخريطة كلها لا تُلتقط في لقطة: نُبقي بطاقة «تابع» ومحطة المواجهة وجارتيها
+const track = map.querySelector('.map');
+if (track) {
+  const kids = [...track.children];
+  const at = kids.findIndex((el) => el.classList.contains('station--contrast'));
+  track.replaceChildren(
+    ...kids.filter((el) => el.classList.contains('continue')),
+    ...kids.slice(Math.max(0, at - 2), at + 3),
+  );
+}
+
+// نقرةُ الخطأ آخرَ شيء: تلوينُها يُرفَع بعد ٧٠٠ م.ث، فلو نُقرت قبل بناء الخريطة لمُحيت
+wrongChip?.click();
+
+// مهلةٌ قبل حدث التحميل: بها يتخطّط المبنيّ حديثاً ويُرسَم قبل التقاط اللقطة
+await sleep(400);
+</script>
+</body>
+</html>

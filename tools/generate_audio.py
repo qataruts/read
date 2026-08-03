@@ -488,6 +488,7 @@ def synthesize_gemini(texts: dict, model: str, voice: str, force: bool, api_key,
     total = len(texts)
 
     for i, (text, cat) in enumerate(texts.items(), 1):
+        checkpoint_pause()
         path = OUT_DIR / f"{key_for(text)}.mp3"
         stale = replace_same_as is not None and path.exists() and is_same_as(path, replace_same_as)
         if path.exists() and not force and not stale:
@@ -752,6 +753,29 @@ def mark_done(text: str, model: str) -> None:
     return changed
 
 
+COMMIT_LOCK = ROOT / "scratch" / "commit.lock"
+LOCK_POLL_SEC = 5.0
+
+
+def checkpoint_pause() -> None:
+    """قفل نقطة التفتيش: يُدعى قبل بدء كل ملف — فيتمّ الجاري ثم ينتظر رفع القفل.
+
+    النشر يقرأ من git وطفلة المالك على النسخة المنشورة، فيلتزم المدير لقطةً كل يوم
+    بلا إيقاف التصريف. وكي تكون اللقطة **صحيحة** لا ساكنة فقط، يُكتب الفهرس
+    والبصمات قبل الانتظار: فلا تُلتقط ملفاتٌ لا يعرفها الفهرس.
+    """
+    if not COMMIT_LOCK.exists():
+        return
+    print("  ⏸ نقطة تفتيش: وُجد قفل الالتزام — يُغلق الفهرس ثم ينتظر رفعه…",
+          file=sys.stderr)
+    write_manifest(manifest_map())
+    waited = 0.0
+    while COMMIT_LOCK.exists():
+        time.sleep(LOCK_POLL_SEC)
+        waited += LOCK_POLL_SEC
+    print(f"  ▶ رُفع القفل بعد {waited:.0f}ث — يستأنف التوليد", file=sys.stderr)
+
+
 def mark_failed(text: str, model: str) -> None:
     """يقيّد إخفاق نصٍّ على نموذج — دمجاً لا استبدالاً كـ`mark_done`.
 
@@ -896,6 +920,7 @@ def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
     exhausted = {}                              # نموذج ← ثوانٍ حتى تجدد حصص مفاتيحه كلها
     empty_streak = collections.Counter()        # إخفاقات «بلا صوت» متتابعة لكل نموذج
     for n, (_idx, entry, m) in enumerate(plan, 1):
+        checkpoint_pause()                      # قفل الالتزام: يتمّ الجاري ثم ينتظر
         if m in exhausted:                      # حصته نفدت أو تدهورت — لا طلب آخر عليها
             continue
         text = entry["text"]
@@ -1112,6 +1137,7 @@ def madd_batch(api_key, voice: str, variants: int = MADD_VARIANTS,
     pool = api_key if isinstance(api_key, KeyPool) else KeyPool([("GEMINI_API_KEY", api_key)], voice)
     made = failed = 0
     for text, v in todo:
+        checkpoint_pause()
         path = MADD_DIR / f"{key_for(text)}__{v}.mp3"
         try:
             pcm, rate, _key = pool.call(text, MADD_STYLE, MODEL_CORE)

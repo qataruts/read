@@ -236,6 +236,27 @@ def main():
     gen.INDEPENDENCE_FILE, gen.gemini_pcm = real_ind, real_pcm
     shutil.rmtree(tmp)
 
+    # ————— ٥د. «ما فشل في نموذج يعود لـ3.1» (سياسة AUDIO_QUEUE) —————
+    print("تحويل الفاشل إلى نموذج النواة:")
+    tmp = sandbox([
+        {"text": "وَرْدَةْ", "category": "word", "requestedBy": "session-6",
+         "priority": 100, "status": "pending", "doneAt": None},
+    ])
+    calls = []
+    stub(calls, empty_on={"وَرْدَةْ"})
+    gen.drain_queue(None, "Sulafat", "k")
+    entry = gen.load_queue()[0]
+    ok(entry.get("failCount") == 1 and entry.get("lastFailModel") == gen.MODEL_LEXICON,
+       "الإخفاق يُقيَّد في المدخل مع نموذجه")
+    ok(gen.route_model(entry, True) == gen.MODEL_CORE,
+       "وفي الجولة التالية يُوجَّه إلى 3.1 بدل النموذج الذي أخفق")
+    calls.clear()
+    stub(calls)
+    gen.drain_queue(None, "Sulafat", "k")
+    ok(gen.load_queue()[0]["model"] == gen.MODEL_CORE,
+       "فيُولَّد فعلاً بنموذج النواة ويُسجَّل به")
+    shutil.rmtree(tmp)
+
     # ————— ٦. نموذج بدأ يردّ بلا صوت: يُنحّى بدل حرق بقية حصته —————
     print("صون الحصة من الاستجابات الفارغة:")
     words = ["أَلِفْ", "بَاءْ", "تَاءْ", "ثَاءْ", "جِيمْ"]
