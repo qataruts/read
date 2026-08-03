@@ -118,6 +118,87 @@ def parse_curriculum(src: str) -> dict:
 
 # ————————————————————————— المفتاح والبيئة —————————————————————————
 
+KEY_NAMES = ("GEMINI_API_KEY", "GEMINI_API_KEY_PRO")
+INDEPENDENCE_FILE = ROOT / "scratch" / "key_independence.json"
+
+
+def read_keys() -> list:
+    """[(اسم المفتاح، قيمته)] بالترتيب — القيم لا تُطبع في أي مخرَج أبداً."""
+    out = []
+    for name in KEY_NAMES:
+        val = read_env_key(name)
+        if val and all(val != v for _n, v in out):     # مفتاح مكرر لا يفيد
+            out.append((name, val))
+    return out
+
+
+def note_independence(model: str, blocked: str, worked: str, seconds: dict) -> None:
+    """يسجّل نتيجة اختبار الاستقلال متى وقع طبيعياً (بلا طلب مهدور).
+
+    الحصص نوافذ متدحرجة، فحالة «مستنفَد» لا تُطلب عند الحاجة؛ ولذلك يُجرى الاختبار
+    حيث يقع وحده: أول 429 يوميّ لمفتاحٍ على نموذج، يُعاد الطلب بالمفتاح الآخر.
+    """
+    INDEPENDENCE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    data = {}
+    if INDEPENDENCE_FILE.exists():
+        try:
+            data = json.loads(INDEPENDENCE_FILE.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            data = {}
+    verdict = "مستقلّان" if worked else "المشروع نفسه (نافذتا تجدد متقاربتان)"
+    data[model] = {"testedAt": TODAY, "blockedKey": blocked, "otherKey": worked or "—",
+                   "verdict": verdict, "retrySeconds": seconds}
+    INDEPENDENCE_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=1),
+                                 encoding="utf-8")
+    print(f"  🔑 اختبار الاستقلال على {short_model(model)}: {verdict}"
+          + (f" — يواصل بـ{worked}" if worked else ""))
+
+
+class KeyPool:
+    """مفاتيح متعددة بحساب حصةٍ مستقلٍّ لكل (مفتاح × نموذج).
+
+    نفاد حصة نموذجٍ على مفتاح لا يوقفه على الآخر، ولا يوقف بقية النماذج على الأول.
+    """
+
+    def __init__(self, keys: list, voice: str):
+        self.keys = keys
+        self.voice = voice
+        self.exhausted = {}                 # (اسم المفتاح، نموذج) ← ثوانٍ حتى التجدد
+        self.used = collections.Counter()   # (اسم المفتاح، نموذج) ← عدد ما وُلِّد
+
+    def available(self, model: str) -> list:
+        return [(n, v) for n, v in self.keys if (n, model) not in self.exhausted]
+
+    def all_exhausted(self, model: str) -> bool:
+        return not self.available(model)
+
+    def retry_seconds(self, model: str) -> int:
+        secs = [s for (n, m), s in self.exhausted.items() if m == model]
+        return min(secs) if secs else 3600
+
+    def call(self, text: str, style: str, model: str) -> tuple[bytes, int, str]:
+        """يجرّب المفاتيح المتاحة لهذا النموذج بالترتيب؛ يرفع QuotaExhausted متى نفدت كلها."""
+        blocked = None
+        for name, value in self.available(model):
+            try:
+                pcm, rate = gemini_pcm(text, style, model, self.voice, value,
+                                       pace_key=f"{name}:{model}")
+                if blocked:                 # نجح الثاني بعد نفاد الأول = دليل الاستقلال
+                    note_independence(model, blocked, name,
+                                      {blocked: self.exhausted[(blocked, model)]})
+                self.used[(name, model)] += 1
+                return pcm, rate, name
+            except QuotaExhausted as e:
+                self.exhausted[(name, model)] = e.seconds
+                print(f"  ⏸ {short_model(model)} · {name}: {e}", file=sys.stderr)
+                if blocked:                 # نفد الاثنان: قارن نافذتَي التجدد
+                    first = self.exhausted[(blocked, model)]
+                    if abs(first - e.seconds) < 300:
+                        note_independence(model, blocked, "", {blocked: first, name: e.seconds})
+                blocked = blocked or name
+        raise QuotaExhausted(self.retry_seconds(model))
+
+
 def read_env_key(name: str = "GEMINI_API_KEY") -> str | None:
     """المفتاح من البيئة أو .env بمحلّل بسيط (لا حزم جديدة، ولا طباعة للقيمة)."""
     val = os.environ.get(name)
@@ -194,7 +275,7 @@ class EmptyAudio(TTSError):
 
 
 def gemini_pcm(text: str, style: str, model: str, voice: str, api_key: str,
-               retries: int = 5, empty_retries: int = 2) -> tuple[bytes, int]:
+               retries: int = 5, empty_retries: int = 2, pace_key: str = "") -> tuple[bytes, int]:
     """يعيد (PCM خام 16-bit little-endian، معدّل العيّنات). يعيد المحاولة عند 429/5xx.
 
     `style` تعليمة الأداء التي تسبق النص (لا تُنطق) — انظر STYLE.
@@ -219,7 +300,7 @@ def gemini_pcm(text: str, style: str, model: str, voice: str, api_key: str,
             "x-goog-api-key": api_key,
         })
         try:
-            _pace(model)
+            _pace(pace_key or model)
             with urllib.request.urlopen(req, timeout=180) as resp:
                 payload = json.loads(resp.read().decode("utf-8"))
             return extract_audio(payload)
@@ -359,8 +440,9 @@ def is_same_as(path: Path, ref_dir: Path) -> bool:
     return ref.exists() and ref.read_bytes() == path.read_bytes()
 
 
-def synthesize_gemini(texts: dict, model: str, voice: str, force: bool, api_key: str,
+def synthesize_gemini(texts: dict, model: str, voice: str, force: bool, api_key,
                       replace_same_as: Path | None = None, dry_run: bool = False) -> int:
+    pool = api_key if isinstance(api_key, KeyPool) else KeyPool([("GEMINI_API_KEY", api_key)], voice)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     # الفهرس يُبنى كاملاً قبل التوليد كي يبقى صحيحاً حتى لو توقّف التوليد في منتصفه،
     # ويضمّ منجَز قائمة الانتظار كي لا يسقط منه ما صُرِّف سابقاً.
@@ -379,7 +461,7 @@ def synthesize_gemini(texts: dict, model: str, voice: str, force: bool, api_key:
             print(f"  [{i}/{total}] ⟶ {text} ({CATEGORY_AR[cat]}) → {path.name}")
             continue
         try:
-            pcm, rate = gemini_pcm(text, STYLE[cat], model, voice, api_key)
+            pcm, rate, _key = pool.call(text, STYLE[cat], model)
             pcm_to_mp3(pcm, rate, path)
             made += 1
             print(f"  [{i}/{total}] ✓ {text} ({CATEGORY_AR[cat]}) → {path.name} "
@@ -722,7 +804,7 @@ def short_model(model: str) -> str:
     return model.replace("gemini-", "").replace("-preview", "").replace("-tts", "")
 
 
-def drain_queue(model: str | None, voice: str, api_key: str, dry_run: bool = False,
+def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
                 only_model: str = "") -> int:
     """تصريف القائمة بالترتيب على حصص اليوم الثلاث (سياسة النماذج الثلاثة).
 
@@ -752,9 +834,10 @@ def drain_queue(model: str | None, voice: str, api_key: str, dry_run: bool = Fal
     if held:
         print(f"  · محبوس حتى إجازة المالك ({short_model(MODEL_LEXICON)}): {len(held)} نصاً")
 
+    pool = api_key if isinstance(api_key, KeyPool) else KeyPool([("GEMINI_API_KEY", api_key)], voice)
     made = failed = 0
     done_by_model = collections.Counter()
-    exhausted = {}                              # نموذج ← ثوانٍ حتى تجدد حصته
+    exhausted = {}                              # نموذج ← ثوانٍ حتى تجدد حصص مفاتيحه كلها
     empty_streak = collections.Counter()        # إخفاقات «بلا صوت» متتابعة لكل نموذج
     for n, (_idx, entry, m) in enumerate(plan, 1):
         if m in exhausted:                      # حصته نفدت أو تدهورت — لا طلب آخر عليها
@@ -769,7 +852,7 @@ def drain_queue(model: str | None, voice: str, api_key: str, dry_run: bool = Fal
             made += 1
             continue
         try:
-            pcm, rate = gemini_pcm(text, style_for(entry), m, voice, api_key)
+            pcm, rate, used_key = pool.call(text, style_for(entry), m)
             pcm_to_mp3(pcm, rate, path)
             mark_done(text, m)                  # دمجاً لا استبدالاً — وبعد كل نصّ
             made += 1
@@ -812,6 +895,9 @@ def drain_queue(model: str | None, voice: str, api_key: str, dry_run: bool = Fal
     if done_by_model:
         print("  المولَّد: " + "، ".join(f"{short_model(m)}: {n}"
                                           for m, n in done_by_model.most_common()))
+    if pool.used:
+        print("  بالمفاتيح: " + "، ".join(f"{n}·{short_model(m)}: {c}"
+                                            for (n, m), c in pool.used.most_common()))
     if left_by_model:
         print("  المتبقي: " + "، ".join(f"{m}: {n}" for m, n in left_by_model.most_common()))
     return failed
@@ -941,7 +1027,7 @@ def madd_targets() -> list:
     return sorted(out)
 
 
-def madd_batch(api_key: str, voice: str, variants: int = MADD_VARIANTS,
+def madd_batch(api_key, voice: str, variants: int = MADD_VARIANTS,
                dry_run: bool = False) -> int:
     """ثلاث محاولات لكل مدّ ناقص على نموذج النواة وحده (2.5-pro موثَّق فشلُه في «بَا»).
 
@@ -961,11 +1047,12 @@ def madd_batch(api_key: str, voice: str, variants: int = MADD_VARIANTS,
         print("  " + " ".join(targets))
         return 0
 
+    pool = api_key if isinstance(api_key, KeyPool) else KeyPool([("GEMINI_API_KEY", api_key)], voice)
     made = failed = 0
     for text, v in todo:
         path = MADD_DIR / f"{key_for(text)}__{v}.mp3"
         try:
-            pcm, rate = gemini_pcm(text, MADD_STYLE, MODEL_CORE, voice, api_key)
+            pcm, rate, _key = pool.call(text, MADD_STYLE, MODEL_CORE)
             pcm_to_mp3(pcm, rate, path)
             made += 1
             print(f"  ✓ {text} [{v}/{variants}] → {path.name} {path.stat().st_size // 1024}KB")
@@ -1396,14 +1483,16 @@ def main():
     if args.verify_only:
         sys.exit(1 if verify(texts, pending) else 0)
 
-    api_key = read_env_key()
+    keys = read_keys()
+    api_key = keys[0][1] if keys else None
+    pool = KeyPool(keys, args.tts_voice) if keys else None
     engine = args.engine or ("gemini" if api_key else "edge")
 
     if args.madd_batch:
         if not api_key and not args.dry_run:
             sys.exit("الاحتياط التوليدي يحتاج GEMINI_API_KEY")
         set_rpm(args.rpm)
-        sys.exit(1 if madd_batch(api_key or "", args.tts_voice,
+        sys.exit(1 if madd_batch(pool, args.tts_voice,
                                  args.madd_variants, args.dry_run) else 0)
 
     if args.model_audition:
@@ -1420,8 +1509,9 @@ def main():
         # بلا --model صريح: التوجيه بالمحتوى (سياسة النماذج الثلاثة)
         forced = args.model if args.model != DEFAULT_MODEL else None
         print(f"تصريف القائمة · {'النموذج ' + forced if forced else 'توجيه بالمحتوى'} "
-              f"· الصوت {args.tts_voice} · ≤{args.rpm:g} طلب/دقيقة لكل نموذج")
-        failed = drain_queue(forced, args.tts_voice, api_key, args.dry_run, args.only_model)
+              f"· الصوت {args.tts_voice} · ≤{args.rpm:g} طلب/دقيقة لكل مفتاح ونموذج "
+              f"· مفاتيح: {'، '.join(n for n, _v in keys)}")
+        failed = drain_queue(forced, args.tts_voice, pool, args.dry_run, args.only_model)
         if args.dry_run:
             return
         texts, pending = expected_texts()
@@ -1457,7 +1547,7 @@ def main():
             ref = ROOT / args.replace_same_as
             if not ref.is_dir():
                 sys.exit(f"مجلد المرجع غير موجود: {ref}")
-        failed = synthesize_gemini(curriculum, args.model, args.tts_voice, args.force, api_key,
+        failed = synthesize_gemini(curriculum, args.model, args.tts_voice, args.force, pool,
                                    ref, args.dry_run)
         if args.dry_run:
             return

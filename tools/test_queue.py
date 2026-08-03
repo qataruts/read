@@ -199,6 +199,43 @@ def main():
     ok(gen.load_queue()[2]["status"] == "pending", "والوافد الجديد يبقى منتظِراً لجولة تالية")
     shutil.rmtree(tmp)
 
+    # ————— ٥ج. مفتاحان: نفاد حصة أحدهما لا يوقف الآخر —————
+    print("مجمّع المفاتيح:")
+    real_ind, real_pcm = gen.INDEPENDENCE_FILE, gen.gemini_pcm
+    tmp = Path(tempfile.mkdtemp())
+    gen.INDEPENDENCE_FILE = tmp / "ind.json"
+    paces = []
+
+    def two_keys(text, style, model, voice, key, retries=5, empty_retries=2, pace_key=""):
+        paces.append(pace_key)
+        if key == "K1":
+            raise gen.QuotaExhausted(70000)
+        return b"\x00\x01" * 2400, 24000
+
+    gen.gemini_pcm = two_keys
+    pool = gen.KeyPool([("KEY_A", "K1"), ("KEY_B", "K2")], "Sulafat")
+    _pcm, _rate, used = pool.call("بَا", gen.MADD_STYLE, gen.MODEL_CORE)
+    ok(used == "KEY_B", "نفاد حصة المفتاح الأول يُكمَل بالثاني بلا انتظار")
+    ok(paces == [f"KEY_A:{gen.MODEL_CORE}", f"KEY_B:{gen.MODEL_CORE}"],
+       "الإيقاع يُحسب لكل (مفتاح × نموذج) على حدة")
+    ok(pool.available(gen.MODEL_SENTENCE) == pool.keys,
+       "نفاد نموذجٍ على مفتاح لا يمسّ نماذجه الأخرى")
+    verdict = json.loads(gen.INDEPENDENCE_FILE.read_text(encoding="utf-8"))
+    ok(verdict[gen.MODEL_CORE]["verdict"] == "مستقلّان",
+       "نجاحُ الثاني بعد نفاد الأول يُسجَّل دليلَ استقلال آلياً")
+
+    gen.gemini_pcm = lambda *a, **k: (_ for _ in ()).throw(gen.QuotaExhausted(500))
+    try:
+        pool.call("بِي", gen.MADD_STYLE, gen.MODEL_SENTENCE)
+        ok(False, "نفاد كل المفاتيح يرفع QuotaExhausted")
+    except gen.QuotaExhausted as e:
+        ok(e.seconds == 500, "ونفادها كلها يرفع الاستثناء بأقرب مهلة تجدد")
+    verdict = json.loads(gen.INDEPENDENCE_FILE.read_text(encoding="utf-8"))
+    ok(verdict[gen.MODEL_SENTENCE]["verdict"].startswith("المشروع نفسه"),
+       "وتقارُبُ نافذتَي التجدد يُسجَّل «المشروع نفسه»")
+    gen.INDEPENDENCE_FILE, gen.gemini_pcm = real_ind, real_pcm
+    shutil.rmtree(tmp)
+
     # ————— ٦. نموذج بدأ يردّ بلا صوت: يُنحّى بدل حرق بقية حصته —————
     print("صون الحصة من الاستجابات الفارغة:")
     words = ["أَلِفْ", "بَاءْ", "تَاءْ", "ثَاءْ", "جِيمْ"]
