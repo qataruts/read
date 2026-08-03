@@ -130,7 +130,7 @@ export const GROUPS = [
     words: [
       { tiles: ['شَ', 'مْ', 'سْ'], say: 'شمس', emoji: '☀️' },
       { tiles: ['مَ', 'طَ', 'رْ'], say: 'مطر', emoji: '🌧️' },
-      { tiles: ['زَيْ', 'تْ'], say: 'زيت', emoji: '🫒' },
+      { tiles: ['زَيْ', 'تْ'], say: 'زيت', emoji: '🫗' },
       { tiles: ['صَا', 'رُو', 'خْ'], say: 'صاروخ', emoji: '🚀' },
       { tiles: ['قِ', 'طَا', 'رْ'], say: 'قطار', emoji: '🚆' },
     ],
