@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v17';  // v17: خفوت التشكيل ز١→ز٣ (وحدة fade.js في القشرة)
+const VERSION = 'v18';  // v18: القرآني الموسّع (ثماني سور + خطوة الترديد بكتلة record.js)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -62,6 +62,7 @@ const SHELL = [
   'js/progress.js',
   'js/quran.js',
   'js/recitation.js',
+  'js/record.js',
   'js/recorder.js',
   'js/recordings.js',
   'js/review.js',

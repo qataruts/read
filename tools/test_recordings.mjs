@@ -41,7 +41,7 @@ const codeOf = (src) => src
 const NET = ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'WebSocket', 'EventSource',
   'FormData', 'navigator.connection', 'http://', 'https://', '.upload'];
 
-const carriers = ['recorder.js', 'recordings.js', 'story.js', 'parent.js'];
+const carriers = ['recorder.js', 'recordings.js', 'record.js', 'story.js', 'parent.js'];
 for (const file of carriers) {
   const code = codeOf(read(`js/${file}`));
   const found = NET.filter((token) => code.includes(token));
@@ -62,9 +62,9 @@ ok(!recorderCode.includes("from './audio.js'") && !storeCode.includes("from './a
 
 // ولا يُسرَّب الصوت عبر وحدةٍ أخرى: كل ملفٍّ يذكر `blob` هو أحد حامليه المفحوصين
 const modules = ['audio.js', 'curriculum.js', 'garden.js', 'ladder.js', 'lesson.js', 'lexicon.js',
-  'library.js', 'main.js', 'parent.js', 'progress.js', 'quran.js', 'recitation.js', 'recorder.js',
-  'recordings.js', 'review.js', 'screens.js', 'sentences.js', 'skill.js', 'story.js', 'ui.js',
-  'words.js'];
+  'library.js', 'main.js', 'parent.js', 'progress.js', 'quran.js', 'recitation.js', 'record.js',
+  'recorder.js', 'recordings.js', 'review.js', 'screens.js', 'sentences.js', 'skill.js',
+  'story.js', 'ui.js', 'words.js'];
 const blobbed = modules.filter((f) => /blob/i.test(codeOf(read(`js/${f}`))));
 ok(blobbed.every((f) => carriers.includes(f)),
   `ولا يمسّ الصوتَ ملفٌّ خارج هؤلاء الأربعة (${blobbed.join('، ')})`);
@@ -165,12 +165,18 @@ ok(/^[؀-ۿ]+ [٠-٩]+\/[٠-٩]+ · [٠-٩]+:[٠-٩]+$/.test(whenText(Date.now()
 
 // ————— ٥. الوصل: الشاشة والتوجيه والمخزون —————
 
-const story = read('js/story.js');
-ok(story.includes('recordBlock') && story.includes('micIcon'),
-  'شاشةُ القصة فيها زرُّ التسجيل بأيقونته الهندسية (SVG لا إيموجي — DESIGN §٦)');
-ok(!/عدّاد|setInterval/.test(codeOf(story).split('recordBlock')[1] || ''),
+// **الكتلةُ واحدة لموضعيها** (حزمة «القرآني الموسّع»): القصةُ وترديدُ السورة —
+// ونسخُ شيفرةٍ تحمل صوتَ طفلٍ أسوأُ ما يُنسَخ، فيومَ يُشدَّد قيدٌ في إحداهما تبقى
+// الأخرى على حالها. فالحاملُ ملفٌّ واحد يُفحَص، والشاشتان تستدعيانه ولا تحملانه.
+const block = read('js/record.js');
+const users = ['js/story.js', 'js/quran.js'].map((f) => [f, read(f)]);
+ok(block.includes('micIcon') && block.includes('rec-mic'),
+  'كتلةُ التسجيل فيها زرُّها بأيقونته الهندسية (SVG لا إيموجي — DESIGN §٦)');
+ok(users.every(([, src]) => /from '\.\/record\.js'/.test(src) && /recordBlock\(/.test(src)),
+  `وموضعاها يستدعيانها ولا ينسخانها (${users.map(([f]) => f.slice(3)).join('، ')})`);
+ok(!/عدّاد|setInterval|setTimeout/.test(codeOf(block)),
   'وبلا مؤقّت ولا عدّاد يراه الطفل (DESIGN §٥.٦)');
-ok(story.includes('micAllowed') && story.includes('gateCard'),
+ok(block.includes('micAllowed') && block.includes('gateCard'),
   'وأول استعمال يمرّ ببوابة وليّ الأمر نفسِها (لا نسخة ثانية منها)');
 ok(codeOf(read('js/main.js')).includes('recorder.release()'),
   'والتوجيه يُطلق الميكروفون عند مغادرة الشاشة (لا يتبع الطفلَ إلى غيرها)');

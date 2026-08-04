@@ -20,6 +20,8 @@ import {
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import * as recitation from './recitation.js';
+import * as recorder from './recorder.js';   // لإسكات صوت الطفل وحده — والالتقاطُ في record.js
+import { recordBlock } from './record.js';
 import { starsForGame } from './words.js';
 import { starsForStory } from './story.js';
 import { steppedScreen, readQuizStep, nextButton } from './screens.js';
@@ -492,6 +494,7 @@ export function renderSurah(surahId) {
   const total = surah.ayat.length;
   const read = new Set();
   let done = false;
+  let root = null;          // عنصر الشاشة — تُعلَّق عليه بوابةُ إذن وليّ الأمر (الترديد)
 
   // سطور الصفحة بترتيبها: البسملة سطراً مستقلاً في السور الثلاث ثم الآيات.
   // هي نفسها ترتيب التلاوة، فموضع ما يُتلى موضعُه في الصفحة بلا حساب ثانٍ.
@@ -508,7 +511,8 @@ export function renderSurah(surahId) {
     foot.replaceChildren(
       h('p', { class: 'hint' },
         `قرأتَ ${arNum(read.size)} من ${arCount(total, ['آية', 'آيتين', 'آيات', 'آية'])}`),
-      h('button', { class: 'btn btn--primary btn--wide next', onclick: finish }, 'أتممتُ القراءة ←'),
+      h('button', { class: 'btn btn--primary btn--wide next', onclick: toTarteel },
+        'أتممتُ القراءة — رَدِّدْ ←'),
     );
   }
 
@@ -617,7 +621,102 @@ export function renderSurah(surahId) {
     recitation.ready().then(() => recitation.prefetch(lines));
   }
 
+  // ————— خطوةُ «الترديد»: يسمع الآية من القارئ ثم يردّدها بصوته —————
+  //
+  // **سندُها التحفيظيّ** (METHOD §٥.٦): التلقين بالمشافهة هو طريق حفظ القرآن منذ
+  // نزوله — يقرأ الشيخُ آيةً ويردّها الصبيّ حتى تستقيم. فبعد أن قرأ الطفل السورة
+  // بعينه يسمعها أذنُه ويعيدها لسانُه، آيةً آية.
+  //
+  // **خطوةٌ ثالثة في شاشة السورة لا عقدةٌ ثالثة** (حكم المدير): الترديد تعبّديّ
+  // بلا حكم — لا يُقاس ولا يُقفَل به شيء، والقفلُ التسلسليّ يبقى كلماتٌ ← سورة.
+  // وعقدةٌ لا تُقاس ولا تُقفَل تُثقل الخريطة باثنتي عشرة بطاقةً بلا نجوم.
+  //
+  // **ولا مؤقّت ألبتّة** (DESIGN §٥.٦، وقانونُنا في كل الرحلة): لا عدّاد تنازليّ
+  // ولا انتقالَ آليّ بعد سكوت — الطفل يردّد ما شاء، والانتقالُ بيده وحدها.
+  //
+  // **وصفرُ إضافةٍ صوتية**: ما يُسمَع هنا تلاوةُ الحصري لآياتٍ لها ملفاتُها،
+  // وتعليماتُه مكتوبةٌ لا منطوقة — كتعليمات شاشة السورة نفسِها.
+
+  let at = 0;                          // موضعُ الترديد من سطور الصفحة
+  const hush = () => { recitation.stop(); audio.stop(); recorder.stopPlayback(); };
+
+  function tarteelStep() {
+    const label = (i) => (surah.basmalaIsAyah || i > 0
+      ? `الآية ${arNum(i + (surah.basmalaIsAyah ? 1 : 0))}` : 'البسملة');
+
+    const text = h('p', { class: 'mushaf mushaf--big' });
+    const counter = h('p', { class: 'hint' });
+    const listen = h('button', { class: 'btn btn--primary' });
+    const back = h('button', { class: 'btn' }, '→ السابقة');
+    const fwd = h('button', { class: 'btn' }, 'التالية ←');
+
+    let playing = false;
+    function paintListen() {
+      listen.replaceChildren(playing ? `${HALT} أوقِف` : `${LISTEN} اسمع الآية`);
+      listen.classList.toggle('btn--primary', !playing);
+    }
+
+    async function hear() {
+      if (playing) { playing = false; hush(); return paintListen(); }
+      const mine = at;
+      playing = true;
+      paintListen();
+      await recitation.play(lines[at]);
+      if (mine === at) { playing = false; paintListen(); }   // انتقل الطفل؟ الرسمُ لِما هو فيه
+    }
+
+    function show(next) {
+      hush();
+      playing = false;
+      at = Math.min(Math.max(next, 0), lines.length - 1);
+      text.textContent = lines[at];
+      counter.textContent = `${label(at)} — ${arNum(at + 1)} من ${arNum(lines.length)}`;
+      back.disabled = at === 0;
+      fwd.disabled = at === lines.length - 1;
+      paintListen();
+    }
+
+    listen.onclick = hear;
+    back.onclick = () => show(at - 1);
+    fwd.onclick = () => show(at + 1);
+
+    // «رتّل وسجّل» — الكتلةُ نفسُها التي في القصة (`record.js`)، وخصوصيتُها هي هي:
+    // محليّ في IndexedDB، ويُسمَع من `blob:`، ولا شبكةَ ولا رفع. وهي **اختيارية**:
+    // جهازٌ بلا ميكروفون أو بلا مخزن ⇒ لا يظهر الصفّ أصلاً ولا ينقص من الخطوة شيء.
+    const rec = recordBlock({
+      nodeId,
+      title: `ترتيل سورة ${surah.name}`,
+      label: 'رتّل وسجّل',
+      hint: 'نسمعك… رَدِّدِ الآية بصوتك',
+      stopAll: hush,
+      root: () => root,
+    });
+
+    show(0);
+    return h('div', { class: 'tarteel' },
+      h('h2', {}, `رَدِّدْ سورة ${surah.name}`),
+      h('p', { class: 'rule' },
+        'اسمع الآية بصوت القارئ، ثم رَدِّدْها بصوتك على مهلك — لا وقتَ يجري عليك، '
+        + 'وأنت تنتقل حين تشاء.'),
+      text,
+      counter,
+      h('div', { class: 'row' }, back, listen, fwd),
+      rec,
+    );
+  }
+
+  function toTarteel() {
+    halt();
+    at = 0;
+    body.replaceChildren(tarteelStep());
+    foot.replaceChildren(
+      h('button', { class: 'btn btn--primary btn--wide next', onclick: finish }, 'أتممتُ ←'),
+      h('button', { class: 'btn', onclick: () => { hush(); paint(); } }, '↻ عُد إلى القراءة'),
+    );
+  }
+
   function finish() {
+    hush();
     halt();
     done = true;
     const stars = starsForStory(read.size, total);
@@ -655,7 +754,7 @@ export function renderSurah(surahId) {
       + 'استمع واتبعْ بعينك، ثم اقرأها بنفسك.';
   });
 
-  return h('div', { class: 'screen story quran', css: { '--accent': QURAN_ACCENT } },
+  root = h('div', { class: 'screen story quran', css: { '--accent': QURAN_ACCENT } },
     topbar(
       h('button', { class: 'btn', onclick: () => go('#/') }, '→ الخريطة'),
       h('span', { class: 'spacer' }),
@@ -671,10 +770,12 @@ export function renderSurah(surahId) {
         h('div', { class: 'dev-row' },
           h('span', {}, `الآيات: ${arNum(total)}`),
           h('button', { class: 'btn', onclick: () => toast(`قُرئت: ${arNum(read.size)}`) }, 'عدّ المقروء'),
+          h('button', { class: 'btn', onclick: toTarteel }, 'إلى الترديد'),
           h('button', { class: 'btn', onclick: finish }, 'إنهاء القراءة الآن'),
         )),
     ),
   );
+  return root;
 }
 
 // ————— التوجيه داخل المرحلة —————

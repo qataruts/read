@@ -20,12 +20,11 @@ import { libraryStory, storyTexts as libraryStoryTexts } from './library.js';
 import { textWord } from './fade.js';   // عرضٌ بدرجات الخفوت — ولا احتساب هنا (الشاهد الواحد)
 import * as progress from './progress.js';
 import * as audio from './audio.js';
-import * as recorder from './recorder.js';
-import * as recordings from './recordings.js';
-import { gateCard } from './parent.js';
+import * as recorder from './recorder.js';   // لإسكات صوت الطفل وحده — والالتقاطُ في record.js
+import { recordBlock } from './record.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar, shake,
-  STORY_ACCENT, mascot, micIcon, shuffle, DEV,
+  STORY_ACCENT, mascot, shuffle, DEV,
 } from './ui.js';
 
 const LINE_GAP_MS = 500;     // فاصلٌ بين جملتين في الكاريوكي — مهلةُ عينٍ تنتقل
@@ -216,107 +215,18 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
   // ————— «اقرأ لي»: يقرأ الطفل بصوته ثم يسمع نفسه (الحزمة ١٠) —————
   //
   // فعلٌ ثانويّ لا يزاحم «أتممتُ القراءة» (DESIGN §٥.١)، وموضعه تحت «اسمع القصة
-  // كاملة» مباشرةً: يسمعها بصوتنا ثم يقرؤها بصوته. و**لا مؤقّت ولا عدّاد** يراه
-  // (DESIGN §٥.٦) — المدّة تُلتقط ضمنياً وتذهب إلى لوحة والده وحدها.
-  //
-  // **إعادة القراءة هي المقصود**: زرُّ «سجّل من جديد» حاضرٌ دائماً بلا حدّ، فالطلاقة
-  // تُبنى بإعادة قراءة النصّ نفسه مرّاتٍ (repeated reading — ROADMAP §المرحلة و).
+  // كاملة» مباشرةً: يسمعها بصوتنا ثم يقرؤها بصوته. والكتلةُ نفسُها في `record.js`
+  // — تشاركها فيها خطوةُ ترديد السورة (حزمة «القرآني الموسّع»)، فحاملُ صوت الطفل
+  // ملفٌّ واحد لا نسختان تفترقان.
 
-  function recordBlock() {
-    // غيابُ الميكروفون أو المخزن لا يكسر شيئاً: لا يظهر الزرّ أصلاً (بند الحزمة ١٠/٤)
-    if (!recorder.supported() || !recordings.supported()) return null;
-
-    const row = h('div', { class: 'row record' });
-    let clip = null;      // آخر تسجيل في هذه الجلسة — يُسمَع من الذاكرة بلا فتح المخزن
-    let busy = false;
-
-    function paintIdle() {
-      const buttons = [h('button', {
-        class: 'btn rec-mic',
-        'aria-label': clip ? 'سجّل قراءتك من جديد' : 'سجّل قراءتك بصوتك',
-        onclick: begin,
-      }, micIcon(), clip ? 'سجّل من جديد' : 'اقرأ لي')];
-      if (clip) {
-        buttons.push(h('button', {
-          class: 'btn rec-hear',
-          'aria-label': 'اسمع صوتك مرة أخرى',
-          onclick: hear,
-        }, '▶ اسمع صوتك'));
-      }
-      row.replaceChildren(...buttons);   // لا فراغ ولا `null` — replaceChildren لا يُصفّي كـ`h`
-    }
-
-    function paintRecording() {
-      row.replaceChildren(
-        h('button', {
-          class: 'btn rec-mic rec-mic--on',
-          'aria-label': 'أوقِف التسجيل',
-          onclick: end,
-        }, h('span', { class: 'rec-dot', 'aria-hidden': 'true' }), 'أوقِف التسجيل'),
-        h('span', { class: 'hint rec-hint' }, 'نسمعك… اقرأ القصة بصوتك'),
-      );
-    }
-
-    /** إذنُ وليّ الأمر مرة واحدة (بند الحزمة ١٠/٤) — بالبوابة الحسابية نفسها. */
-    function askParent() {
-      const overlay = h('div', { class: 'overlay' },
-        h('div', { class: 'overlay-card' }, gateCard({
-          hint: 'التسجيل يحتاج إذن وليّ الأمر مرة واحدة — أجب لتفتحه لطفلك.',
-          onPass: () => { overlay.remove(); progress.allowMic(); begin(); },
-          onCancel: () => overlay.remove(),
-        })));
-      root?.append(overlay);
-      overlay.querySelector('input')?.focus();
-    }
-
-    async function begin() {
-      if (busy || recorder.isRecording()) return;
-      if (!progress.micAllowed()) return askParent();
-      busy = true;
-      stopAll();                    // لا يدخل صوتُ التطبيق في تسجيل الطفل
-      try {
-        await recorder.start();
-        paintRecording();
-      } catch (e) {
-        console.warn('[record] تعذّر التسجيل:', e);
-        row.replaceChildren();      // يختفي بهدوء — الرفض لا يكسر شيئاً
-        toast('لم يُسمح باستعمال الميكروفون');
-      }
-      busy = false;
-    }
-
-    async function end() {
-      if (busy) return;
-      busy = true;
-      const taken = await recorder.stop().catch(() => null);
-      busy = false;
-      if (!taken) {
-        paintIdle();          // لم يُلتقط شيء: يعود الزرّ كما كان بلا شكوى
-        return;
-      }
-
-      // **يسمع نفسه أولاً** — أحبُّ صوتٍ إلى الطفل صوتُه، فلا يُؤخَّر سماعُه بانتظار
-      // كتابة القرص. والصوت في الذاكرة أصلاً، وحفظُه لوليّ أمره يجري خلفه.
-      clip = taken.blob;
-      paintIdle();
-      hear();
-      progress.logRecording({ node: nodeId, title, seconds: taken.seconds });
-      recordings.saveClip({
-        node: nodeId, title, seconds: taken.seconds, blob: taken.blob, day: progress.dayKey(),
-      }).catch((e) => console.warn('[record] تعذّر حفظ التسجيل:', e));
-    }
-
-    function hear() {
-      if (!clip) return;
-      stopAll();
-      recorder.playClip(clip);
-    }
-
-    paintIdle();
-    return row;
-  }
-
-  const recordRow = recordBlock();
+  const recordRow = recordBlock({
+    nodeId,
+    title,
+    label: 'اقرأ لي',
+    hint: 'نسمعك… اقرأ القصة بصوتك',
+    stopAll,
+    root: () => root,
+  });
 
   // ————— سؤال الفهم (قصص المكتبة) —————
   //

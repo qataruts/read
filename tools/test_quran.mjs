@@ -47,7 +47,9 @@ ok(QURAN.after === GROUPS.at(-1).id, `المرحلة القرآنية بعد ا�
 
 const parts = quranParts().map((x) => x.part);
 ok(parts.join(' ← ') === ('letters words1 words2 words3 rasm muqattaat '
-  + 'sw-s1 s1 sw-s112 s112 sw-s113 s113 sw-s114 s114').split(' ').join(' ← '),
+  + 'sw-s1 s1 sw-s112 s112 sw-s113 s113 sw-s114 s114 '
+  + 'sw-s108 s108 sw-s103 s103 sw-s106 s106 sw-s111 s111 '
+  + 'sw-s105 s105 sw-s94 s94 sw-s107 s107 sw-s101 s101').split(' ').join(' ← '),
   `درجاتها بالترتيب: ${parts.join(' ← ')}`);
 ok(parts.indexOf('letters') < parts.indexOf('words1'),
   'درس الحرفين قبل الكلمات (كلماتها تستعملهما)');
@@ -121,11 +123,35 @@ upTo('quran:letters');
 ok(p.isNodeUnlockedById('quran:letters') && p.nextNode().id === 'quran:letters',
   'وتُفتح بإتمام كل ما قبلها (القصة الثالثة آخره)');
 ok(!p.isNodeUnlockedById('quran:s1'), 'وسورة الفاتحة تنتظر دروس التهيئة قبلها');
-upTo('quran:s114');
-ok(p.isNodeUnlockedById('quran:s114'), 'وآخر سورة تُفتح بإتمام ما قبلها');
-p.setStars('quran:s114', 3);
+const lastSurah = `quran:${QURAN.surahs.at(-1).id}`;
+upTo(lastSurah);
+ok(p.isNodeUnlockedById(lastSurah), `وآخر سورة تُفتح بإتمام ما قبلها (${lastSurah})`);
+p.setStars(lastSurah, 3);
 ok(p.nextNode()?.id === ids[quranStart + parts.length],
   `وبإتمامها يُفتح أول بستان (${p.nextNode()?.id})`);
+
+// ————— ١ج. الشريحة الثانية (حزمة «القرآني الموسّع») —————
+//
+// **معيارُ الاختيار صار بنيوياً**: أقرّ المدير الشريحة بترتيب الطول التصاعدي، فإن
+// أُقحمت سورةٌ طويلة بين قصيرتين يوماً سقط هذا الاختبار — لا يبقى المعيار في ورقةٍ
+// وحدها. والطولُ بالرمز (لا بعدد الآيات) فهو ما يراه الطفل على الصفحة.
+
+const SLICE = ['s108', 's103', 's106', 's111', 's105', 's94', 's107', 's101'];
+ok(QURAN.surahs.length === 12 && SLICE.every((id) => surahById(id)),
+  `اثنتا عشرة سورة: أربعٌ سابقة وثمانٍ أقرّها المدير (${SLICE.join('، ')})`);
+const bulk = (s) => s.ayat.join(' ').length;
+const slice = SLICE.map((id) => surahById(id));
+ok(slice.every((s, i) => i === 0 || bulk(slice[i - 1]) < bulk(s)),
+  `وطولُها صاعدٌ بلا قفزةٍ إلى الوراء (${slice.map((s) => bulk(s)).join(' ← ')} رمزاً)`);
+ok(bulk(slice[0]) < bulk(surahById('s112')),
+  `وأوّلُها (${slice[0].name}، ${bulk(slice[0])}) أقصرُ من الإخلاص — لا يلقى أثقلَ ممّا عرف`);
+ok(slice.every((s) => !s.basmalaIsAyah && s.emoji && s.name),
+  'ولكلٍّ اسمُها ووجهُها، والبسملةُ سطرٌ مستقلّ فيها كلِّها');
+
+// **التين والقدر مستثناتان بحكمٍ مستقلّ**: بسملتُهما في المصدر `بِّسْمِ` بشدّةٍ على
+// الباء — إظهارٌ لإدغام باء آخرِ السورة قبلهما — فلا تُنزَع بمطابقةٍ حرفية.
+ok(!QURAN.surahs.some((s) => [95, 97].includes(s.number)),
+  'ولا التينُ ولا القدرُ في المنهج — بسملتُهما تخالف بسملتَنا حرفاً (حكمٌ مستقلّ)');
 
 // ————— ٢. جولات «اقرأ واختر» و«ميّز العلامة» —————
 
@@ -334,6 +360,65 @@ ok(/WORD_PREFIX/.test(recitationSrc) && /wbw-/.test(recitationSrc),
   + `${clash.length ? ' (' + clash.join('، ') + ')' : ''}`);
 ok(clash.length > 0,
   'وهو ليس احتياطاً نظرياً: في السور كلماتٌ نصُّها نصُّ كلمةٍ عربية عادية في التطبيق');
+
+// ————— ٥ج. خطوةُ الترديد (حزمة «القرآني الموسّع») —————
+//
+// المحروسُ فيها أربعة: **لا مؤقّت** (قانونُنا في كل الرحلة)، و**لا صوتَ مولَّداً**
+// لآيةٍ تُردَّد، و**خصوصيةُ صوت الطفل** بنيويّةً، و**صفرُ إضافةٍ صوتية**.
+
+const surahSrc = quranSrc.slice(quranSrc.indexOf('let at = 0;'),
+  quranSrc.indexOf('function finish()'));
+ok(surahSrc.length > 500 && /recordBlock\(/.test(surahSrc),
+  `خطوةُ الترديد قائمة في شاشة السورة (${surahSrc.length} حرفاً) وفيها «رتّل وسجّل»`);
+ok(!/setTimeout|setInterval|requestAnimationFrame/.test(surahSrc),
+  'ولا مؤقّتَ فيها البتّة — لا عدّادَ تنازليّ ولا انتقالَ آليّ بعد سكوت (DESIGN §٥.٦)');
+ok(!/audio\.play/.test(surahSrc) && /recitation\.play/.test(surahSrc),
+  'وما يُسمَع فيها تلاوةُ قارئ لا صوتٌ مولَّد — لا تمرّ بـ`audio.play` أصلاً');
+
+// **حاملُ صوت الطفل ملفٌّ واحد**: `record.js` تشترك فيه القصةُ والترديد، فلا تفترق
+// نسختان في شيفرةٍ تحمل صوت طفل (ويقرأ `test_recordings.mjs` نصَّه ليثبت أنه بلا شبكة).
+const recordSrc = readFileSync(new URL('../app/js/record.js', import.meta.url), 'utf8');
+const storySrc = readFileSync(new URL('../app/js/story.js', import.meta.url), 'utf8');
+// الشيفرةُ وحدها بلا تعليقات — وإلا لأمسك الحارسُ توثيقَ القاعدة نفسِها (كما في test_recordings)
+const codeOf = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|\s)\/\/[^\n]*/g, ' ');
+ok(/blob/i.test(codeOf(recordSrc))
+  && !/blob/i.test(codeOf(quranSrc)) && !/blob/i.test(codeOf(storySrc)),
+  'وصوتُ الطفل لا يمرّ بـ`quran.js` ولا `story.js` — كتلتُه الواحدة في `record.js`');
+ok(/recordBlock\(/.test(storySrc) && /from '\.\/record\.js'/.test(storySrc),
+  'والقصةُ تستعمل الكتلةَ نفسَها — لا نسخةً ثانية تشيخ وحدها');
+
+// **إعفاءُ القياس منصوصٌ** حيث يطالب به حارسُ «لا تدريسَ بلا قياس»
+const measureSrc = readFileSync(new URL('test_measure.mjs', import.meta.url), 'utf8');
+ok(/الترديد/.test(measureSrc) && !/progress\.recordAttempt\s*\(/.test(quranSrc),
+  'وإعفاءُ الترديد من القياس مكتوبٌ بسببه في `test_measure.mjs`، ولا مهارةَ تُسجَّل هنا');
+
+// ————— ٥د. الترحيلُ الرحيم: امتدادُ الدرسين لا يقفل على أحدٍ شيئاً —————
+//
+// درسا الرسم والهمزة اتّسعا (٦←٩ علامات، ٣←٥ صور) — **وهما عقدتان قائمتان لا
+// جديدتان**، فنجومُ مَن تجاوزهما محفوظةٌ ولا يُعاد قفلُ ما بعدهما؛ والامتدادُ يُرى
+// بالعودة إليهما. والسورُ الثماني عقدٌ **مستحدَثة خلف موضع مَن أتمّ الرحلة**،
+// فيرحّلها `migrateJourney` بنجمة إتمامٍ واحدة (لا تدّعي إتقاناً وتدعوه إلى لعبها).
+
+ok(QURAN.rasm.signs.length === 9 && QURAN.letters.signs[0].shapes.length === 5,
+  `درسُ الرسم ${QURAN.rasm.signs.length} علامات ودرسُ الهمزة `
+  + `${QURAN.letters.signs[0].shapes.length} صور`);
+
+// حالةُ طفلٍ أتمّ الرحلة **قبل هذه الحزمة**: نجومٌ لكل عقدةٍ إلا الستّ عشرة الجديدة
+const fresh = SLICE.flatMap((s) => [`quran:${s}`, `quran:sw-${s}`]);
+store.set('muallim.progress.v1', JSON.stringify({
+  v: p.VERSION,
+  stars: Object.fromEntries(nodes.map((n) => [n.id, 3]).filter(([id]) => !fresh.includes(id))),
+  skills: {}, days: {}, reviews: {},
+}));
+const after = await import(new URL('progress.js?slice=1', APP));   // الترحيل يجري عند الاستيراد
+
+ok(after.getStars('quran:rasm') === 3 && after.getStars('quran:letters') === 3,
+  'مَن تجاوز درسَي الرسم والهمزة: نجومُه الثلاث كما هي — الامتدادُ لا يمسّها');
+ok(fresh.every((id) => after.getStars(id) === 1),
+  `والسورُ الثماني المستحدَثة خلفه تُرحَّل بنجمةِ إتمامٍ واحدة (${fresh.length} عقدة)`);
+ok(after.isNodeUnlockedById('gate:gardens') && after.isNodeUnlockedById(nodes.at(-1).id),
+  'فلا يُحبَس مَن كان في البساتين بسورٍ استُحدثت خلفه — البوابةُ وآخرُ الرحلة مفتوحان');
+store.clear();
 
 // ————— ٦. النجوم —————
 

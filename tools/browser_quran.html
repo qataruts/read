@@ -208,8 +208,11 @@ try {
   await waitFor(() => heardLog.length > beforeRule, 'صوت القاعدة');
   ok(lastHeard() === QURAN.letters.rule, 'زر القاعدة يُسمعها');
 
+  // كلمةٌ لكل صورةٍ من صور الحرفين — والصورُ صارت خمساً للهمزة (حزمة «القرآني الموسّع»)
   const words = $$('.example-word');
-  ok(words.length === 6, `ست كلمات مصوَّرة (${words.length})`);
+  const wanted = QURAN.letters.signs.flatMap((s) => s.words);
+  ok(words.length === wanted.length,
+    `لكلّ صورةٍ كلمتُها المصوَّرة (${words.length} كلمة: ${wanted.map((w) => w.read).join('، ')})`);
   words[0].click();
   await sleep(60);
   ok(lastHeard() === 'مَاءْ', `نقرة الكلمة تُسمعها (${lastHeard()})`);
@@ -408,6 +411,45 @@ try {
   ok(!$('.ayah-row--playing'), 'وبانتهائها لا يبقى سطرٌ معلَّماً');
   ok(btn('اسمع السورة'), 'ويعود الزرّ إلى حاله');
 
+  // ————— ٦ج) خطوةُ الترديد: يسمع الآية من القارئ ثم يردّدها — بلا مؤقّت —————
+  //
+  // خطوةٌ ثالثة في شاشة السورة لا عقدة (حكم المدير): لا تُقاس ولا تُقفَل بها سورة،
+  // والانتقالُ فيها بيد الطفل وحدها.
+
+  $('.next').click();
+  await waitFor(() => $('.tarteel'), 'خطوة الترديد');
+  ok(!$('.sheet--mushaf') && $('.tarteel'),
+    'أتممتُ القراءة ⇒ خطوةُ الترديد لا الاحتفال — يسمع ثم يردّد');
+  ok($('.tarteel .mushaf--big').textContent === fatiha.ayat[0],
+    'وتبدأ بأول سطرٍ من الصفحة (الفاتحة: بسملتُها آيتُها الأولى)');
+  ok(!$('.tarteel').textContent.match(/ثانية|ثوانٍ|:\d\d/),
+    'ولا مؤقّتَ ولا عدّادَ وقتٍ في الشاشة (DESIGN §٥.٦)');
+  checkTargets('خطوة الترديد');
+
+  const beforeTarteel = [recited.length, played.length, spoken.length];
+  btn('اسمع الآية').click();
+  await waitFor(() => recited.length > beforeTarteel[0], 'تلاوة آية الترديد');
+  await sleep(60);
+  ok(recited.at(-1) === fatiha.ayat[0], 'وزرُّ السماع يتلو الآية المعروضة بصوت القارئ');
+  ok(played.length === beforeTarteel[1] && spoken.length === beforeTarteel[2],
+    'ولا صوتَ مولَّداً ولا نطقاً آلياً في الترديد البتّة');
+
+  btn('التالية').click();
+  await sleep(80);
+  ok($('.tarteel .mushaf--big').textContent === fatiha.ayat[1],
+    'و«التالية» تنقله بيده إلى الآية التي بعدها — لا انتقالَ آليّ');
+  btn('السابقة').click();
+  await sleep(80);
+  ok($('.tarteel .mushaf--big').textContent === fatiha.ayat[0], 'و«السابقة» تردّه إليها');
+
+  const backBtn = btn('عُد إلى القراءة');
+  ok(!!backBtn, 'وله بابُ رجوعٍ إلى صفحة السورة');
+  backBtn.click();
+  await waitFor(() => $('.sheet--mushaf'), 'الرجوع إلى الصفحة');
+  ok($$('.ayah').length === fatiha.ayat.length, 'فيعود إلى آياتها كما كانت');
+
+  $('.next').click();
+  await waitFor(() => $('.tarteel'), 'الترديد ثانيةً');
   $('.next').click();
   await waitFor(() => $('.celebrate'), 'ختام السورة');
   ok($$('.big-stars .on').length === 3, 'من قرأ آياتها كلها ⇒ ثلاث نجوم');
@@ -417,7 +459,7 @@ try {
   await seed(idsBefore('quran:s114'));
   await goto('#/quran/s114');
   await waitFor(() => $('.sheet--mushaf'), 'صفحة الناس');
-  const nas = QURAN.surahs.at(-1);
+  const nas = QURAN.surahs.find((s) => s.id === 's114');
   ok($('.basmala')?.textContent.trim() === QURAN.basmala,
     'البسملة سطر مستقلّ فوق سور ما بعد الفاتحة');
   ok(texts('.ayah .mushaf').join('|') === nas.ayat.join('|'), 'وآياتها تطابق المنهج حرفاً بحرف');
@@ -437,7 +479,47 @@ try {
 
   for (const a of $$('.ayah')) { a.click(); await sleep(20); }
   $('.next').click();
+  await waitFor(() => $('.tarteel'), 'ترديد الناس');
+  ok($('.tarteel .mushaf--big').textContent === QURAN.basmala,
+    'وترديدُ ما بعد الفاتحة يبدأ بالبسملة سطراً مستقلاً كما في الصفحة');
+  $('.next').click();
   await waitFor(() => $('.celebrate'), 'ختام الناس');
+  ok(!$('.celebrate').textContent.includes('أتممتَ الرحلة'),
+    'وبعد الناس تبقى سورٌ وبساتين — فلا يُبشَّر باكتمال الرحلة قبل أوانه');
+
+  $('.celebrate .btn--primary').click();
+  await waitFor(() => $('.station'), 'العودة للخريطة');
+  ok(continueCard()?.textContent.includes('كلمات سورة'),
+    `والخريطة تدلّه على كلمات السورة التالية لا على سورتها (${continueCard()?.textContent.trim().split('\n')[0]})`);
+
+  // ————— ٧ب) الشريحة الثانية: القفل التسلسليّ يمتدّ إليها، وآخرُها بابُ البساتين —————
+  //
+  // ثماني سورٍ أقرّها المدير بترتيب الطول (`docs/REVIEW_QURAN_SLICE.md`): لكلٍّ
+  // محطةُ كلماتها ثم سورتُها، و«لا سورة قبل كلماتها» يسري عليها كما سرى على الأربع.
+
+  const SLICE = ['s108', 's103', 's106', 's111', 's105', 's94', 's107', 's101'];
+  const last = QURAN.surahs.at(-1);
+  ok(last.id === 's101' && QURAN.surahs.length === 12,
+    `اثنتا عشرة سورة، وآخرُها ${last.name} (${last.ayat.length} آية)`);
+
+  await seed(idsBefore(`quran:${surahWordsPart('s108')}`));
+  await goto('#/quran/s108');
+  await sleep(200);
+  ok(!$('.sheet--mushaf'), 'أوّلُ سور الشريحة مقفلةٌ حتى تُتمّ كلماتُها — القفل امتدّ إليها');
+
+  await seed(idsBefore(`quran:${last.id}`));
+  await goto(`#/quran/${last.id}`);
+  await waitFor(() => $('.sheet--mushaf'), `صفحة ${last.name}`);
+  ok(texts('.ayah .mushaf').join('|') === last.ayat.join('|'),
+    `وآيات ${last.name} تطابق المصدر حرفاً بحرف على الشاشة (${last.ayat.length} آية)`);
+  ok(!$$('.screen-card').some((c) => /[\u{1F300}-\u{1FAFF}]/u.test(c.textContent)),
+    'ولا إيموجي في شاشتها (DESIGN §٦)');
+
+  for (const a of $$('.ayah')) { a.click(); await sleep(15); }
+  $('.next').click();
+  await waitFor(() => $('.tarteel'), `ترديد ${last.name}`);
+  $('.next').click();
+  await waitFor(() => $('.celebrate'), `ختام ${last.name}`);
   ok(!$('.celebrate').textContent.includes('أتممتَ الرحلة'),
     'وبعد آخر سورة تبقى البساتين — فلا يُبشَّر باكتمال الرحلة قبل أوانه');
 
@@ -445,7 +527,7 @@ try {
   await waitFor(() => $('.station'), 'العودة للخريطة');
   // (الحزمة ١٤) بين المصحف والبساتين بوابةُ إتقانٍ ثانية — فهي وجهتُه لا أول باقة
   ok(continueCard()?.textContent.includes('بوابة الحديقة'),
-    `والخريطة تدلّه على بوابة الحديقة قبل البساتين (${continueCard()?.textContent.trim().split('\n')[0]})`);
+    `والخريطة تدلّه على بوابة الحديقة بعد آخر سورة (${continueCard()?.textContent.trim().split('\n')[0]})`);
 
   // ————— ٨) نصّ المصحف: يُتلى من تسجيل القارئ ولا يُولَّد صوتُه أبداً —————
   const mushaf = new Set(quranMushafTexts());

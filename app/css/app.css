@@ -1417,6 +1417,21 @@ button {
 .vchip--mushaf { min-width: 0; padding: .45rem .7rem; }
 .vchip--mushaf .vchip-face { font-size: 1.7rem; line-height: 1.9; white-space: nowrap; }
 
+/* خطوة الترديد: الآيةُ وحدها في الوسط، بلا عدّادٍ ولا شريطِ وقتٍ يجري (DESIGN §٥.٦) */
+.tarteel { text-align: center; }
+
+.tarteel .mushaf--big {
+  margin: .8rem 0 .3rem;
+  padding: 1rem .7rem;
+  border-radius: 18px;
+  border: 3px double color-mix(in srgb, var(--star) 60%, var(--mix));
+  background: color-mix(in srgb, var(--star) 6%, var(--card));
+  line-height: 2.1;
+}
+
+.tarteel .row { justify-content: center; }
+.tarteel .btn[disabled] { opacity: .35; pointer-events: none; }
+
 /* الكلمة المطلوبة: أكبر ما في الشاشة — هي السؤال كلُّه */
 .sw-target {
   margin: .5rem 0 .25rem;
