@@ -5,8 +5,10 @@
     python3 tools/make_icons.py --check    # يتحقّق من وجودها وسلامتها بلا توليد
 
 لماذا Chrome: المشروع بلا npm ولا مكتبات صور، وChrome موجود أصلاً لاختبارات الواجهة
-(tools/browser_test.py) ويرسم العربية بخطوط النظام رسماً صحيحاً. الأيقونة مصدرها
+(tools/browser_test.py) ويرسم العربية رسماً صحيحاً بحركاتها. الأيقونة مصدرها
 `tools/icon.html` وحدها — فلا يُحرَّر ملف PNG يدوياً ولا يُفقَد أصله.
+والخطّ خطُّ العلامة في `app/fonts/` لا خطُّ النظام (جلسة «الاسم والشعار»): أيقونةُ
+التطبيق وترويستُه علامةٌ واحدة، فلا يفترق رسمُها بين جهازٍ التُقطت عليه وآخر.
 
 ملاحظة: هذه أصول رسومية لا صوت — قيد «لا تلمس app/audio/» لا يمسّها.
 """
@@ -24,7 +26,6 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TOOLS = ROOT / "tools"
 ICONS = ROOT / "app" / "icons"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
@@ -48,9 +49,11 @@ def png_size(path: Path):
 
 
 def serve(port: int):
+    # الجذرُ لا `tools/`: الأيقونةُ تحمّل خطَّ العلامة من `app/fonts/`،
+    # وخادمُ بايثون لا يخرج بـ`..` عن مجلده (وهو صوابُه أمنياً).
     class Handler(http.server.SimpleHTTPRequestHandler):
         def __init__(self, *a, **kw):
-            super().__init__(*a, directory=str(TOOLS), **kw)
+            super().__init__(*a, directory=str(ROOT), **kw)
 
         def log_message(self, *a):
             pass
@@ -65,6 +68,9 @@ def shoot(url: str, out: Path, size: int, profile: Path, timeout: int) -> bool:
     cmd = [CHROME, f"--user-data-dir={profile}", "--no-first-run", "--no-default-browser-check",
            "--headless=new", "--disable-gpu", "--hide-scrollbars",
            "--default-background-color=00000000",
+           # الوقتُ الافتراضيّ: لا تُلتقط اللقطة حتى يصل خطُّ العلامة ويُعاد قياسُ
+           # رفعة حبره — وإلا صُوِّرت الأيقونةُ بمقاييس خطٍّ احتياطيّ ليست مقاييسَه.
+           "--virtual-time-budget=4000",
            f"--screenshot={out}", f"--window-size={size},{size}", url]
     proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     deadline = time.time() + timeout
@@ -95,7 +101,7 @@ def check() -> int:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="توليد أيقونات المُعلِّم")
+    ap = argparse.ArgumentParser(description="توليد أيقونات «اِقْرَأْ»")
     ap.add_argument("--port", type=int, default=8791)
     ap.add_argument("--timeout", type=int, default=40)
     ap.add_argument("--check", action="store_true", help="تحقّق فقط بلا توليد")
@@ -115,7 +121,7 @@ def main():
     try:
         for name, size, pad, round_, bg in TARGETS:
             out = ICONS / name
-            url = (f"http://127.0.0.1:{args.port}/icon.html"
+            url = (f"http://127.0.0.1:{args.port}/tools/icon.html"
                    f"?size={MASTER}&pad={pad}&round={'1' if round_ else '0'}"
                    + (f"&bg={bg.replace('#', '%23')}" if bg else ""))
             if not shoot(url, out, MASTER, profile, args.timeout):

@@ -116,7 +116,7 @@ for (const [name, value] of Object.entries(expected)) {
 }
 
 for (const [id, title] of [
-  ['who', 'ما «المُعلِّم» ولمن'],
+  ['who', 'ما «اِقْرَأْ» ولمن'],
   ['basis', 'الأسس الخمسة'],
   ['journey', 'رحلة التعلم بلقطات حقيقية'],
   ['install', 'تثبيت التطبيق على الجهاز'],

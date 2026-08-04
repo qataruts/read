@@ -2,10 +2,17 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<title>أيقونة المُعلِّم</title>
+<title>أيقونة «اِقْرَأْ»</title>
 <style>
   /* أيقونة التطبيق: تُرسَم هنا وتُلتقط بـ tools/make_icons.py — لا أصل ثنائيّ يُحرَّر يدوياً.
-     المقاس والهامش يأتيان من الرابط: ?size=512&pad=0.20 (الهامش لأيقونة maskable). */
+     المقاس والهامش يأتيان من الرابط: ?size=512&pad=0.20 (الهامش لأيقونة maskable).
+     الخطّ خطُّ العلامة نفسُه (`app/fonts/`) لا خطّ النظام: الأيقونةُ والترويسةُ علامةٌ واحدة. */
+  @font-face {
+    font-family: 'Marhey';
+    src: url('../app/fonts/Marhey-arabic.woff2') format('woff2');
+    font-weight: 400 700;
+    font-display: block;          /* لا نلتقط بخطٍّ احتياطيّ ثم نُسمّيه علامتنا */
+  }
   html, body { margin: 0; padding: 0; background: transparent; }
   body { display: grid; place-items: center; }
   .icon {
@@ -13,12 +20,15 @@
     place-items: center;
     background: linear-gradient(160deg, #f7b733 0%, #f5a524 45%, #e8590c 100%);
     color: #fff;
-    font-family: 'Noto Naskh Arabic', 'Geeza Pro', 'Al Bayan', serif;
+    font-family: 'Marhey', 'Geeza Pro', 'Al Bayan', sans-serif;
     font-weight: 700;
     line-height: 1;
     overflow: hidden;
   }
-  .icon span { transform: translateY(-.04em); }
+  /* حبرُ الكلمة لا يجلس في وسط سطره: الخطّ يُجلسه على خطّ أساس ثم يتوزّع حولَه.
+     فتُرفع الكلمةُ بمقدار انزياح حبرها هي — قاعدةُ DESIGN §٤ نفسُها (giantInk)،
+     مقيسةً لا مقدَّرة (`--ink-lift` يكتبها القياس أدناه). */
+  .icon span { transform: translateY(var(--ink-lift, 0em)); }
 </style>
 </head>
 <body>
@@ -37,10 +47,34 @@
   box.style.width = `${size}px`;
   box.style.height = `${size}px`;
   box.style.borderRadius = round ? `${size * 0.22}px` : '0';
-  box.style.fontSize = `${size * (1 - 2 * pad) * 0.38}px`;
-  // شعار لا مادةَ قراءة: يُكتب بلا شكل كي يبقى واضحاً في الأيقونة الصغيرة
-  box.append(Object.assign(document.createElement('span'), { textContent: 'اقرأ' }));
+  // مشكولةٌ في كل مقاس (حكم المالك، ٨ أغسطس ٢٠٢٦): العلامةُ واحدةٌ لا تتبدّل بالمقاس،
+  // والتشكيلُ في الأيقونة الصغرى زخرفةٌ لا تُقرأ — والأيقونةُ ليست مادّةَ قراءة.
+  // والنسبةُ أصغرُ قليلاً ممّا كانت (0.38 → 0.37): الحركاتُ تعلو الكلمةَ وتسفلها فتحتاج هواءً.
+  box.style.fontSize = `${size * (1 - 2 * pad) * 0.37}px`;
+  const word = Object.assign(document.createElement('span'), { textContent: 'اِقْرَأْ' });
+  box.append(word);
   document.body.append(box);
+
+  // القياس نظيرُ `inkLift` في app/js/ui.js حرفاً بحرف: نصفُ فرقِ صندوق الخطّ ناقصاً
+  // نصفَ فرقِ صندوق الحبر — موجبُه يعني أن الحبر يجلس تحت المركز، فالرفعة سالبُه.
+  const PROBE = 200;
+  function applyLift() {
+    try {
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.font = `700 ${PROBE}px "Marhey", sans-serif`;
+      ctx.textBaseline = 'alphabetic';
+      const m = ctx.measureText(word.textContent);
+      const base = (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2;
+      const ink = (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+      if (Number.isFinite(base + ink)) {
+        word.style.setProperty('--ink-lift', `${(-(base + ink) / PROBE).toFixed(4)}em`);
+      }
+    } catch { /* بلا canvas: توسيطٌ هندسيّ كما كان */ }
+  }
+  applyLift();
+  // `font-display: block` يؤخّر الرسم لا التحميل: القياسُ قبل وصول الخطّ قياسُ الاحتياطيّ.
+  // فيُعاد بعد وصوله — و`--virtual-time-budget` في make_icons.py يضمن أن اللقطة بعده.
+  document.fonts?.ready.then(applyLift);
 </script>
 </body>
 </html>

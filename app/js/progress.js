@@ -728,7 +728,7 @@ export function readBackup(text) {
     return { error: 'تعذّرت قراءة الملف — ليس ملفَ نسخةٍ صالحاً.' };
   }
   if (!raw || typeof raw !== 'object' || raw.kind !== BACKUP_KIND) {
-    return { error: 'هذا الملف ليس نسخةَ تقدّمٍ من «المُعلِّم».' };
+    return { error: 'هذا الملف ليس نسخةَ تقدّمٍ من «اِقْرَأْ».' };
   }
   const format = Number(raw.format);
   if (!Number.isFinite(format)) return { error: 'ملف النسخة معطوب — لا يعلن شكله.' };

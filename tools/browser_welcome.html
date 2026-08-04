@@ -59,9 +59,9 @@ frame.contentWindow.addEventListener('error', (e) => jsErrors.push(String(e.mess
 
 // ————— ١) الصفحة تُعرض كاملةً وبلا جافاسكربت —————
 
-ok(/المُعلِّم/.test(doc.title), `عنوان الصفحة: ${doc.title}`);
+ok(/اِقْرَأْ/.test(doc.title), `عنوان الصفحة: ${doc.title}`);
 for (const [id, label] of [
-  ['who', 'ما «المُعلِّم» ولمن'],
+  ['who', 'ما «اِقْرَأْ» ولمن'],
   ['basis', 'الأسس الخمسة'],
   ['journey', 'رحلة التعلم'],
   ['install', 'تثبيت التطبيق'],
@@ -131,7 +131,7 @@ start[0].click();
 await gone;
 await waitFor(() => frame.contentDocument?.getElementById('app'), 'فتح التطبيق من زرّ البدء', 8000);
 ok(!!frame.contentDocument.getElementById('app')
-  && /المُعلِّم/.test(frame.contentDocument.title),
+  && /اِقْرَأْ/.test(frame.contentDocument.title),
   'ونقرُه يفتح التطبيق نفسَه (لا صفحةَ خطأ ولا وجهةً أخرى)');
 
 // ————— ٤) عاملُ الخدمة لا يبتلع الصفحة ولا يخزنها —————

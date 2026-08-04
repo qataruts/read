@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v15';  // v15: «أيقونات لا إيموجي» — أصول Twemoji في app/emoji/
+const VERSION = 'v16';  // v16: العلامة «اِقْرَأْ» — الاسم والأيقونات وخطّ العلامة
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -45,6 +45,7 @@ const SHELL = [
   'fonts/BalooBhaijaan2-arabic.woff2',
   'fonts/BalooBhaijaan2-latin.woff2',
   'fonts/KFGQPCUthmanicHafs.woff2',
+  'fonts/Marhey-arabic.woff2',
   'js/audio.js',
   'js/contrast.js',
   'js/curriculum.js',

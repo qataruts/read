@@ -18,7 +18,8 @@ import { renderGarden } from './garden.js';
 import { renderLadder } from './ladder.js';
 import { renderParent, skillsText } from './parent.js';
 import {
-  h, icon, faceEl, toast, go, arNum, arCount, starsRow, topbar, letterTitle, nodeTitle, nodeFace, nodeWhere,
+  h, icon, faceEl, toast, go, arNum, arCount, starsRow, topbar, brandMark,
+  letterTitle, nodeTitle, nodeFace, nodeWhere,
   ACCENTS, PAUSE_ACCENT, STORY_ACCENT, QURAN_ACCENT, SENTENCE_ACCENT,
   accentFor, accentForGarden, landmark, DEV,
 } from './ui.js';
@@ -48,7 +49,7 @@ function renderMap() {
 
   const screen = h('div', {},
     topbar(
-      h('h1', {}, 'المُعلِّم'),
+      brandMark('h1'),
       h('span', { class: 'spacer' }),
       DEV && h('button', { class: 'btn btn--ghost', onclick: () => go('#/audio') }, icon('ear'), ' فحص الأصوات'),
       h('button', {
