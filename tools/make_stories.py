@@ -240,6 +240,7 @@ SPECS = [
     # ————— المستوى ١: ثلاث جمل (٢–٣ كلمات) —————
     {
         "id": "miftah-sami", "level": 1, "garden": "home", "emoji": "🔑",
+        "cover": {"mood": "warm"},
         "title": "مِفْتَاحْ~u سَامِي",
         "pages": [
             ("سَامِي أَمَامَ بَابْ~p", "🚪"),
@@ -250,6 +251,7 @@ SPECS = [
     },
     {
         "id": "jaddat-hasan", "level": 1, "garden": "family", "emoji": "👵",
+        "cover": {"mood": "green"},
         "title": "جَدَّةْ~u حَسَنْ",
         "pages": [
             ("جَدَّةْ~n فِي حَدِيقَةْ~p", "🏡"),
@@ -260,6 +262,7 @@ SPECS = [
     },
     {
         "id": "dirs-zayd", "level": 1, "garden": "body", "emoji": "🦷",
+        "cover": {"mood": "teal"},
         "title": "ضِرْسْ~u زَيْدْ",
         "pages": [
             ("زَيْدْ~N يَبْكِي", "😢"),
@@ -275,6 +278,7 @@ SPECS = [
     # ————— المستوى ٢: خمس أو ست جمل (٢–٤ كلمات) —————
     {
         "id": "shorbat-ummi", "level": 2, "garden": "food", "emoji": "🥣",
+        "cover": {"mood": "gold"},
         "title": "شُورْبَةْ~u أُمِّي",
         "pages": [
             ("سَامِي فِي مَطْبَخْ~p", "🍳"),
@@ -287,6 +291,7 @@ SPECS = [
     },
     {
         "id": "arnab-alhadiqa", "level": 2, "garden": "animals", "emoji": "🐇",
+        "cover": {"mood": "green"},
         "title": "أَرْنَبْ~u حَدِيقَةْ~p",
         "pages": [
             ("فِي حَدِيقَةْ~i أَرْنَبْ", "🏡"),
@@ -300,6 +305,7 @@ SPECS = [
     },
     {
         "id": "zahrat-alhaql", "level": 2, "garden": "nature", "emoji": "🌸",
+        "cover": {"mood": "violet"},
         "title": "زَهْرَةْ~u حَقْلْ~p",
         "pages": [
             ("زَهْرَةْ~n فِي حَقْلْ~p", "🌾"),
@@ -312,6 +318,7 @@ SPECS = [
     },
     {
         "id": "daftar-zayd", "level": 2, "garden": "school", "emoji": "📓",
+        "cover": {"mood": "teal"},
         "title": "دَفْتَرْ~u زَيْدْ",
         "pages": [
             ("زَيْدْ~N فِي مَدْرَسَةْ~p", "🏫"),
@@ -327,6 +334,7 @@ SPECS = [
     # ————— المستوى ٣: ثماني جمل (٣–٥ كلمات) —————
     {
         "id": "quffaz-hasan", "level": 3, "garden": "clothes", "emoji": "🧤",
+        "cover": {"mood": "warm"},
         "title": "قُفَّازْ~u حَسَنْ",
         "pages": [
             ("حَسَنْ~N يَلْبَسْ~v مِعْطَفْ~a ثَقِيلْ~p", "🧥"),
@@ -342,6 +350,7 @@ SPECS = [
     },
     {
         "id": "hafilat-almadrasa", "level": 3, "garden": "city", "emoji": "🚌",
+        "cover": {"mood": "deep"},
         "title": "حَافِلَةْ~u مَدْرَسَةْ~p",
         "pages": [
             ("سَامِي يَقِفْ~v فِي مَحَطَّةْ~p", "🚉"),
@@ -357,6 +366,7 @@ SPECS = [
     },
     {
         "id": "kurat-zayd", "level": 3, "garden": "play", "emoji": "⚽",
+        "cover": {"mood": "gold"},
         "title": "كُرَةْ~u زَيْدْ",
         "pages": [
             ("زَيْدْ~N يَلْعَبْ~v فِي مَلْعَبْ~p", "🏟️"),
@@ -752,7 +762,11 @@ def build(data: dict) -> tuple:
             # **الغلافُ بيانٌ لا صورة** (أمر المالك): `{hero, props, mood}` يركّبه
             # `coverEl` من رموز `app/emoji/` بـ CSS — فلا ملفَّ يُرسم بيد، والنمطُ
             # يثبت بالبناء. وقصصُ البساتين والسور بلا غلافٍ اليوم (يفرضه الفاحص).
-            "cover": spec.get("cover") or None,
+            # **والبطلُ وجهُ القصة نفسُه**: لا يُكتب مرّتين فيفترقا يوماً — والوجهُ من
+            # رموزها بالبناء، فشرطُ «صدق الصورة» مستوفىً بلا مراجعة. والمعلَنُ في
+            # البيان **المزاجُ وحدَه**: هو ما لا يُشتقّ من القصة.
+            "cover": ({"hero": spec["emoji"], **spec["cover"]}
+                      if spec.get("cover") else None),
             "pages": [{"text": compose(text, bases, unknown), "emoji": emoji}
                       for text, emoji in pages],
             "questions": [{
@@ -999,7 +1013,7 @@ def self_test(data: dict) -> int:
 
     # ————— الغلاف: لكل قصةِ رفٍّ غلافٌ، وعناصرُه من رموزها —————
     bad_cover = []
-    for story in shelf:
+    for story in [s for s in stories if not s["surah"]]:
         cv = story.get("cover") or {}
         own = {story["emoji"], *(p["emoji"] for p in story["pages"])}
         if sorted(cv) != sorted(COVER_FIELDS):
@@ -1009,7 +1023,7 @@ def self_test(data: dict) -> int:
             bad_cover.append(f"{story['id']}: {cv['hero']} خارج رموزها")
         if cv["mood"] not in COVER_MOODS:
             bad_cover.append(f"{story['id']}: مزاجٌ مجهول {cv['mood']}")
-    ok(not bad_cover, f"ولكل قصةِ رفٍّ غلافٌ بطلُه من رموزها ({len(shelf)} غلافاً)"
+    ok(not bad_cover, f"ولكل قصةٍ (رفّاً وبستاناً) غلافٌ بطلُه من رموزها ({len([s for s in stories if not s['surah']])} غلافاً)"
        + (f" — {bad_cover[:3]}" if bad_cover else ""))
     moods = [s["cover"]["mood"] for s in shelf if s.get("cover")]
     ok(all(a != b for a, b in zip(moods, moods[1:])),

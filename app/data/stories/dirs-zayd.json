@@ -6,7 +6,7 @@
   "shelf": "",
   "title": "ضِرْسُ زَيْدْ",
   "emoji": "🦷",
-  "cover": null,
+  "cover": {"hero": "🦷", "mood": "teal"},
   "pages": [
     {"text": "زَيْدٌ يَبْكِي", "emoji": "😢"},
     {"text": "الطَّبِيبُ يُعَالِجُ الضِّرْسْ", "emoji": "🩺"},

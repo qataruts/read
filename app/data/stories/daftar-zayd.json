@@ -6,7 +6,7 @@
   "shelf": "",
   "title": "دَفْتَرُ زَيْدْ",
   "emoji": "📓",
-  "cover": null,
+  "cover": {"hero": "📓", "mood": "teal"},
   "pages": [
     {"text": "زَيْدٌ فِي الْمَدْرَسَةْ", "emoji": "🏫"},
     {"text": "الدَّفْتَرُ فِي الْبَيْتْ", "emoji": "🏠"},

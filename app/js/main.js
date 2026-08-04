@@ -218,10 +218,14 @@ function quranEl(section, next, folded) {
     className: `station station--quran${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
     accent: QURAN_ACCENT,
     mark: 'dome',
-    label: `${QURAN.title}${unlocked ? '' : ' — مقفلة'}`,
-    badge: QURAN.face,
-    title: QURAN.title,
-    sub: 'كلمات ورسم المصحف وسور قصار',
+    // **محطاتٌ مسمّاة لا كتلةٌ واحدة** (بلاغ المالك، ١٢ أغسطس ٢٠٢٦): كانت المرحلةُ
+    // ٣١ عقدةً تحت عنوانٍ واحد، والبساتينُ مئةٌ في عشرِ محطاتٍ فلا تثقل. والعنوانُ
+    // والوجهُ من القسم نفسِه (`quranSections` تحسبهما من `QURAN`)، فمحطةٌ رابعة
+    // تُفتَح يومَ تُضاف سورةٌ ثالثةَ عشرة بلا سطرٍ يُعدَّل هنا.
+    label: `${QURAN.title} · ${section.title}${unlocked ? '' : ' — مقفلة'}`,
+    badge: section.face,
+    title: section.title,
+    sub: section.sub,
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
       : [icon('lock'), ' مقفلة'],
@@ -403,6 +407,9 @@ function libraryEl(section, next, folded) {
       : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
+    // **وأُلحقت مكتباتُ البساتين بالأغلفة** (رضي المالكُ النمط): الرفُّ والمكتبةُ
+    // نمطٌ واحد — كتابٌ يُختار من غلافه، لا نقطةٌ على درب.
+    body: shelfRow(section.nodes, next),
   });
 }
 

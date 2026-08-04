@@ -147,8 +147,10 @@ try {
   // محطةُ المكتبة قصصُ **البساتين** وحدها — وقصصُ السور عقدُها في المرحلة القرآنية
   const GARDEN_STORIES = LIBRARY.filter((s) => s.garden);
   const SHELF_STORIES = LIBRARY.filter((s) => s.shelf);
-  ok(libStations().reduce((n, el) => n + el.querySelectorAll('.node').length, 0) === GARDEN_STORIES.length,
-    `وعقدُها قصصُ المكتبة كلها (${arNum(GARDEN_STORIES.length)} قصة)`);
+  // وأُلحقت مكتباتُ البساتين بالأغلفة كذلك (رضي المالكُ النمط) — كتابٌ يُختار من غلافه
+  ok(libStations().reduce((n, el) => n + el.querySelectorAll('.shelf-book').length, 0)
+    === GARDEN_STORIES.length,
+    `وعقدُها أغلفةُ قصص المكتبة كلها (${arNum(GARDEN_STORIES.length)} غلافاً)`);
   // الرفُّ يعرض **أغلفةً على رفّ** لا نقاطاً على درب (أمر المالك)
   ok($$('.station--shelf .shelf-book').length === SHELF_STORIES.length
     && $$('.station--shelf .shelf-book .cover').length === SHELF_STORIES.length,

@@ -1011,11 +1011,15 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
         # وهذا هو «صدق الصورة» في موضع الغلاف، وقاعدةٌ **تُحسَب** لا تُذاق.
         cover = story.get("cover")
         where = f"{label} غلاف"
-        if shelf and not isinstance(cover, dict):
-            errors.append(f"{where}: لكل قصةِ رفٍّ غلافٌ معلَن ({list(COVER_FIELDS)})")
-        elif cover is not None and not shelf:
-            errors.append(f"{where}: الغلافُ لقصص الرفّ وحدها اليوم "
-                          "(العشرُ القديمة تُلحَق بعد رضا المالك بالنمط)")
+        # **وأُلحقت العشرُ القديمة بعد رضا المالك بالنمط** (١٢ أغسطس ٢٠٢٦): فالغلافُ
+        # لقصص الرفّ والبساتين جميعاً. وتبقى **قصةُ السورة بلا غلاف**: موضعُها داخل
+        # المرحلة القرآنية لا على رفٍّ يُتصفَّح، ومحتواها دينيٌّ عبر بوّابةً ثلاثية —
+        # فلا يُزاد فيه شيءٌ إلا بها.
+        if not surah and not isinstance(cover, dict):
+            errors.append(f"{where}: لكل قصةٍ غلافٌ معلَن ({list(COVER_FIELDS)})")
+        elif cover is not None and surah:
+            errors.append(f"{where}: لا غلافَ لقصة السورة — موضعُها في المرحلة "
+                          "القرآنية لا على رفّ، وبوّابتُها ثلاثية")
         elif isinstance(cover, dict):
             if sorted(cover) != sorted(COVER_FIELDS):
                 errors.append(f"{where}: حقوله {sorted(cover)} (المطلوب {list(COVER_FIELDS)})")
@@ -1378,7 +1382,8 @@ def self_test(letters: dict) -> int:
     ASK = {"upto": 3, "text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِفْتَاحْ",
            "distractors": ["مِصْبَاحْ", "سَرِيرْ"]}
     story = {
-        "id": "t1", "level": 1, "garden": "t", "surah": "", "shelf": "", "cover": None,
+        "id": "t1", "level": 1, "garden": "t", "surah": "", "shelf": "",
+        "cover": {"hero": "🔑", "mood": "warm"},
         "title": "مِفْتَاحُ سَامِي", "emoji": "🔑",
         "pages": [{"text": "سَامِي أَمَامَ الْمِفْتَاحْ", "emoji": "🚪"},
                   {"text": "الْمِفْتَاحُ كَبِيرْ", "emoji": "🔑"},
@@ -1465,7 +1470,7 @@ def self_test(letters: dict) -> int:
                    "distractors": ["مِصْبَاحْ", "سَرِيرْ"]},
                   {"upto": 9, "text": "أَيْنَ الْمِفْتَاحْ", "answer": "بَابْ",
                    "distractors": ["سَرِيرْ", "مِصْبَاحْ"]}]
-    COVER = {"hero": "🔑", "mood": "warm"}
+    COVER = dict(story["cover"])
     shelf_story = {**story, "garden": "", "shelf": SHELF, "level": 4, "cover": dict(COVER),
                    "pages": [{"text": t, "emoji": "🚪"} for t in shelf_pages],
                    "questions": shelf_asks}
@@ -1482,10 +1487,10 @@ def self_test(letters: dict) -> int:
        "وسؤالٌ مكرَّر في المكتبة يُمسَك (نصٌّ يُنطَق كغيره)")
 
     # ————— الغلاف: بيانٌ يُركَّب، و«صدقُ الصورة» يسري عليه —————
-    ok("لكل قصةِ رفٍّ غلافٌ معلَن" in runsh({**shelf_story, "cover": None}),
+    ok("لكل قصةٍ غلافٌ معلَن" in runsh({**shelf_story, "cover": None}),
        "وقصةُ رفٍّ بلا غلافٍ تُمسَك (لكلٍّ غلافُها)")
-    ok("لقصص الرفّ وحدها" in runs({"cover": dict(COVER)}),
-       "وغلافٌ في قصةِ بستانٍ يُمسَك (النمطُ للرفّ حتى يرضاه المالك)")
+    ok("لكل قصةٍ غلافٌ معلَن" in runs({"cover": None}),
+       "وقصةُ بستانٍ بلا غلافٍ تُمسَك كذلك (أُلحقت العشرُ بعد رضا المالك بالنمط)")
     ok("ليس من رموز القصة" in runsh({**shelf_story, "cover": {**COVER, "hero": "🌴"}}),
        "وبطلٌ ليس من رموز قصته يُمسَك — الغلافُ يَعِد بحكايته لا بغيرها")
     ok("مزاجٌ مجهول" in runsh({**shelf_story, "cover": {**COVER, "mood": "أزرق"}}),

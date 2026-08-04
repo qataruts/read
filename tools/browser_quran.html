@@ -38,7 +38,7 @@ const {
   QURAN, quranMushafTexts, quranSpokenTexts, quranWordTexts, quranWordItems,
   surahWords, surahWordsPart,
 } = await import('./js/curriculum.js');
-const { allNodes } = await import('./js/progress.js');
+const { allNodes, SURAHS_PER_STATION } = await import('./js/progress.js');
 const { LIBRARY } = await import('./js/library.js');
 const manifest = await (await fetch('audio/manifest.json')).json();
 const recitations = await (await fetch('data/recitations.json')).json();
@@ -173,9 +173,15 @@ try {
   // ————— ١) الخريطة: محطة الخاتمة —————
   await seed([]);
   await waitFor(() => $('.station'), 'الخريطة');
-  ok($$('.station--quran').length === 1, 'الخريطة فيها محطة قرآنية واحدة');
-  ok($('.station--quran').classList.contains('station--locked'),
-    'وهي مقفلة في بداية الرحلة');
+  // **مفاصلُ المرحلة** (بلاغ المالك، ١٢ أغسطس ٢٠٢٦): كانت محطةً واحدة تحمل ٣١ عقدة،
+  // فصارت محطاتٍ مسمّاة **محسوبةً من `QURAN.surahs`** — والعددُ يُقرأ من المنهج لا يُكتب.
+  const wantStations = 2 + Math.ceil(QURAN.surahs.length / SURAHS_PER_STATION);
+  ok($$('.station--quran').length === wantStations,
+    `الخريطة فيها ${arNum($$('.station--quran').length)} محطاتٍ قرآنية مسمّاة لا كتلةً واحدة`);
+  ok($$('.station--quran').every((el) => el.classList.contains('station--locked')),
+    'وكلها مقفلة في بداية الرحلة');
+  ok($$('.station--quran h2').every((el) => el.textContent.trim().length > 2),
+    `ولكلٍّ عنوانُها على الخريطة (${$$('.station--quran h2').map((e) => e.textContent.trim()).join(' · ')})`);
   const stationEls = $$('.station');
   ok(stationEls.slice(0, stationEls.indexOf($('.station--quran')))
       .every((s) => !s.classList.contains('station--garden')),

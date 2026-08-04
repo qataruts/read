@@ -7,7 +7,7 @@
 
 import {
   GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, ROOTS,
-  gateBefore, quranParts, surahOfWordsPart, bareLetters,
+  gateBefore, quranParts, surahOfWordsPart, surahWordsPart, bareLetters,
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf, stemOf } from './sentences.js';
@@ -17,6 +17,15 @@ const STORE_KEY = 'muallim.progress.v1';
 export const VERSION = 2;            // ١ = نجوم فقط (تُرقّى تلقائياً بلا فقد)
 export const MAX_STARS = 3;
 export const WORDS_PART = 'words';   // عقدة لعبة الكلمات في آخر كل مجموعة
+
+/** «أربعُ سورٍ لكل محطة» — به تُشقّ السورُ محطاتٍ، ويتبعه عددُها بلا سطرٍ يُعدَّل. */
+export const SURAHS_PER_STATION = 4;
+
+// رقمٌ عربيّ لعنوان المحطة. ونسخةٌ صغيرة هنا لا استيرادٌ من `ui.js`: اتجاهُ الاعتماد
+// واحد (`ui.js` ← `progress.js`)، ولا تُقلَب طبقةٌ لأجل سطرٍ من عشرة محارف.
+// **وموضعُهما فوق**: `migrateJourney()` تعمل وقتَ تحميل الوحدة فتبني الرحلة —
+// فتعريفٌ تحتها يقع في منطقة الموت الزمنيّ ويُسقِط الوحدة كلَّها عند أول استيراد.
+const arNumeral = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 
 /** أنواع التمارين المقيسة — أسماؤها ثابتة لأنها تُخزَّن في مفاتيح المهارات. */
 export const KINDS = {
@@ -226,6 +235,69 @@ export function quranNodes() {
 }
 
 /**
+ * **مفاصلُ المرحلة القرآنية** (بلاغ المالك، ١٢ أغسطس ٢٠٢٦): كانت **٣١ عقدةً في
+ * محطةٍ واحدة**، والبساتينُ مئةُ عقدةٍ في عشر محطاتٍ مسمّاة فلا تثقل — **فالعلّة
+ * كتلةٌ بلا مفاصل لا عددٌ كثير**. فتُشقّ محطاتٍ مسمّاةً بعدّاداتها كالبساتين والرفّ.
+ *
+ * **ولا يتغيّر ترتيبُ عقدةٍ ولا قفلُها ولا نجومُها**: الشقُّ **قسمةُ القائمة نفسِها
+ * بترتيبها** — تُوزَّع عقدُ `quranNodes()` على محطاتها بلا فرزٍ ولا إعادةِ بناء،
+ * فتسلسلُها المسطَّح هو هو حرفاً بحرف (يثبته `test_quran.mjs` بمقايسة الاثنين).
+ * فالترحيلُ **بلا أثر**: العقدةُ نفسُها بمعرّفها نفسِه في موضعها نفسِه، وإنما تبدّل
+ * العنوانُ فوقها والصندوقُ حولها.
+ *
+ * **والمحطاتُ محسوبةٌ من `QURAN` لا مكتوبة**: سورةٌ ثالثةَ عشرةَ تُضاف غداً تفتح
+ * محطةً رابعة بلا سطرٍ يُعدَّل. وقصةُ السورة تتبع محطةَ سورتها — «في موضعها».
+ */
+export function quranSections() {
+  const station = new Map();      // معرّفُ الجزء ← مفتاحُ محطته
+  const at = (part, key) => station.set(part, key);
+  at(QURAN.letters.id, 'prep');
+  for (const level of QURAN.words.levels) at(level.id, 'prep');
+  at(QURAN.rasm.id, 'rasm');
+  at(QURAN.muqattaat.id, 'rasm');
+  QURAN.surahs.forEach((surah, i) => {
+    const key = `short${Math.floor(i / SURAHS_PER_STATION) + 1}`;
+    at(surah.id, key);
+    at(surahWordsPart(surah.id), key);
+  });
+
+  const titles = { prep: 'التهيئة', rasm: 'رسمُ المصحف' };
+  const faces = { prep: QURAN.letters.face, rasm: QURAN.rasm.face };
+  const subs = {
+    prep: 'الحرفان وكلماتٌ من القرآن',
+    rasm: 'علاماتُ الرسم والحروف المقطَّعة',
+  };
+  let shorts = 0;
+  const out = [];
+  for (const node of quranNodes()) {
+    // عقدةُ القصة تتبع سورتَها (`part` معرّفُ القصة لا الجزء) — «في موضعها»
+    const key = station.get(node.part)
+      || (node.story ? station.get(node.story.surah) : null) || 'prep';
+    const last = out[out.length - 1];
+    if (last && last.key === key) { last.nodes.push(node); continue; }
+    const isShort = key.startsWith('short');
+    if (isShort) shorts++;
+    out.push({
+      key,
+      kind: 'quran',
+      id: `quran:${key}`,
+      title: titles[key] || `سورٌ قصار ${arNumeral(shorts)}`,
+      face: faces[key] || node.face,
+      sub: subs[key] || '',
+      nodes: [node],
+    });
+  }
+  // وصفُ محطة السور يُكتب بعد امتلائها: عددُ سورها لا عددُ عقدها
+  for (const section of out) {
+    if (!section.sub) {
+      const n = section.nodes.filter((x) => x.type === 'quran' && !x.part.startsWith('sw-')).length;
+      section.sub = `${arNumeral(n)} سور بكلماتها`;
+    }
+  }
+  return out;
+}
+
+/**
  * عقدة «بوابة الإتقان» (الحزمة ١٤): عقدةٌ واحدة تقف قبل مفصلٍ كبير، لا تُجتاز
  * بالإتمام بل بالإصابة — وحدها في محطتها كي يراها الطفل بوّابةً لا درساً.
  */
@@ -364,7 +436,7 @@ export function journey() {
     }
   }
   pushGate('quran');
-  out.push({ kind: 'quran', id: 'quran', nodes: quranNodes() });
+  out.push(...quranSections());
   pushGate('gardens');
   for (const garden of GARDENS) {
     out.push({ kind: 'garden', id: `garden:${garden.id}`, garden, nodes: gardenNodes(garden) });

@@ -106,6 +106,35 @@ ok(ids.slice(quranStart + parts.length + prophetNodes.length).every((id) => id.s
   || id.startsWith('shelf:') || id === 'gate:gardens'),
   'ولا يليها إلا بوابة الحديقة (١٤) وبساتين الموضوعات (٧) وسلالم جملها (٨) '
   + 'ومكتبة قصصها (٩) وأشجار جذورها (الجذور) ورفُّ قراءتها الطويلة (المكتبة)');
+// ————— مفاصلُ المرحلة: محطاتٌ مسمّاة، والشقُّ بلا أثر —————
+//
+// **بلاغ المالك (١٢ أغسطس ٢٠٢٦)**: ٣١ عقدةً تحت عنوانٍ واحد بينما البساتين مئةٌ في
+// عشر محطاتٍ فلا تثقل — فالعلّة كتلةٌ بلا مفاصل. والمحروسُ هنا شيئان لا ثالثَ لهما:
+//   (أ) **المحطاتُ محسوبةٌ من `QURAN.surahs` لا مكتوبةٌ بيد** — فسورةٌ تُضاف تفتح
+//       محطتَها بلا سطرٍ يُعدَّل، ولا رقمَ في حارسٍ يُكتب بيد.
+//   (ب) **الشقُّ بلا أثر**: قسمةُ القائمة نفسِها بترتيبها — فتسلسلُ العقد المسطَّح
+//       هو هو حرفاً بحرف، ومنه يتبع أنّ القفلَ التسلسلي والنجومَ لم تُمَسّ.
+const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
+console.log('\n— مفاصلُ المرحلة (محطاتٌ مسمّاة) —');
+const sections = p.quranSections();
+const wantShort = Math.ceil(QURAN.surahs.length / p.SURAHS_PER_STATION);
+const shorts = sections.filter((x) => x.key.startsWith('short'));
+ok(sections.length === 2 + wantShort && shorts.length === wantShort,
+  `المرحلةُ ${arNum(sections.length)} محطاتٍ مسمّاة لا كتلةً واحدة `
+  + `(التهيئة · رسمُ المصحف · ${arNum(wantShort)} محطاتِ سورٍ — محسوبةٌ من ${arNum(QURAN.surahs.length)} سورة)`);
+ok(sections.every((x) => x.title && x.sub && x.face && x.nodes.length),
+  'ولكلٍّ عنوانُها ووصفُها ووجهُها وعقدُها — كالبساتين والرفّ');
+const perStation = shorts.map((x) => x.nodes.filter(
+  (n) => n.type === 'quran' && !n.part.startsWith('sw-')).length);
+ok(perStation.every((n) => n > 0 && n <= p.SURAHS_PER_STATION),
+  `ولا محطةَ سورٍ تتجاوز حدَّها (${perStation.map(arNum).join('، ')} من ${arNum(p.SURAHS_PER_STATION)})`);
+ok(sections.flatMap((x) => x.nodes).map((n) => n.id).join('|')
+  === p.quranNodes().map((n) => n.id).join('|'),
+  '**والشقُّ بلا أثر**: تسلسلُ العقد المسطَّح هو هو — قسمةُ القائمة لا إعادةُ بنائها، '
+  + 'فلا ترتيبٌ تغيّر ولا قفلٌ ولا نجمة');
+ok(p.journey().filter((x) => x.kind === 'quran').length === sections.length,
+  'وأقسامُ الرحلة تحمل المحطات كما هي (لا كتلةَ باقية)');
+
 ok(ids[quranStart - 1] === 'gate:quran',
   'ويسبقها مباشرةً بوابة الإتقان — لا مصحف بحروف هشّة (الحزمة ١٤)');
 // عقد التأسيس: حروف المجموعات ولعبها + المهارات + القصص + البوابتان + المرحلة القرآنية

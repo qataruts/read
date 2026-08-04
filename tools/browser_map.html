@@ -144,10 +144,12 @@ try {
   ok(backEl.classList.contains('station--folded'), 'محطةٌ خمسُ محطاتٍ خلف الجبهة مطويّة');
   backEl.querySelector('.station-head--fold').click();          // النقرة الأولى
   await sleep(60);
-  ok(!backEl.classList.contains('station--folded') && backEl.querySelectorAll('.node').length > 0,
-    `النقرة الأولى تفرد المحطة فتظهر عقدها (${arNum(backEl.querySelectorAll('.node').length)} عقدة)`);
+  // (وعقدُ المحطة نقاطٌ `.node` أو أغلفةٌ `.shelf-book` — والمكتباتُ والرفُّ تعرض كتباً)
+  const cells = (el) => el.querySelectorAll('.node, .shelf-book').length;
+  ok(!backEl.classList.contains('station--folded') && cells(backEl) > 0,
+    `النقرة الأولى تفرد المحطة فتظهر عقدها (${arNum(cells(backEl))} عقدة)`);
   ok(!!backEl.querySelector('.station-mark svg'), 'ويعود معلمها البصري على الدرب (DESIGN §٦)');
-  const target = backEl.querySelector('.node--done');
+  const target = backEl.querySelector('.node--done, .shelf-book.node--done');
   target.click();                                               // النقرة الثانية
   await sleep(150);
   ok(!$('.map'), 'والنقرة الثانية تفتح العقدة — فلا عقدة أبعد من نقرتين');

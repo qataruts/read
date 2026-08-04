@@ -89,16 +89,19 @@ ok(new Set(texts).size === texts.length, `ولا جملة مكرَّرة في ا
 //   • عناصرُه **من رموز القصة نفسِها** («صدق الصورة»: لا يَعِد بغير حكايته).
 //   • **العنوانُ نصٌّ حقيقيّ** في DOM لا محروقٌ في صورة — يقرؤه الطفل وقارئةُ الشاشة.
 console.log('\n— أغلفةُ الرفّ —');
-const SHELF_COVERS = SHELF.map((s) => s.cover);
-ok(SHELF.length > 0 && SHELF_COVERS.every(Boolean),
-  `لكل قصةِ رفٍّ غلافٌ معلَن (${SHELF.length} غلافاً)`);
-ok(ALL_STORIES.filter((s) => !s.shelf).every((s) => !s.cover),
-  'ولا غلافَ لقصص البساتين والسور اليوم (تُلحَق بعد رضا المالك بالنمط)');
+// **وأُلحقت العشرُ القديمة بعد رضا المالك بالنمط**: الغلافُ لقصص الرفّ والبساتين
+// جميعاً. وتبقى قصةُ السورة بلا غلاف — موضعُها في المرحلة القرآنية لا على رفّ.
+const COVERED = ALL_STORIES.filter((s) => !s.surah);
+const SHELF_COVERS = COVERED.map((s) => s.cover);
+ok(COVERED.length > 0 && SHELF_COVERS.every(Boolean),
+  `لكل قصةٍ (رفّاً وبستاناً) غلافٌ معلَن (${COVERED.length} غلافاً)`);
+ok(ALL_STORIES.filter((s) => s.surah).every((s) => !s.cover),
+  'ولا غلافَ لقصة السورة — موضعُها في المرحلة القرآنية لا على رفّ، وبوّابتُها ثلاثية');
 // **بطلٌ ومزاجٌ لا غير** (تبسيطُ المالك بعد معاينة اللقطة): المسانِدُ حُذفا لأنّهما
 // رموزٌ مستقلّة تُصفّ لا عناصرُ لوحةٍ تُركَّب — فيُحرَس ألّا يعودا خلسةً.
 ok(SHELF_COVERS.every((c) => Object.keys(c).sort().join() === 'hero,mood'),
   'وحقولُه بطلٌ ومزاجٌ لا غير — رمزٌ واحدٌ واضحٌ خيرٌ من ثلاثةٍ تتزاحم');
-const untrue = SHELF.filter((s) => {
+const untrue = COVERED.filter((s) => {
   const own = new Set([s.emoji, ...s.pages.map((p) => p.emoji)]);
   return !own.has(s.cover.hero);
 });
