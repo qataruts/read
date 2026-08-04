@@ -24,10 +24,14 @@ const ok = (cond, msg) => {
 setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 110000);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// **وتنتظر المُهلِبَ كما تنتظر المتزامن** (إصلاح ١٢ أغسطس ٢٠٢٦): كانت تختبر
+// `fn()` بلا `await`، والدالّةُ غيرُ المتزامنة تعيد **وعداً — وهو صادقٌ دائماً**،
+// فتعود من أول محاولةٍ بوعدٍ قد يُحلّ إلى `null`. فما بدا انتظاراً كان محاولةً
+// واحدة، ولم يظهر أثرُه إلا يوم تأخّر ما كان يسبق.
 async function waitFor(fn, label = '', ms = 4000) {
   const t0 = Date.now();
   for (;;) {
-    let v; try { v = fn(); } catch { v = null; }
+    let v; try { v = await fn(); } catch { v = null; }
     if (v) return v;
     if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
     await sleep(25);
@@ -605,14 +609,27 @@ try {
   ok(paths.some((p) => p.endsWith('/data/recitations.json')),
     'وبيانُ التلاوة في مخزون الهيكل');
 
+  // **يُنتظَر التخزينُ ولا يُلتقَط في لحظة** (١٢ أغسطس ٢٠٢٦): كان يُقاس مرّةً واحدة
+  // بعد مهلةٍ ثابتة، فيمرّ ما دام الصوتُ قليلاً — ويسقط يومَ يكبر. وعاملُ الخدمة
+  // يخزّن **دفعاتٍ من ١٦ والتلاوةُ آخِراً** (حزمة «خفّة التخزين»)، فكلَّما زادت
+  // ملفاتُ الصوت تأخّرت التلاوة عن نافذة القياس — **حارسٌ يرثّ بنموّ المشروع**،
+  // وقد سقط فعلاً حين صُرِّفت مئةٌ وتسعون نصاً في يومٍ واحد. فصار يُنتظَر بلوغُها
+  // بمهلةٍ سخيّة: فالمقيسُ **أنها تُخزَّن**، لا أنها تُخزَّن في ثانيةٍ بعينها.
+  const ayatKeys = Object.keys(recitations.ayat);
   const audioName = (await win.caches.keys()).find((n) => n.startsWith('muallim-audio'));
-  const audioCache = audioName && await win.caches.open(audioName);
-  const audioKeys = audioCache ? await audioCache.keys() : [];
-  const cachedAudio = new Set(audioKeys.map((r) => new URL(r.url).pathname.split('/').pop()));
-  const offline = Object.keys(recitations.ayat).filter((k) => cachedAudio.has(`${k}.mp3`));
-  ok(offline.length === Object.keys(recitations.ayat).length,
+  const offline = await waitFor(async () => {
+    const name = (await win.caches.keys()).find((n) => n.startsWith('muallim-audio'));
+    if (!name) return null;
+    const keys = await (await win.caches.open(name)).keys();
+    const have = new Set(keys.map((r) => new URL(r.url).pathname.split('/').pop()));
+    const hit = ayatKeys.filter((k) => have.has(`${k}.mp3`));
+    return hit.length === ayatKeys.length ? hit : null;
+  }, 'تخزين تلاوات القارئ', 60000).catch(() => []);
+  ok(offline.length === ayatKeys.length,
     `وتلاواتُ القارئ كلها مخزونة فتعمل دون إنترنت (${offline.length}/`
-    + `${Object.keys(recitations.ayat).length} في ${audioName})`);
+    + `${ayatKeys.length} في ${audioName})`);
+  // مفاتيحُ المخزون **بعد الانتظار** — فما بعدها يقيس ما استقرّ لا ما كان
+  const audioKeys = audioName ? await (await win.caches.open(audioName)).keys() : [];
   // وسمُ بصمة المحتوى: بلا وسمٍ يبقى الجهاز على صوتٍ قديم أبداً بعد أي استبدال
   const untagged = audioKeys.filter((r) => !new URL(r.url).search.startsWith('?v='));
   ok(audioKeys.length > 0 && untagged.length === 0,

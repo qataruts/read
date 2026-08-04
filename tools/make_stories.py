@@ -665,6 +665,10 @@ SPECS = [
     # `يَحْبِسْ`**)، والهلاكُ (نزولُ الحجارة هو الهلاك مرويّاً برفق).
     {
         "id": "alfil-walkaaba", "level": 3, "surah": "s105", "emoji": "🐘",
+        # غلافُها بالنمط نفسِه (أمر المالك، ١٢ أغسطس ٢٠٢٦): البطلُ وجهُها والمزاجُ
+        # المعلَن — **فلا محتوى جديد** يُزاد على قصةٍ عبرت بوّابةً ثلاثية، وإنما
+        # كسوةٌ لِما هو مكتوب. و«deep» لونُ المرحلة القرآنية نفسُه من اللوح.
+        "cover": {"mood": "deep"},
         "title": "فِيلْ~n +كَعْبَةْ~p",
         "pages": [
             ("كَعْبَةْ~n بَيْتْ~u اللَّٰهْ", "🕋"),
@@ -1013,7 +1017,7 @@ def self_test(data: dict) -> int:
 
     # ————— الغلاف: لكل قصةِ رفٍّ غلافٌ، وعناصرُه من رموزها —————
     bad_cover = []
-    for story in [s for s in stories if not s["surah"]]:
+    for story in stories:
         cv = story.get("cover") or {}
         own = {story["emoji"], *(p["emoji"] for p in story["pages"])}
         if sorted(cv) != sorted(COVER_FIELDS):
@@ -1023,7 +1027,7 @@ def self_test(data: dict) -> int:
             bad_cover.append(f"{story['id']}: {cv['hero']} خارج رموزها")
         if cv["mood"] not in COVER_MOODS:
             bad_cover.append(f"{story['id']}: مزاجٌ مجهول {cv['mood']}")
-    ok(not bad_cover, f"ولكل قصةٍ (رفّاً وبستاناً) غلافٌ بطلُه من رموزها ({len([s for s in stories if not s['surah']])} غلافاً)"
+    ok(not bad_cover, f"ولكل قصةٍ غلافٌ بطلُه من رموزها ({len(stories)} غلافاً)"
        + (f" — {bad_cover[:3]}" if bad_cover else ""))
     moods = [s["cover"]["mood"] for s in shelf if s.get("cover")]
     ok(all(a != b for a, b in zip(moods, moods[1:])),
