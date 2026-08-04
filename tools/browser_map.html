@@ -161,6 +161,8 @@ try {
   const lockedEl = $$('.station').at(-1);
   lockedEl.querySelector('.station-head--fold')?.click();
   await sleep(60);
+  // (وآخرُ محطةٍ اليوم رفُّ المكتبة: عقدُه أغلفةٌ `.shelf-book` لا `.node` — والمقفلُ
+  //  فيه يحمل `node--locked` نفسَه ويردّ الردَّ نفسَه، فالشكلُ تبدّل والسلوكُ لا.)
   const lockedNode = lockedEl.querySelector('.node--locked');
   ok(!!lockedNode, 'آخر محطة تُفرد فتظهر عقدها مقفلةً');
   lockedNode.click();
@@ -200,8 +202,11 @@ try {
     + `(أصغر ${arNum(Math.round(fullDom / lazyDom))} أضعاف)`);
   ok(lazyMs < fullMs,
     `وزمن الرسمة الواحدة: مفرودةً ${arNum(round(fullMs))} م.ث ← كسولةً ${arNum(round(lazyMs))} م.ث`);
-  ok($$('.node').length === ALL.length,
-    `والمفرودة كلها تعرض عقد الرحلة كلها (${arNum($$('.node').length)} عقدة) — الطيّ عرضٌ لا حذف`);
+  // **العدُّ بالعقد لا بصنفٍ واحد**: رفُّ المكتبة يعرض عقدَه أغلفةً (`.shelf-book`)
+  // لا نقاطاً (`.node`) — فيُعدّ الاثنان، وإلا كذب الحارسُ يومَ تبدّل شكلُ محطة.
+  const shown = $$('.node').length + $$('.shelf-book').length;
+  ok(shown === ALL.length,
+    `والمفرودة كلها تعرض عقد الرحلة كلها (${arNum(shown)} عقدة) — الطيّ عرضٌ لا حذف`);
 
   ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
 } catch (e) {

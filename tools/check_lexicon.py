@@ -101,7 +101,22 @@ FILL_OPTIONS = 3               # خيارات «أكمل الجملة» (نظي�
 # من هنا): فالعقد مكتوبٌ في الحارس لا في المؤلِّف، ولا يوسّعه المؤلِّف على نفسه.
 STORIES_DIR = ROOT / "app" / "data" / "stories"
 STORY_INDEX = STORIES_DIR / "index.json"
-STORY_FIELDS = ("id", "level", "garden", "surah", "shelf", "title", "emoji", "pages", "questions")
+STORY_FIELDS = ("id", "level", "garden", "surah", "shelf", "title", "emoji", "cover",
+                "pages", "questions")
+
+# ————— غلافُ القصة (أمر المالك، ١٢ أغسطس ٢٠٢٦) —————
+#
+# **غلافٌ واحد للقصة كما في كتب الأطفال** — لا رسمٌ لكل صفحة: فينتفي الخطرُ التعليمي
+# (الغلافُ يعِد بالحكاية ولا يسلّم كلمةً في صفحة)، وتصير الكلفةُ تسعةَ أصولٍ لا مئة.
+#
+# و**بيانٌ لا صورة**: `{hero, props, mood}` — ثلاثةُ حقولٍ تُعلَن هنا ويركّبها المُصيِّر
+# (`coverEl` في `ui.js`) من رموز `app/emoji/` أنفسِها بـ CSS. فيثبت النمطُ بالبناء لا
+# بيدِ رسّام، ويبقى الحجمُ كيلوباتٍ، وكلُّ عنصرٍ موثَّقُ النسب في جرد Twemoji.
+COVER_FIELDS = ("hero", "props", "mood")
+COVER_PROPS = (1, 2)       # عنصرٌ أو عنصران مسانِدان — لا صفٌّ متساوٍ ولا مشهدٌ مزدحم
+# **المزاجُ مفتاحٌ لا لون**: يُترجَم في `app.css` إلى أحد ألوان اللوح القائمة، فلا
+# يُنسَخ لونٌ في بيانٍ ولا يفترق الغلافُ عن الثيم الليليّ. (يحرس أسماءَها `test_stories`.)
+COVER_MOODS = ("warm", "green", "teal", "violet", "gold", "deep")
 # **محاورُ الموضع ثلاثة** (حكم المدير على `REVIEW_LIBRARY.md`، ١٢ أغسطس ٢٠٢٦):
 # «garden» لقصص المكتبة بعد سلّم بستانها، و«surah» لقصص المرحلة القرآنية قبل البساتين،
 # و«shelf» لقصص **رفّ المكتبة** الطويلة في **ذيل الرحلة**. يملأ واحدٌ منها ويفرغ اثنان.
@@ -985,6 +1000,38 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
                 audio_texts.add(text)
             audio_texts.update(page_words)
 
+        # ————— الغلاف: بيانٌ يُركَّب، و«صدقُ الصورة» يسري عليه —————
+        #
+        # **ولا يعِد بما ليس في القصة**: كلُّ عنصرٍ فيه من رموز القصة نفسِها (وجهُها
+        # ومشاهدُ صفحاتها) — فالغلافُ يَعِد بالحكاية التي بين دفّتيه لا بغيرها.
+        # وهذا هو «صدق الصورة» في موضع الغلاف، وقاعدةٌ **تُحسَب** لا تُذاق.
+        cover = story.get("cover")
+        where = f"{label} غلاف"
+        if shelf and not isinstance(cover, dict):
+            errors.append(f"{where}: لكل قصةِ رفٍّ غلافٌ معلَن ({list(COVER_FIELDS)})")
+        elif cover is not None and not shelf:
+            errors.append(f"{where}: الغلافُ لقصص الرفّ وحدها اليوم "
+                          "(العشرُ القديمة تُلحَق بعد رضا المالك بالنمط)")
+        elif isinstance(cover, dict):
+            if sorted(cover) != sorted(COVER_FIELDS):
+                errors.append(f"{where}: حقوله {sorted(cover)} (المطلوب {list(COVER_FIELDS)})")
+            else:
+                own = {story.get("emoji"), *(p.get("emoji") for p in pages)}
+                props = cover.get("props") or []
+                if not isinstance(props, list) or not COVER_PROPS[0] <= len(props) <= COVER_PROPS[1]:
+                    errors.append(f"{where}: {len(props) if isinstance(props, list) else props} "
+                                  f"عنصراً مسانداً (المطلوب {COVER_PROPS[0]}–{COVER_PROPS[1]})")
+                if cover.get("mood") not in COVER_MOODS:
+                    errors.append(f"{where}: مزاجٌ مجهول «{cover.get('mood')}» "
+                                  f"(المُعلَن {list(COVER_MOODS)})")
+                scene = [cover.get("hero"), *props]
+                stray = [g for g in scene if g not in own]
+                if stray:
+                    errors.append(f"{where}: «{'، '.join(map(str, stray))}» ليست من رموز القصة — "
+                                  "الغلافُ يعِد بحكايته لا بغيرها («صدق الصورة»)")
+                if len(set(scene)) != len(scene):
+                    errors.append(f"{where}: عنصرٌ مكرَّر في المشهد ({'، '.join(map(str, scene))})")
+
         # ————— أسئلة الفهم: سؤالٌ لكل مقطعٍ في الرفّ، وواحدٌ في الخاتمة لغيره —————
         #
         # **حوضُ الخيارات يتبع محورَ القصة**: قصةُ البستان من معجمه؛ وقصةُ السورة من
@@ -1335,7 +1382,7 @@ def self_test(letters: dict) -> int:
     ASK = {"upto": 3, "text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِفْتَاحْ",
            "distractors": ["مِصْبَاحْ", "سَرِيرْ"]}
     story = {
-        "id": "t1", "level": 1, "garden": "t", "surah": "", "shelf": "",
+        "id": "t1", "level": 1, "garden": "t", "surah": "", "shelf": "", "cover": None,
         "title": "مِفْتَاحُ سَامِي", "emoji": "🔑",
         "pages": [{"text": "سَامِي أَمَامَ الْمِفْتَاحْ", "emoji": "🚪"},
                   {"text": "الْمِفْتَاحُ كَبِيرْ", "emoji": "🔑"},
@@ -1422,7 +1469,8 @@ def self_test(letters: dict) -> int:
                    "distractors": ["مِصْبَاحْ", "سَرِيرْ"]},
                   {"upto": 9, "text": "أَيْنَ الْمِفْتَاحْ", "answer": "بَابْ",
                    "distractors": ["سَرِيرْ", "مِصْبَاحْ"]}]
-    shelf_story = {**story, "garden": "", "shelf": SHELF, "level": 4,
+    COVER = {"hero": "🔑", "props": ["🚪"], "mood": "warm"}
+    shelf_story = {**story, "garden": "", "shelf": SHELF, "level": 4, "cover": dict(COVER),
                    "pages": [{"text": t, "emoji": "🚪"} for t in shelf_pages],
                    "questions": shelf_asks}
     runsh = lambda st: runs(stories=[st], support=SHELF_SUPPORT_T)
@@ -1436,6 +1484,20 @@ def self_test(letters: dict) -> int:
     ok("سؤالٌ مكرَّر" in runsh(
         {**shelf_story, "questions": [shelf_asks[0], {**shelf_asks[0], "upto": 9}]}),
        "وسؤالٌ مكرَّر في المكتبة يُمسَك (نصٌّ يُنطَق كغيره)")
+
+    # ————— الغلاف: بيانٌ يُركَّب، و«صدقُ الصورة» يسري عليه —————
+    ok("لكل قصةِ رفٍّ غلافٌ معلَن" in runsh({**shelf_story, "cover": None}),
+       "وقصةُ رفٍّ بلا غلافٍ تُمسَك (لكلٍّ غلافُها)")
+    ok("لقصص الرفّ وحدها" in runs({"cover": dict(COVER)}),
+       "وغلافٌ في قصةِ بستانٍ يُمسَك (النمطُ للرفّ حتى يرضاه المالك)")
+    ok("ليست من رموز القصة" in runsh({**shelf_story, "cover": {**COVER, "props": ["🌴"]}}),
+       "وعنصرٌ ليس من رموز قصته يُمسَك — الغلافُ يَعِد بحكايته لا بغيرها")
+    ok("مزاجٌ مجهول" in runsh({**shelf_story, "cover": {**COVER, "mood": "أزرق"}}),
+       "ومزاجٌ خارج المُعلَن يُمسَك (المزاجُ مفتاحٌ يترجمه app.css لا لونٌ في بيان)")
+    ok("عنصراً مسانداً" in runsh({**shelf_story, "cover": {**COVER, "props": []}}),
+       "ومشهدٌ بلا مسانِدٍ يُمسَك — رمزٌ مفردٌ مكبَّر أيقونةٌ لا غلاف")
+    ok("عنصرٌ مكرَّر" in runsh({**shelf_story, "cover": {**COVER, "props": ["🔑"]}}),
+       "وعنصرٌ مكرَّرٌ في المشهد يُمسَك (بطلٌ ومسانِدٌ صورتُهما واحدة)")
 
     late = {"id": "t2", "title": "بستان ثانٍ", "emoji": "🌴"}
     ok("قاعدة «أوّل موضع تكتمل كلماته»" in _late_garden(story, extra, good, theme, late,

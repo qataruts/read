@@ -19,7 +19,7 @@ import { renderRoots } from './roots.js';
 import { renderLadder } from './ladder.js';
 import { renderParent, skillsText } from './parent.js';
 import {
-  h, icon, faceEl, toast, go, arNum, arCount, starsRow, topbar, brandMark,
+  h, icon, faceEl, coverEl, toast, go, arNum, arCount, starsRow, topbar, brandMark,
   letterTitle, nodeTitle, nodeFace, nodeWhere,
   ACCENTS, PAUSE_ACCENT, STORY_ACCENT, QURAN_ACCENT, SENTENCE_ACCENT,
   accentFor, accentForGarden, landmark, DEV,
@@ -435,7 +435,40 @@ function shelfEl(section, next, folded) {
       : [icon('lock'), ' مقفل'],
     nodes: section.nodes,
     next,
+    // **أغلفةٌ على رفّ** (أمر المالك): الرفُّ يُعرَض كتباً لا نقاطاً على درب — فيصير
+    // الاسمُ صورةً لا استعارة، ويختار الطفلُ كتابَه كما يختاره من رفّ بيته.
+    body: shelfRow(section.nodes, next),
   });
+}
+
+/** صفُّ الأغلفة على لوح الرفّ — بديلُ مسار العقد في هذا القسم وحدَه. */
+function shelfRow(nodes, next) {
+  return h('ol', { class: 'shelf-row' }, nodes.map((node) => {
+    const open = progress.isNodeUnlockedById(node.id);
+    const stars = progress.getStars(node.id);
+    const isNext = next && next.id === node.id;
+    // **والمقفلُ يُجيب كما يُجيب سائرُ المقفل**: هزّةٌ ورسالة «أكمِل ما قبله أولاً» —
+    // لا زرٌّ ميّت (`disabled`) لا يردّ على الطفل. فالغلافُ بدّل الشكلَ لا السلوك.
+    const btn = h('button', {
+      class: `shelf-book node--${open ? (stars ? 'done' : 'open') : 'locked'}`
+        + `${isNext ? ' node--next' : ''}`,
+      'aria-label': `${nodeTitle(node)} — ${open ? (stars ? `${arNum(stars)} نجوم · يمكن إعادته` : 'مفتوح') : 'مقفل'}`,
+      onclick: () => {
+        if (!open) {
+          btn.classList.remove('shake');
+          void btn.offsetWidth;
+          btn.classList.add('shake');
+          toast('أكمِل ما قبله أولاً', 'smile');
+          return;
+        }
+        openNode(node);
+      },
+    },
+      coverEl(node.story),
+      h('span', { class: 'shelf-stars' }, open && stars ? `★ ${arNum(stars)}` : (open ? '' : icon('lock'))),
+    );
+    return h('li', {}, btn);
+  }));
 }
 
 /** لون العقدة في بطاقة «تابع من هنا»: لون مجموعتها، أو لون محطتها الخاصة. */
@@ -471,7 +504,7 @@ function trailEl(flip) {
  * أين هو ومَن حوله (اسم المحطة ونجومها وقفلها كما هي)، ولا يُبنى من العقد إلا ما
  * يقع تحت بصره. وفرْدُها يبقى ما دامت الجلسة، فلا تُطوى تحت يده كلما عاد إليها.
  */
-function trackEl({ id, folded, className, accent, mark, label, badge, title, sub, meta, nodes, next }) {
+function trackEl({ id, folded, className, accent, mark, label, badge, title, sub, meta, nodes, next, body }) {
   const station = h('section', { class: className, css: { '--accent': accent }, 'aria-label': label });
   let open = !folded;
 
@@ -496,8 +529,9 @@ function trackEl({ id, folded, className, accent, mark, label, badge, title, sub
       return;
     }
 
-    const track = h('ol', { class: 'track' });
-    for (const node of nodes) track.append(h('li', {}, nodeButton(node, next)));
+    // `body` جسدٌ بديلٌ للمسار (رفُّ المكتبة يعرض أغلفةً لا نقاطاً) — والباقي كما هو
+    const track = body || h('ol', { class: 'track' });
+    if (!body) for (const node of nodes) track.append(h('li', {}, nodeButton(node, next)));
     station.replaceChildren(h('div', { class: 'station-head' }, inner), track);
     if (mark) station.append(landmark(mark));
   }

@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_lexicon import (
     SHELF, SHELF_LEVELS, STORIES_DIR, STORY_FIELDS, STORY_INDEX, STORY_LEVELS, SUPPORT_FIELD,
-    bare, curriculum_word, dump_story, load, load_stories, segments_of, stem, taught_words,
+    COVER_FIELDS, COVER_MOODS, bare, curriculum_word, dump_story, load, load_stories, segments_of, stem, taught_words,
 )
 from make_sentences import FATHA, all_bases as sentence_bases, render, strip_end
 
@@ -311,6 +311,7 @@ SPECS = [
         # خرافةُ النملة والجرادة، مُعادةَ التأليف. **وشرطُ المدير محفوظٌ بحرفه**
         # (١٢ أغسطس ٢٠٢٦): لا هلاكَ للجراد ولا ردَّ له خائباً — النملةُ تُعطي،
         # ويأكلان معاً. فالجدُّ يُرى في الصفحات، والكرمُ يُرى في الخاتمة.
+        "cover": {"hero": "🐜", "props": ["🦗", "🌽"], "mood": "gold"},
         "title": "نَمْلَةْ~n +جَرَادْ~p",
         "pages": [
             ("فِي حَقْلْ~i نَمْلَةْ~N صَغِيرَةْ", "🌾"),
@@ -333,6 +334,7 @@ SPECS = [
         "id": "thalab-walinab", "level": 4, "shelf": SHELF, "emoji": "🦊",
         # خرافةُ الثعلب والعنب. والخاتمةُ طيبة: يترك ما لا يبلغه ويجد ما يبلغه —
         # فلا ينصرف الطفلُ على خيبة.
+        "cover": {"hero": "🦊", "props": ["🍇", "🌳"], "mood": "green"},
         "title": "ثَعْلَبْ~n +عِنَبْ~p",
         "pages": [
             ("فِي غَابَةْ~i ثَعْلَبْ~N جَائِعْ", "🌳"),
@@ -363,6 +365,7 @@ SPECS = [
     {
         "id": "sami-walmaktaba", "level": 4, "shelf": SHELF, "emoji": "📚",
         # تأليفٌ مقيَّد: يعود سامي — يبحث فيجد، ثمّ **يُعطي** صديقَه ما وجد.
+        "cover": {"hero": "📚", "props": ["🪜", "🏫"], "mood": "teal"},
         "title": "سَامِي فِي مَكْتَبَةْ~p",
         "pages": [
             ("سَامِي فِي مَكْتَبَةْ~i كَبِيرَةْ~p", "🏫"),
@@ -391,6 +394,7 @@ SPECS = [
         # خرافةُ الغراب والجبن. و**الراوي لا يصف الثعلبَ بما ليس فيه**: لا «طيّبٌ»
         # ولا «ماكر» — يُروى فعلُه (يطلب الصوتَ الجميل) ويُرى أثرُه. والخاتمةُ طيبة:
         # يخسر الجبنَ ويجد صديقاً — والعبرةُ تُرى ولا تُقال.
+        "cover": {"hero": "🐦\u200d⬛", "props": ["🧀", "🦊"], "mood": "violet"},
         "title": "غُرَابْ~n +جُبْنْ~p",
         "pages": [
             ("غُرَابْ~N يَحْمِلْ~v جُبْنْ~a صَغِيرْ~p", "🧀"),
@@ -419,6 +423,7 @@ SPECS = [
         # تراثٌ عربيّ: جُحَا وحمارُه — **مُعادُ التأليف** بالعقد لا منقولاً بنصّه.
         # والعبرة: لا تُرضي الناسَ كلَّهم، فامضِ بما تراه صواباً. والضحكُ يُروى فعلاً
         # («يَضْحَكُ مِنَ…») ولا يُوصَف الضاحكُ بسوءٍ — الراوي يخبر ولا يحكم.
+        "cover": {"hero": "🫏", "props": ["🧔", "🛤️"], "mood": "warm"},
         "title": "جُحَا +حِمَارْ~p",
         "pages": [
             ("جُحَا يَمْشِي مَعَ وَلَدْ~i صَغِيرْ~p", "🚶"),
@@ -443,6 +448,7 @@ SPECS = [
     {
         "id": "hasan-walusfur", "level": 5, "shelf": SHELF, "emoji": "🐦",
         # تأليفٌ مقيَّد: يعود حسن — عصفورٌ يقع من عشّه فيردّه إليه.
+        "cover": {"hero": "🐦", "props": ["🪺", "🪜"], "mood": "green"},
         "title": "حَسَنْ +عُصْفُورْ~p",
         "pages": [
             ("عُشّْ~n صَغِيرْ~n فَوْقَ شَجَرَةْ~i عَالِيَةْ~p", "🪹"),
@@ -477,6 +483,7 @@ SPECS = [
         "id": "asad-walfar", "level": 6, "shelf": SHELF, "emoji": "🦁",
         # خرافةُ الأسد والفأر: الصغيرُ ينفع الكبير. والراوي يروي الفعلَ ولا يصف
         # الأسدَ بجبروتٍ ولا الفأرَ بذكاء — العبرةُ تُرى في الصفحات.
+        "cover": {"hero": "🦁", "props": ["🐭", "🪤"], "mood": "deep"},
         "title": "أَسَدْ~n +فَأْرْ~p",
         "pages": [
             ("فِي غَابَةْ~i كَبِيرَةْ~i أَسَدْ~N قَوِيّْ", "🌳"),
@@ -505,6 +512,7 @@ SPECS = [
         "id": "hamama-wassayyad", "level": 6, "shelf": SHELF, "emoji": "🕊️",
         # «الحمامةُ المطوَّقة» من **كليلة ودمنة** — مُعادةَ التأليف بالعقد لا منقولة.
         # والعبرة: الجماعةُ تنجو معاً. والخاتمةُ طيبة، والصيادُ يُروى فعلُه لا يُذَمّ.
+        "cover": {"hero": "🕊️", "props": ["🪢", "🌽"], "mood": "teal"},
         "title": "حَمَامَةْ~n +جَمَاعَةْ~p",
         "pages": [
             ("حَمَامَةْ~N جَائِعَةْ~N تَطِيرْ~v فَوْقَ حَقْلْ~p", "🕊️"),
@@ -532,6 +540,7 @@ SPECS = [
         "id": "zayd-wassibaq", "level": 6, "shelf": SHELF, "emoji": "🏅",
         # تأليفٌ مقيَّد: يعود زيد — يخسر مرّةً ثم يُحاول فيفوز. والخسارةُ تُروى بلا
         # ذمّ، والفوزُ يُشارَك — «يُعطي الزميلَ الكأس» خاتمةٌ طيبة لا تفاخُر.
+        "cover": {"hero": "🏅", "props": ["🏆", "🏟️"], "mood": "gold"},
         "title": "زَيْدْ +سِبَاقْ~p",
         "pages": [
             ("زَيْدْ~N يَجْرِي فِي مَلْعَبْ~i وَاسِعْ~p", "🏟️"),
@@ -659,6 +668,10 @@ def build(data: dict) -> tuple:
             "shelf": spec.get("shelf", ""),
             "title": compose(spec["title"], bases, unknown, title=True),
             "emoji": spec["emoji"],
+            # **الغلافُ بيانٌ لا صورة** (أمر المالك): `{hero, props, mood}` يركّبه
+            # `coverEl` من رموز `app/emoji/` بـ CSS — فلا ملفَّ يُرسم بيد، والنمطُ
+            # يثبت بالبناء. وقصصُ البساتين والسور بلا غلافٍ اليوم (يفرضه الفاحص).
+            "cover": spec.get("cover") or None,
             "pages": [{"text": compose(text, bases, unknown), "emoji": emoji}
                       for text, emoji in pages],
             "questions": [{
@@ -868,6 +881,25 @@ def self_test(data: dict) -> int:
     ok(not shared, "ولا مفردةَ معلَنةٍ يعرفها الطفل أصلاً — معجمُ المنهج والجمل متاحٌ "
        "للقصص كما هو، والمعلَنُ هنا زيادتُها وحدها"
        + (f" — معروفة سلفاً: {shared}" if shared else ""))
+
+    # ————— الغلاف: لكل قصةِ رفٍّ غلافٌ، وعناصرُه من رموزها —————
+    bad_cover = []
+    for story in shelf:
+        cv = story.get("cover") or {}
+        own = {story["emoji"], *(p["emoji"] for p in story["pages"])}
+        if sorted(cv) != sorted(COVER_FIELDS):
+            bad_cover.append(f"{story['id']}: حقولٌ ناقصة")
+            continue
+        scene = [cv["hero"], *cv["props"]]
+        if stray := [g for g in scene if g not in own]:
+            bad_cover.append(f"{story['id']}: {stray} خارج رموزها")
+        if cv["mood"] not in COVER_MOODS:
+            bad_cover.append(f"{story['id']}: مزاجٌ مجهول {cv['mood']}")
+    ok(not bad_cover, f"ولكل قصةِ رفٍّ غلافٌ عناصرُه من رموزها ({len(shelf)} غلافاً)"
+       + (f" — {bad_cover[:3]}" if bad_cover else ""))
+    moods = [s["cover"]["mood"] for s in shelf if s.get("cover")]
+    ok(all(a != b for a, b in zip(moods, moods[1:])),
+       f"ولا غلافان متجاوران بمزاجٍ واحد على الرفّ ({'، '.join(moods)})")
 
     # ————— الرتابة اللفظية: عبارةٌ تتنقّل بين القصص —————
     #

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>لقطة أغلفة الرفّ</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 1rem; background: var(--paper); }
+    h4 { text-align: center; color: var(--ink-soft); font-family: var(--font-ui); margin: 0 0 .6rem; }
+  </style>
+</head>
+<body>
+<div class="app"><main class="map"><section class="station station--library station--shelf">
+  <div class="station-head"><span class="station-num"></span>
+    <div><h2>رفّ المكتبة</h2><p class="station-letters">٩ قصص طويلة</p></div>
+  </div>
+  <ol class="shelf-row" id="row"></ol>
+</section></main></div>
+<script type="module">
+import { LIBRARY } from './js/library.js';
+import { coverEl, h } from './js/ui.js';
+const row = document.getElementById('row');
+for (const s of LIBRARY.filter((x) => x.shelf)) {
+  row.append(h('li', {}, h('button', { class: 'shelf-book node--open' },
+    coverEl(s), h('span', { class: 'shelf-stars' }, '★ ٣'))));
+}
+document.title = 'ready';
+</script>
+</body>
+</html>

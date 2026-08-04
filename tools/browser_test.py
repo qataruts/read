@@ -50,6 +50,7 @@ TOOLS = Path(__file__).resolve().parent
 PAGES = {
     "/__test.html": TOOLS / "browser_test.html",
     "/__shots.html": TOOLS / "browser_shots.html",
+    "/__covers_shots.html": TOOLS / "browser_covers_shots.html",
     "/__words.html": TOOLS / "browser_words.html",
     "/__words_shots.html": TOOLS / "browser_words_shots.html",
     "/__review.html": TOOLS / "browser_review.html",

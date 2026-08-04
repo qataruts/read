@@ -149,8 +149,13 @@ try {
   const SHELF_STORIES = LIBRARY.filter((s) => s.shelf);
   ok(libStations().reduce((n, el) => n + el.querySelectorAll('.node').length, 0) === GARDEN_STORIES.length,
     `وعقدُها قصصُ المكتبة كلها (${arNum(GARDEN_STORIES.length)} قصة)`);
-  ok($$('.station--shelf .node').length === SHELF_STORIES.length,
-    `وعقدُ الرفّ قصصُه الطويلة (${arNum(SHELF_STORIES.length)} قصة)`);
+  // الرفُّ يعرض **أغلفةً على رفّ** لا نقاطاً على درب (أمر المالك)
+  ok($$('.station--shelf .shelf-book').length === SHELF_STORIES.length
+    && $$('.station--shelf .shelf-book .cover').length === SHELF_STORIES.length,
+    `وعقدُ الرفّ أغلفةٌ على رفّ لا نقاطٌ على درب (${arNum(SHELF_STORIES.length)} غلافاً)`);
+  ok($$('.station--shelf .cover-title').every((el) => el.textContent.trim().length > 2)
+    && $$('.station--shelf .cover-scene .emoji').length >= SHELF_STORIES.length * 2,
+    'وعنوانُ كلِّ غلافٍ نصٌّ في الشاشة، ومشهدُه رمزان فأكثر (بطلٌ ومسانِد)');
   ok(!!$('.station--library .station-mark svg'), 'ولها معلمها البصري على الدرب (DESIGN §٦)');
 
   const first = GARDEN_STORIES[0];

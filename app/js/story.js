@@ -23,7 +23,7 @@ import * as audio from './audio.js';
 import * as recorder from './recorder.js';   // لإسكات صوت الطفل وحده — والالتقاطُ في record.js
 import { recordBlock } from './record.js';
 import {
-  h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar, shake,
+  h, icon, faceEl, coverEl, cheer, toast, go, arNum, arCount, starsRow, topbar, shake,
   STORY_ACCENT, mascot, shuffle, DEV,
 } from './ui.js';
 
@@ -86,6 +86,8 @@ export function renderLibraryStory(storyId) {
     texts: [...libraryStoryTexts(story),
       ...story.questions.flatMap((q) => q.options.map((w) => w.say))],
     lines: story.pages.map((p) => ({ words: p.words, emoji: p.emoji, text: p.text })),
+    // غلافُ القصة في صدر شاشتها — كما يُفتَح الكتابُ على غلافه (أمر المالك)
+    cover: story.cover ? story : null,
     questions: story.questions,
     aloud: readsAloud(story),
     readToMother: shelf,
@@ -103,7 +105,7 @@ export function renderLibraryStory(storyId) {
  * @param {boolean} readToMother أتُختَم بخطوة «اِقْرَأْ لِأُمِّكْ»؟
  */
 function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [],
-  aloud = true, readToMother = false, stars }) {
+  aloud = true, readToMother = false, cover = null, stars }) {
   const total = lines.length;
   const heard = new Set();      // فهارس الجمل التي سمعها الطفل (كلمةً كلمةً أو كاملةً)
 
@@ -158,6 +160,8 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [
   function page() {
     lineEls.length = 0;
     const sheet = h('div', { class: 'sheet' },
+      // الغلافُ في صدر المقطع الأول وحدَه: يُفتَح الكتابُ على غلافه ثم يُقرأ
+      seg === 0 && coverEl(cover, { className: 'story-cover' }),
       h('button', {
         class: 'story-title',
         'aria-label': `اسمع عنوان القصة: ${title}`,
