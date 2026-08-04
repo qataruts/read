@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار خفوت التشكيل ز١→ز٣</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 170000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 6000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+// بيانات المنهج والقاعدة مصدرُهما الوحيد — لا رقمَ مكتوباً هنا
+const { RUNGS } = await import('./js/sentences.js');
+const { LIBRARY, storyTexts } = await import('./js/library.js');
+const { GARDENS } = await import('./js/lexicon.js');
+const { GROUPS, QURAN, exampleWordFor } = await import('./js/curriculum.js');
+const { wordText } = await import('./js/ui.js');
+const { allNodes, wordKey } = await import('./js/progress.js');
+const { FADE_AT, BARE_AT, REVEAL_MS, fadeText, levelOf } = await import('./js/fade.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+
+const played = [], spoken = [], heardLog = [], jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      const text = manifest[key] ?? `?${key}`;
+      played.push(text);
+      heardLog.push(text);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class {
+    constructor(text) { this.text = text; spoken.push(text); heardLog.push(text); }
+  };
+  const synth = { cancel() {}, speak(u) { setTimeout(() => u.onend && u.onend(), 5); } };
+  Object.defineProperty(win, 'speechSynthesis', { configurable: true, get: () => synth });
+}
+
+function idsBefore(id) {
+  const out = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out;
+    out.push(node.id);
+  }
+  return out;
+}
+
+const DAY = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+
+/** زرعُ الحالة: عقدٌ منجَزة + تاريخُ قراءةٍ لكلماتٍ بعينها (يومُه أمسِ فيقبل زيادةَ اليوم). */
+async function seed(nodeIds, reads = {}) {
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, records: [], reads, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(200);
+}
+
+/** تاريخُ قراءةٍ لهذه الكلمات: `n` قراءةً آخرُها أمسِ. */
+const readsFor = (words, n) => Object.fromEntries(
+  [...new Set(words.map(wordKey))].filter(Boolean).map((key) => [key, { n, day: DAY - 1 }]));
+
+const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
+const countOf = (text) => stored().reads?.[wordKey(text)]?.n || 0;
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji ?? el?.textContent.trim() ?? '';
+const lastHeard = () => heardLog[heardLog.length - 1];
+
+async function goto(hash) {
+  win.location.hash = '#/';
+  await sleep(120);
+  win.location.hash = hash;
+  await sleep(220);
+}
+
+// ————— ١) دورة كاملة على جملة: عبورُ العتبة ثم الخفوت ثم الكشف والارتداد —————
+//
+// الجملةُ الأولى في درجةٍ ميكانيكيتُها «اقرأ ونفّذ» — أوضحُ مواضع القراءة المحكومة:
+// لا صوت قبل الاختيار، فالإصابة دليلُ قراءةٍ لا سمع.
+
+const rung = RUNGS.find((r) => r.sentences[0].mechanic === 'read');
+const sentence = rung.sentences[0];
+const fillAt = rung.sentences.findIndex((s) => s.mechanic === 'fill');
+
+out.textContent += `— درجة «${rung.garden.title}» · جملة «${sentence.text}» —\n`;
+// عتبةٌ ناقصةٌ واحدة: قراءةُ اليوم هي التي تعبر بها إلى ز٢ (لا زرعَ للنتيجة نفسها)
+await seed(idsBefore(`ladder:${rung.id}`), readsFor(sentence.words, FADE_AT - 1));
+await goto(`#/ladder/${rung.id}`);
+await waitFor(() => $$('.piccard').length === 3, 'صور اقرأ ونفّذ');
+
+ok(texts('.sentence-word').join(' ') === sentence.text,
+  `دون العتبة: الجملة مشكولةٌ كاملةً («${texts('.sentence-word').join(' ')}»)`);
+ok($$('.sentence-word[data-fade="1"]').length === sentence.words.length,
+  `وكلُّ كلماتها تُعلن درجتها ز١ (${sentence.words.length})`);
+ok($$('.sentence-word').every((el) => el.tagName === 'SPAN'),
+  'والمشكولةُ ليست زرّاً — ما لا يُكشف لا يُغرى بلمسه');
+
+const beforeHeard = heardLog.length;
+const cards = $$('.piccard');
+cards[cards.map(picOf).indexOf(sentence.target.emoji)].click();
+await waitFor(() => heardLog.length > beforeHeard, 'سماع الجملة بعد الإصابة');
+ok(countOf(sentence.words[0]) === FADE_AT,
+  `والإصابة تُحتسب قراءةً صحيحة لكلمات الجملة كلها (${countOf(sentence.words[0])}/${FADE_AT})`);
+ok(sentence.words.every((w) => countOf(w) === FADE_AT), 'لكلٍّ منها لا لهدفها وحده');
+
+await goto(`#/ladder/${rung.id}`);
+await waitFor(() => $$('.piccard').length === 3, 'عودة إلى الجملة نفسها');
+const shown = texts('.sentence-word');
+ok(shown.join(' ') === sentence.words.map((w) => fadeText(w, 2)).join(' '),
+  `وعند العتبة خفتت حركاتُها القصيرة: «${shown.join(' ')}»`);
+ok(shown.join(' ') !== sentence.text, 'فصارت غيرَ ما كانت — الخفوت واقعٌ على الشاشة');
+ok($$('.sentence-word[data-fade="2"]').length === sentence.words.length, 'وكلُّها تُعلن ز٢');
+ok($$('.sentence-word').every((el) => el.tagName === 'BUTTON'), 'وصارت أزراراً تُنقر فتنكشف');
+ok($$('.sentence-word').every((el) => {
+  const r = el.getBoundingClientRect();
+  return r.height >= 44 && r.width >= 44;
+}), 'وهي أهدافُ لمسٍ لإصبع طفل (DESIGN §٤)');
+
+// «الشكل عند الطلب»: نقرةٌ تكشف كاملاً — **صامتةً** (لا صوت قبل الاختيار)
+const first = $('.sentence-word');
+const quiet = heardLog.length;
+first.click();
+await sleep(120);
+ok(first.textContent === sentence.words[0], `النقرة تكشف شكلها كاملاً («${first.textContent}»)`);
+ok(first.classList.contains('word--shown'), 'وتُعلَّم لحظةَ الكشف');
+ok(heardLog.length === quiet, '**ولا صوت**: الكشف بصريّ فلا يُلقَّن جوابُ الجملة');
+ok(countOf(sentence.words[0]) === FADE_AT - 1,
+  `والكشفُ تراجعٌ جزئيّ في عدّادها (${countOf(sentence.words[0])})`);
+first.click();
+await sleep(100);
+ok(countOf(sentence.words[0]) === FADE_AT - 1,
+  'ونقرةٌ ثانية عليها وهي مكشوفة لا تُحتسب طلباً ثانياً — النقراتُ المتتابعة طلبٌ واحد');
+
+await sleep(REVEAL_MS + 400);
+ok(!first.classList.contains('word--shown'), 'ثم يعود بعد ثوانٍ');
+ok(first.textContent === sentence.words[0] && first.dataset.fade === '1',
+  '**وقد ارتدّت ز١ مشكولةً** — فقد تراجع عدّادها دون العتبة');
+ok(texts('.sentence-word').slice(1).join(' ')
+  === sentence.words.slice(1).map((w) => fadeText(w, 2)).join(' '),
+  'وسائرُ كلمات الجملة على خفوتها — العتبة لكل كلمة وحدها');
+
+// ————— ٢) حوض الخيارات لا يخفت: «أكمل الجملة» و«رتّب» —————
+//
+// لو خفتت كلمةٌ وبقيت أختُها مشكولةً في حوضٍ واحد لصار فرقُ التشكيل دليلاً على
+// الجواب. فالحوضُ كلُّه ز١ ولو بلغت كلماتُه ضِعفَ العتبة.
+
+if (fillAt >= 0) {
+  const fill = rung.sentences[fillAt];
+  const blank = fill.words[fill.blank];
+  const pool = [...fill.words, ...GARDENS.flatMap((g) => g.words.map((w) => w.word))];
+  await seed(idsBefore(`ladder:${rung.id}`), readsFor(pool, BARE_AT));
+  await goto(`#/ladder/${rung.id}`);
+  for (let i = 0; i < fillAt; i++) {                 // تخطٍّ إلى جولة «أكمل»
+    await waitFor(() => $('.dots'), 'شريط الجولات');
+    const s = rung.sentences[i];
+    if (s.mechanic === 'read') {
+      const pics = $$('.piccard');
+      pics[pics.map(picOf).indexOf(s.target.emoji)].click();
+    } else {
+      for (const word of s.words) {
+        const tile = $$('.tiles--words .tile').find((t) => !t.disabled && t.textContent.trim() === word);
+        tile?.click();
+        await sleep(70);
+      }
+    }
+    await sleep(1400);
+  }
+  await waitFor(() => $$('.vchip--pic').length === 3, 'خيارات أكمل الجملة');
+  ok(texts('.vchip-face').includes(blank),
+    `«أكمل الجملة»: الخيارات بصيغتها الكاملة ولو بلغت ضِعف العتبة (${texts('.vchip-face').join('|')})`);
+  ok($$('.vchip-face [data-fade]').length === 0 && !$('.vchip-face[data-fade]'),
+    'ولا يمسّها مُصيِّر الخفوت أصلاً');
+  ok($$('.sentence-word[data-fade="3"]').length > 0, 'بينما جملتُها عاريةٌ ز٣ فوقها');
+  $$('.vchip--pic')[texts('.vchip-face').indexOf(blank)].click();
+  await sleep(200);
+  ok($('.sentence-word--filled')?.textContent === blank,
+    'والكلمةُ تملأ الفراغ **كما قرأها على خيارها** لا مخفوتةً');
+}
+
+const orderRung = RUNGS.find((r) => r.sentences.some((s) => s.mechanic === 'order'));
+const order = orderRung.sentences.find((s) => s.mechanic === 'order');
+const orderAt = orderRung.sentences.indexOf(order);
+await seed(idsBefore(`ladder:${orderRung.id}`),
+  readsFor(orderRung.sentences.flatMap((s) => s.words), BARE_AT));
+await goto(`#/ladder/${orderRung.id}`);
+for (let i = 0; i < orderAt; i++) {
+  await waitFor(() => $('.dots'), 'شريط الجولات');
+  const s = orderRung.sentences[i];
+  if (s.mechanic === 'read') {
+    const pics = $$('.piccard');
+    pics[pics.map(picOf).indexOf(s.target.emoji)].click();
+  } else {
+    const at = texts('.vchip-face').indexOf(s.words[s.blank]);
+    $$('.vchip--pic')[at]?.click();
+  }
+  await sleep(1400);
+}
+await waitFor(() => $('.tiles--words .tile'), 'بلاطات رتّب الجملة');
+ok(order.words.every((w) => texts('.tiles--words .tile-face').includes(w)),
+  `«رتّب الجملة»: البلاطات بصيغتها الكاملة (${texts('.tiles--words .tile-face').slice(0, 4).join('|')})`);
+ok(!$('.tiles--words [data-fade]'), 'ولا تعرف البلاطاتُ الخفوت');
+for (const word of order.words) {
+  $$('.tiles--words .tile').find((t) => !t.disabled && t.textContent.trim() === word)?.click();
+  await sleep(90);
+}
+ok(order.words.every((w) => countOf(w) === BARE_AT + 1),
+  'ووضعُ الكلمة في موضعها يُحتسب قراءةً — **مرةً واحدة في اليوم** مهما تكرّرت في الدرجة');
+
+// ————— ٣) القصة: الكلمة تُنقر فتُسمَع **بأصلها** وتنكشف —————
+
+const story = LIBRARY[0];
+const pageWords = story.pages[0].words;
+await seed(idsBefore(`library:${story.id}`), readsFor(storyTexts(story).flatMap((t) => t.split(/\s+/)), BARE_AT));
+await goto(`#/library/${story.id}`);
+await waitFor(() => $$('.story-word').length, 'كلمات القصة');
+const line = texts('.line-words .story-word').slice(0, pageWords.length);
+ok(line.join(' ') === pageWords.map((w) => fadeText(w, 3)).join(' '),
+  `القصة: سطرُها عارٍ ز٣ («${line.join(' ')}»)`);
+ok(line.join(' ') !== pageWords.join(' '), 'وهو غيرُ نصّها المشكول');
+
+const word = $('.line-words .story-word');
+const markStory = heardLog.length;
+word.click();
+await waitFor(() => heardLog.length > markStory, 'سماع الكلمة المنقورة');
+ok(lastHeard() === pageWords[0],
+  `**والصوتُ صوتُ الكلمة بأصلها** لا بصورتها المخفوتة (${lastHeard()})`);
+ok(word.textContent === pageWords[0], 'والنقرةُ تكشف شكلها كاملاً — سماعٌ وكشفٌ معاً');
+ok(countOf(pageWords[0]) === BARE_AT - 1,
+  `ويُسجَّل الكشف تراجعاً جزئياً (${countOf(pageWords[0])})`);
+await sleep(REVEAL_MS + 400);
+ok(word.dataset.fade === '2' && word.textContent === fadeText(pageWords[0], 2),
+  'ثم تعود بدرجتها الجديدة ز٢ — هيكلٌ بمفاتيحه');
+
+// ————— ٤) بطاقة البستان —————
+
+const bundle = GARDENS[0].bundles[0];
+await seed(idsBefore(`garden:${bundle.id}`), readsFor(bundle.words.map((w) => w.word), FADE_AT));
+await goto(`#/garden/${bundle.id}`);
+await waitFor(() => $$('.example-word').length === bundle.words.length, 'بطاقات الباقة');
+ok(texts('.word-text').join('|') === bundle.words.map((w) => fadeText(w.word, 2)).join('|'),
+  `بطاقات البستان بدرجتها ز٢ («${texts('.word-text').join('|')}»)`);
+const markCard = heardLog.length;
+$('.example-word').click();
+await waitFor(() => heardLog.length > markCard, 'سماع كلمة البطاقة');
+ok(lastHeard() === bundle.words[0].say, 'ونقرُ البطاقة يُسمعها بأصلها');
+ok($('.word-text').textContent === bundle.words[0].word, 'ويكشف شكلها على البطاقة نفسها');
+
+// ————— ٥) المواضع المحظورة: التهجّي والمصحف لا يخفتان ولو بلغت كلماتُهما السقف —————
+//
+// زرعٌ **شامل**: كلُّ مفتاحٍ في التطبيق بضِعف العتبة. فلو تسرّب الخفوت إلى موضعٍ
+// محظور لظهر هنا حتماً — لا نعتمد على أن الوحدة «لا تستورد» بل على ما تراه العين.
+
+const allText = [
+  ...GROUPS.flatMap((g) => [...g.letters, ...g.words.flatMap((w) => [w.say, ...w.tiles])]),
+  ...GARDENS.flatMap((g) => g.words.flatMap((w) => [w.word, ...w.tiles])),
+  ...QURAN.surahs.flatMap((s) => s.ayat.flatMap((a) => a.split(/\s+/))),
+];
+await seed(allNodes().map((n) => n.id), readsFor(allText, BARE_AT * 3));
+
+const HARAKA_RE = /[\u064E\u064F\u0650]/;   // فتحة أو ضمة أو كسرة: أثرُ الشكل على الشاشة
+const AYAH = QURAN.surahs[0].ayat[0];
+const G1_TILES = new Set(GROUPS[0].words.flatMap((w) => w.tiles));
+
+await goto('#/lesson/g1/' + encodeURIComponent(GROUPS[0].letters[1]));
+await sleep(250);
+ok(!$('[data-fade]'), 'درس الحرف: لا كلمةَ يمسّها مُصيِّر الخفوت');
+ok(HARAKA_RE.test(doc.body.textContent), 'وحركاتُه على الشاشة كما هي — الحركة هي الدرس');
+const example = exampleWordFor('g1', GROUPS[0].letters[1]);
+ok(example && $('.example-word')?.textContent.includes(wordText(example)),
+  `وكلمةُ مثاله «${example ? wordText(example) : '—'}» بتشكيلها حرفاً بحرف`);
+
+await goto('#/words/g1');
+await sleep(300);
+ok(!$('[data-fade]'), 'لعبة الكلمات: لا خفوت');
+const tiles = texts('.tile-face');
+ok(tiles.length && tiles.every((t) => G1_TILES.has(t)),
+  `وبلاطاتُها مقاطعُ المنهج حرفاً بحرف (${tiles.slice(0, 5).join('|')})`);
+
+await goto('#/quran/' + encodeURIComponent(QURAN.surahs[0].id));
+await sleep(350);
+ok(!$('[data-fade]'), 'سورةٌ من المصحف: لا خفوت');
+ok(doc.body.textContent.includes(AYAH), 'ونصُّها العثماني معروضٌ بتشكيله كاملاً');
+ok(!doc.body.textContent.includes(fadeText(AYAH, 3)),
+  'ولا أثرَ لصورةٍ عاريةٍ منه في الشاشة');
+
+await goto('#/review');
+await sleep(300);
+ok(!$('[data-fade]'), 'المراجعة اليومية: مادّتُها تهجٍّ لا يخفت');
+
+// ————— ٦) لوحة وليّ الأمر: «نحو القراءة الحرة» —————
+
+await goto('#/parent');
+await waitFor(() => $('.gate input'), 'بوابة وليّ الأمر');
+const prompt = $('.gate .giant').textContent;
+const [a, b] = prompt.split('×').map((s) => Number(s.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+$('.gate input').value = String(a * b);
+$('.gate-go').click();
+await waitFor(() => $('.audit'), 'اللوحة');
+const heads = texts('.audit h3');
+ok(heads.includes('نحو القراءة الحرة'), `اللوحة فيها قسم «نحو القراءة الحرة» (${heads.join('، ')})`);
+const body = $('.audit').textContent;
+ok(/عاريةٌ تماماً/.test(body) && /هيكلٌ بمفاتيحه/.test(body), 'وفيه عددُ ما بلغ كلَّ درجة');
+ok($$('.audit .vchip').some((el) => el.querySelector('small')),
+  'وأمثلةٌ حيّة: الكلمة كما يراها الطفل وتحتها أصلُها');
+ok(body.includes('لا يخفت الشكل في التهجّي'), 'وسطرٌ يشرح الفكرة وحدودَها لوليّ الأمر');
+
+// ————— الختام —————
+
+ok(jsErrors.length === 0, `بلا أخطاء جافاسكربت${jsErrors.length ? ': ' + jsErrors.join(' | ') : ''}`);
+const stray = spoken.filter((t) => !pendingAudio.has(t));
+ok(stray.length === 0,
+  `ولا نطقَ آليّ إلا لنصٍّ ينتظر التصريف${stray.length ? ': ' + stray.join('، ') : ''}`);
+
+post();
+out.textContent += '\n— انتهى —\n';
+</script>
+</body>
+</html>

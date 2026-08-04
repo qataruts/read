@@ -7,6 +7,7 @@
 import * as progress from './progress.js';
 import * as recordings from './recordings.js';
 import * as recorder from './recorder.js';
+import { FADE_AT, BARE_AT, levelOf, fadeText } from './fade.js';
 import {
   h, go, toast, arNum, arCount, topbar, letterTitle, nodeTitle, nodeWhere, shake,
 } from './ui.js';
@@ -155,6 +156,56 @@ function letterChip(stat, color) {
   },
     h('span', { class: 'vchip-face' }, stat.letter),
     h('small', {}, `${arNum(stat.right)} ✓ · ${arNum(stat.wrong)} ✗`));
+}
+
+// ————— «نحو القراءة الحرة» (حزمة الخفوت — ROADMAP §المرحلة ز) —————
+//
+// وليّ الأمر يرى الشكل يخفت عن كلمات طفله فيسأل: أعطبٌ هذا أم مقصود؟ فهنا جوابُه —
+// كم كلمةً بلغت كلَّ درجة، وأمثلةٌ حيّة **كما يراها الطفل بجانب أصلها**، وسطرٌ واحد
+// يشرح الفكرة. ولا يُعرض هذا للطفل: عدُّ كلماته العارية ليس سباقاً يُلهيه عن القراءة.
+
+const FADE_EXAMPLES = 12;   // ما يسع سطرين من اللوحة — أمثلةٌ لا جردٌ كامل
+
+/** الكلمة كما يراها الطفل الآن، وتحتها أصلُها مشكولاً — بيانٌ في نظرة. */
+function fadedChip(word) {
+  return h('span', {
+    class: 'vchip',
+    css: { '--accent': word.level === 3 ? GOOD : ACCENT },
+    title: `${word.key} — ${arCount(word.n, ['قراءة صحيحة', 'قراءتان صحيحتان', 'قراءات صحيحة', 'قراءة صحيحة'])}`,
+  },
+    h('span', { class: 'vchip-face' }, fadeText(word.key, word.level)),
+    h('small', {}, word.key));
+}
+
+function fadingSection() {
+  const words = progress.wordReads()
+    .filter((w) => w.key)
+    .map((w) => ({ ...w, level: levelOf(w.n) }))
+    .sort((a, b) => b.n - a.n || a.key.localeCompare(b.key));
+  const bare = words.filter((w) => w.level === 3);
+  const partial = words.filter((w) => w.level === 2);
+  const onWay = words.filter((w) => w.level === 1);
+  const shown = [...bare, ...partial].slice(0, FADE_EXAMPLES);
+
+  return h('div', {},
+    h('div', { class: 'audit-row' },
+      pill('هيكلٌ بمفاتيحه', arNum(partial.length)),
+      pill('عاريةٌ تماماً', arNum(bare.length)),
+      pill('في الطريق', arNum(onWay.length)),
+    ),
+    shown.length
+      ? h('div', { class: 'audit-row' }, shown.map(fadedChip))
+      : h('p', { class: 'hint' },
+        'لم تبلغ كلمةٌ عتبتها بعد — الشكل كاملٌ في كل ما يقرؤه، وهو الصواب في أوّل الطريق.'),
+    h('p', { class: 'hint' },
+      `الكتب والصحف بلا شكل. فكلُّ كلمةٍ يقرؤها طفلك صحيحةً في ${arNum(FADE_AT)} أيام`
+      + ` متباعدة تخفت حركاتُها القصيرة، وفي ${arNum(BARE_AT)} تتعرّى تماماً —`
+      + ' لكلِّ كلمةٍ عتبتُها بتاريخه معها وحدها، لا خفوتٌ جماعيّ بيومٍ ولا بمرحلة.'
+      + ' وإن تعثّر في كلمةٍ خافتة نقرها فظهر شكلها ثوانيَ، وتراجعت درجتُها فعادت مشكولةً.'),
+    h('p', { class: 'note' },
+      'ولا يخفت الشكل في التهجّي (المقاطع ودروس الحروف والمهارات) ولا في نصّ المصحف —'
+      + ' هناك الشكلُ مادّةُ الدرس لا كسوتَه.'),
+  );
 }
 
 // ————— «تسجيلات طفلي» (الحزمة ١٠) —————
@@ -325,6 +376,7 @@ function saveBackupFile() {
 /** ما في النسخة بعبارة وليّ الأمر — يُقرأ قبل التأكيد لا بعده. */
 function summaryText(sum) {
   return `★ ${arNum(sum.stars)} في ${nodesText(sum.nodes)} · ${skillsText(sum.skills)} مقيسة`
+    + (sum.reads ? ` · ${arCount(sum.reads, ['كلمة واحدة', 'كلمتان', 'كلمات', 'كلمة'])} لها تاريخ قراءة` : '')
     + (sum.records ? ` · ${arCount(sum.records, ['قراءة واحدة', 'قراءتان', 'قراءات', 'قراءة'])} مسجَّلة` : '')
     + (sum.savedAt ? ` · حُفظت ${whenText(sum.savedAt)}` : '');
 }
@@ -400,8 +452,8 @@ function backupSection(rerender) {
     slot,
     storage,
     h('p', { class: 'note' },
-      'في النسخة: النجوم وصناديق المراجعة ودقائق التعلّم ومدد قراءاته الجهرية.'
-      + ' وليس فيها تسجيلات صوته — تلك لا تغادر جهازه أبداً.'),
+      'في النسخة: النجوم وصناديق المراجعة ودقائق التعلّم ومدد قراءاته الجهرية'
+      + ' وتاريخ خفوت كلماته. وليس فيها تسجيلات صوته — تلك لا تغادر جهازه أبداً.'),
   );
 }
 
@@ -560,6 +612,8 @@ function dashboard(rerender = () => {}) {
         : 'أتمّ كل عقد الخريطة.'),
       h('p', { class: 'hint' },
         `بانتظار التثبيت الآن: ${arNum(due.length)} من ${arNum(progress.skills().length)} مهارة سُجّلت.`)),
+
+    ...section('نحو القراءة الحرة', fadingSection()),
 
     ...section('تسجيلات طفلي', recordingsSection()),
 

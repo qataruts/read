@@ -95,6 +95,7 @@ python3 tools/test_queue.py          # تصريف قائمة الانتظار ا
 node tools/test_progress.mjs         # قواعد القفل والنجوم وسجلّ المهارات والتكرار المتباعد
 node tools/test_gate.mjs             # بوابتا الإتقان: موضعهما وعتبتهما ومادّتهما والترحيل الرحيم
 node tools/test_contrast.mjs         # محطتا «ميّز بين»: أزواج المتشابهات ومفكوكيتها وقياسها
+node tools/test_fade.mjs             # خفوت التشكيل ز١→ز٣: العتبة والدرجات وحصانة التهجّي والمصحف
 node tools/test_lesson.mjs           # مفكوكية جولات درس الحرف
 node tools/test_words.mjs            # مفكوكية ألواح لعبة الكلمات وتغطية أصواتها
 node tools/test_review.mjs           # جلسة المراجعة (مفكوكيتها وتغطية أصواتها) واللوحة
@@ -111,6 +112,7 @@ python3 tools/browser_test.py --quran    # المرحلة القرآنية وا�
 python3 tools/browser_test.py --garden   # بساتين الموضوعات (حديقة الكلمات)
 python3 tools/browser_test.py --gate     # بوابتا الإتقان (عبور وإخفاق وإعادة وترحيل)
 python3 tools/browser_test.py --contrast # محطتا «ميّز بين» (المواجهة و«اسمع الفرق»)
+python3 tools/browser_test.py --fade     # خفوت التشكيل: عبور العتبة والكشف عند الطلب وارتداد الدرجة
 python3 tools/browser_test.py --map      # الخريطة: جبهة الفتح والطيّ الكسول وقياس سرعتهما
 python3 tools/browser_test.py --welcome  # الصفحة التعريفية: صفر طلبٍ خارجي، ولا يبتلعها عامل الخدمة
 python3 tools/browser_test.py --device   # مقاسات آيباد حقيقية: لا سحبَ في الوضع العرضي ولا فائض أفقي

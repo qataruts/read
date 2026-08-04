@@ -15,6 +15,7 @@
 
 import { syllableSkill } from './curriculum.js';
 import { bundleById } from './lexicon.js';
+import { credit, fadeWord } from './fade.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard, starsForGame } from './words.js';
@@ -46,6 +47,7 @@ function showStep(bundle, { next }, heard) {
   };
 
   const row = h('div', { class: 'row wordrow' }, bundle.words.map((word) => {
+    const face = h('span', { class: 'word-text' });
     const btn = h('button', {
       class: 'example-word',
       'aria-label': `اسمع كلمة ${word.text}`,
@@ -55,10 +57,10 @@ function showStep(bundle, { next }, heard) {
         paintFoot();
         audio.play(word.say);
       },
-    },
-      faceEl(word.emoji, 'word-emoji'),
-      h('span', { class: 'word-text' }, word.text),
-    );
+    }, faceEl(word.emoji, 'word-emoji'), face);
+    // بطاقةُ الكلمة بدرجة خفوتها (حزمة الخفوت): الصورةُ والكلمةُ زرٌّ واحد، فنقرتُه
+    // تُسمعها وتكشف شكلها ثوانيَ معاً — والحبرُ وحده يتبدّل، والصندوقُ كما هو.
+    fadeWord(face, word.text, btn);
     return btn;
   }));
 
@@ -222,7 +224,14 @@ export function renderGarden(bundleId) {
     face: garden.emoji,
     steps: [
       { title: 'شاهد واسمع', build: (api) => showStep(bundle, api, heard) },
-      { title: 'اقرأ واختر', build: (api) => readQuizStep(words, api) },
+      // «اقرأ واختر» موضعُ قراءةٍ محكوم: إصابتُه قراءةٌ صحيحة للكلمة المختارة —
+      // تُحتسب في عدّاد خفوتها. وخياراتُه لا تخفت (الفرقُ بينها يفضح الجواب).
+      {
+        title: 'اقرأ واختر',
+        build: (api) => readQuizStep(words, api, {
+          onPick: (target, word, correct) => { if (correct) credit(word.read); },
+        }),
+      },
       { title: 'ركّب الكلمة', build: (api) => buildStep(bundle, api) },
     ],
     celebrate: (state) => ({

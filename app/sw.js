@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v16';  // v16: العلامة «اِقْرَأْ» — الاسم والأيقونات وخطّ العلامة
+const VERSION = 'v17';  // v17: خفوت التشكيل ز١→ز٣ (وحدة fade.js في القشرة)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -49,6 +49,7 @@ const SHELL = [
   'js/audio.js',
   'js/contrast.js',
   'js/curriculum.js',
+  'js/fade.js',
   'js/garden.js',
   'js/gate.js',
   'js/ladder.js',

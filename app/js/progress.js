@@ -9,7 +9,7 @@ import {
   GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, gateBefore, quranParts, bareLetters,
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
-import { ladderOf } from './sentences.js';
+import { ladderOf, stemOf } from './sentences.js';
 import { libraryOf } from './library.js';
 
 const STORE_KEY = 'muallim.progress.v1';
@@ -45,6 +45,7 @@ function blank() {
     days: {},         // «YYYY-MM-DD» ← ثوانٍ من الاستعمال الفعلي
     reviews: {},      // «YYYY-MM-DD» ← {items, right, at}
     records: [],      // «اقرأ لي»: [{node, title, seconds, day, at}] — بيانٌ نصيّ لا صوت
+    reads: {},        // «جذع كلمة» ← {n, day} — عدّاد خفوت التشكيل (حزمة الخفوت)
     mic: false,       // إذنُ وليّ الأمر بالتسجيل (يُعطى مرة واحدة خلف بوابته)
     seconds: 0,
     startedAt: Date.now(),
@@ -557,6 +558,71 @@ export function letterStats() {
     .sort((a, b) => rank(a.letter) - rank(b.letter));
 }
 
+// ————— عدّاد القراءات الصحيحة لكل كلمة (حزمة «الخفوت» — ROADMAP §المرحلة ز) —————
+//
+// **لكل كلمة عتبةُ خفوتها الخاصة بتاريخ الطفل معها** — لا خفوت جماعي اعتباطي.
+// وهذا مخزنُ التاريخ وحدَه: رقمٌ لكل كلمة ويومُ آخر ما احتُسب لها. أمّا العتبةُ
+// والدرجاتُ وصورةُ الكلمة المخفوتة فتملكها `fade.js` (ولذلك لا تعرف هذه الوحدةُ
+// شيئاً عن الخفوت — الاتجاه في اتجاهٍ واحد: `fade.js` ← `progress.js`).
+//
+// **مفتاح الكلمة جذعُها** (`stemOf` في `sentences.js` — القاعدة نفسُها التي يُطابَق
+// بها هدفُ الجملة): «الْغُرْفَةُ» في جملةٍ و«غُرْفَةْ» على بطاقة بستانٍ كلمةٌ واحدة
+// بعدّادٍ واحد، فتاريخُ الطفل معها تاريخٌ واحد لا تاريخان.
+//
+// و**التباعد شرطٌ بنيويّ**: لا تُحتسب للكلمة قراءتان في يومٍ واحد مهما تكرّرت في
+// الدرجة الواحدة — «٣ قراءات صحيحة **متباعدة**» تعني ثلاثة أيام، لا ثلاث نقرات في
+// جلسة. (والوحدة يومُ `dayNumber()` نفسُه الذي يجدول به ليتنر — لا وحدةَ زمنٍ ثانية.)
+
+/** مفتاح الكلمة في عدّاد القراءات — جذعُها المشكول. */
+export const wordKey = (text) => stemOf(String(text ?? ''));
+
+/** السجلّ مضموناً كائناً — نسخةٌ احتياطية معطوبة لا تُسقِط قراءةً ولا كتابة. */
+function reads() {
+  if (!state.reads || typeof state.reads !== 'object') state.reads = {};
+  return state.reads;
+}
+
+/** قراءات هذه الكلمة الصحيحة المتباعدة (صفرٌ لما لم يُقرأ بعد). */
+export function readCount(key) {
+  return reads()[key]?.n || 0;
+}
+
+/**
+ * تسجيل قراءةٍ صحيحة لكلمة. **يومٌ واحد لا يزيد العدّاد إلا مرة**، فما تكرّر في
+ * الجلسة الواحدة قراءةٌ واحدة — وهو معنى «متباعدة».
+ * @returns {boolean} هل ارتفع العدّاد فعلاً؟
+ */
+export function recordRead(text, today = dayNumber()) {
+  const key = wordKey(text);
+  if (!key) return false;
+  const before = reads()[key];
+  if (before && before.day >= today) return false;
+  reads()[key] = { n: (before?.n || 0) + 1, day: today };
+  save();
+  return true;
+}
+
+/**
+ * «الشكل عند الطلب»: كشفُ تشكيل كلمةٍ مخفوتة **تراجعٌ جزئيّ** في عدّادها — درجةٌ
+ * واحدة إلى الوراء لا تصفيرٌ. فالكلمةُ التي احتاج إلى شكلها لم تنضج بعدُ للعري،
+ * وتعود إلى ما دون عتبتها فتُعرض مشكولةً حتى يقرأها متباعداً من جديد.
+ * @returns {number} العدّاد بعد التراجع
+ */
+export function revealRead(text) {
+  const key = wordKey(text);
+  if (!key || !reads()[key]) return 0;
+  const n = Math.max(0, reads()[key].n - 1);
+  if (n) reads()[key] = { ...reads()[key], n };
+  else delete reads()[key];         // لا نُبقي صفراً في التخزين
+  save();
+  return n;
+}
+
+/** كل الكلمات التي لها تاريخُ قراءة: [{key, n, day}] — مادّةُ لوحة وليّ الأمر. */
+export function wordReads() {
+  return Object.entries(reads()).map(([key, r]) => ({ key, ...r }));
+}
+
 // ————— دقائق الاستخدام —————
 
 /** إضافة زمن استعمال فعلي (يُستدعى بنبضة من main.js وقت انتباه الطفل فقط). */
@@ -753,6 +819,7 @@ export function backupSummary(bundle) {
     nodes: done.length,
     stars: done.reduce((sum, n) => sum + Math.min(MAX_STARS, stars[n.id]), 0),
     skills: Object.keys(bundle?.state?.skills || {}).length,
+    reads: Object.keys(bundle?.state?.reads || {}).length,
     records: (bundle?.state?.records || []).length,
     seconds: bundle?.state?.seconds || 0,
   };

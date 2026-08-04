@@ -17,6 +17,7 @@
 
 import { storyById, storyTexts, sentenceText } from './curriculum.js';
 import { libraryStory, storyTexts as libraryStoryTexts } from './library.js';
+import { credit, textWord } from './fade.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import * as recorder from './recorder.js';
@@ -128,20 +129,20 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
     lines.forEach((line, index) => {
       const said = new Set();
 
-      const words = line.words.map((word, i) => {
-        const btn = h('button', {
-          class: 'story-word',
-          'aria-label': `اسمع كلمة ${word}`,
-          onclick: () => {
-            stopAll();
-            btn.classList.add('story-word--said');
-            said.add(i);
-            if (said.size === line.words.length) markHeard(index);
-            audio.play(word);
-          },
-        }, word);
-        return btn;
-      });
+      // كلُّ كلمةٍ بدرجة خفوتها (حزمة الخفوت)، ونقرتُها تُسمعها **وتكشف شكلها** ثوانيَ:
+      // فالنقرة هنا هي «الشكل عند الطلب» بعينها — من احتاج أن يسمع كلمةً احتاج شكلها،
+      // ولذلك يُحتسب لها التراجعُ الجزئيّ نفسُه.
+      const words = line.words.map((word, i) => textWord(word, {
+        className: 'story-word',
+        label: `اسمع كلمة ${word}`,
+        onclick: (e) => {
+          stopAll();
+          e.currentTarget.classList.add('story-word--said');
+          said.add(i);
+          if (said.size === line.words.length) markHeard(index);
+          audio.play(word);
+        },
+      }));
 
       const el = h('div', { class: 'line' },
         faceEl(line.emoji, 'line-emoji'),
@@ -342,6 +343,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
           }
           locked = true;
           btn.classList.add('good');
+          credit(question.words);   // قرأ السؤال فأصاب صورته: قراءةٌ صحيحة لكلماته
           const mine = ++token;
           await audio.play(word.say);
           if (!live(mine)) return;
@@ -356,7 +358,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       h('h2', {}, 'سؤال القصة'),
       h('p', { class: 'hint' }, 'اقرأ السؤال، ثم اختر صورته'),
       h('p', { class: 'sentence' },
-        question.words.map((word) => h('span', { class: 'sentence-word' }, word))),
+        question.words.map((word) => textWord(word, { className: 'sentence-word' }))),
       row,
     );
   }

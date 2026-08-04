@@ -13,6 +13,7 @@
     python3 tools/browser_test.py --gate       # بوابتا الإتقان (الحزمة ١٤)
     python3 tools/browser_test.py --parent     # صلابة التقدّم وتحكّم وليّ الأمر (الحزمة ١١)
     python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
+    python3 tools/browser_test.py --fade       # خفوت التشكيل ز١→ز٣ (المرحلة ز)
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
     python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record|--gate|--map]
@@ -72,6 +73,7 @@ PAGES = {
     "/__device.html": TOOLS / "browser_device.html",
     "/__welcome.html": TOOLS / "browser_welcome.html",
     "/__parent.html": TOOLS / "browser_parent.html",
+    "/__fade.html": TOOLS / "browser_fade.html",
     "/__parent_shots.html": TOOLS / "browser_parent_shots.html",
 }
 # نافذة Chrome بلا واجهة تحجز ٨٧ بكسلاً لإطارٍ وهميّ فوق المنظور — فلولا تعويضها لقِسنا
@@ -331,6 +333,8 @@ def main():
                     help="صلابة التقدّم وتحكّم وليّ الأمر: ترقية عامل الخدمة والنسخة الاحتياطية (الحزمة ١١)")
     ap.add_argument("--contrast", action="store_true",
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
+    ap.add_argument("--fade", action="store_true",
+                    help="خفوت التشكيل ز١→ز٣: العتبة والكشف عند الطلب وحصانة التهجّي والمصحف")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
     ap.add_argument("--welcome", action="store_true",
                     help="الصفحة التعريفية: لا طلب خارجي، ولا يبتلعها عامل الخدمة (ومع --shots لقطتها)")
@@ -385,6 +389,7 @@ def main():
             return 0 if out.exists() else 1
 
         page = ("__welcome.html" if args.welcome
+                else "__fade.html" if args.fade
                 else "__parent.html" if args.parent
                 else "__contrast.html" if args.contrast
                 else "__gate.html" if args.gate

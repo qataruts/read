@@ -19,6 +19,7 @@
 
 import { wordSkill } from './curriculum.js';
 import { rungById, orderPool, optionPool, fillText, MECHANIC_TITLES } from './sentences.js';
+import { credit, textWord } from './fade.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard, starsForGame } from './words.js';
@@ -106,10 +107,12 @@ export function renderLadder(rungId) {
     if (text) audio.play(text);
   }
 
+  // كلماتُ الجملة تُعرض **بدرجة خفوت كلٍّ منها** (حزمة الخفوت): ما بلغ عتبته يخفت
+  // شكلُه، والنقرةُ تكشفه ثوانيَ **صامتاً** — فلا صوت قبل الاختيار كما هو العقد.
   const sentenceEl = (sentence, blank) => h('p', { class: 'sentence' },
     sentence.words.map((word, i) => (i === blank
       ? h('span', { class: 'sentence-blank', 'aria-label': 'الكلمة الناقصة' }, BLANK)
-      : h('span', { class: 'sentence-word' }, word))));
+      : textWord(word, { className: 'sentence-word' }))));
 
   // ————— ١) اقرأ ونفّذ: جملة ← ثلاث صور —————
 
@@ -127,6 +130,7 @@ export function renderLadder(rungId) {
           if (word !== sentence.target) return wrong(btn, word.say);
           locked = true;
           btn.classList.add('good');
+          credit(sentence.words);   // قرأ الجملة كلها فأصاب صورتها: قراءةٌ صحيحة لكلماتها
           sayAndGo(sentence);
         },
       }, faceEl(word.emoji, 'pic-emoji'));
@@ -171,6 +175,7 @@ export function renderLadder(rungId) {
       if (skill) progress.recordAttempt(skill.letter, skill.haraka, progress.KINDS.ORDER, correct);
 
       if (!correct) return wrong(btn, item.text);
+      credit(expected);       // الكلمةُ المطلوبة في موضعها قُرئت صحيحةً (كما يُقاس ليتنر)
 
       btn.disabled = true;
       btn.classList.add('tile--used');
@@ -229,9 +234,14 @@ export function renderLadder(rungId) {
           if (word !== sentence.target) return wrong(btn, face);   // يُسمعه ما قرأه هو
           locked = true;
           btn.classList.add('good');
-          line.replaceChildren(...sentence.words.map((w, i) => h('span', {
-            class: `sentence-word${i === sentence.blank ? ' sentence-word--filled' : ''}`,
-          }, w)));
+          // **الكلمةُ التي ملأت الفراغ تُعرض كما قرأها على خيارها**: كاملةَ الشكل ولو
+          // بلغت عتبة خفوتها — الخيارُ لا يخفت (فرقُ التشكيل بين الخيارات يفضح الجواب)،
+          // فلو خفتت في الفراغ لتبدّل الرمزُ بين ما اختار وما استقرّ. وسائرُ الجملة
+          // بدرجاتها كما كانت، والاحتسابُ **بعد** الرسم فلا تخفت كلمةٌ تحت عينه.
+          line.replaceChildren(...sentence.words.map((w, i) => (i === sentence.blank
+            ? h('span', { class: 'sentence-word sentence-word--filled' }, w)
+            : textWord(w, { className: 'sentence-word' }))));
+          credit(sentence.words);
           sayAndGo(sentence);
         },
       },

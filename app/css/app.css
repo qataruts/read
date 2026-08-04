@@ -1620,6 +1620,28 @@ button {
 
 .sentence--built { color: var(--ok-text); margin-top: 0; animation: pop .4s ease; }
 
+/* ————— خفوت التشكيل و«الشكل عند الطلب» (حزمة الخفوت — ROADMAP §المرحلة ز) —————
+   الكلمةُ التي بلغت عتبتها يخفت شكلُها، ويبقى تحتها خطٌّ منقّط خفيّ: إشارةُ «انقُرني
+   أُرِك شكلي» بلغة الواجهة نفسها (الفراغُ المنقّط في «أكمل الجملة» أخوه). ولا شيء
+   على المشكولة (ز١) — ما لا يُكشف لا يُغرى بلمسه. */
+[data-fade='2'],
+[data-fade='3'] {
+  border-bottom: 2px dotted color-mix(in srgb, var(--accent) 45%, var(--mix));
+  padding-bottom: .05rem;
+}
+
+/* كلمةُ الجملة إذا خفتت صارت زرّاً — فلها ما لكلمة القصة: هدفُ لمسٍ لإصبع طفل
+   (DESIGN §٤). والمشكولةُ تبقى عنصراً صامتاً، فلا يتبدّل قياسُ سطرٍ لم يخفت. */
+button.sentence-word { min-width: 3rem; min-height: 3rem; }
+
+/* لحظةُ الكشف: الشكلُ كاملاً على أرضيةٍ لطيفة ثوانيَ ثم يعود إلى خفوته */
+.word--shown {
+  border-radius: 10px;
+  border-bottom-color: transparent;
+  background: color-mix(in srgb, var(--accent) 16%, var(--mix));
+  animation: pop .35s ease;
+}
+
 /* «اقرأ ونفّذ»: ثلاث صور كبيرة بلا كلمة — الحكم على قراءة الجملة */
 .picrow { flex-wrap: wrap; gap: .75rem; margin-top: .5rem; }
 
