@@ -138,8 +138,10 @@ try {
   ok($$('.station--library').every((s) => s.classList.contains('station--locked')),
     'وكلها مقفلة في بداية الرحلة');
   unfoldAll();
-  ok($$('.station--library .node').length === LIBRARY.length,
-    `وعقدُها قصصُ المكتبة كلها (${arNum(LIBRARY.length)} قصة)`);
+  // محطةُ المكتبة قصصُ **البساتين** وحدها — وقصصُ السور عقدُها في المرحلة القرآنية
+  const SHELF = LIBRARY.filter((s) => s.garden);
+  ok($$('.station--library .node').length === SHELF.length,
+    `وعقدُها قصصُ المكتبة كلها (${arNum(SHELF.length)} قصة)`);
   ok(!!$('.station--library .station-mark svg'), 'ولها معلمها البصري على الدرب (DESIGN §٦)');
 
   const first = LIBRARY[0];

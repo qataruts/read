@@ -41,6 +41,43 @@ from check_lexicon import (
 from make_sentences import FATHA, all_bases as sentence_bases, render, strip_end
 
 DAMMATAN = "ٌ"
+
+# ————— قصص المرحلة القرآنية (البند ٤) — ما لزمها من قيدٍ ومعجم —————
+#
+# **لِمَ معجمٌ ثانٍ لا ذيلٌ لمعجم المكتبة؟** لأنّ موضعَهما من الرحلة مختلف: المكتبة
+# **بعد** البساتين العشرة، وقصةُ السورة **قبلها كلِّها**. فميزانيةُ الأولى ٥٠٠ كلمةِ
+# بستانٍ وزيادة، وميزانيةُ الثانية ٧٤ كلمةَ منهجٍ و١٩٧ مفردةً مساندة لا غير.
+
+QURAN_SUPPORT = [
+    # ما يسقط بغيابه معنى قصةِ الفيل — وليس منها مفردةٌ لتحسين عبارة
+    "طَيْرْ", "جَيْشْ", "مَلِكْ",
+    # **لفظ الجلالة بلا تطويل** (حكم المدير على ورقة الأنبياء، وأمر المالك):
+    # الألفُ الخنجرية على اللام مباشرةً لا على محرف تطويل — فمادّةُ التأليف تمرّ
+    # بالخفوت، وز٣ ينزع التشكيل: «اللَّـٰهْ» تصير «اللـه» بتطويلٍ معلَّق، و«اللَّٰهْ»
+    # تصير «الله» صحيحةً. يُكتب ما يبقى صحيحاً عارياً — ويحرسه `check_tatweel`.
+    "اللَّٰهْ",
+]
+
+# **لفظ الجلالة معرفةٌ لا يُنوَّن أبداً** — ومنعُه بنيويّ لا انتباهاً (حكم المدير):
+# أوّلُ تصييرٍ للصفحة الثامنة أعطى «اللَّـٰهٌ» لأنّ الدور كان `~N`، وهو ممتنعٌ نحواً
+# وشرعاً. فمن وسمه بتنوينٍ أوقف البناءَ ولم يمرّ.
+LAFZ_JALALA = "اللَّٰهْ"
+
+# **«التقديمُ المعلَن»** (حكم المدير، بثلاثة قيود): كلمةُ بستانٍ لاحقٍ يجوز أن تُقدَّم
+# إلى قصة المرحلة القرآنية — **بشرط أن يسقط بغيابها المعنى** لا لتحسين عبارة، وأن
+# تبقى في بستانها فلا تُنقَل (واللقاءُ الثاني تكرارٌ مقصود)، وأن تكون في هذه القائمة
+# **المعدودة المرئية** يطبعها الحارس فلا يكون باباً مفتوحاً.
+BROUGHT_FORWARD = {
+    "حَجَرْ": "الحجارةُ هي الحدث نفسُه («تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ») "
+              "ولا بديلَ لها في ميزانية ما قبل البساتين — وبستانُها الطبيعة (السادس).",
+}
+
+# **واوُ العطف الملتصقة — استثناءٌ مقصورٌ على العناوين** (حكم المدير، ١١ أغسطس ٢٠٢٦):
+# قاعدةُ المشروع أنّ الملتصق ممنوع («يخفي كلمتين في رسمٍ واحد، وطفلُنا يقرأ كلمةً
+# كلمة» — `make_sentences.py`)، وهي **باقيةٌ على متون الجمل والصفحات كلِّها**.
+# وقد أُقرّ عنوانُ «الْفِيلُ وَالْكَعْبَةْ» بعد عرض التصادم، فصار الاستثناء معلَناً
+# ومحصوراً: سابقةُ `+` في رمزٍ **من عنوانٍ وحده**، ويرفضها الحارس في أي موضعٍ آخر.
+WAW = "وَ"
 # **يُكتب ما يُنطق** (قاعدة المشروع في الوقف): تنوينُ الضمّ يُنطق في وسط الجملة فيُكتب
 # («زَيْدٌ يَبْكِي»)، وتنوينُ النصب يُوقف عليه **ألفاً** في آخرها فيُكتب ألفاً («يُسَاعِدُ
 # زَيْدَا») لا «زَيْدًا» — فلا يرى الطفلُ علامةً لا يقرؤها. (حكم المدير في مراجعة الحزمة ٩،
@@ -64,7 +101,10 @@ LIBRARY_SUPPORT = [
     # ظرفُ المعيّة — الخاتمة الطيبة صحبةٌ لا شيء (والملتصقُ ممنوع كما في ٩أ)
     "مَعَ",
     # ما تحتاجه الحبكة: بحثٌ فوقوعٌ فعثورٌ فشكر، وفرحٌ وحزنٌ يقرؤهما الطفل في نفسه
-    "يَبْحَثْ", "يَجِدْ", "يَسْقُطْ", "يَشْكُرْ", "تَقْفِزْ",
+    # («تَقْفِزْ» خرجت من الإعلان ولم تخرج من القصص: أعلنتها الحزمة ٩، ثم أعلنتها
+    #  حزمةُ ب٢ في معجم البساتين — فصارت معلَنةً مرّتين. والمعجمُ أولى بها، والمعلَنُ
+    #  هنا زيادتُه وحدها. حمرةٌ عاشت صامتةً لأنّ `--self-test` لم يكن في سَوقةِ أحد.)
+    "يَبْحَثْ", "يَجِدْ", "يَسْقُطْ", "يَشْكُرْ",
     "سَعِيدْ", "سَعِيدَةْ", "حَزِينْ",
     # مذكَّرُ فعلين أُعلن مؤنّثهما في معجم الجمل (الفعل يُطابِق فاعله): جارٌ يَحمل، وسامي يَقف
     "يَحْمِلْ", "يَقِفْ",
@@ -216,28 +256,68 @@ SPECS = [
         ],
         "ask": ("أَيْنَ يَلْعَبْ~v زَيْدْ", "مَلْعَبْ", ["مَتْحَفْ", "سُوقْ"]),
     },
+
+    # ————— قصص المرحلة القرآنية: «لا سورةَ قَصَصيّةٌ قبل قصتها» —————
+    #
+    # عبرت البوابةَ الثلاثية كاملةً (فاحص ← مدير ← **مالك**): الورقة
+    # `docs/REVIEW_PROPHETS.md`، وحكمُ المدير `ae23296`، وحكمُ المالك `4896341`.
+    # **موضعُها قبل محطة كلمات سورتها** — كما لا تُقرأ سورةٌ قبل كلماتها، لا تُقرأ
+    # سورةٌ قَصَصيّةٌ قبل قصتها: يعرف الطفلُ الخبرَ ثم يقرؤه في كلام الله.
+    #
+    # وثلاثةُ تحفّظاتٍ رُفعت إلى المالك وحُكم فيها: العنوان (أُقِرّ «الْفِيلُ
+    # وَالْكَعْبَةْ»)، ووقوفُ الفيل (الصفحةُ الثامنة إطارُ القصة — **لا تاسعة ولا
+    # `يَحْبِسْ`**)، والهلاكُ (نزولُ الحجارة هو الهلاك مرويّاً برفق).
+    {
+        "id": "alfil-walkaaba", "level": 3, "surah": "s105", "emoji": "🐘",
+        "title": "فِيلْ~n +كَعْبَةْ~p",
+        "pages": [
+            ("كَعْبَةْ~n بَيْتْ~u اللَّٰهْ", "🕋"),
+            ("مَلِكْ~N يَمْشِي مَعَ جَيْشْ~p", "🚶"),
+            ("فِيلْ~N كَبِيرْ~N أَمَامَ جَيْشْ~p", "🐘"),
+            ("فِيلْ~n يَقِفْ~v أَمَامَ كَعْبَةْ~p", "🛑"),
+            ("طَيْرْ~N كَثِيرْ~N يَطِيرْ~v فَوْقَ جَيْشْ~p", "🐦"),
+            ("طَيْرْ~n يَحْمِلْ~v حَجَرْ~A", "🪨"),
+            ("حَجَرْ~n يَنْزِلْ~v فَوْقَ جَيْشْ~p", "⬇️"),
+            # الخاتمةُ إطارُ القصة كلِّها: الأمرُ لله لا للفيل (حكم المالك)
+            ("اللَّٰهْ~u يَحْفَظْ~v كَعْبَةْ~p", "🕋"),
+        ],
+        # خياراتُ الفهم **من كلمات المنهج** لا من البساتين (حكم المدير):
+        # هو عينُ ما يعرفه الطفل عند هذه النقطة من الرحلة.
+        "ask": ("مَاذَا يَحْمِلْ~v طَيْرْ~p", "حَجَرْ", ["تَمْرْ", "عِنَبْ"]),
+    },
 ]
 
 
 # ————— البناء —————
 
 
-def render_token(token: str, bases: dict) -> str:
-    """رمزٌ ← صيغتُه. الأدوارُ أدوارُ ٩أ، وزيادةً `~N` تنوينُ الضمّ لاسم العلم."""
+def render_token(token: str, bases: dict, *, title: bool = False) -> str:
+    """رمزٌ ← صيغتُه. الأدوارُ أدوارُ ٩أ، وزيادةً `~N` تنوينُ الضمّ لاسم العلم.
+
+    وسابقةُ `+` عطفٌ بواوٍ ملتصقة — **في العنوان وحده** (الاستثناء المعلَن أعلاه).
+    """
+    if token.startswith("+"):
+        if not title:
+            raise ValueError(f"واوُ العطف الملتصقة في غير عنوان: «{token}» — "
+                             "الملتصقُ ممنوعٌ في المتون (قاعدة ٩أ)")
+        return WAW + render_token(token[1:], bases, title=title)
     base, _, role = token.partition("~")
     if role in TANWIN_ROLES:
+        if base == LAFZ_JALALA:
+            raise ValueError("لفظُ الجلالة معرفةٌ لا يُنوَّن — «اللَّٰهٌ» ممتنعٌ نحواً وشرعاً "
+                             f"(الدور «~{role}»); استعمل `~u`")
         if base not in bases:
             raise KeyError(base)
         return strip_end(base) + TANWIN_ROLES[role]
     return render(token, bases)
 
 
-def compose(spec: str, bases: dict, unknown: list) -> str:
+def compose(spec: str, bases: dict, unknown: list, *, title: bool = False) -> str:
     """رموزٌ ← جملةٌ مشكولة. الرمزُ الذي لا أصلَ له يُسجَّل ويُترك كما هو."""
     words = []
     for token in spec.split():
         try:
-            words.append(render_token(token, bases))
+            words.append(render_token(token, bases, title=title))
         except KeyError as e:
             unknown.append((str(e.args[0]), spec))
             words.append(token)
@@ -245,10 +325,12 @@ def compose(spec: str, bases: dict, unknown: list) -> str:
 
 
 def all_bases(data: dict) -> dict:
-    """كل ما يجوز أن يرد في التأليف: أصول ٩أ + معجم المكتبة المعلَن."""
+    """كل ما يجوز أن يرد في التأليف: أصول ٩أ + معجما المكتبة والمرحلة القرآنية."""
     out = sentence_bases(data)
     for text in LIBRARY_SUPPORT:
         out[text] = "library"
+    for text in QURAN_SUPPORT:
+        out[text] = "quran"
     return out
 
 
@@ -261,8 +343,10 @@ def build(data: dict) -> tuple:
         story = {
             "id": spec["id"],
             "level": spec["level"],
-            "garden": spec["garden"],
-            "title": compose(spec["title"], bases, unknown),
+            # محورُ الموضع: بستانٌ للمكتبة، وسورةٌ لقصص المرحلة القرآنية — ولا يجتمعان.
+            "garden": spec.get("garden", ""),
+            "surah": spec.get("surah", ""),
+            "title": compose(spec["title"], bases, unknown, title=True),
             "emoji": spec["emoji"],
             "pages": [{"text": compose(text, bases, unknown), "emoji": emoji}
                       for text, emoji in spec["pages"]],
@@ -277,12 +361,16 @@ def build(data: dict) -> tuple:
 
 
 def library_support(stories: list) -> list:
-    """المعلَن بعد طرح ما لا تستعمله قصة (لا معجم ميت — كما في مساند ٩أ)."""
+    """المعلَن بعد طرح ما لا تستعمله قصة (لا معجم ميت — كما في مساند ٩أ).
+
+    والقائمتان تُعلَنان في حقلٍ واحد لأنّ الفاحص يقرأ حقلاً واحداً — وتفريقُهما في
+    الشيفرة لا في الملف: `LIBRARY_SUPPORT` لقصص البساتين و`QURAN_SUPPORT` لقصة السورة.
+    """
     used = {stem(word) for story in stories
             for text in [story["title"], story["question"]["text"],
                          *(p["text"] for p in story["pages"])]
             for word in text.split()}
-    return [text for text in LIBRARY_SUPPORT if stem(text) in used]
+    return [text for text in [*LIBRARY_SUPPORT, *QURAN_SUPPORT] if stem(text) in used]
 
 
 def index_of(stories: list) -> dict:
@@ -352,9 +440,38 @@ def self_test(data: dict) -> int:
     ok(stem("زَيْدٌ") == stem("زَيْدْ") == stem("زَيْدَا"),
        "وجذعُها واحدٌ فيعرفها الفاحص من إعلانها الموقوف")
 
-    ok(len(stories) == 10 and [s["level"] for s in stories] == sorted(s["level"] for s in stories),
-       f"عشرُ قصص، ومستوياتُها ترتفع مع الرحلة "
-       + "(" + "، ".join(str(s["level"]) for s in stories) + ")")
+    # **محوران لا محور**: قصصُ المكتبة (بستان) وقصصُ المرحلة القرآنية (سورة). ولكلٍّ
+    # ترتيبُه: المكتبةُ ترتفع مستوياتُها مع البساتين، والقرآنيةُ ترتيبُها ترتيبُ سورها.
+    lib = [s for s in stories if s["garden"]]
+    qur = [s for s in stories if s["surah"]]
+    ok(len(lib) + len(qur) == len(stories) and not any(s["garden"] and s["surah"] for s in stories),
+       f"لكل قصةٍ محورُ موضعٍ واحد: {len(lib)} في البساتين و{len(qur)} عند سورتها")
+    ok(len(lib) == 10 and [s["level"] for s in lib] == sorted(s["level"] for s in lib),
+       "وقصصُ المكتبة عشرٌ ومستوياتُها ترتفع مع الرحلة "
+       + "(" + "، ".join(str(s["level"]) for s in lib) + ")")
+
+    # **قصةُ المرحلة القرآنية تسبق البساتين كلَّها**، فميزانيتُها كلماتُ المنهج
+    # ومعجمُها المعلَن — ولا كلمةَ بستانٍ إلا بـ«التقديم المعلَن» بقيوده الثلاثة.
+    lex_place = {w["word"]: w["theme"] for w in data["words"]}
+    trespass, forward = [], set()
+    for story in qur:
+        for text in [story["title"], story["question"]["text"],
+                     *(p["text"] for p in story["pages"])]:
+            for word in text.split():
+                base = next((b for b in lex_place if stem(b) == stem(word)), None)
+                if not base:
+                    continue
+                if base in BROUGHT_FORWARD:
+                    forward.add(base)
+                else:
+                    trespass.append(f"{story['id']}: {base} (بستان {lex_place[base]})")
+    ok(not trespass, "ولا كلمةَ بستانٍ في قصةِ سورةٍ إلا بالتقديم المعلَن"
+       + (f" — متسلّلة: {sorted(set(trespass))[:3]}" if trespass else ""))
+    idle_fwd = sorted(set(BROUGHT_FORWARD) - forward)
+    ok(not idle_fwd, "وكلُّ مقدَّمةٍ معلَنةٍ تستعملها قصة (لا بابَ مفتوحاً)"
+       + (f" — معطَّلة: {idle_fwd}" if idle_fwd else ""))
+    print(f"      ⤷ التقديمُ المعلَن ({len(forward)}): "
+          + "، ".join(f"«{w}» من بستان {lex_place[w]}" for w in sorted(forward)))
 
     off = [s["id"] for s in stories
            if not STORY_LEVELS[s["level"]]["pages"][0] <= len(s["pages"])
@@ -373,12 +490,15 @@ def self_test(data: dict) -> int:
     unpictured = {w["word"] for w in data["words"] if w.get("pictured") is False}
     gardens = [t["id"] for t in data["themes"]]
     place = {w["word"]: gardens.index(w["theme"]) for w in data["words"]}
-    late = [f"{s['id']}: {w}" for s in stories for p in s["pages"] for w in p["text"].split()
+    # (قصصُ السورة خارج هذا الميزان: محورُها ليس بستاناً — يحرسها فحصُ التقديم أعلاه)
+    late = [f"{s['id']}: {w}" for s in lib for p in s["pages"] for w in p["text"].split()
             if (base := next((b for b in lex if stem(b) == stem(w)), None))
             and place[base] > gardens.index(s["garden"])]
     ok(not late, "ولا كلمةَ بستانٍ لاحقٍ في قصةِ بستانٍ سابق (فلا تُؤجَّل قصة)"
        + (f" — {late[:3]}" if late else ""))
 
+    # كلماتُ المنهج بصيغتها المعلَنة — حوضُ خيارات قصةِ السورة (لا معجمَ البساتين)
+    curriculum = {t for t in bases if bare(stem(t)) in taught_words()}
     bad_ask = []
     for story in stories:
         stems = {stem(w) for p in story["pages"] for w in p["text"].split()}
@@ -387,8 +507,13 @@ def self_test(data: dict) -> int:
             bad_ask.append(f"{story['id']}: جوابٌ خارج النصّ")
         if any(stem(d) in stems for d in ask["distractors"]):
             bad_ask.append(f"{story['id']}: مشتّتٌ في النصّ")
-        if {ask["answer"], *ask["distractors"]} - lex:
-            bad_ask.append(f"{story['id']}: خيارٌ ليس كلمةَ معجم")
+        # **مصدرُ الخيارات يتبع محورَ القصة** (حكم المدير): قصةُ المكتبة بعد البساتين
+        # فخياراتُها من معجمها؛ وقصةُ السورة **قبلها كلِّها** فخياراتُها من كلمات
+        # المنهج — وهو عينُ ما يعرفه الطفل عند تلك النقطة، وإسقاطُ السؤال يُفقر القصة.
+        pool = lex if story["garden"] else set(BROUGHT_FORWARD) | curriculum
+        if {ask["answer"], *ask["distractors"]} - pool:
+            outside = sorted({ask["answer"], *ask["distractors"]} - pool)
+            bad_ask.append(f"{story['id']}: خيارٌ خارج حوضه ({'، '.join(outside)})")
         # خيارات السؤال صورٌ — فالكلمةُ غير المصوَّرة لا تدخلها («صدق الصورة»)
         if blind := {ask["answer"], *ask["distractors"]} & unpictured:
             bad_ask.append(f"{story['id']}: خيارٌ غير مصوَّر ({'، '.join(sorted(blind))})")

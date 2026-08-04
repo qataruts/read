@@ -101,7 +101,9 @@ FILL_OPTIONS = 3               # خيارات «أكمل الجملة» (نظي�
 # من هنا): فالعقد مكتوبٌ في الحارس لا في المؤلِّف، ولا يوسّعه المؤلِّف على نفسه.
 STORIES_DIR = ROOT / "app" / "data" / "stories"
 STORY_INDEX = STORIES_DIR / "index.json"
-STORY_FIELDS = ("id", "level", "garden", "title", "emoji", "pages", "question")
+STORY_FIELDS = ("id", "level", "garden", "surah", "title", "emoji", "pages", "question")
+# محورُ الموضع اثنان لا واحد (البند ٤): «garden» لقصص المكتبة بعد البساتين،
+# و«surah» لقصص المرحلة القرآنية قبلها — ويملأ أحدُهما ويفرغ الآخر، ولا يجتمعان.
 QUESTION_FIELDS = ("text", "answer", "distractors")
 STORY_LEVELS = {          # المستوى ← (عدد الصفحات، طول الجملة بالكلمات)
     1: {"pages": (3, 3), "words": (2, 3)},
@@ -706,6 +708,54 @@ def dump_story(story: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _quran_part() -> dict:
+    """قسمُ المرحلة القرآنية من المنهج — مصدرُ محورِ السورة ورصيدِ رسمِها."""
+    src = CURRICULUM.read_text(encoding="utf-8")
+    _letters, _groups, parts = parse_curriculum(src)
+    return parse_quran(parts.get("QURAN", ""))
+
+
+def quran_surah_ids() -> set:
+    """معرّفاتُ سور المنهج — بها يُعرَف محورُ قصةِ السورة (مشتقَّةٌ لا مكتوبة)."""
+    return {s["id"] for s in _quran_part()["surahs"]}
+
+
+WAW_PREFIX = "وَ"        # واوُ العطف الملتصقة — استثناءٌ مُقَرّ في العناوين وحدها
+
+
+def curriculum_word(text: str) -> dict:
+    """كلمةُ منهجٍ بصورتها (`word`/`emoji`/`pictured`) — أو None.
+
+    **حوضُ خيارات سؤالِ قصةِ السورة** (حكم المدير): تلك القصة قبل البساتين كلِّها،
+    فخياراتُها من كلمات المنهج لا من معجمها — وصورتُها من المنهج كذلك، فالخيارات
+    صورٌ («صدق الصورة»). ويُقرأ ذلك من `curriculum.js` لا من نسخةٍ ثانية تفترق عنه.
+    """
+    src = CURRICULUM.read_text(encoding="utf-8")
+    _letters, groups, parts = parse_curriculum(src)
+    quran = parse_quran(parts.get("QURAN", ""))
+    pool = [(("".join(w["tiles"])), w.get("emoji"), True) for g in groups for w in g["words"]]
+    pool += [(w[0], w[1], w[2]) for w in quran["words"]["items"]]
+    pool += [(w[0], w[1], w[2]) for s in quran["letters"]["signs"] for w in s["words"]]
+    for word, emoji, pictured in pool:
+        if word == text:
+            return {"word": word, "emoji": emoji, "theme": "", PICTURED: pictured}
+    return None
+
+
+def quran_rasm_marks() -> set:
+    """علاماتُ درس الرسم — رصيدٌ زائد **لقصص المرحلة القرآنية وحدها**.
+
+    موضعُ قصةِ السورة بعد درس الرسم من المرحلة نفسِها، فما عرضه الدرسُ عرفه الطفل:
+    ومنه **الألف الخنجرية** `ٰ` التي يُكتب بها لفظُ الجلالة في مادّتنا (بلا تطويل —
+    انظر `check_tatweel`). ولا يُعطى هذا الرصيد لقصص المكتبة: تلك في البساتين،
+    ولا رسمَ عثمانياً فيها.
+    """
+    out = set()
+    for sign in _quran_part()["rasm"]["signs"]:
+        out |= set(sign["sign"]) - {TATWEEL}
+    return out
+
+
 def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = False,
                   library: tuple = None) -> int:
     """فحص عقد «مصنع القصص»: المفكوكية، والمعجم المعلَن، وحدود المستوى، والسؤال.
@@ -764,10 +814,15 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
                       f"أصلاً): {'، '.join(shared[:8])}")
 
     def place_of(parts_, label):
-        """موضعُ نصٍّ في الرحلة، وتسجيلُ خطأِ كل مفردةٍ خارج المعلَن."""
+        """موضعُ نصٍّ في الرحلة، وتسجيلُ خطأِ كل مفردةٍ خارج المعلَن.
+
+        و**واو العطف الملتصقة تُنزَع قبل المطابقة**: هي استثناءٌ مُقَرّ في **العناوين
+        وحدها** (حكم المدير، عنوانُ «الْفِيلُ وَالْكَعْبَةْ») — والمعطوفُ بعدها كلمةٌ
+        معلَنة كغيرها، فلا يُحسَب الرسمُ الملتصق مفردةً مجهولة.
+        """
         place = 0
         for part in parts_:
-            root_stem = stem(part)
+            root_stem = stem(part[len(WAW_PREFIX):] if part.startswith(WAW_PREFIX) else part)
             if root_stem in lex_place:
                 place = max(place, lex_place[root_stem])
             elif bare(root_stem) in known or bare(part) in known:
@@ -816,16 +871,32 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
         if not bounds:
             errors.append(f"{label}: مستوى مجهول «{level}» (المستويات {sorted(STORY_LEVELS)})")
             continue
-        levels.append(level)
+        levels.append((level, story.get("garden") or ""))
 
-        garden = story.get("garden")
-        if garden not in [t.get("id") for t in themes]:
+        # **محورا الموضع** (البند ٤): بستانٌ لقصص المكتبة، وسورةٌ لقصص المرحلة
+        # القرآنية — يملأ أحدُهما ويفرغ الآخر. وقصةُ السورة تقع **قبل البساتين
+        # كلِّها**، فلا موضعَ بستانيّ لها (`base = 0`) وميزانيتُها كلماتُ المنهج.
+        garden, surah = story.get("garden") or "", story.get("surah") or ""
+        if bool(garden) == bool(surah):
+            errors.append(f"{label}: محورُ موضعها ملتبس — بستانٌ «{garden}» وسورةٌ «{surah}» "
+                          "(يملأ أحدُهما ويفرغ الآخر)")
+            continue
+        if garden and garden not in [t.get("id") for t in themes]:
             errors.append(f"{label}: بستان مجهول «{garden}»")
             continue
-        base = theme_place(themes, garden)
+        if surah and surah not in quran_surah_ids():
+            errors.append(f"{label}: سورةٌ مجهولة «{surah}» (ليست في المنهج)")
+            continue
+        base = theme_place(themes, garden) if garden else 0
+
+        # **علاماتُ الرسم مدروسةٌ لقصة السورة**: موضعُها بعد درس الرسم من المرحلة
+        # القرآنية، فالألفُ الخنجرية (`ٰ` في لفظ الجلالة) حرفٌ عرفه الطفل هناك —
+        # ولا تُعرَض على قصص المكتبة، فتلك في البساتين ولا رسمَ فيها.
+        story_taught = taught
+        story_allowed = (allowed | quran_rasm_marks()) if surah else allowed
 
         # العنوان والصفحات: مفكوكة، ومن المعجم المعلَن، وبحدود مستواها
-        errors += text_errors(story.get("title", ""), f"{label} عنوان", taught, letters, allowed)
+        errors += text_errors(story.get("title", ""), f"{label} عنوان", story_taught, letters, story_allowed)
         place = place_of(str(story.get("title", "")).split(), f"{label} عنوان")
         audio_texts.add(story.get("title", ""))
 
@@ -848,7 +919,7 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
                 errors.append(f"{where}: «{text}» {len(page_words)} كلمة "
                               f"(المستوى {level}: {wlow}–{whigh})")
             for word in page_words:
-                errors += text_errors(word, where, taught, letters, allowed)
+                errors += text_errors(word, where, story_taught, letters, story_allowed)
             errors += waqf_errors(text, where, verb_stems)
             place = max(place, place_of(page_words, where))
             if text in seen:
@@ -867,7 +938,7 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             ask_text = str(ask.get("text", "") or "").strip()
             ask_words = ask_text.split()
             for word in ask_words:
-                errors += text_errors(word, where, taught, letters, allowed)
+                errors += text_errors(word, where, story_taught, letters, story_allowed)
             errors += waqf_errors(ask_text, where, verb_stems)
             if not any(w in ASK_WORDS for w in ask_words):
                 errors.append(f"{where}: «{ask_text}» بلا أداة استفهام ({'، '.join(ASK_WORDS)})")
@@ -887,11 +958,16 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             if len(set(options)) != len(options):
                 errors.append(f"{where}: خيارٌ مكرَّر ({'، '.join(options)})")
             for n, option in enumerate(options):
-                item = lex_word.get(option)
+                # **حوضُ الخيارات يتبع محورَ القصة** (حكم المدير على ورقة الأنبياء):
+                # قصةُ المكتبة بعد البساتين فخياراتُها من معجمها؛ وقصةُ السورة قبلها
+                # كلِّها فخياراتُها من **كلمات المنهج** — وهو عينُ ما يعرفه الطفل هناك.
+                item = lex_word.get(option) or (curriculum_word(option) if surah else None)
                 if item is None:
-                    errors.append(f"{where}: الخيار «{option}» ليس كلمةَ معجم (لا صورة له)")
+                    errors.append(f"{where}: الخيار «{option}» ليس من حوضه "
+                                  + ("(كلماتُ المنهج لقصة السورة)" if surah
+                                     else "(ليس كلمةَ معجم — لا صورة له)"))
                     continue
-                if theme_place(themes, item.get("theme")) > base:
+                if not surah and theme_place(themes, item.get("theme")) > base:
                     errors.append(f"{where}: الخيار «{option}» من بستانٍ بعد «{garden}» "
                                   "(لم يبلغه الطفل بعد)")
                 if item.get(PICTURED) is False:
@@ -903,14 +979,16 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
                 if n and inside:
                     errors.append(f"{where}: المشتّت «{option}» في نصّ القصة — "
                                   "فالسؤال يحتمل جوابين")
-            emojis = [lex_word[o]["emoji"] for o in options if o in lex_word]
+            picked = [lex_word.get(o) or (curriculum_word(o) if surah else None) for o in options]
+            emojis = [it["emoji"] for it in picked if it]
             if len(set(emojis)) != len(emojis):
                 errors.append(f"{where}: صورتان متشابهتان في الخيارات")
 
-        if place != base:
+        if garden and place != base:
             errors.append(f"{label}: بستانُها المعلَن «{garden}» وكلماتُها تكتمل في "
                           f"«{theme_id(themes, place)}» (قاعدة «أوّل موضع تكتمل كلماته»)")
 
+    levels = [lv for lv, g in levels if g]        # محورُ المكتبة وحده
     if levels != sorted(levels):
         errors.append(f"[المكتبة] المستويات لا ترتفع مع الرحلة: {levels} — "
                       "قصةٌ أطولُ قبل أقصر منها تُرهق الطفل")
@@ -918,8 +996,11 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
     if idle:
         errors.append(f"[معجم المكتبة] {len(idle)} مفردة معلَنة لا تستعملها قصة: "
                       + "، ".join(idle[:10]) + ("…" if len(idle) > 10 else ""))
+    # المعلَنُ لقصة السورة يُفحَص برصيدها (فيه لفظُ الجلالة بألفه الخنجرية المدروسة)
+    quran_declared = {t for t in library_support if set(t) & quran_rasm_marks()}
     for text in library_support:
-        errors += text_errors(text, f"[معجم المكتبة/«{text}»]", taught, letters, allowed)
+        marks = (allowed | quran_rasm_marks()) if text in quran_declared else allowed
+        errors += text_errors(text, f"[معجم المكتبة/«{text}»]", taught, letters, marks)
 
     if not library and STORIES_DIR.exists():
         on_disk = sorted(p.stem for p in STORIES_DIR.glob("*.json") if p.name != "index.json")
@@ -1286,6 +1367,67 @@ def _no_support(good: dict, theme: dict, letters: dict, known: set) -> str:
     return buf.getvalue()
 
 
+def check_tatweel(data: dict, quiet: bool = False) -> int:
+    """**لا محرفَ تطويلٍ (`U+0640`) في مادّةٍ مؤلَّفة** — حكم المدير على ورقة الأنبياء.
+
+    **العلّة، وقد كشفها الخفوت لا العين**: التطويل يُستعمل حاملاً لعلامةٍ لا كرسيَّ
+    لها في الرسم الإملائي — كالألف الخنجرية في لفظ الجلالة `اللَّـٰهْ`. وهو يقرأ
+    سليماً ما دام مشكولاً. لكنّ **موادّ التأليف تمرّ بالخفوت** (بخلاف نصّ المصحف،
+    وهو محرَّمٌ عليه)، وز٣ ينزع التشكيل كلَّه — فيبقى التطويلُ عارياً معلَّقاً:
+
+        اللَّـٰهْ  ← ز٣ ←  اللـه      ✗ تطويلٌ معلَّق لا يقرؤه أحد
+        اللَّٰهْ   ← ز٣ ←  الله       ✓ الألفُ الخنجرية على اللام مباشرة
+
+    فالحكم: يُكتب ما يبقى صحيحاً **عارياً**، لا ما يصحّ مشكولاً وحده.
+
+    و**استثناءان معلَنان لا ثالث**: (١) نصُّ المصحف — رسمُه من مشروع تنزيل حرفاً
+    بحرف ولا يُنقص منه شيء، والخفوتُ محرَّمٌ عليه أصلاً (CLAUDE.md)؛ (٢) حقولُ
+    `face` — تعرض **علامةً على حاملها** لا كلمةً تُقرأ (`ـٰ` في درس الرسم مثلاً).
+    وكلاهما خارج هذا الفحص بناءً لا استثناءً: هذا الفحص لا يقرأ إلا المؤلَّف.
+
+    والمادةُ اليوم **نظيفةٌ تماماً** — فهذا الحارس يحفظ نظافةً قائمة لا يُصلح فساداً.
+    """
+    errors = []
+    hit = lambda text: TATWEEL in str(text or "")
+
+    for entry in data.get("words") or []:
+        for field in ("word", "sentence"):
+            if hit(entry.get(field)):
+                errors.append(f"[معجم/{entry.get('word')}] «{entry.get(field)}» فيه تطويل")
+        if any(hit(t) for t in entry.get("tiles") or []):
+            errors.append(f"[معجم/{entry.get('word')}] في مقاطعها تطويل")
+    for text in data.get(SUPPORT_FIELD) or []:
+        if hit(text):
+            errors.append(f"[المعجم المساند] «{text}» فيه تطويل")
+    for sentence in all_sentences(data):
+        if hit(sentence):
+            errors.append(f"[سلّم الجمل] «{sentence}» فيه تطويل")
+
+    if STORY_INDEX.exists():
+        index, stories = load_stories()
+        for text in index.get(SUPPORT_FIELD) or []:
+            if hit(text):
+                errors.append(f"[معجم المكتبة] «{text}» فيه تطويل")
+        for story in stories:
+            if story.get("missing"):
+                continue
+            texts = [story.get("title"), *(p.get("text") for p in story.get("pages") or []),
+                     (story.get("question") or {}).get("text")]
+            for text in texts:
+                if hit(text):
+                    errors.append(f"[قصة «{story.get('id')}»] «{text}» فيه تطويل")
+
+    for line in errors:
+        print(f"  ✗ {line}")
+    if errors:
+        print(f"\n✗ {len(errors)} موضعاً فيه محرف تطويل (U+0640) في مادّةٍ مؤلَّفة — "
+              "يُكتب ما يبقى صحيحاً عارياً (حكم المدير، ورقة الأنبياء)")
+        return 1
+    if not quiet:
+        print("✓ لا تطويل في مادّةٍ مؤلَّفة: كلُّ ما يُقرأ يبقى صحيحاً بعد الخفوت.")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description="فحص معجم «حديقة الكلمات»")
     ap.add_argument("-q", "--quiet", action="store_true", help="إخفاء التنبيهات")
@@ -1305,7 +1447,8 @@ def main():
     if args.fill_support:
         sys.exit(fill_support(data))
     status = check(data, letters, quiet=args.quiet)
-    sys.exit(status | check_stories(data, letters, quiet=args.quiet))
+    status |= check_stories(data, letters, quiet=args.quiet)
+    sys.exit(status | check_tatweel(data, quiet=args.quiet))
 
 
 if __name__ == "__main__":

@@ -410,7 +410,7 @@ function accentOf(node, group) {
   if (node.type === 'quran') return QURAN_ACCENT;
   if (node.type === 'garden') return accentForGarden(node.garden);
   if (node.type === 'ladder') return SENTENCE_ACCENT;
-  if (node.type === 'library') return STORY_ACCENT;
+  if (node.type === 'library' || node.type === 'prophet') return STORY_ACCENT;
   if (node.type === 'skill' || node.type === 'story' || node.type === 'gate'
     || node.type === 'contrast' || node.type === 'roots') return PAUSE_ACCENT;
   return accentFor(group);
@@ -499,7 +499,7 @@ function nodeButton(node, next) {
 
   const btn = h('button', {
     class: `node node--${node.type} node--${state}${isNext ? ' node--next' : ''}`,
-    css: node.type === 'story' || node.type === 'library' ? { '--accent': STORY_ACCENT } : {},
+    css: ['story', 'library', 'prophet'].includes(node.type) ? { '--accent': STORY_ACCENT } : {},
     'aria-label': `${label} — ${open ? (stars ? `${arNum(stars)} نجوم · يمكن إعادته` : 'مفتوح') : 'مقفل'}`,
     onclick: () => {
       if (!open) {
@@ -620,6 +620,10 @@ async function render() {
     screen = renderLadder(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'library' && arg1) {
     if (!guard(`library:${decodeURIComponent(arg1)}`)) return;
+    screen = renderLibraryStory(decodeURIComponent(arg1)) || renderMap();
+  } else if (name === 'prophet' && arg1) {
+    // قصةُ السورة تُقرأ بشاشة القصة نفسِها — مُصيِّرٌ واحد لا ثانيَ له
+    if (!guard(`prophet:${decodeURIComponent(arg1)}`)) return;
     screen = renderLibraryStory(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'review') {
     screen = renderReview();

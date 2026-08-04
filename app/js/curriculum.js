@@ -1115,6 +1115,23 @@ export const storyById = (id) => STORIES.find((s) => s.id === id) || null;
 export const wordBySay = (say) => GROUPS.flatMap((g) => g.words).find((w) => w.say === say) || null;
 
 /**
+ * كلمةُ منهجٍ بنصّها المشكول، في شكلِ كلمةِ معجمٍ (`word`/`emoji`/`pictured`) — أو null.
+ *
+ * **حوضُ خيارات سؤالِ قصةِ السورة** (حكم المدير، حزمة قصص الأنبياء): تلك القصة تقع
+ * **قبل البساتين كلِّها**، فخياراتُها من كلمات المنهج لا من معجم البساتين — وصورتُها
+ * من المنهج كذلك، فخياراتُ الفهم صورٌ («صدق الصورة»). ونظيرُها في الفاحص
+ * `curriculum_word` بـ`check_lexicon.py`، ويقرأ كلاهما من هذا الملف لا من نسخةٍ ثانية.
+ */
+export function curriculumWord(text) {
+  const tiled = GROUPS.flatMap((g) => g.words)
+    .find((w) => w.tiles.join('') === text);
+  if (tiled) return { word: text, emoji: tiled.emoji, pictured: tiled.pictured !== false };
+  const imla = [...quranWordItems(),
+    ...QURAN.letters.signs.flatMap((s) => s.words)].find((w) => w.read === text);
+  return imla ? { word: text, emoji: imla.emoji, pictured: imla.pictured !== false } : null;
+}
+
+/**
  * كلمات درس المهارة موحَّدة الشكل: {text المعروض، say المنطوق، emoji}.
  * المُحال إليها من المنهج تُعرض بمقاطعها المركّبة وتُنطق بـsay (صوتها موجود أصلاً)،
  * والجديدة نصّها المشكول هو المعروض والمنطوق معاً.

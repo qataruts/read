@@ -14,6 +14,8 @@
 //      يُشغَّل. (دخلت مادّتُها القائمة بعد اعتماد المدير — بند الحزمة ٩/٤.)
 
 import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const APP = new URL('../app/js/', import.meta.url);
 
@@ -28,10 +30,17 @@ const { GROUPS, SKILLS, QURAN, quranWordItems, bareLetters, skillExamples } =
   await import(new URL('curriculum.js', APP));
 const { GARDENS, WORDS } = await import(new URL('lexicon.js', APP));
 const { stemOf } = await import(new URL('sentences.js', APP));
-const { LIBRARY, libraryOf, libraryStory, libraryTexts, storyTexts } =
+const { LIBRARY: ALL_STORIES, libraryOf, libraryStory, libraryTexts, storyTexts } =
   await import(new URL('library.js', APP));
 const { starsForLibrary, starsForStory } = await import(new URL('story.js', APP));
 const p = await import(new URL('progress.js', APP));
+
+// **محورا الموضع** (حزمة قصص الأنبياء): هذا الحارسُ حارسُ **المكتبة** — قصصُ
+// البساتين بعد سلالمها. وقصصُ المرحلة القرآنية محورُها سورةٌ لا بستان، وموضعُها
+// قبل البساتين كلِّها، فيحرسها `test_quran.mjs` حيث تقع. ولولا الفصلُ لقيس
+// كلٌّ بميزان الآخر — فاختلط رصيدُ الكلمات وموضعُ العقدة.
+const LIBRARY = ALL_STORIES.filter((s) => s.garden);
+const SURAH_STORIES = ALL_STORIES.filter((s) => s.surah);
 
 let fails = 0;
 const ok = (cond, msg) => { if (!cond) { fails++; console.log('  ✗', msg); } else console.log('  ✓', msg); };
@@ -144,6 +153,15 @@ for (const story of LIBRARY) {
   }
 }
 ok(true, `لا كلمة خارج المدروس في المكتبة كلها (${checked} كلمة مفحوصة بترتيب الرحلة)`);
+// المعجمُ المعلَن حقلٌ واحد يشترك فيه المحوران (`index.support`)، فيُجرد استعمالُه
+// عليهما معاً — وإلا حُسبت مفرداتُ قصةِ السورة «معطَّلة» وهي مستعمَلة.
+for (const story of SURAH_STORIES) {
+  for (const word of [...story.title.split(' '),
+    ...story.pages.flatMap((page) => page.words), ...story.question.words]) {
+    const st = stemOf(word);
+    if (support.has(st)) usedSupport.add(support.get(st));
+  }
+}
 ok((index.support || []).every((t) => usedSupport.has(t)),
   `ومعجم المكتبة المعلَن مستعمَل كلُّه (${(index.support || []).length} مفردة)`);
 ok((index.support || []).every((t) => !(lexicon.support || []).includes(t)),
@@ -210,6 +228,26 @@ ok(libraryTexts().every((t) => voiced(t)),
   'ومادّةُ القصص دخلت القائمة بعد اعتماد المدير (بند الحزمة ٩/٤: لا صوت قبل حكم العين)');
 ok(LIBRARY.every((s) => storyTexts(s).length === new Set(storyTexts(s)).size),
   'ولا تكرار في قائمة نصوص أي قصة');
+
+// ————— ٧. المولّد نفسُه في السَّوقة — «فحصٌ لا يُشغَّل ليس حارساً» —————
+//
+// **عيبٌ بنيويّ كشفته حزمةُ الأنبياء** (حكم المدير، ١١ أغسطس ٢٠٢٦): `make_stories.py`
+// له `--self-test` و`--check` منذ الحزمة ٩، ولم يكونا في سَوقةِ أحد. فلمّا وسّعت
+// حزمةُ ب٢ معجمَ البساتين بكلمةٍ كانت معلَنةً في معجم المكتبة (`تَقْفِزْ`) بقي الفحصُ
+// أحمرَ **صامتاً** حتى صادفتْه هذه الحزمة. فمن اليوم: **المولّد يُشغَّل هنا**، في
+// حارسٍ تشمله السَّوقة القياسية (`tools/test_*.mjs`) — فلا يعود فحصٌ يملكه المشروع
+// ولا يراه أحد.
+
+console.log('\n— المولّد ومادّتُه (make_stories.py) —');
+for (const [flag, what] of [
+  ['--self-test', 'المولّد ومادّتُه سليمان (المعجم المعلَن، وحدود المستوى، والسؤال)'],
+  ['--check', 'وملفاتُ app/data/stories هي عينُ خرج المولّد (لا تُحرَّر قصةٌ بيد)'],
+]) {
+  const run = spawnSync('python3',
+    [fileURLToPath(new URL('make_stories.py', import.meta.url)), flag], { encoding: 'utf8' });
+  ok(run.status === 0, `[${flag}] ${what}`
+    + (run.status === 0 ? '' : `\n${(run.stdout || '').split('\n').filter((l) => l.includes('✗')).join('\n')}`));
+}
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات مصنع القصص ناجحة');
 process.exit(fails ? 1 : 0);

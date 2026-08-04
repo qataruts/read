@@ -7,11 +7,11 @@
 
 import {
   GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, ROOTS,
-  gateBefore, quranParts, bareLetters,
+  gateBefore, quranParts, surahOfWordsPart, bareLetters,
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf, stemOf } from './sentences.js';
-import { libraryOf } from './library.js';
+import { libraryOf, storiesOfSurah } from './library.js';
 
 const STORE_KEY = 'muallim.progress.v1';
 export const VERSION = 2;            // ١ = نجوم فقط (تُرقّى تلقائياً بلا فقد)
@@ -124,7 +124,7 @@ function migrateJourney() {
     if (node.type === 'gate') {
       state.stars[node.id] = MAX_STARS;           // بوابةٌ عبَر مفصلَها قبل وجودها ⇒ مجتازة
       changed = true;
-    } else if (node.type === 'contrast' || node.type === 'quran' || node.type === 'roots') {
+    } else if (['contrast', 'quran', 'prophet', 'roots'].includes(node.type)) {
       // محطةٌ استحدثناها خلف موضع الطفل: نجمةُ إتمامٍ واحدة تفكّ حبسه ولا تدّعي إتقاناً —
       // فتبقى تدعوه إلى لعبها (النجوم لا تنقص، فما يكسبه حين يلعبها يعلو عليها).
       // ويشمل ذلك محطاتِ «كلمات السورة» المستحدثة أمام سورٍ قرأها الطفل (الحزمة ١٢):
@@ -205,9 +205,24 @@ export function interludeNodes(groupId) {
  * ترتيبها من `quranParts()` — بيانات المنهج وحدها تحدّد ما فيها.
  */
 export function quranNodes() {
-  return quranParts().map(({ part, title, face }) => ({
-    id: `quran:${part}`, type: 'quran', groupId: QURAN.after, part, title, face,
-  }));
+  const out = [];
+  for (const { part, title, face } of quranParts()) {
+    // **«لا سورةَ قَصَصيّةٌ قبل قصتها»** (حزمة قصص الأنبياء): قصةُ السورة تسبق محطةَ
+    // كلماتها — يعرف الطفلُ الخبرَ ثم يقرأ كلماتِه ثم يقرؤه في كلام الله. وهي عقدةٌ
+    // من نوعها (`prophet`) لأنها **قراءةٌ لا امتحان**: لا تُقاس ولا يُبنى منها مهارة
+    // (إعفاؤها منصوصٌ بسببه في `tools/test_measure.mjs`).
+    const surah = surahOfWordsPart(part);
+    if (surah) {
+      for (const story of storiesOfSurah(surah.id)) {
+        out.push({
+          id: `prophet:${story.id}`, type: 'prophet', groupId: QURAN.after,
+          part: story.id, title: story.title, face: story.emoji, story,
+        });
+      }
+    }
+    out.push({ id: `quran:${part}`, type: 'quran', groupId: QURAN.after, part, title, face });
+  }
+  return out;
 }
 
 /**

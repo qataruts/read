@@ -89,13 +89,19 @@ ok(QURAN.surahs.every((s) => surahOfWordsPart(surahWordsPart(s.id)) === s)
 
 const nodes = p.allNodes();
 const ids = nodes.map((n) => n.id);
+const prophetNodes = nodes.filter((n) => n.type === 'prophet');
 ok(ids.filter((id) => id.startsWith('quran:')).length === parts.length,
   `عقد المرحلة في الرحلة (${parts.length} عقدة)`);
 const quranStart = ids.indexOf('quran:letters');
-ok(ids.slice(quranStart, quranStart + parts.length).join('|') === parts.map((x) => `quran:${x}`).join('|')
-  && ids.slice(0, quranStart).every((id) => !id.startsWith('quran:')),
-  'وهي متتابعة بعد الرحلة كلها (من درس الحرفين إلى آخر سورة)');
-ok(ids.slice(quranStart + parts.length).every((id) => id.startsWith('garden:')
+// **قصصُ الأنبياء عقدٌ داخل المرحلة** (حزمة قصص الأنبياء): كلُّ واحدةٍ تسبق محطةَ
+// كلمات سورتها، فتتخلّل السلسلة. والمحروسُ أن تبقى المرحلةُ **كتلةً متصلة** لا أن
+// تكون كلُّ عقدةٍ فيها `quran:` — فالخلطُ بينهما يمنع كلَّ قصةٍ قادمة من دخولها.
+const stageIds = ids.slice(quranStart, quranStart + parts.length + prophetNodes.length);
+ok(stageIds.filter((id) => id.startsWith('quran:')).join('|') === parts.map((x) => `quran:${x}`).join('|')
+  && stageIds.every((id) => id.startsWith('quran:') || id.startsWith('prophet:'))
+  && ids.slice(0, quranStart).every((id) => !id.startsWith('quran:') && !id.startsWith('prophet:')),
+  `وهي كتلةٌ متصلة بعد الرحلة كلها (${stageIds.length} عقدة: ${parts.length} محطة و${prophetNodes.length} قصة)`);
+ok(ids.slice(quranStart + parts.length + prophetNodes.length).every((id) => id.startsWith('garden:')
   || id.startsWith('ladder:') || id.startsWith('library:') || id.startsWith('roots:')
   || id === 'gate:gardens'),
   'ولا يليها إلا بوابة الحديقة (١٤) وبساتين الموضوعات (٧) وسلالم جملها (٨) '
@@ -127,8 +133,23 @@ const lastSurah = `quran:${QURAN.surahs.at(-1).id}`;
 upTo(lastSurah);
 ok(p.isNodeUnlockedById(lastSurah), `وآخر سورة تُفتح بإتمام ما قبلها (${lastSurah})`);
 p.setStars(lastSurah, 3);
-ok(p.nextNode()?.id === ids[quranStart + parts.length],
+ok(p.nextNode()?.id === ids[quranStart + parts.length + prophetNodes.length],
   `وبإتمامها يُفتح أول بستان (${p.nextNode()?.id})`);
+
+// ————— ١د. قصصُ الأنبياء: «لا سورةَ قَصَصيّةٌ قبل قصتها» —————
+//
+// عبرت البوابة الثلاثية (فاحص ← مدير ← مالك): `docs/REVIEW_PROPHETS.md`.
+// والمحروسُ موضعُها ونوعُها ورصيدُها — أمّا معناها فعينُ المالك، ولا يحرسها اختبار.
+for (const node of prophetNodes) {
+  const at = ids.indexOf(node.id);
+  const surah = node.story.surah;
+  ok(ids[at + 1] === `quran:${surahWordsPart(surah)}`,
+    `قصة «${node.story.title}» تسبق محطةَ كلمات سورتها مباشرةً — يعرف الخبرَ ثم يقرؤه`);
+  ok(node.story.garden === '' && Boolean(surah) && surahById(surah),
+    'ومحورُ موضعها سورةٌ لا بستان (ولا يجتمعان)');
+}
+ok(prophetNodes.every((n) => !/[\u0640]/.test(JSON.stringify(n.story))),
+  'ولا محرفَ تطويلٍ في نصّها — فالخفوت ينزعه إلى رسمٍ معلَّق (حكم المدير)');
 
 // ————— ١ج. الشريحة الثانية (حزمة «القرآني الموسّع») —————
 //

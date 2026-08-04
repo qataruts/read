@@ -39,6 +39,7 @@ const {
   surahWords, surahWordsPart,
 } = await import('./js/curriculum.js');
 const { allNodes } = await import('./js/progress.js');
+const { LIBRARY } = await import('./js/library.js');
 const manifest = await (await fetch('audio/manifest.json')).json();
 const recitations = await (await fetch('data/recitations.json')).json();
 const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
@@ -180,10 +181,13 @@ try {
       .every((s) => !s.classList.contains('station--garden')),
     'وموضعها بعد محطات الحروف كلها وقبل بساتين الحزمة ٧');
   unfoldAll();
-  const QURAN_NODES = 3 + QURAN.words.levels.length + QURAN.surahs.length * 2;
+  // ومعها قصصُ السور: كلُّ قصةٍ عقدةٌ تسبق محطةَ كلمات سورتها (حزمة قصص الأنبياء)
+  const SURAH_STORIES = LIBRARY.filter((s) => s.surah).length;
+  const QURAN_NODES = 3 + QURAN.words.levels.length + QURAN.surahs.length * 2 + SURAH_STORIES;
   ok($$('.station--quran .node').length === QURAN_NODES,
     `وفيها ${arNum(QURAN_NODES)} عقدة (حرفان، ${arNum(QURAN.words.levels.length)} درجات كلمات، `
-    + `رسم، مقطَّعة، وأربع سور كلٌّ بمحطة كلماتها)`);
+    + `رسم، مقطَّعة، و${arNum(QURAN.surahs.length)} سورة كلٌّ بمحطة كلماتها، `
+    + `و${arNum(SURAH_STORIES)} قصةَ سورة)`);
 
   await goto('#/quran/s1');
   ok(!!$('.station') && !$('.story'), 'الدخول المباشر على سورة مقفلة يعيده إلى الخريطة');

@@ -12,6 +12,7 @@
 // `progress.journey()` متزامنة. وإن تعذّرت القراءة تعمل الرحلة كاملةً بلا مكتبة.
 
 import { lexiconWord } from './lexicon.js';
+import { curriculumWord } from './curriculum.js';
 
 const INDEX_URL = new URL('../data/stories/index.json', import.meta.url);
 
@@ -48,8 +49,10 @@ const wordsOf = (text) => String(text ?? '').split(/\s+/).filter(Boolean);
  * وهذا حارسُ الشاشة إن تسرّبت: سؤالٌ لا يُسأل خيرٌ من سؤالٍ يظلم.
  */
 function asStory(raw) {
+  // وحوضُ الخيارات يتبع محورَ القصة: قصةُ البستان من معجمه، وقصةُ السورة **من
+  // كلمات المنهج** — فهي قبل البساتين كلِّها (حكم المدير، حزمة قصص الأنبياء).
   const options = [raw.question?.answer, ...(raw.question?.distractors || [])]
-    .map((word) => lexiconWord(word))
+    .map((word) => (raw.surah ? curriculumWord(word) || lexiconWord(word) : lexiconWord(word)))
     .filter((word) => word && word.pictured !== false);
   return {
     ...raw,
@@ -69,6 +72,12 @@ export const libraryStory = (id) => LIBRARY.find((s) => s.id === id) || null;
 
 /** قصص بستانٍ بعينه — عقدُها على الخريطة بعد سلّم جمله. */
 export const libraryOf = (gardenId) => LIBRARY.filter((s) => s.garden === gardenId);
+
+/**
+ * قصصُ سورةٍ بعينها — عقدُها **قبل محطة كلماتها**: كما لا تُقرأ سورةٌ قبل كلماتها،
+ * لا تُقرأ سورةٌ قَصَصيّةٌ قبل قصتها؛ يعرف الطفلُ الخبرَ ثم يقرؤه في كلام الله.
+ */
+export const storiesOfSurah = (surahId) => LIBRARY.filter((s) => s.surah === surahId);
 
 /** كل ما تنطقه القصة: عنوانها، وجملُها، وكلماتُها مفردةً (كلُّ كلمةٍ زرٌّ يُسمعها). */
 export function storyTexts(story) {

@@ -109,7 +109,7 @@ ok(badPick.size === 0,
 console.log('\n— حوض ٣: سؤال فهم القصة —');
 const asked = LIBRARY.filter((s) => s.question);
 const badAsk = asked.filter((s) => s.question.options.some((o) => o.pictured === false));
-ok(asked.length === LIBRARY.length && LIBRARY.length === 10,
+ok(asked.length === LIBRARY.length && LIBRARY.length === 11,   // ١٠ في البساتين + قصةُ سورة الفيل
   `كل القصص احتفظت بسؤالها (${asked.length}/${LIBRARY.length}) — لم يسقط سؤالٌ بالإخراج`);
 ok(badAsk.length === 0,
   'ولا خيارَ غيرَ مصوَّر في أيّ سؤال (خياراتُه صورٌ لا نصّ)'
