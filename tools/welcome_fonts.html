@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>لوحة خطّ العناوين — «المرجع التعريفي»</title>
+<!--
+  لوحةُ الاختيار: بديلا خطّ عناوينٍ عربيّين أو ثلاثة **مُصيَّرةً للنظر لا موصوفةً بالكلام**
+  (بوّابة «المرجع التعريفي»، المرحلة الأولى). وهي **عُدّةٌ لا تُنشَر**: موضعُها `tools/`
+  لا `app/welcome/`، فلا تدخل شجرةَ النشر ولا تُخزَّن ولا يحملها جهازُ طفل.
+
+  ولا تُعرَض الخطوطُ في سطر عيّنة، بل في **شرائح الصفحة نفسِها** (عنوان الصفحة ·
+  عنوان القسم بشريطه · عنوان بطاقة محطة · رقم بطاقة الإحصاء · ترويسة الجدول) —
+  فالحكمُ على ما سيُرى لا على اسمِ الخط. وتحت كلٍّ **عيّنةُ قراءةٍ بخطّ التطبيق نفسِه**
+  (Noto Naskh) تُثبت أن المادّة المقروءة لا تتغيّر بتغيّر العنوان.
+
+  التشغيل (من جذر المستودع):
+      python3 -m http.server 8899
+      open http://127.0.0.1:8899/tools/welcome_fonts.html
+  واللقطة في `shots/welcome-fonts.png` (انظر `docs/REVIEW_WELCOME.md`).
+-->
+<link rel="stylesheet" href="../app/css/app.css">
+<style>
+  /* خطُّ المتن القائم — من موضعه في `app/welcome/fonts/` نفسِه (لا نسخة ثانية) */
+  @font-face { font-family: 'IBM Plex Sans Arabic'; src: url('../app/welcome/fonts/IBMPlexSansArabic-arabic-400.woff2') format('woff2');
+    font-weight: 400; font-display: block; unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC; }
+  @font-face { font-family: 'IBM Plex Sans Arabic'; src: url('../app/welcome/fonts/IBMPlexSansArabic-arabic-600.woff2') format('woff2');
+    font-weight: 600 700; font-display: block; unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC; }
+
+  /* الخطوطُ المرشَّحة — من `tools/fonts/` (عُدّة)، ولا يُنقَل منها إلى `welcome/fonts/`
+     إلا المختارُ وحدَه بعد الحكم (سابقةُ لوحة العلامة: الخاسرُ يُحذف). */
+  @font-face { font-family: 'Reem Kufi'; src: url('fonts/ReemKufi-arabic.woff2') format('woff2');
+    font-weight: 400 700; font-display: block; unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC; }
+  @font-face { font-family: 'Reem Kufi'; src: url('fonts/ReemKufi-latin.woff2') format('woff2');
+    font-weight: 400 700; font-display: block; unicode-range: U+0000-00FF, U+2000-206F; }
+  @font-face { font-family: 'Cairo'; src: url('fonts/Cairo-arabic.woff2') format('woff2');
+    font-weight: 400 700; font-display: block; unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC; }
+  @font-face { font-family: 'Cairo'; src: url('fonts/Cairo-latin.woff2') format('woff2');
+    font-weight: 400 700; font-display: block; unicode-range: U+0000-00FF, U+2000-206F; }
+  @font-face { font-family: 'El Messiri'; src: url('fonts/ElMessiri-arabic.woff2') format('woff2');
+    font-weight: 400 700; font-display: block; unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC; }
+  @font-face { font-family: 'El Messiri'; src: url('fonts/ElMessiri-latin.woff2') format('woff2');
+    font-weight: 400 700; font-display: block; unicode-range: U+0000-00FF, U+2000-206F; }
+
+  body { background: var(--paper); color: var(--ink); padding: 1.5rem; }
+  .board { max-width: 1500px; margin: 0 auto; }
+  .board > h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+  .board > p { color: var(--ink-soft); max-width: 60rem; margin: 0 0 1.5rem; font-size: .95rem; }
+
+  .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; align-items: start; }
+
+  .col {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.1rem 1.2rem 1.4rem; font-family: 'IBM Plex Sans Arabic', var(--font-ui);
+  }
+  .col.is-now { opacity: .82; }
+
+  .tag {
+    display: inline-block; font-size: .8rem; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 999px; padding: .1rem .6rem; margin-bottom: .75rem;
+  }
+  .tag b { color: var(--ink); }
+
+  /* شرائحُ الصفحة كما ستُصيَّر — العناوينُ وحدَها تتبدّل بالخط */
+  .col h2 { font-size: 1.75rem; margin: .4rem 0 .3rem; line-height: 1.35; }
+  .col h3 { font-size: 1.2rem; margin: 1.1rem 0 .3rem; line-height: 1.4; }
+  .col h4 { font-size: 1rem; margin: .9rem 0 .25rem; color: var(--accent-skills); }
+  .col h2::after {
+    content: ''; display: block; width: 3.5rem; height: 4px; margin-top: .45rem;
+    border-radius: 2px; background: var(--accent-quran);
+  }
+  .col p { color: var(--ink-soft); font-size: .95rem; margin: .35rem 0 0; line-height: 1.8; }
+
+  .stat {
+    display: inline-block; border: 1px solid var(--line); border-radius: 16px;
+    padding: .45rem .9rem; margin: .8rem .4rem 0 0; background: var(--paper);
+  }
+  .stat b { display: block; font-size: 1.5rem; line-height: 1.2; }
+  .stat span { font-size: .85rem; color: var(--ink-soft); }
+
+  table { border-collapse: collapse; width: 100%; margin-top: .9rem; font-size: .9rem; }
+  th, td { text-align: start; padding: .35rem .5rem; border-bottom: 1px solid var(--line); }
+  thead th { background: var(--paper-deep); }
+  td { color: var(--ink-soft); }
+
+  /* عيّنةُ القراءة — بخطّ التطبيق نفسِه في كل عمود (لا تتبدّل بتبدّل العنوان) */
+  .sample {
+    margin-top: 1rem; padding-top: .8rem; border-top: 1px dashed var(--line);
+    font-family: var(--font-letter); font-size: 1.35rem; line-height: 2.1; color: var(--ink);
+  }
+  .sample small { display: block; font-family: 'IBM Plex Sans Arabic', var(--font-ui);
+    font-size: .75rem; color: var(--ink-soft); line-height: 1.6; }
+
+  /* الخطُّ المرشَّح يحكم العناوين وحدها في عموده */
+  .f-now  h2, .f-now  h3, .f-now  h4, .f-now  .stat b, .f-now  thead th { font-family: var(--font-ui); }
+  .f-kufi h2, .f-kufi h3, .f-kufi h4, .f-kufi .stat b, .f-kufi thead th { font-family: 'Reem Kufi', var(--font-ui); }
+  .f-cairo h2, .f-cairo h3, .f-cairo h4, .f-cairo .stat b, .f-cairo thead th { font-family: 'Cairo', var(--font-ui); }
+  .f-mess h2, .f-mess h3, .f-mess h4, .f-mess .stat b, .f-mess thead th { font-family: 'El Messiri', var(--font-ui); }
+</style>
+</head>
+<body>
+<div class="board">
+  <h1>خطّ عناوين «المرجع التعريفي» — أربعةُ أعمدة، والمادّة واحدة</h1>
+  <p>
+    العمود الأول هو الحاصل اليوم («بالو» — خطُّ واجهةٍ لاتينيُّ الأصل أُلحِقت به العربية)،
+    والثلاثةُ بعده مرشَّحاتٌ عربيةُ الأصل بترخيص OFL. المتنُ في الأعمدة الأربعة واحد
+    (IBM Plex Sans Arabic)، و<b>عيّنةُ القراءة في أسفل كل عمود بخطّ التطبيق نفسِه</b> —
+    فالمتغيّرُ هو العنوانُ وحدَه.
+  </p>
+
+  <div class="cols">
+
+    <section class="col is-now f-now">
+      <span class="tag">الحاصل اليوم · <b>Baloo Bhaijaan 2</b></span>
+      <h2>لماذا نبدأ بأربعة حروف</h2>
+      <p>الألفُ واللامُ وحدهما نحوُ رُبع أيّ نصٍّ عربيّ، فبأربعة حروفٍ يقرأ الطفل كلمةً حقيقية في يومه الأول.</p>
+      <h3>محطة: درس الحرف</h3>
+      <h4>ماذا يتعلّم الطفل</h4>
+      <p>اسمَ الحرف وصوتَه بالحركات الثلاث، وأشكالَه الأربعة في مواضع الكلمة.</p>
+      <span class="stat"><b>٢٩١</b><span>محطة</span></span>
+      <span class="stat"><b>٨٧٣</b><span>نجمة</span></span>
+      <table>
+        <thead><tr><th>المجموعة</th><th>الحروف</th><th>المسوّغ</th></tr></thead>
+        <tbody>
+          <tr><td>الأولى</td><td>ا ب م ل</td><td>الأعلى تواتراً</td></tr>
+          <tr><td>الثانية</td><td>ن ر د س</td><td>تواتر عالٍ</td></tr>
+        </tbody>
+      </table>
+      <div class="sample">بَيْتُ سَامِي كَبِيرْ
+        <small>عيّنةُ قراءةٍ بخطّ التطبيق (Noto Naskh Arabic) — لا يُمَسّ.</small>
+      </div>
+    </section>
+
+    <section class="col f-kufi">
+      <span class="tag">مرشَّح ١ · <b>Reem Kufi</b> — كوفيّ هندسيّ</span>
+      <h2>لماذا نبدأ بأربعة حروف</h2>
+      <p>الألفُ واللامُ وحدهما نحوُ رُبع أيّ نصٍّ عربيّ، فبأربعة حروفٍ يقرأ الطفل كلمةً حقيقية في يومه الأول.</p>
+      <h3>محطة: درس الحرف</h3>
+      <h4>ماذا يتعلّم الطفل</h4>
+      <p>اسمَ الحرف وصوتَه بالحركات الثلاث، وأشكالَه الأربعة في مواضع الكلمة.</p>
+      <span class="stat"><b>٢٩١</b><span>محطة</span></span>
+      <span class="stat"><b>٨٧٣</b><span>نجمة</span></span>
+      <table>
+        <thead><tr><th>المجموعة</th><th>الحروف</th><th>المسوّغ</th></tr></thead>
+        <tbody>
+          <tr><td>الأولى</td><td>ا ب م ل</td><td>الأعلى تواتراً</td></tr>
+          <tr><td>الثانية</td><td>ن ر د س</td><td>تواتر عالٍ</td></tr>
+        </tbody>
+      </table>
+      <div class="sample">بَيْتُ سَامِي كَبِيرْ
+        <small>عيّنةُ قراءةٍ بخطّ التطبيق (Noto Naskh Arabic) — لا يُمَسّ.</small>
+      </div>
+    </section>
+
+    <section class="col f-cairo">
+      <span class="tag">مرشَّح ٢ · <b>Cairo</b> — سانس عربيّ حديث</span>
+      <h2>لماذا نبدأ بأربعة حروف</h2>
+      <p>الألفُ واللامُ وحدهما نحوُ رُبع أيّ نصٍّ عربيّ، فبأربعة حروفٍ يقرأ الطفل كلمةً حقيقية في يومه الأول.</p>
+      <h3>محطة: درس الحرف</h3>
+      <h4>ماذا يتعلّم الطفل</h4>
+      <p>اسمَ الحرف وصوتَه بالحركات الثلاث، وأشكالَه الأربعة في مواضع الكلمة.</p>
+      <span class="stat"><b>٢٩١</b><span>محطة</span></span>
+      <span class="stat"><b>٨٧٣</b><span>نجمة</span></span>
+      <table>
+        <thead><tr><th>المجموعة</th><th>الحروف</th><th>المسوّغ</th></tr></thead>
+        <tbody>
+          <tr><td>الأولى</td><td>ا ب م ل</td><td>الأعلى تواتراً</td></tr>
+          <tr><td>الثانية</td><td>ن ر د س</td><td>تواتر عالٍ</td></tr>
+        </tbody>
+      </table>
+      <div class="sample">بَيْتُ سَامِي كَبِيرْ
+        <small>عيّنةُ قراءةٍ بخطّ التطبيق (Noto Naskh Arabic) — لا يُمَسّ.</small>
+      </div>
+    </section>
+
+    <section class="col f-mess">
+      <span class="tag">مرشَّح ٣ · <b>El Messiri</b> — إنسانيّ بأثر القلم</span>
+      <h2>لماذا نبدأ بأربعة حروف</h2>
+      <p>الألفُ واللامُ وحدهما نحوُ رُبع أيّ نصٍّ عربيّ، فبأربعة حروفٍ يقرأ الطفل كلمةً حقيقية في يومه الأول.</p>
+      <h3>محطة: درس الحرف</h3>
+      <h4>ماذا يتعلّم الطفل</h4>
+      <p>اسمَ الحرف وصوتَه بالحركات الثلاث، وأشكالَه الأربعة في مواضع الكلمة.</p>
+      <span class="stat"><b>٢٩١</b><span>محطة</span></span>
+      <span class="stat"><b>٨٧٣</b><span>نجمة</span></span>
+      <table>
+        <thead><tr><th>المجموعة</th><th>الحروف</th><th>المسوّغ</th></tr></thead>
+        <tbody>
+          <tr><td>الأولى</td><td>ا ب م ل</td><td>الأعلى تواتراً</td></tr>
+          <tr><td>الثانية</td><td>ن ر د س</td><td>تواتر عالٍ</td></tr>
+        </tbody>
+      </table>
+      <div class="sample">بَيْتُ سَامِي كَبِيرْ
+        <small>عيّنةُ قراءةٍ بخطّ التطبيق (Noto Naskh Arabic) — لا يُمَسّ.</small>
+      </div>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>

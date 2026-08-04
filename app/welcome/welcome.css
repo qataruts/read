@@ -51,18 +51,50 @@
   unicode-range: U+0000-00FF, U+2000-206F, U+FEFF, U+FFFD;
 }
 
-/* المتن للخطّ التحريريّ، والعناوينُ والأزرارُ لخطّ التطبيق كما هي.
+/* ————— خطّ العناوين — عربيُّ الأصل، محلّيّ (حزمة «المرجع التعريفي») —————
+
+   «بالو» خطُّ واجهةٍ لاتينيُّ الأصل أُلحقت به العربية — يصلح أزراراً لطفل ولا يصلح
+   عناوينَ مرجعٍ يقرؤه معلّم. فعناوينُ هذا الموقع **Cairo** (تصميم Mohamed Gaber،
+   OFL، مضمَّنٌ هنا): عربيُّ المحتِد، واضحُ التشكيل، وأرقامُه المشرقية لا تلتبس —
+   وهي علّةُ اختياره على مرشَّحَيه (انظر `docs/REVIEW_WELCOME.md` واللوحة المصيَّرة).
+
+   **وثلاثةٌ لا تُمَسّ**: علامةُ «اِقْرَأْ» تبقى Marhey وحدَها (`.brand-word` في
+   `app.css`)، و**الأزرار تبقى بخطّ التطبيق** فهي صوتُه لا صوتُ الورقة، و**التطبيق
+   لا يُمَسّ خطاً** — ملفّاه في `welcome/fonts/` كأخيهما، خارج قشرة العامل. */
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('fonts/Cairo-arabic.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1,
+    U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74,
+    U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('fonts/Cairo-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+FEFF, U+FFFD;
+}
+
+/* المتن للخطّ التحريريّ، والعناوينُ لخطّ العناوين، والأزرارُ لخطّ التطبيق.
    والاحتياطيّ خطُّ التطبيق نفسُه: لو تعذّر الملفُّ فالصفحة كما كانت لا كما اتّفق. */
-.w-wrap {
+.w-wrap, .w-top {
+  --font-head: 'Cairo', var(--font-ui);
   font-family: 'IBM Plex Sans Arabic', var(--font-ui);
   line-height: 1.85;
 }
 
 .w-wrap h1, .w-wrap h2, .w-wrap h3, .w-wrap h4,
-.w-wrap .btn, .w-wrap .w-num, .w-wrap .w-stats b, .w-wrap .w-stage {
-  font-family: var(--font-ui);
+.w-wrap .w-num, .w-wrap .w-stats b, .w-wrap .w-stage {
+  font-family: var(--font-head);
   line-height: 1.4;
 }
+
+.w-wrap .btn { font-family: var(--font-ui); line-height: 1.4; }
 
 /* ————— الهيكل العام ————— */
 
@@ -364,10 +396,361 @@
 
 .w-foot a { color: inherit; }
 
-/* ————— الطباعة: الدليل يُطبع ورقةً للمعلّم ————— */
+/* ═════ القشرة الواحدة: شريطُ تنقّلٍ واحد فوق صفحات الموقع ═════
+
+   «المرجعُ التعريفيّ» موقعٌ صغير من أربع صفحاتٍ لا صفحةٌ واحدة تطول: الرئيسةُ
+   بوّابةٌ في ثلاثين ثانية، والمنهجُ مرجعٌ عميق، والأسسُ مذهبٌ ومسوّغات، والدليلُ
+   عمليّ. **وقشرتُها واحدة** — شريطٌ ثابتٌ في أعلى كل صفحة، فيعرف الزائرُ أين هو
+   وينتقل بنقرة. وما لم يُبنَ بعدُ يظهر **مُعلَناً بحاله** (لا رابطَ مكسور ولا وعد). */
+
+.w-top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.5rem;
+}
+
+.w-top-in {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: .6rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .9rem;
+}
+
+/* العلامةُ في الشريط: صندوقُ `.brand` من `app.css` بحجمٍ صغير — لا نسخةَ تنسيق */
+.w-top .brand { font-size: 1.35rem; margin: 0; }
+.w-top .brand-word { letter-spacing: normal; }
+.w-top a.w-top-brand { text-decoration: none; display: inline-flex; align-items: center; }
+
+.w-topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2rem .4rem;
+  margin-inline-start: auto;
+}
+
+.w-topnav a, .w-topnav span {
+  display: inline-block;
+  padding: .3rem .7rem;
+  border-radius: 999px;
+  font-size: .95rem;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.w-topnav a:hover { background: var(--paper-deep); }
+
+.w-topnav a[aria-current="page"] {
+  background: var(--card);
+  border: 1px solid var(--line);
+  font-weight: 600;
+}
+
+/* صفحةٌ لم تُبنَ بعد: تُرى في البنية ولا تَعِد بنقرة (المرحلة الثانية) */
+.w-topnav span { color: var(--locked); cursor: default; }
+.w-topnav span::after { content: ' · قريباً'; font-size: .8em; }
+
+/* ═════ رأسُ صفحةٍ داخلية ═════ */
+
+.w-head { margin: 1rem 0 2.25rem; }
+
+.w-head h1 {
+  font-size: clamp(1.9rem, 5.5vw, 2.6rem);
+  margin: 0 0 .5rem;
+  line-height: 1.3;
+}
+
+.w-head .w-lede { max-width: 48rem; margin: 0 0 1.25rem; }
+
+/* مسارا قراءةٍ معلَنان: «في خمس دقائق» و«المرجع الكامل» */
+.w-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: .75rem;
+}
+
+.w-path {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-inline-start: 6px solid var(--accent, var(--accent-letters));
+  border-radius: var(--radius);
+  padding: .85rem 1.1rem;
+}
+
+.w-path h2 { font-size: 1.05rem; margin: 0 0 .35rem; }
+.w-path h2::after { content: none; }
+.w-path p { margin: 0 0 .5rem; color: var(--ink-soft); font-size: .92rem; }
+
+.w-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+
+.w-chips a {
+  font-size: .88rem;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--paper-deep);
+  border-radius: 999px;
+  padding: .2rem .7rem;
+}
+
+/* ═════ الخطُّ الزمنيّ للرحلة — خمسُ مراحلَ كبرى ═════
+
+   عددُ عقد كل مرحلةٍ **محسوبٌ من الرحلة نفسِها** ويحرسه `test_welcome.mjs` — فلا
+   رقمَ يشيخ هنا كذباً حين تنمو الرحلة.
+
+   **وأعمدتُه خمسةٌ معدودة أو واحد** لا `auto-fit`: خمسُ مراحلَ لا تُقسَم قسمةً
+   مستويةً على أربعةٍ ولا على ثلاثة، فإمّا صفٌّ واحدٌ يُقرأ خطّاً زمنياً، وإمّا
+   عمودٌ يُقرأ سُلَّماً — ولا مرحلةٌ يتيمةٌ في سطرٍ وحدَها. */
+
+.w-time {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: .6rem;
+  margin: 0 0 2.5rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: stage;
+}
+
+.w-time li {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 5px solid var(--accent, var(--accent-letters));
+  border-radius: var(--radius);
+  padding: .85rem 1rem 1rem;
+}
+
+.w-time a { text-decoration: none; color: inherit; }
+
+.w-time .w-time-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--accent, var(--accent-letters));
+  color: var(--on-accent);
+  font-family: var(--font-head);
+  font-size: .95rem;
+}
+
+.w-time b { display: block; margin-top: .4rem; font-family: var(--font-head); font-size: 1.05rem; }
+.w-time small { display: block; color: var(--ink-soft); font-size: .85rem; line-height: 1.6; }
+
+/* ═════ بطاقاتُ الإحصاء — الأرقامُ في بطاقات لا في بطون الفقرات ═════
+
+   وأعمدتُها **معدودةٌ لا `auto-fit`**: الشريطُ الذي يفيض عنصرٌ منه إلى سطرٍ وحدَه
+   يبدو حادثَ التفافٍ لا تصميماً (درسُ شبكة الأغلفة ٣×٣) — فأربعةٌ في السطر،
+   وكلُّ شريطٍ عددُه من مضاعفات الأربعة. */
+
+.w-figs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .6rem;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.w-figs li {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: .7rem .9rem;
+  text-align: center;
+}
+
+@media (max-width: 44rem) {
+  .w-figs { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 52rem) {
+  .w-time { grid-template-columns: 1fr; }
+}
+
+.w-figs b {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 1.65rem;
+  line-height: 1.25;
+}
+
+.w-figs span { font-size: .88rem; color: var(--ink-soft); line-height: 1.5; display: block; }
+
+/* ═════ بطاقةُ المحطة — نمطٌ واحدٌ لا يتبدّل ═════
+
+   *ماذا يتعلّم الطفل · كيف يعمل التمرين · دورُك أنت* — بهذا الترتيب في كل بطاقة،
+   فتقرأ العينُ بالتعرّف لا بالتنقيب. و`data-covers` وسمُ نوعِ المحطة في الرحلة:
+   منه يثبت الحارسُ أنّ **كلَّ نوعٍ في `journey()` له بطاقتُه** — لا محطةَ تُترك. */
+
+.w-stations { display: grid; gap: 1rem; margin-bottom: 1.5rem; }
+
+.w-station {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-inline-start: 6px solid var(--accent, var(--accent-letters));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.w-station-head {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+
+.w-station-head img { width: 2.1rem; height: 2.1rem; flex: none; }
+.w-station-head h3 { margin: 0; font-size: 1.2rem; }
+
+.w-kicker {
+  display: block;
+  font-size: .8rem;
+  color: var(--ink-soft);
+  letter-spacing: .02em;
+}
+
+.w-station-n {
+  margin-inline-start: auto;
+  flex: none;
+  text-align: center;
+  font-size: .8rem;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
+
+.w-station-n b { display: block; font-family: var(--font-head); font-size: 1.25rem; color: var(--ink); }
+
+.w-what { margin: 0; display: grid; gap: .5rem; }
+
+.w-what > div {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr;
+  gap: .25rem .9rem;
+}
+
+.w-what dt {
+  font-weight: 600;
+  color: var(--accent, var(--accent-letters));
+  font-size: .92rem;
+}
+
+.w-what dd { margin: 0; color: var(--ink-soft); }
+
+@media (max-width: 40rem) {
+  .w-what > div { grid-template-columns: 1fr; }
+}
+
+/* محطةٌ ولقطتُها جنباً إلى جنب — واللقطةُ من شاشات التطبيق بمولّدها */
+.w-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(11rem, .9fr);
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+
+.w-pair .w-stations { margin-bottom: 0; }
+
+.w-pair figure { margin: 0; }
+
+/* اللقطةُ وحدَها تملأ عمودَها — لا رمزُ البطاقة الذي يجاورها (وهو `img` كذلك) */
+.w-pair figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: var(--paper);
+}
+
+.w-pair figcaption { margin-top: .45rem; font-size: .85rem; color: var(--ink-soft); line-height: 1.6; }
+
+@media (max-width: 48rem) {
+  .w-pair { grid-template-columns: 1fr; }
+}
+
+/* ═════ لمساتُ الجداول والنصّ في صفحة المنهج ═════ */
+
+.w-sec-note {
+  color: var(--ink-soft);
+  font-size: .92rem;
+  margin: .5rem 0 1.25rem;
+}
+
+.w-table td .w-letters, .w-table td .w-word {
+  font-family: var(--font-letter);
+  font-size: 1.05em;
+}
+
+.w-table .w-num-cell { white-space: nowrap; color: var(--ink-soft); }
+
+/* عيّنةُ قراءةٍ بخطّ التطبيق نفسِه — «ما يراه الوليّ هو ما ستراه الطفلة» */
+.w-sample {
+  font-family: var(--font-letter);
+  font-size: 1.35rem;
+  line-height: 2.1;
+  background: var(--paper-deep);
+  border-radius: 14px;
+  padding: .6rem 1rem;
+  display: inline-block;
+  margin: .35rem 0;
+}
+
+/* عنوانُ الجدول: يُقرأ قبله لا بعده، ويبقى معه على الورق */
+.w-table caption {
+  caption-side: top;
+  text-align: start;
+  margin: 0 0 .5rem;
+}
+
+/* ═════ الطباعة: صفحةُ المنهج تخرج ملفاً يُسلَّم لمدرسة ═════
+
+   المطبوعُ **مرجعٌ لا صفحةُ ويب**: يسقط منه ما لا معنى له على ورق (الشريطُ وروابطُ
+   القفز والدعواتُ واللقطات)، ويبقى النصُّ والجداولُ وبطاقاتُ المحطات — ولا تُقصّ
+   بطاقةٌ ولا صفٌّ بين ورقتين. */
 
 @media print {
-  .w-hero, .w-shots, .w-end, .w-nav { display: none; }
+  .w-hero, .w-shots, .w-end, .w-nav, .w-top, .w-paths { display: none; }
+
+  /* اللقطاتُ تبقى في المطبوع — ورقةُ المدرسة تُرى كما يُرى التطبيق — لكن بمقاسٍ
+     يليق بالورق: عمودُها ينهار إلى عرض الصفحة في الطباعة، فتُحَدّ بسبعة سنتيمترات. */
+  .w-pair figure { max-width: 7.5cm; margin-top: .6rem; }
+
   body { background: #fff; }
-  .w-card, .w-why, .w-table { box-shadow: none; }
+
+  .w-wrap { max-width: none; padding: 0; font-size: 10.5pt; line-height: 1.65; }
+
+  .w-card, .w-why, .w-table, .w-station, .w-figs li, .w-time li { box-shadow: none; }
+
+  .w-station, .w-card, .w-why, .w-time li, .w-figs li { break-inside: avoid; }
+
+  .w-table tr, .w-scroll { break-inside: avoid; }
+
+  .w-scroll { overflow: visible; }
+
+  .w-table { min-width: 0; }
+
+  .w-section { margin-top: 1.75rem; break-before: auto; }
+
+  .w-section > h2 { break-after: avoid; }
+
+  .w-station-head h3, .w-guide h3, .w-guide h4, .w-table caption { break-after: avoid; }
+
+  .w-pair { grid-template-columns: 1fr; }
+
+  .w-time { grid-template-columns: repeat(5, 1fr); }
+
+  /* ترويسةُ المطبوع: تُرى على الورق وحدَه — فيعرف قارئُ الورقة مصدرها */
+  .w-print-head { display: block !important; }
 }
+
+.w-print-head { display: none; }

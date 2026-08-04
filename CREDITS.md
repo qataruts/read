@@ -80,3 +80,10 @@
 - **الخط**: [IBM Plex Sans Arabic](https://fonts.google.com/specimen/IBM+Plex+Sans+Arabic) (IBM) — وزنا ٤٠٠ و٦٠٠، مقطعا العربية واللاتينية من Google Fonts.
 - **الترخيص**: [SIL Open Font License 1.1 (OFL)](https://openfontlicense.org/) — يبيح التضمين والتوزيع.
 - **الموضع**: `app/welcome/fonts/` **لا `app/fonts/`** — لمتن الصفحة التعريفية وحده (نصٌّ تحريريّ يقرؤه معلّم راشد)، فلا تحمله قشرةُ التطبيق إلى جهاز طفلٍ لا يقرؤه. وخطوطُ التطبيق الثلاثة (`docs/DESIGN.md §٣`) لم تُمَسّ.
+
+## ٨. خطّ عناوين «المرجع التعريفي» (Cairo) — ملفّان
+
+- **الخط**: [Cairo](https://fonts.google.com/specimen/Cairo) — تصميم Mohamed Gaber، مقطعا العربية واللاتينية من Google Fonts (خطٌّ متغيّر الوزن ٤٠٠–٧٠٠، ملفٌّ واحد لكل مقطع).
+- **الترخيص**: [SIL Open Font License 1.1 (OFL)](https://openfontlicense.org/) — يبيح التضمين والتوزيع.
+- **الموضع**: `app/welcome/fonts/Cairo-arabic.woff2` و`Cairo-latin.woff2` — **لعناوين صفحات `welcome/` وحدها**، خارج قشرة عامل الخدمة كأخيه أعلاه. والأزرارُ تبقى بخطّ التطبيق، وعلامةُ «اِقْرَأْ» تبقى Marhey وحدَها، و**التطبيق لا يُمَسّ خطاً**.
+- **السبب**: حزمة «المرجع التعريفي» — أمرُ المالك «خطوط عربية جيدة»: «بالو» خطُّ واجهةٍ **لاتينيُّ الأصل** أُلحقت به العربية، ولا يصلح عناوينَ مرجعٍ يقرؤه معلّم. والاختيارُ من ثلاثة مرشَّحين عُرضوا مُصيَّرين في لوحةٍ (`tools/welcome_fonts.html` ← `shots/welcome-fonts.png`)، وعلّتُه مكتوبةٌ في `docs/REVIEW_WELCOME.md §٣`.
