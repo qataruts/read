@@ -181,11 +181,17 @@ class KeyPool:
         والثاني نائم. وبالتناوب يصير سقفُ النموذج ١٦/دقيقة — ولكلّ مفتاح إيقاعُه
         كما هو، فلا تجاوز لحدٍّ ولا خطر 429.
         """
-        free = [(n, v) for n, v in self.keys if (n, model) not in self.exhausted]
+        free = [(n, v) for n, v in self.keys
+                if (n, model) not in self.exhausted and spend_left(n, model) > 0]
         return sorted(free, key=lambda kv: _LAST_REQUEST.get(f"{kv[0]}:{model}", 0.0))
 
     def all_exhausted(self, model: str) -> bool:
         return not self.available(model)
+
+    def capped(self, model: str) -> list:
+        """مفاتيحُ بلغت سقفَنا الذاتي اليوم (لا سقف الخادم)."""
+        return [n for n, _v in self.keys
+                if (n, model) not in self.exhausted and spend_left(n, model) <= 0]
 
     def retry_seconds(self, model: str) -> int:
         secs = [s for (n, m), s in self.exhausted.items() if m == model]
@@ -211,6 +217,10 @@ class KeyPool:
                     if abs(first - e.seconds) < 300:
                         note_independence(model, blocked, "", {blocked: first, name: e.seconds})
                 blocked = blocked or name
+        if self.capped(model):
+            print(f"  🛑 {short_model(model)}: بلغ سقفَنا الذاتي اليومي "
+                  f"({DAILY_CAPS.get(model)} لكل مفتاح) — يتوقّف حزامَ أمان",
+                  file=sys.stderr)
         raise QuotaExhausted(self.retry_seconds(model))
 
 
@@ -256,11 +266,14 @@ def set_rpm(rpm: float) -> None:
 
 
 def _pace(model: str = "") -> None:
+    """مَخنَقُ كل طلب: يباعد بالإيقاع **ويقيّد الإنفاق** — فلا طلبَ بلا عدّ."""
     if _MIN_INTERVAL:
         wait = _LAST_REQUEST.get(model, 0.0) + _MIN_INTERVAL - time.monotonic()
         if wait > 0:
             time.sleep(wait)
     _LAST_REQUEST[model] = time.monotonic()
+    if ":" in model:                    # مفتاح:نموذج — لا نعدّ نداءات بلا مفتاح
+        bump_spend(model)
 
 
 def parse_429(body: str) -> tuple[bool, int]:
@@ -792,8 +805,92 @@ def mark_done(text: str, model: str) -> None:
     return changed
 
 
+# ————— سقف الإنفاق اليومي الذاتي (أمر المدير ٤ أغسطس ٢٠٢٦) —————
+# حزامُ أمانٍ لا يعتمد على الخادم: نحاسب أنفسنا لكل (مفتاح × نموذج) ونرفض
+# التجاوز ولو سمح الخادم — فأيّ مستهلكٍ خارجي أو خللِ عدٍّ لا يُفاجئنا بنفادٍ
+# مبكّر يوقف عمل يومٍ كامل. الأرقام هي حدود الخطة المعلومة لكل مفتاح.
+DAILY_CAPS = {
+    "gemini-3.1-flash-tts-preview": 100,
+    "gemini-2.5-flash-preview-tts": 100,
+    "gemini-2.5-pro-preview-tts": 50,
+}
+SPEND_FILE = ROOT / "scratch" / "spend.json"
+STATUS_FILE = ROOT / "scratch" / "monitor_status.json"
+
+
+def load_spend() -> dict:
+    """{"مفتاح:نموذج": عدد} ليوم اليوم — يُنسى ما قبله."""
+    if not SPEND_FILE.exists():
+        return {}
+    try:
+        data = json.loads(SPEND_FILE.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return data.get(TODAY, {}) if isinstance(data, dict) else {}
+
+
+def bump_spend(pace_key: str) -> None:
+    """يُزاد عند كل طلبٍ فعليّ (من `_pace`، وهو مَخنَق كل الطلبات)."""
+    SPEND_FILE.parent.mkdir(parents=True, exist_ok=True)
+    data = {}
+    if SPEND_FILE.exists():
+        try:
+            data = json.loads(SPEND_FILE.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            data = {}
+    day = data.setdefault(TODAY, {})
+    day[pace_key] = day.get(pace_key, 0) + 1
+    for old in [k for k in data if k != TODAY]:
+        data.pop(old)
+    tmp = SPEND_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    os.replace(tmp, SPEND_FILE)
+
+
+def spend_left(key_name: str, model: str) -> int:
+    cap = DAILY_CAPS.get(model, 100)
+    return max(0, cap - load_spend().get(f"{key_name}:{model}", 0))
+
+
 COMMIT_LOCK = ROOT / "scratch" / "commit.lock"
 LOCK_POLL_SEC = 5.0
+
+
+def write_status(events: list | None = None) -> dict:
+    """`scratch/monitor_status.json`: المصروف والباقي وموعد التجدد وآخر الأحداث.
+
+    غايتُه أن تصير مراقبةُ المصرِّف **نظرةً لا تحقيقاً** (أمر المدير ٤ أغسطس).
+    """
+    spend = load_spend()
+    keys = [n for n, _v in read_keys()]
+    quotas = []
+    for model, cap in DAILY_CAPS.items():
+        for k in keys:
+            used = spend.get(f"{k}:{model}", 0)
+            quotas.append({"model": short_model(model), "key": k, "used": used,
+                           "cap": cap, "left": max(0, cap - used)})
+    queue = load_queue()
+    plan = plan_queue(queue)
+    left = collections.Counter(short_model(m) or "محبوس" for _i, _e, m in plan)
+    prev = {}
+    if STATUS_FILE.exists():
+        try:
+            prev = json.loads(STATUS_FILE.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            prev = {}
+    log = (events or []) + prev.get("events", [])
+    status = {
+        "updatedAt": TODAY,
+        "quotas": quotas,
+        "queueLeft": dict(left),
+        "queueTotal": len(plan),
+        "doneToday": sum(1 for e in queue if e.get("doneAt") == TODAY),
+        "resetHint": prev.get("resetHint"),
+        "events": log[:5],
+    }
+    STATUS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    STATUS_FILE.write_text(json.dumps(status, ensure_ascii=False, indent=1), encoding="utf-8")
+    return status
 
 
 def checkpoint_pause() -> None:
@@ -1649,6 +1746,8 @@ def main():
                     help="مع --only-texts: تعليمة أداء تحلّ محلّ افتراضي الفئة")
     ap.add_argument("--only-texts", metavar="TEXTS",
                     help="إعادة توليد نصوص منهجٍ بعينها (مفصولة بفاصلة) — لإصلاح عيب مسموع")
+    ap.add_argument("--status", metavar="EVENT", nargs="?", const="",
+                    help="تحديث scratch/monitor_status.json (مع حدثٍ اختياري)")
     ap.add_argument("--retire", metavar="TEXTS",
                     help="تقاعد نصوص: حذف ملفاتها ووسمُ مدخلاتها (يتيمٌ لم يعد يُطلب)")
     ap.add_argument("--requeue", metavar="TEXTS",
@@ -1679,6 +1778,13 @@ def main():
 
     if args.apply_madd_pick:
         sys.exit(apply_madd_pick(args.apply_madd_pick))
+
+    if args.status is not None:
+        st = write_status([f"{TODAY} · {args.status}"] if args.status else None)
+        print(f"الحالة: {st['queueTotal']} منتظِراً · صُرِّف اليوم {st['doneToday']} · "
+              + "، ".join(f"{q['key'][-3:]}·{q['model']}: {q['left']}/{q['cap']}"
+                          for q in st["quotas"]))
+        sys.exit(0)
 
     if args.retire:
         wanted = [t.strip() for t in args.retire.split(",") if t.strip()]

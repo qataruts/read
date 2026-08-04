@@ -270,6 +270,52 @@ def main():
        "فيُولَّد فعلاً بنموذج النواة ويُسجَّل به")
     shutil.rmtree(tmp)
 
+    # ————— ٥ه. الأوامر البنيوية الثلاثة بعد حادثة الازدواج (٤ أغسطس ٢٠٢٦) —————
+    print("قفل الوحدانية:")
+    monitor = gen.ROOT / "scratch" / "resume_audio.sh"
+    script = monitor.read_text(encoding="utf-8") if monitor.exists() else ""
+    ok("kill -0" in script and "monitor.pid" in script,
+       "المراقب يفحص حياة العملية فعلاً (kill -0) لا وجود الملف")
+    ok("monitor.log" in script and "إقلاع المراقب" in script,
+       "وكل إقلاعٍ (أو رفضٍ) يُسجَّل موقوتاً في monitor.log")
+
+    print("سقف الإنفاق الذاتي:")
+    tmp = Path(tempfile.mkdtemp())
+    real_spend, real_status = gen.SPEND_FILE, gen.STATUS_FILE
+    gen.SPEND_FILE, gen.STATUS_FILE = tmp / "spend.json", tmp / "status.json"
+    gen.set_rpm(0)                                   # بلا إبطاء في الفحص
+    model = gen.MODEL_SENTENCE                       # سقفه ٥٠
+    for _ in range(gen.DAILY_CAPS[model]):
+        gen._pace(f"KEY_A:{model}")
+    ok(gen.spend_left("KEY_A", model) == 0,
+       f"العدّاد يبلغ السقف بعد {gen.DAILY_CAPS[model]} طلباً (المخنَق يعدّ كل طلب)")
+    ok(gen.spend_left("KEY_B", model) == gen.DAILY_CAPS[model],
+       "وسقفُ كل مفتاح مستقلٌّ عن الآخر")
+    pool = gen.KeyPool([("KEY_A", "k1"), ("KEY_B", "k2")], "Sulafat")
+    ok([n for n, _v in pool.available(model)] == ["KEY_B"],
+       "المجمّع يستبعد من بلغ سقفَه الذاتي ولو كان الخادم سامحاً")
+    ok(pool.capped(model) == ["KEY_A"], "ويُسمّيه في تقريره حزامَ أمان")
+    for _ in range(gen.DAILY_CAPS[model]):
+        gen._pace(f"KEY_B:{model}")
+    try:
+        pool.call("نص", gen.STYLE["sentence"], model)
+        ok(False, "بلوغ السقف على الجميع يرفع QuotaExhausted")
+    except gen.QuotaExhausted:
+        ok(True, "وببلوغ الجميع سقفَهم يتوقّف التصريف بلا طلبٍ واحد زائد")
+
+    print("بيان الحالة:")
+    st = gen.write_status(["حدث تجريبي"])
+    ok((tmp / "status.json").exists() and st["quotas"],
+       "بيان الحالة يُكتب بحصص كل (مفتاح × نموذج)")
+    row = next(q for q in st["quotas"] if q["model"] == gen.short_model(model)
+               and q["key"] == "KEY_A") if any(
+        q["key"] == "KEY_A" for q in st["quotas"]) else None
+    ok(st["events"][0].endswith("حدث تجريبي"), "وآخر الأحداث مقيَّدة فيه")
+    ok(set(("updatedAt", "quotas", "queueLeft", "doneToday", "events")) <= set(st),
+       "وفيه: المصروف والباقي واليوم والأحداث")
+    gen.SPEND_FILE, gen.STATUS_FILE = real_spend, real_status
+    shutil.rmtree(tmp)
+
     # ————— ٦. نموذج بدأ يردّ بلا صوت: يُنحّى بدل حرق بقية حصته —————
     print("صون الحصة من الاستجابات الفارغة:")
     words = ["أَلِفْ", "بَاءْ", "تَاءْ", "ثَاءْ", "جِيمْ"]
