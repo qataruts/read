@@ -7,7 +7,7 @@
  },
  "counts": {
   "antura": 141,
-  "sulafat": 2546,
+  "sulafat": 2551,
   "husary": 68
  },
  "files": {
@@ -3391,6 +3391,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "426ceb41ad58": {
+   "text": "ذِئْبْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "4273cae5fb8e": {
    "text": "النَّعْلُ جَدِيدْ",
    "lineage": "sulafat",
@@ -5065,6 +5070,11 @@
    "text": "شُو",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "60b861b99578": {
+   "text": "ميم صغيرة تحت الحرف: حكمها حكم أختها التي فوقه — تنوين يُنطق ميماً.",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts#prose-heard"
   },
   "60dd49eaf440": {
    "text": "جَدَّةُ حَسَنْ",
@@ -8706,6 +8716,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "a1e4ca1f69c0": {
+   "text": "لُؤْلُؤْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "a1f661f7f7ab": {
    "text": "مَرِيضِي",
    "lineage": "sulafat",
@@ -12015,6 +12030,16 @@
    "text": "الْقِطَّةُ الصَّغِيرَةُ فِي السَّلَّةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "df0062f47e75": {
+   "text": "ياء صغيرة بعد الحرف: تمدّ بها الكسرة، كما تمدّ الواو الصغيرة الضمة.",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts#prose-heard"
+  },
+  "df374f87f812": {
+   "text": "دائرة صغيرة فوق الحرف: حرفٌ مكتوب لا تنطقه، مُرَّ عليه ولا تقف عنده.",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts#prose-heard"
   },
   "df5988be43e6": {
    "text": "رَمَادِي",

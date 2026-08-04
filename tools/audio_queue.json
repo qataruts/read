@@ -24089,34 +24089,62 @@
     "requestedBy": "session-7",
     "priority": 100,
     "status": "pending",
-    "doneAt": null
+    "doneAt": null,
+    "hold": "مردودة: المولّد نطق الرمز «ء» «ها» — والتصحيح شقُّ النصّ في curriculum.js (نطاق الجلسة القرآنية)",
+    "fixHistory": [
+      {
+        "reason": "ردّ المالك بعلّة مشخَّصة: الصوت يسمّي ولا يقرأ الرمز",
+        "at": "2026-08-04"
+      }
+    ]
   },
   {
     "text": "لُؤْلُؤْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "ذِئْبْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "ياء صغيرة بعد الحرف: تمدّ بها الكسرة، كما تمدّ الواو الصغيرة الضمة.",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts#prose-heard"
   },
   {
     "text": "ميم صغيرة تحت الحرف: حكمها حكم أختها التي فوقه — تنوين يُنطق ميماً.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts#prose-heard"
+  },
+  {
+    "text": "دائرة صغيرة فوق الحرف: حرفٌ مكتوب لا تنطقه، مُرَّ عليه ولا تقف عنده.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts#prose-heard"
+  },
+  {
+    "text": "الْفِيلُ وَالْكَعْبَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
@@ -24124,7 +24152,191 @@
     "doneAt": null
   },
   {
-    "text": "دائرة صغيرة فوق الحرف: حرفٌ مكتوب لا تنطقه، مُرَّ عليه ولا تقف عنده.",
+    "text": "الْكَعْبَةُ بَيْتُ اللَّٰهْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَعْبَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّٰهْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَلِكٌ يَمْشِي مَعَ الْجَيْشْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَلِكٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَيْشْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فِيلٌ كَبِيرٌ أَمَامَ الْجَيْشْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فِيلٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَبِيرٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفِيلُ يَقِفُ أَمَامَ الْكَعْبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفِيلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَعْبَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَيْرٌ كَثِيرٌ يَطِيرُ فَوْقَ الْجَيْشْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَيْرٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَثِيرٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَطِيرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّيْرُ يَحْمِلُ حَجَرَا",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّيْرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَجَرَا",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَجَرُ يَنْزِلُ فَوْقَ الْجَيْشْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّٰهُ يَحْفَظُ الْكَعْبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّٰهُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَحْفَظُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَاذَا يَحْمِلُ الطَّيْرْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,

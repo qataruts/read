@@ -330,6 +330,35 @@ def main():
     gen.SPEND_FILE, gen.STATUS_FILE = real_spend, real_status
     shutil.rmtree(tmp)
 
+    # ————— ٥و. «الصوت يسمّي ولا يقرأ الرمز» (قاعدة المالك ٥ أغسطس ٢٠٢٦) —————
+    print("الرمز المقتبس في نصّ منطوق:")
+    ok(gen.quoted_symbols('الهمزة تُكتب وحدها «ء» أو على ألف «أ»') == ["ء", "أ"],
+       "يُكشف الرمز المفرد المقتبس مهما تعدّد")
+    ok(gen.quoted_symbols("الهمزةُ تُكتب وحدها، أو تركب على ألف.") == [],
+       "والنصّ الذي يسمّي ولا يقتبس نظيف")
+    ok(gen.quoted_symbols('قال «مرحبا» ثم مضى') == [],
+       "ولا يُتّهم اقتباسُ كلمةٍ كاملة")
+    tmp = sandbox([
+        {"text": 'الهمزة تُكتب «ء» هكذا', "category": "sentence", "requestedBy": "session-6",
+         "priority": 100, "status": "pending", "doneAt": None},
+        {"text": "جملةٌ نظيفة تسمّي ولا تقتبس.", "category": "sentence",
+         "requestedBy": "session-6", "priority": 100, "status": "pending", "doneAt": None},
+    ])
+    calls = []
+    stub(calls)
+    gen.drain_queue(None, "Sulafat", "k")
+    queue = gen.load_queue()
+    ok(len(calls) == 1 and calls[0][0].startswith("جملةٌ نظيفة"),
+       "لا يُنفَق طلبٌ على نصٍّ يقتبس رمزاً — يُحجَز قبل التوليد")
+    ok(queue[0].get("hold", "").startswith("رمز مقتبس"),
+       "ويُقيَّد سببُ الحجز في المدخل")
+    ok(queue[1]["status"] == "done", "والنظيف يمضي في طريقه")
+    calls.clear()
+    stub(calls)
+    gen.drain_queue(None, "Sulafat", "k")
+    ok(not calls, "والمحجوز لا يُعاد عليه في الجولات التالية")
+    shutil.rmtree(tmp)
+
     # ————— ٦. نموذج بدأ يردّ بلا صوت: يُنحّى بدل حرق بقية حصته —————
     print("صون الحصة من الاستجابات الفارغة:")
     words = ["أَلِفْ", "بَاءْ", "تَاءْ", "ثَاءْ", "جِيمْ"]

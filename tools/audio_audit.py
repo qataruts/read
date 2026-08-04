@@ -290,6 +290,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="عرض بلا توليد")
     ap.add_argument("--repair", action="store_true",
                     help="إصلاح ذاتي: يعيد توليد المكرَّر حتى تخرج نطقةٌ واحدة")
+    ap.add_argument("--outliers-page", action="store_true",
+                    help="شواذّ المدة: إعادة توليد بتعليمة إبطاء + صفحة قبل/بعد")
+    ap.add_argument("--apply-outliers", metavar="JSON",
+                    help="تطبيق حكم المالك على شواذّ المدة")
     ap.add_argument("--lineage", action="store_true",
                     help="جرد النسب: كل ملف لأحد ثلاثة أنساب — أو يفشل الفحص")
     ap.add_argument("--orphans", action="store_true",
@@ -298,6 +302,12 @@ def main():
 
     if args.repair:
         sys.exit(repair(args.dry_run if hasattr(args, "dry_run") else False))
+
+    if args.outliers_page:
+        sys.exit(outlier_page())
+
+    if args.apply_outliers:
+        sys.exit(apply_outlier_picks(args.apply_outliers))
 
     if args.lineage:
         sys.exit(1 if print_lineage(lineage_audit()) else 0)
@@ -570,6 +580,147 @@ def print_lineage(ledger: dict) -> int:
     if not unknown and not orphans:
         print("\n  ✓ الجرد كله ثلاثة أنساب لا رابع لها.")
     return len(unknown) + len(orphans)
+
+
+# ————————————————————————— شواذّ المدة: صفحة «قبل/بعد» —————————————————————————
+
+SLOW_STYLE = {
+    "letter_name": ("انطق اسم هذا الحرف العربي ببطء شديد ووضوح تام، ممدوداً كما يلفظه "
+                    "معلم القرآن لطفل، مرة واحدة فقط: "),
+    "letter_haraka": ("انطق الحرف بحركته ببطء ووضوح، ممدوداً قليلاً، بمخرج صحيح، "
+                      "مرة واحدة فقط: "),
+    "syllable": ("انطق هذا المقطع ببطء ووضوح، ممدوداً مدّاً طبيعياً حركتين إن كان مدّاً، "
+                 "صوتاً واحداً متصلاً مرة واحدة فقط: "),
+}
+OUTLIER_DIR = gen.ROOT / "scratch" / "outliers"
+
+
+def outlier_page() -> int:
+    """يعيد توليد كل شاذّ مدة بتعليمة إبطاء، ويبني صفحة «قبل/بعد» لحكمٍ واحد."""
+    texts, _pending = gen.expected_texts()
+    outliers = gen.duration_outliers(texts)
+    if not outliers:
+        print("لا شاذّ مدة — لا صفحة.")
+        return 0
+    OUTLIER_DIR.mkdir(parents=True, exist_ok=True)
+    gen.set_rpm(8)
+    pool = gen.KeyPool(gen.read_keys(), gen.DEFAULT_VOICE)
+    rows = []
+    for text, cat, sec, med in outliers:
+        key = gen.key_for(text)
+        before = OUTLIER_DIR / f"before__{key}.mp3"
+        shutil.copy2(gen.OUT_DIR / f"{key}.mp3", before)
+        style = SLOW_STYLE.get(cat.split(":")[0], gen.STYLE.get(cat, gen.STYLE["word"]))
+        after = OUTLIER_DIR / f"after__{key}.mp3"
+        try:
+            model = gen.route_model({"text": text, "category": cat.split(":")[0]}, True)
+            pcm, rate, _k = pool.call(text, style, model or gen.MODEL_CORE)
+            gen.pcm_to_mp3(pcm, rate, after)
+            new_sec = round(gen.mp3_duration(after), 2)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ✗ {text}: {str(e)[:80]}", file=sys.stderr)
+            continue
+        kind = "أقصر" if sec < med else "أطول"
+        rows.append({"text": text, "cat": cat, "kind": kind, "med": round(med, 2),
+                     "before": before.name, "beforeSec": round(sec, 2),
+                     "after": after.name, "afterSec": new_sec})
+        print(f"  ✓ {text}: {sec:.2f}ث → {new_sec:.2f}ث (وسيط فئته {med:.2f}ث)")
+    write_outlier_page(rows)
+    print(f"\nالصفحة: {OUTLIER_DIR}/index.html ({len(rows)} نصاً)")
+    print(f"افتحها: .venv/bin/python -m http.server 8090 -d {OUTLIER_DIR}")
+    return 0
+
+
+def write_outlier_page(rows: list) -> None:
+    cells = "".join(
+        f'<tr data-text="{r["text"]}"><th>{r["text"]}</th>'
+        f'<td class="c">{r["cat"].replace("syllable:", "مقطع ")}<small>وسيط {r["med"]}ث</small></td>'
+        f'<td><button data-src="{r["before"]}">▶ قبل</button><small>{r["beforeSec"]}ث '
+        f'({r["kind"]})</small></td>'
+        f'<td><button class="a" data-src="{r["after"]}">▶ بعد</button>'
+        f'<small>{r["afterSec"]}ث</small></td>'
+        f'<td><button class="pick" data-text="{r["text"]}" data-v="after">أبقِ «بعد»</button>'
+        f'<button class="pick keep" data-text="{r["text"]}" data-v="before">أبقِ «قبل»</button></td>'
+        f'<td class="chosen"></td></tr>' for r in rows)
+    (OUTLIER_DIR / "index.html").write_text(f"""<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>شواذّ المدة — قبل/بعد</title>
+<style>
+ body {{ font-family:"Noto Naskh Arabic","Geeza Pro",serif; margin:2rem; background:#faf7f2; color:#241f1a }}
+ h1 {{ font-size:1.35rem }}
+ p.note {{ background:#fff3d6; padding:.8rem 1rem; border-radius:.6rem; max-width:56rem; line-height:1.9 }}
+ table {{ border-collapse:collapse; margin-top:1rem }}
+ th, td {{ border:1px solid #ddd2c2; padding:.45rem .7rem; background:#fff; text-align:center }}
+ th {{ background:#f0e8db; font-size:1.3rem; min-width:5rem }}
+ td.c {{ font-size:.8rem; color:#6b5f4f; font-family:system-ui }}
+ button {{ font-family:inherit; font-size:.95rem; padding:.35rem .8rem; margin:.1rem; cursor:pointer;
+           border:1px solid #c9bba6; border-radius:.45rem; background:#fdfaf4 }}
+ button.a {{ background:#e8f1ea; border-color:#8fb79d }}
+ button.pick {{ font-size:.78rem; background:#eef3fb; border-color:#a9bcd6 }}
+ button.keep {{ background:#f6efe6 }}
+ button.playing {{ background:#2f7d4f; color:#fff }}
+ small {{ display:block; font-size:.62rem; color:#8a7a66; font-family:system-ui }}
+ td.chosen {{ font-family:system-ui; font-size:.85rem; color:#2f7d4f; min-width:5rem }}
+ #out {{ position:sticky; bottom:0; background:#241f1a; color:#fdfaf4; padding:.8rem 1rem;
+         border-radius:.6rem; margin-top:1.5rem; font-family:system-ui; font-size:.85rem }}
+ #out button {{ background:#fdfaf4 }}
+</style></head><body>
+<h1>شواذّ المدة — حكمٌ واحد بـ«قبل/بعد»</h1>
+<p class="note">هذه نصوصٌ مدّتها تخالف نظائرها في طبقتها الصوتية (ساكن · بسيط · مدّ · مركّب):
+إمّا <strong>أقصر</strong> فيُخشى بترُ النطق، وإمّا <strong>أطول</strong> فيُخشى تكرارُه.
+<br>«بعد» أُعيد توليده بتعليمة إبطاء ووضوح ومرةٍ واحدة. اسمع الاثنين واختر — وما لا تختار له
+شيئاً يبقى على «قبل».
+<br>ثم اضغط «انسخ الاختيارات» وأعطني النصّ المنسوخ لأطبّقه.</p>
+<table><thead><tr><th>النص</th><th>الطبقة</th><th>الحالي</th><th>المعاد</th><th>الحكم</th><th></th></tr></thead>
+<tbody>{cells}</tbody></table>
+<div id="out">لم تُختر بعد — <button id="copy">انسخ الاختيارات</button> <span id="count"></span></div>
+<script>
+const picks = {{}};
+let cur = null, btn = null;
+document.addEventListener('click', (e) => {{
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.id === 'copy') {{
+    navigator.clipboard.writeText(JSON.stringify(picks, null, 1));
+    b.textContent = 'نُسخت ✓'; setTimeout(() => b.textContent = 'انسخ الاختيارات', 1500); return;
+  }}
+  if (b.dataset.src) {{
+    if (cur) cur.pause();
+    if (btn) btn.classList.remove('playing');
+    cur = new Audio(b.dataset.src); btn = b; b.classList.add('playing');
+    cur.onended = () => b.classList.remove('playing');
+    cur.play(); return;
+  }}
+  if (b.classList.contains('pick')) {{
+    picks[b.dataset.text] = b.dataset.v;
+    b.closest('tr').querySelector('.chosen').textContent =
+      b.dataset.v === 'after' ? 'المعاد ✓' : 'الحالي ✓';
+    document.getElementById('count').textContent = `(${{Object.keys(picks).length}} حكماً)`;
+  }}
+}});
+</script></body></html>""", encoding="utf-8")
+
+
+def apply_outlier_picks(spec: str) -> int:
+    """يطبّق حكم المالك: {"كَةْ": "after", …} — «before» تعني إبقاء الحالي."""
+    raw = Path(spec).read_text(encoding="utf-8") if Path(spec).exists() else spec
+    picks = json.loads(raw)
+    n = 0
+    for text, which in picks.items():
+        if which != "after":
+            continue
+        src = OUTLIER_DIR / f"after__{gen.key_for(text)}.mp3"
+        if not src.exists():
+            print(f"  ✗ «{text}»: لا ملف معاد", file=sys.stderr)
+            continue
+        shutil.copy2(src, gen.OUT_DIR / f"{gen.key_for(text)}.mp3")
+        gen.mark_done(text, f"{gen.MODEL_CORE}#slow")
+        n += 1
+        print(f"  ✓ «{text}» ← المعاد")
+    if n:
+        gen.write_manifest(gen.manifest_map())
+    print(f"\nطُبِّق {n} حكماً (والباقي بقي على الحالي).")
+    return 0
 
 
 if __name__ == "__main__":

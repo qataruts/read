@@ -369,6 +369,12 @@ def gemini_pcm(text: str, style: str, model: str, voice: str, api_key: str,
             "Content-Type": "application/json",
             "x-goog-api-key": api_key,
         })
+        # حزامٌ للعيب النادر «POST data should be bytes» (مرّتان في ~٢٦٠٠ طلب،
+        # ولم يُفسَّر بالقراءة): إن صار الجسمُ نصّاً بأي سبيل يُرمَّز ويُبلَّغ بدل
+        # أن يسقط النصّ ويُترك منتظِراً.
+        if isinstance(req.data, str):
+            print(f"  ! جسم الطلب صار نصّاً — رُمِّز تلقائياً ({text[:20]}…)", file=sys.stderr)
+            req.data = req.data.encode("utf-8")
         try:
             _pace(pace_key or model)
             with urllib.request.urlopen(req, timeout=180) as resp:
@@ -714,7 +720,52 @@ def shape_class(text: str, cat: str) -> str:
         return "syllable:ساكن"
     if len(text) == 3 and text[1] in HARAKAT.values() and text[2] in "اوي":
         return "syllable:مدّ"
+    # «كَةْ» و«وَةْ» و«عَةْ»: تاءٌ مربوطة ساكنة تُقفل المقطع، فيقصر بطبعه عن
+    # نظيره المفتوح («كَا»). كان الحارس يقيسها بوسيط المقاطع البسيطة فيتّهمها
+    # بالبتر — والمعايرة بالبنية لا بإسكات ملفٍ بعينه (إذن المدير ٥ أغسطس ٢٠٢٦).
+    if text.endswith("ةْ"):
+        return "syllable:مقفل بالتاء"
     return "syllable:بسيط"
+
+
+LINEAGE_LEDGER = ROOT / "tools" / "audio_lineage.json"
+VERDICTS = ROOT / "tools" / "audio_verdicts.json"   # ما سمعه المالك وحكم فيه
+
+
+def load_verdicts() -> dict:
+    """أحكامُ أذنِ المالك: نصّ ← (التاريخ، الحكم). التنبيه بعدها خبرٌ لا مطالبة."""
+    if not VERDICTS.exists():
+        return {}
+    try:
+        return json.loads(VERDICTS.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def record_verdict(text: str, verdict: str) -> None:
+    data = load_verdicts()
+    data[text] = {"verdict": verdict, "at": TODAY}
+    VERDICTS.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def human_texts() -> set:
+    """نصوصٌ صوتُها **بشريّ** (Antura أو تلاوة) — لا يُقاس بمسطرة المولَّد.
+
+    خطأ ٥ أغسطس ٢٠٢٦: اتُّهم «طاء» بالبتر (٠٫٤٢ث مقابل وسيط ٠٫٩١ث) فاستُبدل
+    بمولَّد — وهو تسجيلٌ بشريّ من Antura أُجيز بأذن المالك. والوسيط نفسه يغلب
+    عليه المولَّد، فقياس البشريّ به ظلمٌ بنيويّ: الإنسان أوجزُ من الآلة.
+    """
+    out = {e["text"] for e in load_queue()
+           if "antura" in str(e.get("model", "")).lower()}
+    out |= set(recitation_texts())
+    if LINEAGE_LEDGER.exists():
+        try:
+            for row in json.loads(LINEAGE_LEDGER.read_text(encoding="utf-8")).get("files", {}).values():
+                if row.get("lineage") in ("antura", "husary"):
+                    out.add(row.get("text", ""))
+        except json.JSONDecodeError:
+            pass
+    return out
 
 
 def duration_outliers(texts: dict) -> list:
@@ -724,9 +775,10 @@ def duration_outliers(texts: dict) -> list:
     يطول عن نظائره، فالمدة كاشفٌ رخيص يُشغَّل مع كل تحقّق. (التصنيف القاطع
     — نطقتان أم طول طبيعي — في `tools/audio_audit.py --analyze`.)
     """
+    human = human_texts()
     by_cat = {}
     for text, cat in texts.items():
-        if cat not in CORE_CATEGORIES:
+        if cat not in CORE_CATEGORIES or text in human:   # البشريّ خارج المسطرة
             continue
         p = OUT_DIR / f"{key_for(text)}.mp3"
         if p.exists():
@@ -773,10 +825,15 @@ def verify(texts: dict, pending: dict | None = None, min_bytes: int = 1500) -> i
     long_ones = duration_outliers(texts)
 
     print(f"\nالتحقّق الختامي: {len(texts)} نصاً متوقَّعاً، {len(on_disk)} ملفاً على القرص.")
+    verdicts = load_verdicts()
     for text, cat, sec, med in long_ones:
         kind = "أطول" if sec > med else "أقصر"
         why = "تكرار داخلي" if sec > med else "نطقٌ مبتور"
         label = CATEGORY_AR.get(cat, cat).replace("syllable:", "مقطع ")
+        if text in verdicts:                    # سمعه المالك وحكم — خبرٌ لا مطالبة
+            print(f"  ℹ شذوذ مدة معلوم ({label}): «{text}» {sec:.2f}ث — "
+                  f"بحكم المالك ({verdicts[text]['at']}): {verdicts[text]['verdict']}")
+            continue
         print(f"  ⚠ شذوذ مدة ({label}): «{text}» {sec:.2f}ث "
               f"= {sec / med:.1f}× وسيط فئته ({med:.2f}ث) — {kind} من نظائره، يُسمَع لاحتمال {why}")
     if recitations:
@@ -997,6 +1054,18 @@ def checkpoint_pause() -> None:
     print(f"  ▶ رُفع القفل بعد {waited:.0f}ث — يستأنف التوليد", file=sys.stderr)
 
 
+def mark_hold(text: str, reason: str) -> None:
+    """يحجز نصّاً عن التوليد بعلّة مذكورة — دمجاً كـ`mark_done`."""
+    disk = load_queue()
+    changed = False
+    for e in disk:
+        if e.get("text") == text and not e.get("hold"):
+            e["hold"] = reason
+            changed = True
+    if changed:
+        save_queue(disk)
+
+
 def mark_failed(text: str, model: str) -> None:
     """يقيّد إخفاق نصٍّ على نموذج — دمجاً لا استبدالاً كـ`mark_done`.
 
@@ -1128,6 +1197,34 @@ def plan_queue(queue: list, lexicon_ok: bool | None = None) -> list:
     return [(i, e, route_model(e, lexicon_ok)) for i, e in queue_pending(queue)]
 
 
+QUOTE_PAIRS = (("«", "»"), ("\u201c", "\u201d"), ('"', '"'), ("'", "'"))
+
+
+def quoted_symbols(text: str) -> list:
+    """رموزٌ مفردة مقتبسة داخل نصّ منطوق — «ء» و«أ» ونحوها.
+
+    قاعدة المالك (٥ أغسطس ٢٠٢٦): **الصوت يسمّي ولا يقرأ الرمز**. ردَّ قاعدةَ
+    الهمزة لأن المولّد نطق «ء» «ها»: الرمزُ يُرى في الشاشة ويُسمّى في الصوت
+    («الهمزة تُكتب وحدها») لا يُقتبس فيُقرأ. فمنعُه في المصدر أوفرُ من ردّه
+    بعد التوليد — طلبٌ لا يُنفَق، وأذنٌ لا تُتعب.
+    """
+    found = []
+    for open_q, close_q in QUOTE_PAIRS:
+        i = 0
+        while True:
+            a = text.find(open_q, i)
+            if a < 0:
+                break
+            b = text.find(close_q, a + 1)
+            if b < 0:
+                break
+            inner = text[a + 1:b].strip()
+            if 0 < len(inner) <= 2 and not inner.isascii():
+                found.append(inner)
+            i = b + 1
+    return found
+
+
 def style_for(entry: dict) -> str:
     hint = (entry.get("style_hint") or "").strip()
     if hint:
@@ -1177,6 +1274,15 @@ def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
     for n, (_idx, entry, m) in enumerate(plan, 1):
         checkpoint_pause()                      # قفل الالتزام: يتمّ الجاري ثم ينتظر
         if m in exhausted:                      # حصته نفدت أو تدهورت — لا طلب آخر عليها
+            continue
+        if entry.get("hold"):
+            continue                            # محجوزٌ بحكمٍ سابق (مردودٌ بعلّة)
+        syms = quoted_symbols(entry["text"])
+        if syms and entry.get("category") == "sentence":
+            print(f"  ⛔ رمزٌ مقتبس في نصّ منطوق ({'، '.join(syms)}): "
+                  f"«{entry['text'][:40]}…» — الصوت يسمّي ولا يقرأ الرمز، فيُحجَز",
+                  file=sys.stderr)
+            mark_hold(entry["text"], f"رمز مقتبس: {'، '.join(syms)}")
             continue
         text = entry["text"]
         cat = entry.get("category", "word")
