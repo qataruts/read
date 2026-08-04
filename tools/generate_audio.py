@@ -124,9 +124,33 @@ KEY_NAMES = ("GEMINI_API_KEY", "GEMINI_API_KEY_PRO")
 INDEPENDENCE_FILE = ROOT / "scratch" / "key_independence.json"
 
 
+class VertexRafid:
+    """مغلِّفُ رافد Vertex بواجهة `synth` — يُحمَّل كسولاً ولا يُطبع مفتاحه."""
+
+    def __init__(self):
+        sys.path.insert(0, str(ROOT / "tools"))
+        import vertex_tts as vx  # noqa: PLC0415
+        self._vx = vx
+        self._auth = vx.VertexAuth()
+
+    def synth(self, text: str, style: str, model: str, voice: str):
+        return self._vx.synth(self._auth, text, style,
+                              self._vx.VERTEX_NAMES.get(model, model), voice)
+
+
+def vertex_enabled() -> bool:
+    """مُفعَّلٌ متى وُجد ملفُّ حساب الخدمة وأُقِرّ الرافد (قرار الإدارة ٥ أغسطس ٢٠٢٦)."""
+    return (ROOT / "tools" / "gcloud-sa.json").exists() and is_approved("vertex")
+
+
 def read_keys() -> list:
     """[(اسم المفتاح، قيمته)] بالترتيب — القيم لا تُطبع في أي مخرَج أبداً."""
     out = []
+    if vertex_enabled():
+        try:
+            out.append((VERTEX_KEY, VertexRafid()))    # الرافد الأول: بلا حصة يومية
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! تعذّر رافد Vertex: {str(e)[:80]}", file=sys.stderr)
     for name in KEY_NAMES:
         val = read_env_key(name)
         if val and all(val != v for _n, v in out):     # مفتاح مكرر لا يفيد
@@ -198,13 +222,26 @@ class KeyPool:
         return min(secs) if secs else 3600
 
     def call(self, text: str, style: str, model: str) -> tuple[bytes, int, str]:
-        """يجرّب المفاتيح المتاحة لهذا النموذج بالترتيب؛ يرفع QuotaExhausted متى نفدت كلها."""
+        """يجرّب المفاتيح المتاحة لهذا النموذج بالترتيب؛ يرفع QuotaExhausted متى نفدت كلها.
+
+        الرافدان: مفاتيح AI Studio (حصة يومية بالعدد) و**Vertex** (فوترة بالدولار).
+        وVertex يُقدَّم متى كان متاحاً — لا حصة تحبسه، وقد أثبت مخرجاً من نصوصٍ
+        عاندت AI Studio («رَاةْ»). وسقفُه ٥$/يوم يوقفه ويستدعي مراجعةً بشرية.
+        """
         blocked = None
         for name, value in self.available(model):
             try:
-                pcm, rate = gemini_pcm(text, style, model, self.voice, value,
-                                       pace_key=f"{name}:{model}")
-                if blocked:                 # نجح الثاني بعد نفاد الأول = دليل الاستقلال
+                if name == VERTEX_KEY:
+                    _pace(f"{name}:{model}")
+                    pcm, rate = value.synth(text, style, model, self.voice)
+                    bump_usd(model, len(style + text) // 3 + 8, len(pcm) / 2 / rate)
+                    if usd_left() <= 0:
+                        print(f"  🛑 Vertex: بلغ سقف اليوم {VERTEX_DAILY_USD}$ — "
+                              f"يتوقّف ويستدعي مراجعةً بشرية", file=sys.stderr)
+                else:
+                    pcm, rate = gemini_pcm(text, style, model, self.voice, value,
+                                           pace_key=f"{name}:{model}")
+                if blocked and blocked != VERTEX_KEY:   # نجاح الثاني بعد نفاد الأول
                     note_independence(model, blocked, name,
                                       {blocked: self.exhausted[(blocked, model)]})
                 self.used[(name, model)] += 1
@@ -256,6 +293,9 @@ class QuotaExhausted(TTSError):
 
 
 _MIN_INTERVAL = 0.0        # ثوانٍ بين طلبين لنفس النموذج (يضبطها --rpm)
+# إيقاعٌ لكل رافد: AI Studio محدودٌ بـ١٠/دقيقة للنموذج فنبقى دونه، وVertex لا حدّ
+# دقيقيّ له بل فوترة — فخنقُه بإيقاع AI Studio يضيّع أهمّ ما جاء به: السرعة.
+RPM_BY_KEY = {"VERTEX": 60.0}
 _LAST_REQUEST = {}         # نموذج ← وقت آخر طلب له (حدّ الدقيقة لكل نموذج على حدة)
 
 
@@ -267,8 +307,10 @@ def set_rpm(rpm: float) -> None:
 
 def _pace(model: str = "") -> None:
     """مَخنَقُ كل طلب: يباعد بالإيقاع **ويقيّد الإنفاق** — فلا طلبَ بلا عدّ."""
-    if _MIN_INTERVAL:
-        wait = _LAST_REQUEST.get(model, 0.0) + _MIN_INTERVAL - time.monotonic()
+    rpm = RPM_BY_KEY.get(model.split(":")[0]) if ":" in model else None
+    interval = 60.0 / rpm if rpm else _MIN_INTERVAL
+    if interval:
+        wait = _LAST_REQUEST.get(model, 0.0) + interval - time.monotonic()
         if wait > 0:
             time.sleep(wait)
     _LAST_REQUEST[model] = time.monotonic()
@@ -622,7 +664,7 @@ def write_versions(manifest: dict) -> dict:
     فلا يقرأ التطبيقُ ولا فاحصٌ بياناً نصفَ مكتوب."""
     versions = versions_map(manifest)
     path = OUT_DIR / "versions.json"
-    tmp = path.with_suffix(".json.tmp")
+    tmp = path.with_suffix(f".{os.getpid()}.tmp")   # اسمٌ خاصّ بالعملية
     tmp.write_text(json.dumps(versions, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     tmp.replace(path)
     print(f"البصمات: {path} ({len(versions)} ملفاً)")
@@ -781,8 +823,13 @@ def load_queue() -> list:
 
 
 def save_queue(queue: list) -> None:
-    """كتابة ذرّية: ملف مؤقت ثم استبدال — فلا يقرأ أحدٌ ملفاً نصفَ مكتوب."""
-    tmp = QUEUE_FILE.with_suffix(".json.tmp")
+    """كتابة ذرّية: ملف مؤقت ثم استبدال — فلا يقرأ أحدٌ ملفاً نصفَ مكتوب.
+
+    واسمُ المؤقت **يحمل رقم العملية**: عمليتان تكتبان معاً (مصرِّفٌ وإصلاحٌ ذاتيّ)
+    كانتا تتنازعان اسماً واحداً، فيستبدل أحدهما ملفَ الآخر ويسقط الثاني بـ
+    FileNotFoundError — وقع فعلاً ٥ أغسطس ٢٠٢٦ في `versions.json`.
+    """
+    tmp = QUEUE_FILE.with_suffix(f".{os.getpid()}.tmp")
     tmp.write_text(json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     os.replace(tmp, QUEUE_FILE)
 
@@ -815,6 +862,17 @@ DAILY_CAPS = {
     "gemini-2.5-pro-preview-tts": 50,
 }
 SPEND_FILE = ROOT / "scratch" / "spend.json"
+# رافد Vertex: بلا حصة يومية بل بفوترة — فحدُّه **إنفاقٌ بالدولار** لا عدد طلبات.
+# سقفُ الإدارة (٥ أغسطس ٢٠٢٦): ٥$ يومياً، وبلوغُه يوقف التصريف ويستدعي مراجعة بشرية.
+VERTEX_KEY = "VERTEX"
+VERTEX_DAILY_USD = 5.0
+# مقيسٌ من usageMetadata: ٢٥ رمز صوت لكل ثانية، ورموز الإدخال ~٢٠ للنصّ القصير.
+PRICE_PER_M = {                       # (إدخال، خرج صوتي) بالدولار لكل مليون رمز
+    "gemini-3.1-flash-tts-preview": (0.50, 10.0),
+    "gemini-2.5-flash-preview-tts": (0.50, 10.0),
+    "gemini-2.5-pro-preview-tts": (1.00, 20.0),
+}
+AUDIO_TOKENS_PER_SEC = 25
 STATUS_FILE = ROOT / "scratch" / "monitor_status.json"
 
 
@@ -842,14 +900,41 @@ def bump_spend(pace_key: str) -> None:
     day[pace_key] = day.get(pace_key, 0) + 1
     for old in [k for k in data if k != TODAY]:
         data.pop(old)
-    tmp = SPEND_FILE.with_suffix(".json.tmp")
+    tmp = SPEND_FILE.with_suffix(f".{os.getpid()}.tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     os.replace(tmp, SPEND_FILE)
 
 
 def spend_left(key_name: str, model: str) -> int:
+    if key_name == VERTEX_KEY:                     # Vertex يُحاسَب بالمال لا بالعدد
+        return 10 ** 6 if usd_left() > 0 else 0
     cap = DAILY_CAPS.get(model, 100)
     return max(0, cap - load_spend().get(f"{key_name}:{model}", 0))
+
+
+def bump_usd(model: str, in_tokens: int, audio_sec: float) -> None:
+    """يقيّد كلفة طلبٍ على Vertex بالدولار (من عدّاد الرموز المقيس)."""
+    pi, po = PRICE_PER_M.get(model, (0.5, 10.0))
+    usd = in_tokens / 1e6 * pi + audio_sec * AUDIO_TOKENS_PER_SEC / 1e6 * po
+    data = {}
+    if SPEND_FILE.exists():
+        try:
+            data = json.loads(SPEND_FILE.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            data = {}
+    day = data.setdefault(TODAY, {})
+    day["VERTEX_USD"] = round(day.get("VERTEX_USD", 0.0) + usd, 6)
+    tmp = SPEND_FILE.with_suffix(f".{os.getpid()}.tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    os.replace(tmp, SPEND_FILE)
+
+
+def usd_spent() -> float:
+    return float(load_spend().get("VERTEX_USD", 0.0))
+
+
+def usd_left() -> float:
+    return max(0.0, VERTEX_DAILY_USD - usd_spent())
 
 
 COMMIT_LOCK = ROOT / "scratch" / "commit.lock"

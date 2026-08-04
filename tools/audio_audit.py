@@ -17,6 +17,7 @@
 """
 
 import argparse
+import collections
 import json
 import shutil
 import statistics
@@ -196,6 +197,7 @@ def classify(rows: list, analysis: list) -> list:
     """
     MIN_SEG = 0.18                       # أقصر ما يُعدّ نطقةً لا شظية
     REPEAT_GAP = 0.5                     # الفاصل الذي يميّز إعادة النطق من وقفةٍ داخلية
+    REPEAT_SIM = 0.60                    # وتكافؤ الطولين: الإعادة تُشبه أصلها
     by_file = {a["file"]: a for a in analysis}
     out = []
     for r in rows:
@@ -209,13 +211,17 @@ def classify(rows: list, analysis: list) -> list:
         verdict, why = "طول طبيعي", f"{len(lens)} نطقة لـ{expected} كلمة: {lens}"
         gaps = [round(big[i + 1][0] - big[i][1], 2) for i in range(len(big) - 1)]
         wide = [g for g in gaps if g >= REPEAT_GAP]
-        if len(big) > expected and wide:
+        # الإعادة نطقةٌ **تشبه** أختَها طولاً؛ أمّا «بُرْتُقَالْ» (٠٫٢٤ ثم ٠٫٥٨) فوقفةُ
+        # سكونٍ داخل كلمة: جزآن متفاوتان لا نطقتان. فالفاصل وحده لا يكفي حكماً.
+        pairs = [min(a, b) / max(a, b) for a, b in zip(lens, lens[1:]) if max(a, b)]
+        similar = any(r >= REPEAT_SIM for r in pairs) if pairs else False
+        if len(big) > expected and wide and similar:
             verdict = "تكرار"
             why = (f"{len(big)} نطقات ({lens}) والمتوقَّع {expected} — "
                    f"وبينها صمتٌ {max(wide)}ث")
         elif len(big) > expected:
-            why = (f"{len(big)} نطقات لـ{expected} كلمة بفواصل قصيرة {gaps} — "
-                   "وقفةٌ داخلية (سكون أو شدّة) لا إعادة")
+            why = (f"{len(big)} نطقات لـ{expected} كلمة · فواصل {gaps} · "
+                   f"تكافؤ {max(pairs) if pairs else 0:.2f} — وقفةٌ داخلية لا إعادة")
         out.append({**r, "segs": segs, "lens": lens, "verdict": verdict, "why": why})
     return out
 
@@ -281,8 +287,11 @@ def main():
     ap.add_argument("--analyze", action="store_true", help="تحليل النطقات في متصفّح حقيقي")
     ap.add_argument("--page", action="store_true", help="صفحة سماع للتصديق")
     ap.add_argument("--all", action="store_true", help="على كل الفهرس لا النواة وحدها")
+    ap.add_argument("--dry-run", action="store_true", help="عرض بلا توليد")
     ap.add_argument("--repair", action="store_true",
                     help="إصلاح ذاتي: يعيد توليد المكرَّر حتى تخرج نطقةٌ واحدة")
+    ap.add_argument("--lineage", action="store_true",
+                    help="جرد النسب: كل ملف لأحد ثلاثة أنساب — أو يفشل الفحص")
     ap.add_argument("--orphans", action="store_true",
                     help="اليتيم الدلاليّ: ملفٌ في الفهرس لم تعد بيانات التطبيق تطلبه")
     args = ap.parse_args()
@@ -290,7 +299,19 @@ def main():
     if args.repair:
         sys.exit(repair(args.dry_run if hasattr(args, "dry_run") else False))
 
+    if args.lineage:
+        sys.exit(1 if print_lineage(lineage_audit()) else 0)
+
     if args.orphans:
+        led = lineage_audit()
+        bad = len(led["unknown"]) + len(led["orphans"])
+        if bad:
+            print(f"✗ نسبٌ غير معتمد: {len(led['unknown'])} مجهولاً و{len(led['orphans'])} "
+                  f"يتيماً — راجع tools/audio_audit.py --lineage", file=sys.stderr)
+        else:
+            print("✓ النسب: ثلاثة أنساب لا رابع لها "
+                  + "، ".join(f"{LINEAGES[k].split(' ')[0]}: {v}"
+                              for k, v in led["counts"].items() if k in LINEAGES))
         rows = semantic_orphans()
         print(f"اليتيم الدلاليّ: {len(rows)} ملفاً")
         for r in rows:
@@ -298,7 +319,7 @@ def main():
                   f"· طلبته {r['requestedBy']}")
         if not rows:
             print("  ✓ كل ملف في الفهرس تطلبه بيانات التطبيق.")
-        return 0
+        return 1 if (rows or bad) else 0
 
     data = scan()
     rows = data["rows"]
@@ -438,6 +459,117 @@ def current_classification() -> list:
              "sec": round(gen.mp3_duration(gen.OUT_DIR / f"{k}.mp3"), 2)}
             for k, t in man.items() if (gen.OUT_DIR / f"{k}.mp3").exists()]
     return classify(rows, analyze([r["file"] for r in rows]))
+
+
+# ————————————————————————— جرد النسب (ثلاثة أنساب لا رابع لها) —————————————————————————
+
+LINEAGES = {
+    "sulafat": "سُلافات (مولَّد — أي نموذج، AI Studio أو Vertex)",
+    "antura": "نواة Antura البشرية (CC-BY)",
+    "husary": "تلاوة الحصري (المصحف)",
+}
+LEDGER = gen.ROOT / "tools" / "audio_lineage.json"
+ARCHIVE_EDGE = gen.ROOT / "archive" / "audio-edge"
+ANTURA_MATCHED = gen.ROOT / "scratch" / "antura" / "matched.json"
+
+
+def _antura_texts() -> set:
+    """نصوصٌ استُوردت من Antura — من دفتر الاستيراد ومن سجلّ القائمة معاً."""
+    out = {e["text"] for e in gen.load_queue()
+           if "antura" in str(e.get("model", "")).lower()}
+    if ANTURA_MATCHED.exists():
+        try:
+            imported = json.loads(ANTURA_MATCHED.read_text(encoding="utf-8"))
+            texts, pending = gen.expected_texts()
+            known = {**texts, **pending}
+            out |= {m["text"] for m in imported if m.get("text") in known}
+        except json.JSONDecodeError:
+            pass
+    if LEDGER.exists():                      # الدفتر المعتمد يُبقي ما ثبت سابقاً
+        try:
+            for key, row in json.loads(LEDGER.read_text(encoding="utf-8")).get("files", {}).items():
+                if row.get("lineage") == "antura":
+                    out.add(row.get("text", ""))
+        except json.JSONDecodeError:
+            pass
+    return out
+
+
+def lineage_of(key: str, text: str, queue_by_text: dict, recit_keys: set,
+               antura: set) -> tuple[str, str]:
+    """(النسب، الدليل) — أو ("", سبب الجهالة)."""
+    if key in recit_keys:
+        return "husary", "بيان التلاوة (tools/recitations.json)"
+    if text in antura:
+        return "antura", "دفتر استيراد Antura أو سجلّ القائمة"
+    entry = queue_by_text.get(text, {})
+    model = str(entry.get("model", ""))
+    if model and ("gemini" in model or model.startswith("vertex")):
+        return "sulafat", f"سجلّ القائمة: {model}"
+    path = gen.OUT_DIR / f"{key}.mp3"
+    old = ARCHIVE_EDGE / f"{key}.mp3"
+    if old.exists() and path.exists() and old.read_bytes() == path.read_bytes():
+        return "", "مطابقٌ لأرشيف edge — من عصر ما قبل سُلافات"
+    if text in gen.parse_curriculum(gen.CURRICULUM.read_text(encoding="utf-8")):
+        # نصّ منهجٍ وُلِّد في تبديل سُلافات الشامل: البرهان أنه **ليس** نسخة الأرشيف،
+        # وكلُّ كتابةٍ بعد الأرشفة كانت بصوت سُلافات (DEFAULT_VOICE ثابت منذئذ).
+        return "sulafat", "نصّ منهج مكتوبٌ بعد أرشفة edge (تبديل سُلافات الشامل)"
+    if model:
+        return "", f"نموذجٌ غير معروف في السجلّ: {model}"
+    return "", "لا سجلّ له في دفتر المصادر"
+
+
+def lineage_audit(write: bool = True) -> dict:
+    """ينسب كل ملف في app/audio إلى أحد الأنساب الثلاثة — أو يعدّه مجهولاً."""
+    man = json.loads((gen.OUT_DIR / "manifest.json").read_text(encoding="utf-8"))
+    recit = gen.recitation_texts()
+    recit_keys = {gen.key_for(t) for t in recit}
+    queue = gen.load_queue()
+    queue_by_text = {e["text"]: e for e in queue}
+    antura = _antura_texts()
+    # الفهرس يُكتب في نهاية التصريف، فملفُّ نصٍّ صُرِّف قبل قليل ليس فيه بعد —
+    # ولولا هذا الربط لعُدّ يتيماً وهو ابنُ نسبٍ معلوم.
+    by_key = {gen.key_for(e["text"]): e["text"] for e in queue}
+    cur = gen.parse_curriculum(gen.CURRICULUM.read_text(encoding="utf-8"))
+    by_key.update({gen.key_for(t): t for t in cur})
+
+    files, counts, unknown, orphan = {}, collections.Counter(), [], []
+    for path in sorted(gen.OUT_DIR.glob("*.mp3")):
+        key = path.stem
+        text = (man.get(key) or by_key.get(key)
+                or next((t for t in recit if gen.key_for(t) == key), ""))
+        if not text:
+            orphan.append(key)
+            continue
+        lin, why = lineage_of(key, text, queue_by_text, recit_keys, antura)
+        files[key] = {"text": text, "lineage": lin, "evidence": why}
+        counts[lin or "مجهول"] += 1
+        if not lin:
+            unknown.append({"key": key, "text": text, "why": why})
+
+    ledger = {"checkedAt": gen.TODAY, "lineages": LINEAGES,
+              "counts": dict(counts), "files": files,
+              "unknown": unknown, "orphans": orphan}
+    if write:
+        LEDGER.write_text(json.dumps(ledger, ensure_ascii=False, indent=1), encoding="utf-8")
+    return ledger
+
+
+def print_lineage(ledger: dict) -> int:
+    print(f"جرد النسب: {sum(ledger['counts'].values())} ملفاً\n")
+    for lin, label in LINEAGES.items():
+        n = ledger["counts"].get(lin, 0)
+        print(f"  {label:<42} {n:>4}")
+    unknown, orphans = ledger["unknown"], ledger["orphans"]
+    if unknown:
+        print(f"\n  ✗ مجهول النسب: {len(unknown)}")
+        for u in unknown[:15]:
+            print(f"      «{u['text'][:34]}» — {u['why']}")
+    if orphans:
+        print(f"\n  ✗ يتيمٌ بلا طالب: {len(orphans)} — {'، '.join(orphans[:6])}")
+    if not unknown and not orphans:
+        print("\n  ✓ الجرد كله ثلاثة أنساب لا رابع لها.")
+    return len(unknown) + len(orphans)
 
 
 if __name__ == "__main__":
