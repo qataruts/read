@@ -140,14 +140,18 @@ ok($$('.sentence-word[data-fade="1"]').length === sentence.words.length,
 ok($$('.sentence-word').every((el) => el.tagName === 'SPAN'),
   'والمشكولةُ ليست زرّاً — ما لا يُكشف لا يُغرى بلمسه');
 
+// **قاعدة الشاهد الواحد** (حزمة «قياس العلامات»): إصابةُ صورة الجملة نقرةٌ بين ثلاث
+// احتمالُها الثلث، وشاهدُها الجملةُ لا كلماتُها — فلا تُحتسب لواحدةٍ منها. وكانت
+// تُحتسب لهنّ جميعاً، فتُشترى عتبةُ الخفوت بالتخمين.
 const beforeHeard = heardLog.length;
 const cards = $$('.piccard');
 cards[cards.map(picOf).indexOf(sentence.target.emoji)].click();
 await waitFor(() => heardLog.length > beforeHeard, 'سماع الجملة بعد الإصابة');
-ok(countOf(sentence.words[0]) === FADE_AT,
-  `والإصابة تُحتسب قراءةً صحيحة لكلمات الجملة كلها (${countOf(sentence.words[0])}/${FADE_AT})`);
-ok(sentence.words.every((w) => countOf(w) === FADE_AT), 'لكلٍّ منها لا لهدفها وحده');
+ok(sentence.words.every((w) => countOf(w) === FADE_AT - 1),
+  `و«اقرأ ونفّذ» **لا يُحتسب**: العدّاد كما كان (${countOf(sentence.words[0])}/${FADE_AT})`);
 
+// وتُبلَغ العتبةُ من مواضع الشاهد الواحد — نزرعها هنا لنرى الخفوت نفسَه على الشاشة
+await seed(idsBefore(`ladder:${rung.id}`), readsFor(sentence.words, FADE_AT));
 await goto(`#/ladder/${rung.id}`);
 await waitFor(() => $$('.piccard').length === 3, 'عودة إلى الجملة نفسها');
 const shown = texts('.sentence-word');
@@ -216,10 +220,19 @@ if (fillAt >= 0) {
   ok($$('.vchip-face [data-fade]').length === 0 && !$('.vchip-face[data-fade]'),
     'ولا يمسّها مُصيِّر الخفوت أصلاً');
   ok($$('.sentence-word[data-fade="3"]').length > 0, 'بينما جملتُها عاريةٌ ز٣ فوقها');
+  const others = fill.words.filter((w, i) => i !== fill.blank);
+  const beforeFill = Object.fromEntries(fill.words.map((w) => [w, countOf(w)]));
+  // كلمةٌ احتُسبت اليوم في جولةٍ سابقة لا تُحتسب ثانيةً (التباعد) — فتُستثنى من المقايسة
+  const fresh = (stored().reads?.[wordKey(blank)]?.day ?? -1) < DAY;
   $$('.vchip--pic')[texts('.vchip-face').indexOf(blank)].click();
   await sleep(200);
   ok($('.sentence-word--filled')?.textContent === blank,
     'والكلمةُ تملأ الفراغ **كما قرأها على خيارها** لا مخفوتةً');
+  // قاعدة الشاهد الواحد: الكلمةُ المقروءة بين خياراتٍ ملبَّسة وحدَها تُحتسب
+  ok(countOf(blank) === beforeFill[blank] + (fresh ? 1 : 0),
+    `و«أكمل» يُحتسب **للكلمة التي ملأت الفراغ وحدَها** («${blank}»: ${countOf(blank)})`);
+  ok(others.every((w) => countOf(w) === beforeFill[w]),
+    `وسائرُ كلمات الجملة سياقٌ لا شاهدَ عليه — عدّادُها كما كان (${others.length} كلمة)`);
 }
 
 const orderRung = RUNGS.find((r) => r.sentences.some((s) => s.mechanic === 'order'));

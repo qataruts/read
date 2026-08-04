@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار «قياس العلامات»</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+const timeout = setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 150000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 6000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const { SKILLS, skillById, markSkillKey, markLabel } = await import('./js/curriculum.js');
+const { allNodes } = await import('./js/progress.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+
+const played = [];
+const spoken = [];
+const jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      played.push(manifest[key] ?? `?${key}`);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { spoken.push(text); this.text = text; } };
+}
+
+function idsBefore(id) {
+  const out2 = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out2;
+    out2.push(node.id);
+  }
+  return out2;
+}
+
+async function seed(nodeIds, extra = {}) {
+  win.localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, records: [], reads: {}, mic: false, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+    ...extra,
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(150);
+}
+
+const stored = () => JSON.parse(win.localStorage.getItem('muallim.progress.v1'));
+
+if (frame.contentDocument?.readyState !== 'complete') {
+  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+}
+attach();
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+const lastPlayed = () => played[played.length - 1];
+const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
+
+async function goto(hash) {
+  win.location.hash = hash;
+  await sleep(220);
+}
+
+try {
+  // درسُ الشدّة: علامةٌ صريحة في الرسم، وأزواجُه مفكوكةٌ عند موضعه
+  const skill = skillById('shadda');
+  const nodeId = `skill:${skill.id}`;
+  const key = markSkillKey(skill.id);
+
+  // ————— ١) خطوة «قارِن»: سماعٌ حرّ ثم قراءةٌ صامتة تُقاس —————
+  await seed(idsBefore(nodeId));
+  await goto(`#/skill/${skill.id}`);
+  await waitFor(() => $('.rule'), 'شاشة القاعدة');
+  ok(texts('.step-name').includes('قارِن'), `درس «${skill.title}» على الشاشة بخطواته`);
+
+  btn('تابع').click();
+  await waitFor(() => $('.pairs'), 'جدول الأزواج');
+  ok($$('.pair').length >= skill.compare.pairs.length,
+    `(أ) السماع الحرّ: ${$$('.pair').length - 1} زوجاً جنباً إلى جنب`);
+
+  const beforePair = played.length;
+  $('.pairs .vchip--pair').click();
+  await waitFor(() => played.length > beforePair, 'نطق طرف الزوج', 6000);
+  ok(skill.compare.pairs.flat().includes(lastPlayed()),
+    `ونقرُ الطرف يُسمعه من ملفه («${lastPlayed()}»)`);
+
+  // ————— ٢) القراءة الصامتة: لا صوت قبل الاختيار، والقياس يُكتب —————
+  btn('تابع').click();
+  await waitFor(() => $('h2')?.textContent.startsWith('أيُّهما'), 'سؤال القراءة الصامتة');
+  const asked = $('h2').textContent.trim();
+  const labels = skill.compare.labels.map(markLabel);
+  ok(labels.some((l) => asked.includes(l)),
+    `(ب) القراءة الصامتة: «${asked}» — وسمُه من بيانات الدرس لا نصٌّ جديد`);
+
+  const options = texts('.vrow .vchip-face');
+  ok(options.length === 2 && skill.compare.pairs.some((p) => p.every((t) => options.includes(t))),
+    `وخياراه طرفا زوجٍ واحد (${options.join(' · ')}) — لا فرق بينهما إلا العلامة`);
+
+  const quiet = played.length + spoken.length;
+  await sleep(700);
+  ok(played.length + spoken.length === quiet,
+    '**ولا صوتَ قبل الاختيار** — المقيسُ أن يرى العلامة لا أن يسمعها');
+
+  // الخطأ يُسمِع ما نقره هو، ويُسجَّل في ليتنر
+  const target = labels.indexOf(asked.replace('أيُّهما ', '').replace('؟', '').trim());
+  const pair = skill.compare.pairs.find((p) => p.every((t) => options.includes(t)));
+  const wrongText = pair[1 - target];
+  const chips = $$('.vrow .vchip--pair');
+  const wrongEl = chips[options.indexOf(wrongText)];
+  const m0 = played.length + spoken.length;
+  wrongEl.click();
+  await waitFor(() => played.length + spoken.length > m0, 'نطق الخطأ', 6000);
+  const heardWrong = played.length > m0 ? lastPlayed() : spoken[spoken.length - 1];
+  ok(heardWrong === wrongText, `والخطأ يُسمعه ما نقره هو («${wrongText}») لا الصواب`);
+
+  const afterWrong = stored().skills;
+  ok(Object.keys(afterWrong).includes(`${key}|none|mark-compare`),
+    `والقياس دخل ليتنر بمفتاح «${key}|none|mark-compare» — علامةٌ لا حرف`);
+  ok(afterWrong[`${key}|none|mark-compare`].wrong === 1
+    && afterWrong[`${key}|none|mark-compare`].box === 0,
+    'وبعقد ليتنر نفسِه: الخطأ يعيد الصندوق إلى الصفر');
+
+  // ————— ٣) الصواب يمضي إلى «ميّز بأذنك»، وهي تُقاس أيضاً —————
+  for (let i = 0; i < 4 && !$('.vrow .vchip--big') && $('h2')?.textContent.startsWith('أيُّهما'); i++) {
+    const now = $('h2').textContent.replace('أيُّهما ', '').replace('؟', '').trim();
+    const side = labels.indexOf(now);
+    const opts = texts('.vrow .vchip-face');
+    const p = skill.compare.pairs.find((x) => x.every((t) => opts.includes(t)));
+    $$('.vrow .vchip--pair')[opts.indexOf(p[side])].click();
+    await sleep(950);
+  }
+  await waitFor(() => $('h2')?.textContent.includes('سمعت'), 'خطوة ميّز بأذنك');
+  ok($('h2').textContent.includes('سمعت'), 'ثم تمضي إلى «ميّز بأذنك» — التمييز بالأذن');
+
+  const heardKeys = Object.keys(stored().skills);
+  ok(heardKeys.filter((k) => k.startsWith(key)).length >= 1,
+    'وقياسُ القراءة محفوظٌ قبلها');
+
+  await waitFor(() => $('.vrow .vchip--pair'), 'خيارات التمييز');
+  const qOpts = $$('.vrow .vchip--pair');
+  qOpts[0].click();
+  await sleep(300);
+  ok(Object.keys(stored().skills).some((k) => k === `${key}|none|mark-quiz`),
+    `و«ميّز بأذنك» تكتب مفتاحَها الثاني «${key}|none|mark-quiz»`);
+
+  const both = Object.keys(stored().skills).filter((k) => k.startsWith(`${key}|`));
+  ok(both.length === 2, `فصار للعلامة مفتاحان لا واحد (${both.length}): قراءةً وسماعاً`);
+  ok(both.every((k) => k.split('|')[1] === 'none'),
+    'وكلاهما بلا حركة — الوحدةُ علامةٌ لا حرفٌ × حركة');
+
+  // ————— ٤) المراجعة اليومية: تمرينا العلامة يظهران على الشاشة —————
+  const skills = {};
+  for (const kind of ['mark-compare', 'mark-quiz']) {
+    skills[`${key}|none|${kind}`] = { right: 0, wrong: 3, box: 0, due: 0, seen: 0 };
+  }
+  await seed([...idsBefore(nodeId), nodeId], { skills });
+  await goto('#/review');
+  await waitFor(() => $('.lesson-body h2'), 'شاشة المراجعة');
+
+  // تُحَلّ التمارينُ **بإجاباتها الصحيحة** لتمضي الجلسة: القراءةُ من وسمها، والسماعيّ
+  // من النصّ الذي شُغّل عند دخوله. وبها نبلغ التمرينين معاً لا الأوّلَ وحده.
+  let sawCompare = false;
+  let sawQuiz = false;
+  let checkedQuiet = false;
+  for (let i = 0; i < 10 && !$('.celebrate'); i++) {
+    const head = $('.lesson-body h2')?.textContent.trim() || '';
+    const opts = texts('.vrow .vchip-face');
+    let answer = null;
+
+    if (head.startsWith('أيُّهما')) {
+      sawCompare = true;
+      if (!checkedQuiet) {
+        checkedQuiet = true;
+        const before = played.length + spoken.length;
+        await sleep(600);
+        ok(played.length + spoken.length === before,
+          'وفي المراجعة كذلك: لا صوتَ قبل الاختيار في تمرين القراءة');
+      }
+      const side = labels.indexOf(head.replace('أيُّهما ', '').replace('؟', '').trim());
+      const p = SKILLS.flatMap((s) => s.compare.pairs).find((x) => x.every((t) => opts.includes(t)));
+      if (p && side >= 0) answer = p[side];
+    } else if (head.includes('أيَّ واحدة سمعت')) {
+      sawQuiz = true;
+      answer = opts.find((t) => t === lastPlayed()) || null;
+    }
+
+    const buttons = $$('.vrow button, .tiles button, .picrow button');
+    const pick = answer ? buttons[opts.indexOf(answer)] : buttons[0];
+    if (!pick) break;
+    pick.click();
+    await sleep(950);
+  }
+  ok(sawCompare, 'وتمرينُ **قراءة** العلامة يدخل مراجعة اليوم فعلاً');
+  ok(sawQuiz, 'وتمرينُ **سماعها** كذلك — النوعان معاً لا أحدهما');
+
+  // ————— ٥) البوابة: العلامةُ من أضعف ما في يده —————
+  const gate = allNodes().find((n) => n.type === 'gate');
+  if (gate) {
+    await seed(idsBefore(gate.id), { skills });
+    await goto(`#/gate/${gate.part}`);
+    await waitFor(() => $('.gate-head') || $('.lesson-body h2'), 'شاشة البوابة');
+    const heads = [];
+    for (let i = 0; i < 4 && !$('.celebrate'); i++) {
+      heads.push($('.lesson-body h2')?.textContent.trim() || '');
+      const pick = $('.vrow button, .tiles button, .picrow button');
+      if (!pick) break;
+      pick.click();
+      await sleep(900);
+    }
+    ok(heads.some((t) => t.startsWith('أيُّهما') || t.includes('أيَّ واحدة سمعت')),
+      `وتظهر العلامةُ في تمارين البوابة (${heads.filter(Boolean).length} تمارين معايَنة)`);
+  }
+
+  // ————— ٦) لوحة وليّ الأمر: صفُّ «العلامات» بلا حرفٍ وهميّ —————
+  await seed([...idsBefore(nodeId), nodeId], {
+    skills: {
+      [`${key}|none|mark-compare`]: { right: 5, wrong: 0, box: 4, due: 0, seen: 0 },
+      [`${key}|none|mark-quiz`]: { right: 1, wrong: 2, box: 1, due: 0, seen: 0 },
+    },
+  });
+  await goto('#/');
+  $('[aria-label="لوحة وليّ الأمر"]').click();
+  await waitFor(() => $('.gate .giant') || $('.audit'), 'شاشة وليّ الأمر');
+  if (!$('.audit')) {
+    const [a, b] = $('.giant').textContent.split('×')
+      .map((s) => Number(s.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+    $('input.chip').value = String(a * b);
+    btn('ادخل').click();
+    await waitFor(() => $('.audit'), 'لوحة وليّ الأمر');
+  }
+
+  const headings = texts('.audit h3');
+  ok(headings.some((t) => t.startsWith('العلامات')),
+    `للعلامات صفُّها في اللوحة إلى جوار الحروف (${headings.find((t) => t.startsWith('العلامات'))})`);
+  const board = $('.audit').textContent;
+  ok(board.includes(skill.title),
+    `ويقرأ وليُّ الأمر اسمَ الدرس «${skill.title}»`);
+  ok(!board.includes('mark-') && !board.includes('root-'),
+    '**ولا مفتاحَ خاماً على الشاشة** — لا «mark-shadda» ولا حرفٌ وهميّ اسمُه كذلك');
+  const letterFaces = texts('.audit .vchip-face');
+  ok(!letterFaces.some((t) => t.includes('mark')),
+    'ولا يتسلّل مفتاحُ علامةٍ إلى بطاقات الحروف');
+
+  // ————— ٧) صفرُ نطقٍ آليّ وصفرُ أعطاب —————
+  const stray = spoken.filter((t) => !pendingAudio.has(t));
+  ok(stray.length === 0,
+    `ولم يُستعمل النطق الآلي إلا لنصٍّ ينتظر التصريف (${stray.slice(0, 3).join('، ') || 'صفر'})`);
+  const noFile = played.filter((t) => String(t).startsWith('?'));
+  ok(noFile.length === 0,
+    `وكلُّ ما نُطق من ملفٍ مولَّد قائم (${noFile.slice(0, 3).join('، ') || 'صفر مفقود'})`);
+  ok(jsErrors.length === 0, `ولا أخطاء جافاسكربت (${jsErrors.join(' · ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, `استثناء: ${e.message}`);
+}
+
+clearTimeout(timeout);
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

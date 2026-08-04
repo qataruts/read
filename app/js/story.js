@@ -17,7 +17,7 @@
 
 import { storyById, storyTexts, sentenceText } from './curriculum.js';
 import { libraryStory, storyTexts as libraryStoryTexts } from './library.js';
-import { credit, textWord } from './fade.js';
+import { textWord } from './fade.js';   // عرضٌ بدرجات الخفوت — ولا احتساب هنا (الشاهد الواحد)
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import * as recorder from './recorder.js';
@@ -343,7 +343,8 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
           }
           locked = true;
           btn.classList.add('good');
-          credit(question.words);   // قرأ السؤال فأصاب صورته: قراءةٌ صحيحة لكلماته
+          // **لا احتساب هنا** (قاعدة الشاهد الواحد — `fade.js`): إصابةُ صورةِ السؤال
+          // شاهدٌ على فهم جملته لا على قراءة كلِّ كلمةٍ فيها، واحتمالُها الثلث.
           const mine = ++token;
           await audio.play(word.say);
           if (!live(mine)) return;

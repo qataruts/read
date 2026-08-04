@@ -14,6 +14,7 @@
     python3 tools/browser_test.py --parent     # صلابة التقدّم وتحكّم وليّ الأمر (الحزمة ١١)
     python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
     python3 tools/browser_test.py --roots      # شبكات الجذور (حزمة الجذور)
+    python3 tools/browser_test.py --marks      # قياس العلامات (مدّ · سكون · شدّة · تنوين · لام)
     python3 tools/browser_test.py --fade       # خفوت التشكيل ز١→ز٣ (المرحلة ز)
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
@@ -71,6 +72,7 @@ PAGES = {
     "/__gate_shots.html": TOOLS / "browser_gate_shots.html",
     "/__contrast.html": TOOLS / "browser_contrast.html",
     "/__roots.html": TOOLS / "browser_roots.html",
+    "/__marks.html": TOOLS / "browser_marks.html",
     "/__contrast_shots.html": TOOLS / "browser_contrast_shots.html",
     "/__device.html": TOOLS / "browser_device.html",
     "/__welcome.html": TOOLS / "browser_welcome.html",
@@ -335,6 +337,8 @@ def main():
                     help="صلابة التقدّم وتحكّم وليّ الأمر: ترقية عامل الخدمة والنسخة الاحتياطية (الحزمة ١١)")
     ap.add_argument("--roots", action="store_true",
                     help="شبكات الجذور: الشجرة و«اجمع العائلة» وقياسُها")
+    ap.add_argument("--marks", action="store_true",
+                    help="قياس العلامات: الدرس يقيس، والمراجعة والبوابة واللوحة تقرؤه")
     ap.add_argument("--contrast", action="store_true",
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--fade", action="store_true",
@@ -396,6 +400,7 @@ def main():
                 else "__fade.html" if args.fade
                 else "__parent.html" if args.parent
                 else "__roots.html" if args.roots
+                else "__marks.html" if args.marks
                 else "__contrast.html" if args.contrast
                 else "__gate.html" if args.gate
                 else "__map.html" if args.map

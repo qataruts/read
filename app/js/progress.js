@@ -21,15 +21,22 @@ export const WORDS_PART = 'words';   // عقدة لعبة الكلمات في آ
 /** أنواع التمارين المقيسة — أسماؤها ثابتة لأنها تُخزَّن في مفاتيح المهارات. */
 export const KINDS = {
   QUIZ: 'quiz', HARAKA: 'haraka', BUILD: 'build', ORDER: 'order', CONTRAST: 'contrast',
-  ROOT: 'root',
+  ROOT: 'root', MARK_COMPARE: 'mark-compare', MARK_QUIZ: 'mark-quiz',
 };
 
 /**
- * مهارةُ العائلة الصرفية: مقيسةٌ في ليتنر كسائرها، **ولا حرفَ لها**. فمفتاحُها
- * `root-<العائلة>` لا حرفٌ × حركة، وتُستثنى من لوحة الحروف كي **لا يظهر حرفٌ وهميّ
- * في لوحة وليّ الأمر** (حكم المدير في الحزمة ١٣ — والعلّةُ هي هي).
+ * **المهاراتُ التي لا حرفَ لها**: العائلةُ الصرفية (`root-<العائلة>`) والعلامةُ
+ * (`mark-<الدرس>`) مقيستان في ليتنر كسائر المهارات، ووحدةُ §٦ فيهما ليست حرفاً ×
+ * حركة. فتُستثنيان من لوحة الحروف كي **لا يظهر حرفٌ وهميّ في لوحة وليّ الأمر**
+ * (حكم المدير في الحزمة ١٣ — صار قاعدةً تسري على كل نوعٍ جديد بعده)، ولكلٍّ قسمُه.
  */
 export const isRootSkill = (skill) => skill?.kind === KINDS.ROOT;
+
+export const isMarkSkill = (skill) =>
+  skill?.kind === KINDS.MARK_COMPARE || skill?.kind === KINDS.MARK_QUIZ;
+
+/** هل مهارةٌ وحدتُها حرفٌ × حركة؟ (ما عداها له قسمُه في اللوحة وشرطُه في المراجعة) */
+export const isLetterSkill = (skill) => !isRootSkill(skill) && !isMarkSkill(skill);
 
 /** تباعد ليتنر بالأيام: كل إجابة صحيحة ترفع الصندوق، والخطأ يعيده إلى الصفر. */
 export const BOX_DAYS = [0, 1, 2, 4, 8, 16];
@@ -486,6 +493,15 @@ export function studiedLetters() {
 }
 
 /**
+ * دروسُ العلامات التي أتمّها فعلاً، بترتيب المنهج — مرجعُ المفكوكية في تمارين
+ * العلامات (حزمة «قياس العلامات»): مادّةُ التمرين أزواجُ درسه، فلا يُسأل عن مدّ الواو
+ * من لم يبلغ درسه بعدُ. وهو نظيرُ `studiedLetters` للحروف: **حصيلةٌ لا نيّة**.
+ */
+export function studiedMarks() {
+  return SKILLS.filter((skill) => isDone(`skill:${skill.id}`));
+}
+
+/**
  * كلمات المنهج المفكوكة بحصيلته: كل حروفها مدروسة (لا يشترط إتمام لعبة مجموعتها)،
  * **يليها ما أتمّه من كلمات البساتين** — فما قِيس في بستانٍ يُراجَع بكلماته نفسها.
  * (الباقة المُنجَزة دليلُ فكّها: لا تُفتح إلا بعد الرحلة كلها بحروفها وعلاماتها.)
@@ -609,7 +625,7 @@ export function weakestSkills() {
 export function letterStats() {
   const byLetter = new Map();
   for (const s of skills()) {
-    if (isRootSkill(s)) continue;      // العائلةُ ليست حرفاً — لها قسمُها في اللوحة
+    if (!isLetterSkill(s)) continue;   // العائلةُ والعلامةُ ليستا حرفاً — لكلٍّ قسمُها
     const acc = byLetter.get(s.letter)
       || { letter: s.letter, right: 0, wrong: 0, minBox: MAX_BOX, kinds: 0, seen: 0 };
     acc.right += s.right;

@@ -130,7 +130,9 @@ export function renderLadder(rungId) {
           if (word !== sentence.target) return wrong(btn, word.say);
           locked = true;
           btn.classList.add('good');
-          credit(sentence.words);   // قرأ الجملة كلها فأصاب صورتها: قراءةٌ صحيحة لكلماتها
+          // **لا احتساب هنا** (قاعدة الشاهد الواحد — `fade.js`): نقرةٌ واحدة بين ثلاث
+          // صورٍ شاهدٌ على الجملة لا على كلماتها، واحتمالُها الثلث. وكانت تُحتسب
+          // ٣–٥ كلماتٍ دفعةً، فتُشترى عتبةُ الخفوت بالتخمين.
           sayAndGo(sentence);
         },
       }, faceEl(word.emoji, 'pic-emoji'));
@@ -241,7 +243,9 @@ export function renderLadder(rungId) {
           line.replaceChildren(...sentence.words.map((w, i) => (i === sentence.blank
             ? h('span', { class: 'sentence-word sentence-word--filled' }, w)
             : textWord(w, { className: 'sentence-word' }))));
-          credit(sentence.words);
+          // **الكلمةُ التي ملأت الفراغ وحدَها** (قاعدة الشاهد الواحد): هي المقروءة
+          // بين خياراتٍ ملبَّسةٍ بلباس الموضع، وسائرُ الجملة سياقٌ لا شاهد عليه.
+          credit(sentence.words[sentence.blank]);
           sayAndGo(sentence);
         },
       },

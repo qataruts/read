@@ -5,7 +5,7 @@
 // (pill · vchip · note · chip) وتُلوَّن بمتغيّر --accent، فلا تحتاج تنسيقاً جديداً.
 
 import * as progress from './progress.js';
-import { rootById } from './curriculum.js';
+import { SKILLS, rootById, skillByMarkKey } from './curriculum.js';
 import * as recordings from './recordings.js';
 import * as recorder from './recorder.js';
 import { FADE_AT, BARE_AT, levelOf, fadeText } from './fade.js';
@@ -157,6 +157,33 @@ function letterChip(stat, color) {
   },
     h('span', { class: 'vchip-face' }, stat.letter),
     h('small', {}, `${arNum(stat.right)} ✓ · ${arNum(stat.wrong)} ✗`));
+}
+
+/**
+ * حصيلةُ كل علامةٍ من سجلّها (حزمة «قياس العلامات») — نظيرُ `letterStats` للحروف،
+ * وموضعُه هنا لا في `progress.js` لأنه عرضٌ لا قياس: يجمع مفتاحَي الدرس (القراءة
+ * والسماع) في بطاقةٍ واحدة باسم الدرس، ويأخذ **أدنى الصندوقين** — فمن أتقن السماع
+ * وحده لم يتقن العلامة. دالّة خالصة: السجلّ يُحقَن فتُختبَر بلا متصفّح.
+ */
+export function markStats(skills) {
+  const byMark = new Map();
+  for (const s of skills) {
+    if (!progress.isMarkSkill(s)) continue;
+    const skill = skillByMarkKey(s.letter);
+    if (!skill) continue;                      // درسٌ سقط من المنهج: لا بطاقةَ وهمية
+    const acc = byMark.get(skill.id)
+      || {
+        id: skill.id, title: skill.title, face: skill.face,
+        right: 0, wrong: 0, box: progress.MAX_BOX, kinds: 0,
+      };
+    acc.right += s.right;
+    acc.wrong += s.wrong;
+    acc.box = Math.min(acc.box, s.box);        // أدنى الصندوقين: القراءةُ والسماع معاً
+    acc.kinds++;
+    byMark.set(skill.id, acc);
+  }
+  const order = SKILLS.map((s) => s.id);
+  return [...byMark.values()].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 }
 
 // ————— «نحو القراءة الحرة» (حزمة الخفوت — ROADMAP §المرحلة ز) —————
@@ -546,6 +573,9 @@ function dashboard(rerender = () => {}) {
     .filter((s) => s.kind === progress.KINDS.ROOT)
     .map((s) => ({ ...s, title: rootById(String(s.letter).replace(/^root-/, ''))?.title || s.letter }))
     .filter((s) => s.title);
+  // **العلامات صفٌّ إلى جوار الحروف**: مفتاحان لكل درس (قراءةً وسماعاً) يُجمعان في
+  // بطاقةٍ واحدة — فوليّ الأمر يقرأ «الشدّة» لا «mark-shadda|none|mark-quiz» مرتين.
+  const marks = markStats(progress.skills());
   const mastered = stats.filter((s) => s.mastered);
   const weak = stats.filter((s) => s.struggling);
   const learning = stats.filter((s) => !s.mastered && !s.struggling);
@@ -600,6 +630,23 @@ function dashboard(rerender = () => {}) {
         ? h('div', { class: 'audit-row' }, learning.map((s) => letterChip(s, ACCENT)))
         : emptyNote('لا شيء في المنتصف.')),
 
+    // **العلاماتُ صفٌّ إلى جوار الحروف** (حزمة «قياس العلامات»): كانت هذه أصعبَ ما
+    // في فكّ الشيفرة وأخفاه عن وليّ الأمر — يدرسها الطفل ولا يُقاس منها حرفٌ واحد،
+    // فتمرّ البوابةُ واللوحةُ عمياوين عنها. وهي علامةٌ لا حرف، فقسمُها مستقلّ.
+    ...section(`العلامات (${arNum(marks.length)})`,
+      marks.length
+        ? [h('div', { class: 'audit-row' }, marks.map((s) => h('span', {
+          class: 'vchip',
+          css: { '--accent': s.box >= progress.MASTERED_BOX ? GOOD : s.wrong >= 2 ? BAD : ACCENT },
+          title: `${s.title} — ${arNum(s.right)} صواب، ${arNum(s.wrong)} خطأ`,
+        },
+          h('span', { class: 'vchip-face' }, s.face),
+          h('small', {}, `${s.title} · ${arNum(s.right)} ✓ · ${arNum(s.wrong)} ✗`)))),
+          h('p', { class: 'hint' },
+            'المدّ والسكون والشدّة والتنوين واللام: تُقاس مرّتين — أن يقرأ العلامة بعينه '
+            + 'وأن يميّزها بأذنه، واللون لأدنى الاثنين.')]
+        : emptyNote('لم يبلغ درس علامةٍ بعدُ — أوّلها مدّ الألِف بعد المجموعة الأولى.')),
+
     // **الجذور قسمٌ خاصٌّ بها**: العائلةُ ليست حرفاً، فلا تدخل لوحةَ الحروف (وإلا ظهر
     // «حرفٌ» اسمُه `root-katb`)، ولكنها مقيسةٌ في ليتنر كسائر المهارات فتُقرأ هنا.
     ...section(`عائلات الجذور (${arNum(roots.length)})`,
@@ -640,7 +687,7 @@ function dashboard(rerender = () => {}) {
 
     ...section('تحكّم في الرحلة', journeySection(rerender)),
 
-    h('p', { class: 'note' }, 'المهارة = حرف × حركة × نوع تمرين. الخطأ يعيدها إلى مراجعة الغد، والإصابة تُباعد موعدها (١ ← ٢ ← ٤ ← ٨ ← ١٦ يوماً).'),
+    h('p', { class: 'note' }, 'المهارة = حرف × حركة × نوع تمرين — وللعلامات والعائلات الصرفية مهاراتُها كذلك بلا حرف. الخطأ يعيدها إلى مراجعة الغد، والإصابة تُباعد موعدها (١ ← ٢ ← ٤ ← ٨ ← ١٦ يوماً).'),
   );
 
   return h('div', { class: 'screen', css: { '--accent': ACCENT } },

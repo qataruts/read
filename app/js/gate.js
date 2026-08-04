@@ -33,6 +33,7 @@ export function gateItems(rnd = Math.random) {
   return buildSession({
     letters, words, sentences,
     pairs: studiedPairs(letters),
+    marks: progress.studiedMarks(),
     due: progress.weakestSkills(),
     size: GATE_SIZE,
     rnd,

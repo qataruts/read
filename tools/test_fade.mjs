@@ -146,7 +146,7 @@ ok(!writers.length,
 
 const USERS = ['story.js', 'ladder.js', 'garden.js'];
 for (const file of USERS) {
-  ok(/from '\.\/fade\.js'/.test(src(file)), `${file} يعرض بدرجات الخفوت ويحتسب القراءة`);
+  ok(/from '\.\/fade\.js'/.test(src(file)), `${file} يعرض بدرجات الخفوت`);
 }
 ok(/from '\.\/fade\.js'/.test(src('parent.js')), 'ولوحةُ وليّ الأمر تقرأ الدرجات لتعرضها');
 
@@ -156,6 +156,54 @@ for (const [what, where] of [['tile-face', 'بلاطات «رتّب»'], ['vchip
   const line = ladder.split('\n').find((l) => l.includes(what)) || '';
   ok(!/textWord|fadeWord|faded\(/.test(line), `${where} بدرجةٍ واحدة لا تخفت`);
 }
+
+// ————— ٤) «قاعدة الشاهد الواحد» (حزمة «قياس العلامات») —————
+//
+// الإشارةُ التي تُشترى بالتخمين لا تُبنى عليها درجةُ عرضٍ تلاحق الطفل. فلا يُحتسب
+// إلا موضعٌ شهد **لكلمةٍ بعينها** — والقاعدةُ بنيوية: `credit` تقبل كلمةً واحدة.
+
+console.log('\n— قاعدة الشاهد الواحد: لا احتساب إلا بشاهدٍ لكلمة —');
+p.reset();
+ok(fade.credit('غُرْفَةْ') === true && p.readCount(p.wordKey('غُرْفَةْ')) === 1,
+  'الكلمةُ الواحدة تُحتسب');
+ok(fade.credit(['غُرْفَةْ', 'سَرِيرْ', 'بَابْ']) === false,
+  '**وقائمةُ كلماتٍ تُردّ صامتةً** — فاحتسابُ جملةٍ كاملة مستحيلٌ لا ممنوع');
+ok(p.readCount(p.wordKey('سَرِيرْ')) === 0 && p.readCount(p.wordKey('بَابْ')) === 0,
+  'ولم تُسجَّل منها كلمةٌ واحدة');
+ok(fade.credit() === false && fade.credit(null) === false && fade.credit(0) === false,
+  'والفارغُ وغيرُ النصّ يُردّان بلا انهيار');
+ok(fade.credit.length === 1,
+  'وتوقيعُ الدالّة كلمةٌ واحدة لا `...texts` — الحصانةُ في الشكل لا في التعليق');
+
+// المواضعُ على المصدر: مَن يحتسب، وبماذا يحتسب
+const ladderSrc = src('ladder.js');
+const storySrc = src('story.js');
+const gardenSrc = src('garden.js');
+const calls = (text) => (text.match(/\bcredit\s*\(([^)]*)\)/g) || [])
+  .filter((c) => !c.startsWith('credit()'));
+
+ok(calls(storySrc).length === 0,
+  'سؤالُ الفهم لا يحتسب: نقرةٌ بين ثلاث صورٍ شاهدٌ على الجملة لا على كلماتها');
+ok(!/from '\.\/fade\.js'[\s\S]{0,80}credit/.test(storySrc) && !/\bcredit\b/.test(storySrc.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n')),
+  'ولا يستورد `credit` أصلاً — عرضٌ بالخفوت بلا احتساب');
+
+const ladderCalls = calls(ladderSrc);
+ok(ladderCalls.length === 2,
+  `و«سلّم الجمل» يحتسب من موضعين لا أربعة (${ladderCalls.join(' · ')})`);
+ok(ladderCalls.some((c) => c.includes('expected')),
+  'الأول: «رتّب» بالكلمة المطلوبة في موضعها');
+ok(ladderCalls.some((c) => c.includes('sentence.blank')),
+  'والثاني: «أكمل» بالكلمة التي ملأت الفراغ وحدَها');
+ok(!ladderCalls.some((c) => /credit\(sentence\.words\)/.test(c)),
+  '**ولا موضعَ يحتسب الجملةَ كلها** (كان يفعل: ٣–٥ كلماتٍ من نقرةٍ احتمالُها الثلث)');
+ok(calls(gardenSrc).length === 1 && calls(gardenSrc)[0].includes('word.read'),
+  'و«اقرأ واختر» يحتسب الكلمة المختارة من ثلاثٍ مكتوبة');
+
+// «اقرأ ونفّذ» — الميكانيكية الثلاثية الصور: لا احتساب في جسمها
+const readView = ladderSrc.slice(ladderSrc.indexOf('function readView'),
+  ladderSrc.indexOf('function orderView'));
+ok(!/\bcredit\s*\(/.test(readView.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n')),
+  'و«اقرأ ونفّذ» بلا احتسابٍ البتّة');
 
 console.log('\n— صفر إضافة صوتية —');
 const fadeSrc = src('fade.js');

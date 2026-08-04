@@ -13,7 +13,8 @@
 // «الحروف المتقنة» في لوحة وليّ الأمر على وليّ الأمر.
 
 import {
-  HARAKAT, ROOTS, contrastPairs, markOf, memberSay, rootById, syllableSkill, wordSkill,
+  HARAKAT, ROOTS, contrastPairs, markLabel, markOf, markSkillKey, memberSay, rootById,
+  skillByMarkKey, syllableSkill, wordSkill,
 } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
@@ -104,9 +105,54 @@ function rootItem(rootId, words, rnd) {
   };
 }
 
+/**
+ * تمرينا العلامة — جولةٌ واحدة من درس المهارة (حزمة «قياس العلامات»):
+ *   `mark-compare` — **صامت**: «أيُّهما مَمدود؟» والخياران طرفا الزوج مكتوبين.
+ *   `mark-quiz`    — **سماعيّ**: «أيَّ واحدة سمعت؟» والخيارات من مادّة الدرس.
+ *
+ * **ولا مهارةَ تُقاس بلا تمرينٍ يراجعها**: الدرس يكتب مهاراته بنوعَي العلامة، فلولا
+ * هذان لبقيا في صندوق ليتنر الأول أبداً — وهي عينُ العلّة التي أبقت العلامات خارج
+ * القياس أربع عشرة حزمة. ومادّتُه **أزواجُ درسه وحدَه**، فلا يُسأل عن مدّ الواو من لم
+ * يدرسه (المفكوكية بالبناء)، ولا نصَّ منطوقاً جديداً: الأزواج لها ملفاتها منذ الجلسة ١.
+ */
+function markItem(key, kind, marks, rnd) {
+  const skill = skillByMarkKey(key);
+  if (!skill || !marks.some((m) => m.id === skill.id)) return null;   // درسٌ لم يبلغه بعد
+  const pairs = (skill.compare?.pairs || []).filter((p) => p.length === 2);
+  const labels = skill.compare?.labels || [];
+  if (!pairs.length || labels.length < 2) return null;
+
+  const pair = pick(pairs, rnd);
+  const base = { mark: skill, letter: markSkillKey(skill.id), haraka: null };
+
+  if (kind === progress.KINDS.MARK_COMPARE) {
+    const side = rnd() < 0.5 ? 0 : 1;   // يُسأل عن الطرفين كليهما — لا عن المعلَّم وحده
+    return {
+      ...base,
+      id: `mark-compare|${skill.id}|${pair[side]}`,
+      kind: progress.KINDS.MARK_COMPARE,
+      label: markLabel(labels[side]),
+      target: pair[side],
+      options: shuffle(pair, rnd),
+    };
+  }
+
+  const others = shuffle(pairs.filter((p) => p !== pair), rnd).flat();
+  const options = [...pair, ...others].filter((t, i, all) => all.indexOf(t) === i);
+  if (options.length < 2) return null;
+  return {
+    ...base,
+    id: `mark-quiz|${skill.id}`,
+    kind: progress.KINDS.MARK_QUIZ,
+    target: pick(pair, rnd),
+    options: shuffle(options.slice(0, OPTIONS), rnd),
+  };
+}
+
 function buildItem(word, words, rnd) {
-  if (!word) return null;
-  const pool = [...new Set(words.flatMap((w) => w.tiles))];
+  // تفشل مغلقةً: كلمةٌ بلا مقاطع لا لوحَ لها (وحوضُ التنويع يمرّ على كل كلمةٍ في حصيلته)
+  if (!word?.tiles?.length) return null;
+  const pool = [...new Set(words.flatMap((w) => w.tiles || []))];
   return {
     id: `build|${word.say}`,
     kind: progress.KINDS.BUILD,
@@ -121,7 +167,7 @@ function buildItem(word, words, rnd) {
  * (فكلّها منطوقةٌ محسوبة، ولا نصّ جديد يدخل المراجعة).
  */
 function orderItem(sentence, sentences, rnd) {
-  if (!sentence) return null;
+  if (!sentence?.words?.length) return null;
   const pool = [...new Set(sentences.flatMap((s) => s.words))];
   return {
     id: `order|${sentence.id}`,
@@ -133,7 +179,7 @@ function orderItem(sentence, sentences, rnd) {
 
 /** كلمة تحوي مقطعاً بهذه المهارة (حرف × حركة) — لإعادة ما تعثّر فيه في سياقه. */
 function wordForSkill(letter, haraka, words, rnd) {
-  const hits = words.filter((w) => w.tiles.some((t) => {
+  const hits = words.filter((w) => (w.tiles || []).some((t) => {
     const s = syllableSkill(t);
     return s && s.letter === letter && s.haraka === haraka;
   }));
@@ -149,13 +195,14 @@ function sentenceForSkill(letter, haraka, sentences, rnd) {
   return hits.length ? pick(hits, rnd) : null;
 }
 
-function itemForSkill(skill, letters, words, sentences, pairs, rnd) {
+function itemForSkill(skill, letters, words, sentences, pairs, marks, rnd) {
   if (skill.kind === progress.KINDS.QUIZ) return quizItem(skill.letter, skill.haraka, letters, rnd);
   if (skill.kind === progress.KINDS.HARAKA) return harakaItem(skill.letter, skill.haraka, rnd);
   if (skill.kind === progress.KINDS.CONTRAST) {
     return contrastItem(skill.letter, skill.haraka, pairs, rnd);
   }
   if (skill.kind === progress.KINDS.ROOT) return rootItem(skill.letter, words, rnd);
+  if (progress.isMarkSkill(skill)) return markItem(skill.letter, skill.kind, marks, rnd);
   if (skill.kind === progress.KINDS.BUILD) {
     return buildItem(wordForSkill(skill.letter, skill.haraka, words, rnd), words, rnd);
   }
@@ -171,7 +218,7 @@ function itemForSkill(skill, letters, words, sentences, pairs, rnd) {
  * دالّة خالصة: كل ما تحتاجه يُحقَن، فتُختبر في node بلا متصفّح.
  */
 export function buildSession({
-  letters = [], words = [], sentences = [], pairs = [], due = [],
+  letters = [], words = [], sentences = [], pairs = [], marks = [], due = [],
   size = SESSION_SIZE, rnd = Math.random,
 } = {}) {
   const known = [...new Set(letters)];
@@ -198,26 +245,33 @@ export function buildSession({
     // تمييز الحرف والحركة يحتاج الحرف في جدول حصيلته؛ أمّا التركيب والترتيب فمادّتهما
     // كلمةٌ أو جملةٌ من حصيلته — فشرطُهما وجودها (الهمزة والتاء المربوطة تُدرَّسان في
     // المرحلة القرآنية ولا تظهران في المجموعات، وترد في كلمات البساتين)، وإلا فلا تمرين.
-    // العائلةُ الصرفية مادّتُها كلماتٌ لا حرفٌ بعينه (مفتاحُها `root-<العائلة>`)،
-    // فتُستثنى من شرط الحرف كما استُثنى التركيبُ والترتيب.
-    if (skill.kind !== progress.KINDS.ROOT
+    // العائلةُ الصرفية والعلامةُ مادّتُهما ليست حرفاً بعينه (مفتاحاهما `root-<العائلة>`
+    // و`mark-<الدرس>`)، فتُستثنيان من شرط الحرف كما استُثني التركيبُ والترتيب.
+    if (progress.isLetterSkill(skill)
       && !(skill.kind in longs) && !known.includes(skill.letter)) continue;
-    add(itemForSkill(skill, known, words, sentences, pairs, rnd));
+    add(itemForSkill(skill, known, words, sentences, pairs, marks, rnd));
   }
 
   // تنويع الباقي: تمييز الحرف والحركة على حروف مدروسة، ومواجهة زوجٍ متشابه،
-  // وتركيب كلمة، وترتيب جملة
+  // وقراءةُ علامةٍ وسماعُها، وجمعُ عائلة، وتركيب كلمة، وترتيب جملة
   const fillers = [
     ...shuffle(known, rnd).map((c) => () => quizItem(c, HARAKAT[0].key, known, rnd)),
     ...shuffle(known, rnd).map((c) => () => harakaItem(c, pick(HARAKAT, rnd).key, rnd)),
     ...shuffle(pairs, rnd).map((p) => () =>
       contrastItem(pick(p.letters, rnd), pick(HARAKAT, rnd).key, pairs, rnd)),
+    ...shuffle(marks, rnd).flatMap((m) =>
+      [progress.KINDS.MARK_COMPARE, progress.KINDS.MARK_QUIZ].map((kind) => () =>
+        markItem(markSkillKey(m.id), kind, marks, rnd))),
     ...shuffle(ROOTS, rnd).map((r) => () => rootItem(r.id, words, rnd)),
     ...shuffle(words, rnd).map((w) => () => buildItem(w, words, rnd)),
     ...shuffle(sentences, rnd).map((s) => () => orderItem(s, sentences, rnd)),
   ];
-  for (let i = 0; items.length < size && i < fillers.length * 2; i++) {
-    add(fillers[i % fillers.length]());
+  // **يُخلَط الحوضُ كلُّه لا كلُّ صنفٍ على حدة**: قائمةٌ مرتَّبةً بالأصناف يبتلع صدرُها
+  // الجلسةَ كلَّها (حروفُ الطفل عشراتٌ وعلاماتُه ستّ)، فلا تُرى علامةٌ ولا عائلةٌ في
+  // التنويع أبداً — وهو عينُ ما جعل الرتابةَ مرفوعاً في المراجعة الخارجية.
+  const mixed = shuffle(fillers, rnd);
+  for (let i = 0; items.length < size && i < mixed.length * 2; i++) {
+    add(mixed[i % mixed.length]());
   }
 
   return items.slice(0, size);
@@ -228,8 +282,11 @@ export function itemTexts(item) {
   if (item.kind === progress.KINDS.QUIZ) return item.options.map((c) => c + item.mark);
   if (item.kind === progress.KINDS.CONTRAST) return item.options.map((c) => c + item.mark);
   if (item.kind === progress.KINDS.HARAKA) return item.options.map((k) => item.letter + k.mark);
+  if (progress.isMarkSkill(item)) return [...item.options];   // أزواجُ الدرس بملفاتها القائمة
   if (item.kind === progress.KINDS.BUILD) return [...item.board.map((t) => t.text), item.word.say];
-  if (item.kind === progress.KINDS.ROOT) return [...item.options.map(memberSay), item.root.sense];
+  // سطرُ معنى العائلة **معروضٌ لا منطوق** في المراجعة (تنطقه شاشةُ الشجرة وحدَها)،
+  // فلا يدخل هنا: نصٌّ يُحمَّل مسبقاً بلا أن يُنطق يطلب ملفاً لا يحتاجه أحد.
+  if (item.kind === progress.KINDS.ROOT) return item.options.map(memberSay);
   if (item.kind === progress.KINDS.ORDER) {
     return [...item.board.map((t) => t.text), item.sentence.text, item.sentence.target.say];
   }
@@ -289,7 +346,9 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
           : item.kind === progress.KINDS.HARAKA ? harakaView(item)
             : item.kind === progress.KINDS.CONTRAST ? contrastView(item)
               : item.kind === progress.KINDS.ROOT ? rootView(item)
-                : quizView(item));
+                : item.kind === progress.KINDS.MARK_COMPARE ? markCompareView(item)
+                  : item.kind === progress.KINDS.MARK_QUIZ ? markQuizView(item)
+                    : quizView(item));
     const ahead = items[state.index + 1];
     if (ahead) audio.preload(itemTexts(ahead));
   }
@@ -385,6 +444,74 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       h('p', { class: 'hint' }, item.root.sense),
       h('div', { class: 'root-trunk root-trunk--small' },
         ...[...item.root.root].map((c) => h('span', { class: 'root-letter' }, c))),
+      row,
+    );
+  }
+
+  // ————— ١ج) العلامة: قراءةً صامتة ثم سماعاً (حزمة «قياس العلامات») —————
+
+  /**
+   * «أيُّهما مَمدود؟» — **لا صوتَ قبل الاختيار**: المقيسُ هنا أن يرى الطفلُ العلامةَ
+   * في الرسم ويعرف أثرها، لا أن يميّزها بأذنه (لذلك تمرينان لا واحد). والخطأُ يُسمِع
+   * ما نقره هو، والصوابُ يُنطق بعد قراءته — قراءةٌ ثم تصديقٌ بالأذن.
+   */
+  function markCompareView(item) {
+    let locked = false;
+    const row = h('div', { class: 'row vrow' }, item.options.map((text) => {
+      const btn = h('button', {
+        class: 'vchip vchip--pair',
+        'aria-label': text,
+        onclick: () => {
+          if (locked) return;
+          const correct = text === item.target;
+          score(item, item.letter, item.haraka, correct);
+          if (!correct) return void wrong(btn, () => audio.play(text));
+          locked = true;
+          right(btn);
+          audio.play(text);
+        },
+      }, h('span', { class: 'vchip-face' }, text));
+      return btn;
+    }));
+
+    return h('div', {},
+      h('h2', {}, `أيُّهما ${item.label}؟`),
+      h('p', { class: 'hint' }, `${item.mark.title} — الفرق في العلامة وحدها`),
+      row,
+    );
+  }
+
+  /** «أيَّ واحدة سمعت؟» على مادّة الدرس نفسِها — تمييزُ العلامة بالأذن. */
+  function markQuizView(item) {
+    let locked = false;
+    const play = () => audio.play(item.target);
+    const row = h('div', { class: 'row vrow' }, item.options.map((text) => {
+      const btn = h('button', {
+        class: 'vchip vchip--pair',
+        'aria-label': text,
+        onclick: () => {
+          if (locked) return;
+          const correct = text === item.target;
+          score(item, item.letter, item.haraka, correct);
+          if (!correct) {
+            // يسمع ما اختاره ليقارنه، ثم يُعاد الهدف بمهلةٍ تفصل الصوتين (كما في الدرس)
+            wrong(btn);
+            audio.play(text);
+            return void setTimeout(play, 900);
+          }
+          locked = true;
+          right(btn);
+        },
+      }, h('span', { class: 'vchip-face' }, text));
+      return btn;
+    }));
+
+    setTimeout(play, 250);
+    return h('div', {},
+      h('h2', {}, 'أيَّ واحدة سمعت؟'),
+      h('p', { class: 'hint' }, item.mark.title),
+      h('div', { class: 'row foot' },
+        h('button', { class: 'btn btn--primary', onclick: play }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
   }
@@ -639,7 +766,8 @@ export function renderReview() {
     const words = progress.studiedWords(letters);
     const sentences = progress.studiedSentences().filter((s) => s.mechanic === 'order');
     return buildSession({
-      letters, words, sentences, pairs: studiedPairs(letters), due: progress.dueSkills(),
+      letters, words, sentences, pairs: studiedPairs(letters), marks: progress.studiedMarks(),
+      due: progress.dueSkills(),
     });
   };
 

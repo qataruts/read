@@ -2,19 +2,32 @@
 // المدّ الطبيعي، السكون، الشدّة، التنوين، اللام الشمسية والقمرية.
 //
 // بنيته نفس حلقة الدرس (§٤) بثلاث خطوات بدل أربع — لا خطوة تتبّع، فالمرسوم هنا
-// علامة لا حرف: ١) القاعدة والأمثلة ٢) قارن بأذنك ٣) ميّز بأذنك ← نجوم واحتفال.
+// علامة لا حرف: ١) القاعدة والأمثلة ٢) قارِن — سماعٌ حرّ ثم قراءةٌ صامتة تُقاس
+// ٣) ميّز بأذنك ← نجوم واحتفال.
 //
 // المفكوكية ١٠٠٪: كل ما يُقرأ هنا (الأزواج والكلمات) من مادة الدرس نفسها، وموضعه
 // في الخريطة مختار كي تكون حروفه وعلاماته مدروسة كلها — يفحص ذلك tools/check_decodable.py.
 //
-// لا قياس هنا: وحدة القياس في §٦ هي (حرف × حركة × تمرين)، والمقيس في هذا الدرس علامة
-// لا حرف بعينه، فلا يُسجَّل في سجلّ المهارات كي لا تكذب لوحة وليّ الأمر ولا تُبنى منه
-// مراجعةٌ لا تمرين لها.
+// **القياس** (حزمة «قياس العلامات» — الأحمر ٢ من المراجعة الخارجية): كانت هذه الدروس
+// **لا تسجّل مهارةً واحدة**، بحجّة أن وحدة §٦ حرفٌ × حركة والمقيس هنا علامة. وثمنُ
+// ذلك أن بوابتَي الإتقان ولوحةَ وليّ الأمر عمياوان عن **أصعب أجزاء فكّ الشيفرة**:
+// الشدّةُ والتنوينُ والمدُّ واللام الشمسية. والعلاجُ سابقةُ الجذور نفسُها: مفتاحٌ
+// لا حرفَ فيه (`mark-<الدرس>` — `curriculum.js`) بعقد ليتنر نفسِه، وقسمٌ مستقلّ في
+// اللوحة، وتمرينٌ يراجعه في المراجعة والبوابتين (`markItem` في `review.js`).
+//
+// و**تمرينان لا واحد**، لأنّ العلامة تُسمَع وتُرى:
+//   • `mark-compare` — **قراءةٌ صامتة**: «أيُّهما مَمدود؟» والخياران طرفا الزوج
+//     مكتوبين بلا صوت، فالمقيس أن يرى العلامة ويعرف أثرها. وهو عينُ الفجوة التي
+//     رصدتها المراجعة: فكُّ الشيفرة لا تمييزُ الصوت.
+//   • `mark-quiz` — **تمييزٌ بالأذن**: «أيَّ واحدة سمعت؟» (خطوة الدرس القائمة).
+//
+// و**صفرُ إضافةٍ صوتية**: أزواجُ المقارنة لها ملفاتها منذ الجلسة ١، ونصّا السؤالين
+// نصُّ واجهةٍ معروض لا منطوق — والخطأ يُسمِع ما نقره الطفل من ملفه.
 
-import { skillById, skillExamples } from './curriculum.js';
+import { markLabel, markSkillKey, skillById, skillExamples } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
-import { starsForErrors } from './lesson.js';
+import { starsForReview } from './review.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar,
   PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
@@ -46,6 +59,27 @@ export function buildSkillRounds(skill, rnd = Math.random) {
   return rounds;
 }
 
+/**
+ * جولات «انظر واختر» — القراءة الصامتة للعلامة (حزمة «قياس العلامات»).
+ *
+ * السؤالُ من `compare.labels` التي يُعلنها الدرس أصلاً («قصير»/«ممدود»…)، والخياران
+ * **طرفا الزوج نفسه مكتوبين**: لا فرق بينهما إلا العلامة، فلا يُجاب إلا بقراءتها.
+ * ويُسأل عن الطرفين كليهما بالتناوب — فمعرفةُ الخالي من العلامة معرفةٌ بها.
+ * تفشل مغلقةً: درسٌ بلا أزواج ⇒ لا جولات (ولا قياسَ يُدَّعى).
+ */
+export function buildMarkRounds(skill, rnd = Math.random) {
+  const pairs = (skill?.compare?.pairs || []).filter((p) => p.length === 2);
+  const labels = skill?.compare?.labels || [];
+  if (!pairs.length || labels.length < 2) return [];
+
+  const order = shuffle(pairs, rnd);
+  const first = rnd() < 0.5 ? 0 : 1;      // أيُّ الطرفين يُسأل عنه أوّلاً
+  return order.slice(0, ROUNDS).map((pair, i) => {
+    const side = (first + i) % 2;
+    return { label: markLabel(labels[side]), target: pair[side], options: shuffle(pair, rnd) };
+  });
+}
+
 // ————— الشاشة —————
 
 export function renderSkillLesson(skillId) {
@@ -53,18 +87,23 @@ export function renderSkillLesson(skillId) {
   if (!skill) return null;
 
   const nodeId = `skill:${skill.id}`;
+  const markKey = markSkillKey(skill.id);
   const examples = skillExamples(skill);
   let rounds = buildSkillRounds(skill);
+  let marks = buildMarkRounds(skill);
 
   audio.preload([skill.rule, ...skill.compare.pairs.flat(), ...examples.map((w) => w.say)]);
 
-  const state = { step: 0, errors: 0, round: 0, done: false };
+  const state = { step: 0, errors: 0, round: 0, mark: 0, done: false };
 
   const steps = [
     { title: 'القاعدة', build: stepRule },
     { title: 'قارِن', build: stepCompare },
     ...(rounds.length ? [{ title: 'ميّز بأذنك', build: stepQuiz }] : []),
   ];
+
+  /** كل ما يُحكَم فيه في هذا الدرس — به تُقاس النجوم قياساً متناسباً مع طوله. */
+  const judged = () => marks.length + rounds.length;
 
   const stepsBar = h('ol', { class: 'steps' });
   const body = h('div', { class: 'lesson-body' });
@@ -128,27 +167,101 @@ export function renderSkillLesson(skillId) {
     ]);
   }
 
-  // ————— ٢) قارِن بأذنك: طرفا كل زوج جنباً إلى جنب —————
+  // ————— ٢) قارِن: سماعٌ حرّ ثم قراءةٌ صامتة تُقاس —————
+  //
+  // شطران في خطوةٍ واحدة: يسمع الفرق أوّلاً بلا حكم (فالسماع مدخلُ العلامة)، ثم
+  // يُسأل عنها **مكتوبةً بلا صوت** — والشطر الثاني هو المقيس (`mark-compare`).
 
   function stepCompare() {
-    const [left, right] = skill.compare.labels;
-    const chip = (text) => h('button', {
-      class: 'vchip vchip--pair',
-      'aria-label': text,
-      onclick: () => audio.play(text),
-    }, h('span', { class: 'vchip-face' }, text));
+    const wrap = h('div', {});
+    const paintPart = (node) => wrap.replaceChildren(node);
 
-    return h('div', {},
-      h('h2', {}, 'قارِن بأذنك'),
-      h('p', { class: 'hint' }, 'اضغط الاثنين واسمع الفرق'),
-      h('div', { class: 'pairs' },
-        h('div', { class: 'pair pair--head' },
-          h('small', {}, left),
-          h('small', {}, right)),
-        ...skill.compare.pairs.map(([a, b]) => h('div', { class: 'pair' }, chip(a), chip(b))),
-      ),
-      nextButton(),
-    );
+    // (أ) السماع الحرّ: طرفا كل زوج جنباً إلى جنب، النقر يُسمع
+    function listenPart() {
+      const [left, right] = skill.compare.labels;
+      const chip = (text) => h('button', {
+        class: 'vchip vchip--pair',
+        'aria-label': text,
+        onclick: () => audio.play(text),
+      }, h('span', { class: 'vchip-face' }, text));
+
+      return h('div', {},
+        h('h2', {}, 'قارِن بأذنك'),
+        h('p', { class: 'hint' }, 'اضغط الاثنين واسمع الفرق'),
+        h('div', { class: 'pairs' },
+          h('div', { class: 'pair pair--head' },
+            h('small', {}, left),
+            h('small', {}, right)),
+          ...skill.compare.pairs.map(([a, b]) => h('div', { class: 'pair' }, chip(a), chip(b))),
+        ),
+        marks.length
+          ? h('button', {
+            class: 'btn btn--primary btn--wide next',
+            onclick: () => { audio.stop(); paintPart(readPart()); },
+          }, 'تابع ←')
+          : nextButton(),
+      );
+    }
+
+    // (ب) القراءة الصامتة المقيسة: «أيُّهما ممدود؟» — لا صوت قبل الاختيار، والخطأ
+    // يُسمِع ما نقره هو (لا تلقين للصواب — DESIGN §٥.٥).
+    function readPart() {
+      const prompt = h('h2', {});
+      const counter = h('p', { class: 'hint' });
+      const row = h('div', { class: 'row vrow' });
+      let locked = false;
+
+      function startRound() {
+        const r = marks[state.mark];
+        locked = false;
+        prompt.textContent = `أيُّهما ${r.label}؟`;
+        counter.textContent = `الجولة ${arNum(state.mark + 1)} من ${arNum(marks.length)}`;
+        row.replaceChildren(...r.options.map((text) => {
+          const btn = h('button', {
+            class: 'vchip vchip--pair',
+            'aria-label': text,
+            onclick: () => onPick(text, btn, r),
+          }, h('span', { class: 'vchip-face' }, text));
+          return btn;
+        }));
+      }
+
+      function onPick(text, btn, r) {
+        if (locked) return;
+        const correct = text === r.target;
+        progress.recordAttempt(markKey, null, progress.KINDS.MARK_COMPARE, correct);
+        if (!correct) {
+          state.errors++;
+          shake(btn);
+          btn.classList.add('bad');
+          setTimeout(() => btn.classList.remove('bad'), 700);
+          audio.play(text);                     // يسمع ما اختاره فيقارنه بما قرأ
+          return;
+        }
+        locked = true;
+        btn.classList.add('good');
+        pop(btn);
+        audio.play(text);                       // الآن يُنطق ما قرأه: قراءةٌ ثم سماع
+        setTimeout(() => {
+          if (!wrap.isConnected) return;        // غادر الشاشة قبل انقضاء المهلة
+          state.mark++;
+          if (state.mark < marks.length) startRound();
+          else next();
+        }, 750);
+      }
+
+      const screen = h('div', {},
+        prompt,
+        counter,
+        h('p', { class: 'hint' }, 'اقرأ الاثنين — الفرق في العلامة وحدها'),
+        row,
+      );
+      startRound();
+      return screen;
+    }
+
+    paintPart(listenPart());
+    return wrap;
   }
 
   // ————— ٣) ميّز بأذنك —————
@@ -179,6 +292,7 @@ export function renderSkillLesson(skillId) {
 
     function onPick(text, btn, r) {
       if (locked) return;
+      progress.recordAttempt(markKey, null, progress.KINDS.MARK_QUIZ, text === r.target);
       if (text === r.target) {
         // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — أثرٌ بصريّ، ثم نداء الجولة التالية بمهلة.
         locked = true;
@@ -212,9 +326,12 @@ export function renderSkillLesson(skillId) {
 
   // ————— الختام —————
 
+  // الختام — عتبةٌ **متناسبة مع طول النشاط** (حكمُ محطة «ميّز بين» نفسُه): صار الدرس
+  // يُحكَم في جولتَي القراءة والسماع معاً، فحرفيّةُ «خطأ واحد ⇒ نجمتان» تظلمه.
+
   function finish() {
     audio.stop();
-    const stars = starsForErrors(state.errors);
+    const stars = starsForReview(state.errors, judged());
     const before = progress.getStars(nodeId);
     progress.setStars(nodeId, stars);
 
@@ -236,8 +353,9 @@ export function renderSkillLesson(skillId) {
         h('button', {
           class: 'btn',
           onclick: () => {
-            Object.assign(state, { step: 0, errors: 0, round: 0, done: false });
+            Object.assign(state, { step: 0, errors: 0, round: 0, mark: 0, done: false });
             rounds = buildSkillRounds(skill);
+            marks = buildMarkRounds(skill);
             paint();
           },
         }, '↻ أعِد الدرس'),
@@ -264,7 +382,7 @@ export function renderSkillLesson(skillId) {
       DEV && h('div', { class: 'dev' },
         h('div', { class: 'dev-title' }, 'أدوات التجربة (?dev=1)'),
         h('div', { class: 'dev-row' },
-          h('span', {}, `الأزواج: ${skill.compare.pairs.length}`),
+          h('span', {}, `الأزواج: ${skill.compare.pairs.length} · المقيس: ${judged()}`),
           h('button', { class: 'btn', onclick: () => toast(`أخطاء: ${arNum(state.errors)}`) }, 'عدّ الأخطاء'),
           h('button', { class: 'btn', onclick: finish }, 'إنهاء الدرس الآن'),
         )),

@@ -204,8 +204,36 @@ try {
   assertDecodable(lettersUpTo('g1'), '.vchip-face', 'خطوة المقارنة');
   checkTargets('خطوة المقارنة');
 
+  // ————— ٢ب) شطرُ القراءة الصامتة المقيس (حزمة «قياس العلامات») —————
+  //
+  // خطوةُ «قارِن» شطران: السماعُ الحرّ أعلاه، ثم حكمٌ **صامت** على العلامة مكتوبةً —
+  // «أيُّهما ممدود؟» — وهو المقيس بنوع `mark-compare`.
+
   $('.next').click();
-  await waitFor(() => $('.vchip--pair') && !$('.pairs'), 'خطوة التمييز');
+  await waitFor(() => $('h2')?.textContent.startsWith('أيُّهما'), 'شطر القراءة الصامتة');
+  const readLabels = madd.compare.labels.map((l) => l.split(':')[0].trim());
+  ok(readLabels.some((l) => $('h2').textContent.includes(l)),
+    `شطرُ القراءة الصامتة: «${$('h2').textContent.trim()}» — وسمُه من بيانات الدرس`);
+  ok($$('.vchip--pair').length === 2
+    && madd.compare.pairs.some((p) => p.every((t) => texts('.vchip-face').includes(t))),
+    `وخياراه طرفا زوجٍ واحد (${texts('.vchip-face').join(' · ')})`);
+  const silent = heardLog.length;
+  await sleep(600);
+  ok(heardLog.length === silent, '**ولا صوتَ قبل الاختيار** — المقيسُ أن يرى العلامة');
+  assertDecodable(lettersUpTo('g1'), '.vchip-face', 'شطر القراءة');
+
+  // يُجاب صواباً في كل جولاته: الخطأ المقصود واحدٌ في «ميّز بأذنك» أدناه
+  for (let i = 0; i < 4 && $('h2')?.textContent.startsWith('أيُّهما'); i++) {
+    const side = readLabels.indexOf($('h2').textContent.replace('أيُّهما ', '').replace('؟', '').trim());
+    const faces = texts('.vchip-face');
+    const pair = madd.compare.pairs.find((p) => p.every((t) => faces.includes(t)));
+    $$('.vchip--pair')[faces.indexOf(pair[side])].click();
+    await sleep(950);
+  }
+  ok(Object.keys(stored().skills).some((k) => k === 'mark-madd-alif|none|mark-compare'),
+    'وقياسُ قراءتها دخل ليتنر بمفتاح «mark-madd-alif|none|mark-compare»');
+
+  await waitFor(() => $('h2')?.textContent.includes('سمعت'), 'خطوة التمييز');
   const pool = madd.compare.pairs.flat();
   // نقطة الصمت `mark` تُحدَّث قبل النقرة الصحيحة لا في رأس الجولة: النقرة الصحيحة
   // ونداءُ الجولة التالية صارا مفصولين بمهلة، فالتقاطها في الرأس قد يقع بعد النداء.
@@ -239,8 +267,16 @@ try {
   await waitFor(() => $('.celebrate'), 'ختام درس المهارة');
   ok($$('.big-stars .on').length === 2, `خطأ واحد ⇒ نجمتان (${$$('.big-stars .on').length})`);
   ok(stored().stars['skill:madd-alif'] === 2, 'ونجوم الدرس محفوظة بمعرّف عقدته');
-  ok(Object.keys(stored().skills).length === 0,
-    'درس المهارة لا يكتب في سجلّ (حرف × حركة) — وحدة القياس حرف لا علامة');
+  // **انقلبت هذه القاعدة** (حزمة «قياس العلامات»): كان يُشترط هنا ألّا يكتب درسُ
+  // المهارة شيئاً في السجلّ، بحجّة أن وحدة §٦ حرفٌ × حركة — وهو عينُ ما أبقى أصعبَ
+  // أجزاء فكّ الشيفرة خارج البوابة واللوحة أربع عشرة حزمة. فصار يكتب **مفتاحين
+  // لا حرفَ فيهما**: قراءةً وسماعاً.
+  const lessonSkills = Object.keys(stored().skills);
+  ok(lessonSkills.length === 2 && lessonSkills.every((k) => k.startsWith('mark-madd-alif|none|')),
+    `درسُ العلامة يكتب مفتاحيه ولا ثالث (${lessonSkills.join(' · ')})`);
+  ok(lessonSkills.some((k) => k.endsWith('|mark-compare'))
+    && lessonSkills.some((k) => k.endsWith('|mark-quiz')),
+    'قراءةً وسماعاً — ولا مفتاحَ (حرف × حركة) بينهما: العلامةُ ليست حرفاً');
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
