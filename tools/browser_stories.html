@@ -153,9 +153,11 @@ try {
   ok($$('.station--shelf .shelf-book').length === SHELF_STORIES.length
     && $$('.station--shelf .shelf-book .cover').length === SHELF_STORIES.length,
     `وعقدُ الرفّ أغلفةٌ على رفّ لا نقاطٌ على درب (${arNum(SHELF_STORIES.length)} غلافاً)`);
+  // **بطلٌ واحدٌ لا مشهدٌ مزدحم** (تبسيطُ المالك): رمزٌ واحدٌ لكل غلاف، وعنوانٌ نصّ
   ok($$('.station--shelf .cover-title').every((el) => el.textContent.trim().length > 2)
-    && $$('.station--shelf .cover-scene .emoji').length >= SHELF_STORIES.length * 2,
-    'وعنوانُ كلِّ غلافٍ نصٌّ في الشاشة، ومشهدُه رمزان فأكثر (بطلٌ ومسانِد)');
+    && $$('.station--shelf .cover-scene .emoji').length === SHELF_STORIES.length
+    && $$('.station--shelf .cover-hero').length === SHELF_STORIES.length,
+    'وعنوانُ كلِّ غلافٍ نصٌّ في الشاشة، ومشهدُه بطلٌ واحدٌ كبير لا صفُّ رموز');
   ok(!!$('.station--library .station-mark svg'), 'ولها معلمها البصري على الدرب (DESIGN §٦)');
 
   const first = GARDEN_STORIES[0];

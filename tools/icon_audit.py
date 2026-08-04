@@ -290,11 +290,10 @@ def collect() -> tuple:
         # (العنوانُ وحدَه نصٌّ يُقرأ). ويرفض الفاحصُ عنصراً ليس من رموز القصة نفسِها،
         # فالغلافُ لا يَعِد بغير حكايته — وهو الشقّ الذي لا تُؤتمَن فيه العينُ وحدَها.
         cover = story.get("cover") or {}
-        for kind, glyph in ([("بطل", cover.get("hero"))] if cover else []) \
-                + [("مسانِد", g) for g in (cover.get("props") or [])]:
+        if cover:
             entries.append(Entry(
-                f"{story['title']} — غلاف/{kind}", glyph, f"stories/{story['id']}.json",
-                "الغلاف", "ج", ["ui.js coverEl (مشهدُ الغلاف، aria-hidden)"],
+                f"{story['title']} — غلاف", cover["hero"], f"stories/{story['id']}.json",
+                "الغلاف", "ج", ["ui.js coverEl (بطلُ الغلاف، aria-hidden)"],
             ))
         # **حوضٌ لكل مقطعٍ لا حوضٌ للقصة** (حزمة المكتبة، ١٢ أغسطس ٢٠٢٦): صار للقصة
         # الطويلة سؤالٌ لكل مقطع، وكلُّ سؤالٍ حوضُ صورٍ قائمٌ بنفسه — فيُجرد وحدَه.

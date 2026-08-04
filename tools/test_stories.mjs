@@ -94,14 +94,16 @@ ok(SHELF.length > 0 && SHELF_COVERS.every(Boolean),
   `لكل قصةِ رفٍّ غلافٌ معلَن (${SHELF.length} غلافاً)`);
 ok(ALL_STORIES.filter((s) => !s.shelf).every((s) => !s.cover),
   'ولا غلافَ لقصص البساتين والسور اليوم (تُلحَق بعد رضا المالك بالنمط)');
-ok(SHELF_COVERS.every((c) => c.props.length >= 1 && c.props.length <= 2),
-  'ومشهدُه مركَّبٌ: بطلٌ ومسانِدٌ أو مسانِدان — لا رمزٌ مفردٌ مكبَّر');
+// **بطلٌ ومزاجٌ لا غير** (تبسيطُ المالك بعد معاينة اللقطة): المسانِدُ حُذفا لأنّهما
+// رموزٌ مستقلّة تُصفّ لا عناصرُ لوحةٍ تُركَّب — فيُحرَس ألّا يعودا خلسةً.
+ok(SHELF_COVERS.every((c) => Object.keys(c).sort().join() === 'hero,mood'),
+  'وحقولُه بطلٌ ومزاجٌ لا غير — رمزٌ واحدٌ واضحٌ خيرٌ من ثلاثةٍ تتزاحم');
 const untrue = SHELF.filter((s) => {
   const own = new Set([s.emoji, ...s.pages.map((p) => p.emoji)]);
-  return [s.cover.hero, ...s.cover.props].some((g) => !own.has(g));
+  return !own.has(s.cover.hero);
 });
 ok(untrue.length === 0,
-  'وكلُّ عنصرٍ فيه من رموز قصته — الغلافُ يَعِد بحكايته لا بغيرها («صدق الصورة»)'
+  'وبطلُه من رموز قصته — الغلافُ يَعِد بحكايته لا بغيرها («صدق الصورة»)'
   + (untrue.length ? ` — ${untrue.map((s) => s.id).join('، ')}` : ''));
 // والمُصيِّرُ يُثبِت الشقّ الأخير: العنوانُ عقدةُ نصٍّ في DOM لا صورة
 const uiSrc = readFileSync(new URL('ui.js', APP), 'utf8');

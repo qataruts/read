@@ -473,9 +473,9 @@ export function landmark(kind) {
  *
  * **والشرطُ أن يبدو غلافاً لا أيقونةً مكبَّرة**، فأربعةٌ تصنعه:
  *   • **نسبةُ كتاب** لا مربّع (`aspect-ratio` في `app.css`).
- *   • **مشهدٌ لا صفّ**: بطلٌ كبيرٌ في المقدمة، ومسانِدان **بأحجامٍ ومواضعَ مختلفة**
- *     خلفه — ولذلك يحمل كلُّ عنصرٍ رتبتَه في صنفه (`cover-prop--1`/`--2`) ويأخذ
- *     حجمَه وموضعَه منها، فلا يستوي عنصران.
+ *   • **بطلٌ واحدٌ كبيرٌ في الوسط**: كان معه مسانِدان، فبانَ في اللقطة أنّهما رموزٌ
+ *     مستقلّة **تُصفّ لا عناصرُ لوحةٍ تُركَّب** (المصيدةُ كتلةٌ غامضة، والحبلُ أشكالٌ
+ *     مجرَّدة) — فحُذفا بأمر المالك: رمزٌ واحدٌ واضحٌ خيرٌ من ثلاثةٍ تتزاحم.
  *   • **العنوانُ نصٌّ حقيقيّ** بخطّ العناوين — لا محروقاً في صورة: يقرؤه الطفل،
  *     وتقرؤه قارئةُ الشاشة، ويتبع الثيمَ الليليّ، ويكبر بتكبير الخطّ.
  *   • **الأرضيةُ من اللوح**: `data-mood` مفتاحٌ يترجمه `app.css` إلى أحد ألوانه —
@@ -487,16 +487,9 @@ export function landmark(kind) {
 export function coverEl(story, { tag = 'div', className = '' } = {}) {
   const cover = story?.cover;
   if (!cover) return null;
-  const scene = h('span', { class: 'cover-scene', 'aria-hidden': 'true' });
-  // المسانِدُ أولاً فالبطلُ فوقها — ترتيبُ DOM هو ترتيبُ العمق، بلا z-index يُتعقَّب
-  (cover.props || []).forEach((glyph, i) => {
-    const el = emojiImg(glyph);
-    el.classList.add('cover-prop', `cover-prop--${i + 1}`);
-    scene.append(el);
-  });
   const hero = emojiImg(cover.hero);
   hero.classList.add('cover-hero');
-  scene.append(hero);
+  const scene = h('span', { class: 'cover-scene', 'aria-hidden': 'true' }, hero);
   return h(tag, { class: `cover ${className}`.trim(), 'data-mood': cover.mood },
     scene,
     // نصٌّ حقيقيّ: هو عنوانُ القصة نفسُه لا نسخةٌ منه (مصدرٌ واحد لا مصدران)

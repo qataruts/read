@@ -2004,6 +2004,7 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
   box-shadow: var(--shadow);
   overflow: hidden;
   --cover-tint: var(--accent-stories);
+  --cover-title-h: 3.1rem;      /* سطران بخطّ العناوين — واحدٌ للجميع */
 }
 /* المزاجُ مفتاحٌ يُترجَم هنا — لا لونَ في بيان القصة (يحرس أسماءَه الفاحص) */
 .cover[data-mood="warm"]   { --cover-tint: var(--accent-stories); }
@@ -2015,17 +2016,14 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
 
 /* المشهد: البطلُ كبيرٌ في المقدمة، والمسانِدان **بحجمين وموضعين مختلفين** خلفه —
    ولا يستوي عنصران، فالصفُّ المتساوي هو ما يجعله أيقونةً لا غلافاً. */
-.cover-scene { position: absolute; inset: 0 0 3.1rem; display: block; }
-.cover-scene .emoji { position: absolute; display: block; }
-/* **البطلُ يسود**: أكبرُ من ضِعف أيّ مسانِد، وفي المقدمة أسفلَ الوسط — والمسانِدان
-   في الزاويتين العلويتين بحجمين مختلفين، فلا يزاحمانه ولا يستويان. */
+/* **البطلُ وحدَه كبيراً في الوسط** (أمر المالك بعد معاينة اللقطة): كان معه مسانِدان،
+   فبانَ أنّهما رموزٌ مستقلّة **تُصفّ لا تُركَّب** — والرمزُ الواحد الواضح خيرٌ من
+   ثلاثةٍ تتزاحم. والغلافُ يبقى غلافاً بنسبته وأرضيته وعنوانه وإطاره. */
+.cover-scene { position: absolute; inset: 0 0 var(--cover-title-h); display: grid; place-items: center; }
 .cover-hero {
-  width: 54%; height: auto;
-  inset-inline-start: 23%; bottom: 8%;
-  filter: drop-shadow(0 3px 6px rgba(61, 52, 40, .28));
+  width: 60%; height: auto; display: block;
+  filter: drop-shadow(0 4px 8px rgba(61, 52, 40, .26));
 }
-.cover-prop--1 { width: 21%; height: auto; inset-inline-end: 9%; top: 8%; opacity: .95; }
-.cover-prop--2 { width: 25%; height: auto; inset-inline-start: 8%; top: 21%; opacity: .88; }
 
 /* العنوانُ نصٌّ حقيقيّ: يقرؤه الطفل وقارئةُ الشاشة، ويتبع الثيم ويكبر بتكبير الخطّ */
 .cover-title {
@@ -2033,9 +2031,10 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
   padding: .45rem .5rem .55rem;
   font-family: var(--font-ui);
   font-size: clamp(.72rem, 2.6vw, .95rem);
-  /* سطران يسعان أطولَ عنوان، وارتفاعٌ ثابت — فتستوي البطاقاتُ على الرفّ ولا يقفز
-     غلافٌ فوق جاره لأنّ عنوانه انثنى. */
-  min-height: 2.6rem; display: grid; place-content: center;
+  /* **ارتفاعٌ ثابت يحتمل سطرين** (تصحيح المدير): «الْحَمَامَةُ وَالْجَمَاعَةْ» يلتفّ
+     سطرين، فلو تبع الشريطُ عنوانَه لاختلّت أطوالُ البطاقات على الرفّ. فالشريطُ
+     بارتفاعٍ واحد للجميع، والعنوانُ يتوسّطه سطراً كان أو سطرين. */
+  height: var(--cover-title-h); display: grid; place-content: center;
   line-height: 1.3; text-align: center; color: var(--ink);
   background: color-mix(in srgb, var(--card) 88%, var(--cover-tint));
   border-top: 1px solid color-mix(in srgb, var(--cover-tint) 30%, var(--line));
