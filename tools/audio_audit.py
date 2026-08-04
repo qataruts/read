@@ -479,6 +479,7 @@ LINEAGES = {
     "husary": "تلاوة الحصري (المصحف)",
 }
 LEDGER = gen.ROOT / "tools" / "audio_lineage.json"
+OVERRIDES = gen.ROOT / "tools" / "audio_lineage_overrides.json"
 ARCHIVE_EDGE = gen.ROOT / "archive" / "audio-edge"
 ANTURA_MATCHED = gen.ROOT / "scratch" / "antura" / "matched.json"
 
@@ -505,9 +506,34 @@ def _antura_texts() -> set:
     return out
 
 
+def load_overrides() -> dict:
+    """نسبٌ مُثبَت بحدثٍ لاحق — كاستبدال ملفٍ بشريّ بمولَّد.
+
+    دفترُ الأدلة يقرأ آثاراً قديمة (دفتر استيراد Antura مثلاً)، فيبقى ينسب إلى
+    البشريّ ملفاً استُبدل اليوم. والتثبيت هنا يعلو على الأثر: حدثٌ مؤرَّخ بسببه.
+    """
+    if not OVERRIDES.exists():
+        return {}
+    try:
+        return json.loads(OVERRIDES.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def set_override(texts: list, lineage: str, why: str) -> int:
+    data = load_overrides()
+    for t in texts:
+        data[t] = {"lineage": lineage, "why": why, "at": gen.TODAY}
+    OVERRIDES.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    return len(texts)
+
+
 def lineage_of(key: str, text: str, queue_by_text: dict, recit_keys: set,
                antura: set) -> tuple[str, str]:
     """(النسب، الدليل) — أو ("", سبب الجهالة)."""
+    over = load_overrides().get(text)
+    if over:
+        return over["lineage"], f"تثبيتٌ ({over['at']}): {over['why']}"
     if key in recit_keys:
         return "husary", "بيان التلاوة (tools/recitations.json)"
     if text in antura:

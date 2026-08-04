@@ -16,8 +16,16 @@
     "requestedBy": "manager-zayt-fix",
     "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الفتحة قبل الألف تُمَدّ، والضمة قبل الواو، والكسرة قبل الياء.",
@@ -66,10 +74,20 @@
     "text": "سُكَّرْ",
     "category": "word",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-flash-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "سُلْ لَمْ",
@@ -120,28 +138,70 @@
     "text": "بً",
     "category": "letter_haraka",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بٌ",
     "category": "letter_haraka",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بٍ",
     "category": "letter_haraka",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "بَابٌ",
@@ -354,10 +414,24 @@
     "text": "الْكَلْبُ",
     "category": "story_word",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-flash-preview-tts"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَامْ",
@@ -489,10 +563,20 @@
     "text": "الشَّمْسُ وَالْمَطَرْ",
     "category": "sentence",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "طَلَعَتِ الشَّمْسْ",
@@ -507,10 +591,24 @@
     "text": "طَلَعَتِ",
     "category": "story_word",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-flash-preview-tts"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "زَيْدٌ يَلْعَبُ فِي الشَّارِعْ",
@@ -534,10 +632,24 @@
     "text": "يَلْعَبُ",
     "category": "story_word",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-flash-preview-tts"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الشَّارِعْ",
@@ -552,10 +664,20 @@
     "text": "نَزَلَ الْمَطَرْ",
     "category": "sentence",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "نَزَلَ",
@@ -570,19 +692,43 @@
     "text": "الْمَطَرْ",
     "category": "story_word",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-flash-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "رَجَعَ زَيْدٌ لِلدَّارْ",
     "category": "sentence",
     "requestedBy": "session-4",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "رَجَعَ",
@@ -765,10 +911,20 @@
     "text": "نَمْلْ",
     "category": "word",
     "requestedBy": "session-6",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "زَيْتُونْ",
@@ -904,10 +1060,18 @@
     "text": "طْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سَرِيرْ",
@@ -958,10 +1122,18 @@
     "text": "قْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مِفْتَاحْ",
@@ -985,10 +1157,18 @@
     "text": "حْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "سَاعَةْ",
@@ -1038,10 +1218,18 @@
     "text": "صْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "صَحْنْ",
@@ -1101,10 +1289,24 @@
     "text": "كْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "كِي",
@@ -1175,10 +1377,20 @@
     "text": "سَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-3.1-flash-tts-preview"
+    "doneAt": "2026-08-04",
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "تِلْفَازْ",
@@ -1202,10 +1414,18 @@
     "text": "زْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "هَاتِفْ",
@@ -1238,10 +1458,20 @@
     "text": "جِدَارْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "وِسَادَةْ",
@@ -1319,10 +1549,20 @@
     "text": "قِدْرْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "أُمِّي",
@@ -1411,19 +1651,39 @@
     "text": "أَخْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "عَمِّي",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "خَالْ",
@@ -1514,10 +1774,20 @@
     "text": "طَةْ",
     "category": "syllable",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-3.1-flash-tts-preview"
+    "doneAt": "2026-08-04",
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "فَلَّاحْ",
@@ -1543,19 +1813,37 @@
     "text": "نَجَّارْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "جْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مُهَنْدِسْ",
@@ -1606,10 +1894,20 @@
     "text": "جُو",
     "category": "syllable",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-3.1-flash-tts-preview"
+    "doneAt": "2026-08-04",
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "زَمِيلْ",
@@ -1671,10 +1969,24 @@
     "text": "رَأْسْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "أْ",
@@ -1689,10 +2001,20 @@
     "text": "أُذُنْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "أَنْفْ",
@@ -1738,10 +2060,20 @@
     "text": "قَدَمْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "شَعْرْ",
@@ -1796,10 +2128,18 @@
     "text": "هْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "كَتِفْ",
@@ -1834,10 +2174,18 @@
     "text": "ظْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "صَوْتْ",
@@ -1881,10 +2229,20 @@
     "text": "ضِرْسْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "صِحَّةْ",
@@ -1908,10 +2266,18 @@
     "text": "ضْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "حُقْنَةْ",
@@ -1957,19 +2323,37 @@
     "text": "مَشْيْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "شْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "خُبْزْ",
@@ -2135,10 +2519,20 @@
     "text": "لَيْمُونْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "لَيْ",
@@ -2563,10 +2957,18 @@
     "text": "ذْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "مَاعِزْ",
@@ -2752,10 +3154,20 @@
     "text": "كَهْفْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "بَرْقْ",
@@ -3126,19 +3538,37 @@
     "text": "غْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "antura-cc-by"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "antura-cc-by",
+        "doneAt": "2026-08-03",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "خَرِيطَةْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مَقْلَمَةْ",
@@ -3423,10 +3853,20 @@
     "text": "صُو",
     "category": "syllable",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-3.1-flash-tts-preview"
+    "doneAt": "2026-08-04",
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "شُورْتْ",
@@ -3695,10 +4135,20 @@
     "text": "مَزْرَعَةْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "بُرْجْ",
@@ -3758,10 +4208,20 @@
     "text": "مَكْتَبْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مَطْعَمْ",
@@ -3839,10 +4299,20 @@
     "text": "أَحْمَرْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "أَزْرَقْ",
@@ -4046,10 +4516,20 @@
     "text": "السَّرِيرُ نَظِيفْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السَّرِيرُ",
@@ -4127,10 +4607,20 @@
     "text": "الصَّحْنُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْكُوبُ صَغِيرْ",
@@ -4534,10 +5024,20 @@
     "text": "الضَّيْفُ فِي الْبَيْتْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الضَّيْفُ",
@@ -4696,10 +5196,24 @@
     "text": "وَجْهِي جَمِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-03",
-    "model": "gemini-2.5-pro-preview-tts"
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-03",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "كَتِفِي عَرِيضْ",
@@ -4812,10 +5326,20 @@
     "text": "جَمِيلْ",
     "category": "story_word",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَشْيُ مُفِيدْ",
@@ -4956,10 +5480,20 @@
     "text": "الْفَرَاوِلَةُ لَذِيذَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللَّيْمُونُ حَامِضْ",
@@ -5037,10 +5571,20 @@
     "text": "الْقَهْوَةُ مُرَّةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعَصِيرُ بَارِدْ",
@@ -5154,10 +5698,20 @@
     "text": "الْقِرْدُ يَلْعَبْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الزَّرَافَةُ طَوِيلَةْ",
@@ -5190,10 +5744,20 @@
     "text": "الطَّاوُوسُ مُلَوَّنْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبَطَّةُ تَسْبَحْ",
@@ -5244,10 +5808,20 @@
     "text": "الْفَرَاشَةُ مُلَوَّنَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعَنْكَبُوتُ صَغِيرْ",
@@ -5271,10 +5845,24 @@
     "text": "الْقُنْفُذُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الْمَاعِزُ يَأْكُلْ",
@@ -5325,10 +5913,20 @@
     "text": "الْبُومَةُ تَنْظُرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقَمَرُ مُنِيرْ",
@@ -5361,10 +5959,20 @@
     "text": "الرِّيحُ قَوِيَّةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الثَّلْجُ بَارِدْ",
@@ -5379,10 +5987,20 @@
     "text": "النَّهْرُ طَوِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْغَابَةُ كَبِيرَةْ",
@@ -5478,10 +6096,20 @@
     "text": "الْجَزِيرَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "النَّخْلَةُ طَوِيلَةْ",
@@ -5546,28 +6174,58 @@
     "text": "الْعَاصِفَةُ قَوِيَّةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الضَّبَابُ كَثِيفْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الظَّلَامُ حَالِكْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الظَّلَامُ",
@@ -5675,10 +6333,20 @@
     "text": "الْمِمْحَاةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِمْحَاةُ",
@@ -5700,19 +6368,39 @@
     "text": "الْمِسْطَرَةُ طَوِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَقِيبَةُ ثَقِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللَّوْحُ نَظِيفْ",
@@ -5772,19 +6460,39 @@
     "text": "الْمَكْتَبَةُ وَاسِعَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "سَمِعْتُ الْجَرَسْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَوَابُ صَحِيحْ",
@@ -6007,19 +6715,39 @@
     "text": "الْفُسْتَانُ جَمِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِعْطَفُ ثَقِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقُبَّعَةُ حَمْرَاءْ",
@@ -6070,19 +6798,39 @@
     "text": "النَّظَّارَةُ جَدِيدَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْخَاتَمُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الصَّنْدَلُ خَفِيفْ",
@@ -6133,10 +6881,20 @@
     "text": "الْإِبْرَةُ حَادَّةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الصُّوفُ نَاعِمْ",
@@ -6151,10 +6909,24 @@
     "text": "الشُّورْتُ قَصِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الصُّنْدُوقُ ثَقِيلْ",
@@ -6178,19 +6950,39 @@
     "text": "الْجَيْبُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "النَّعْلُ جَدِيدْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السِّرْوَالُ وَاسِعْ",
@@ -6232,19 +7024,39 @@
     "text": "السَّيَّارَةُ سَرِيعَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَافِلَةُ كَبِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَافِلَةُ",
@@ -6286,10 +7098,20 @@
     "text": "السَّفِينَةُ كَبِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقَارِبُ صَغِيرْ",
@@ -6322,10 +7144,20 @@
     "text": "السُّوقُ قَرِيبْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعِيَادَةُ قَرِيبَةْ",
@@ -6385,10 +7217,20 @@
     "text": "الْمَصْنَعُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَزْرَعَةُ وَاسِعَةْ",
@@ -6455,10 +7297,20 @@
     "text": "الصَّيْدَلِيَّةُ مَفْتُوحَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَكْتَبُ نَظِيفْ",
@@ -6545,10 +7397,20 @@
     "text": "الْمَوْزُ",
     "category": "story_word",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْخِيَارُ أَخْضَرْ",
@@ -6599,10 +7461,20 @@
     "text": "الدُّخَانُ أَسْوَدْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الدُّخَانُ",
@@ -6624,28 +7496,58 @@
     "text": "الْبَنْطَالُ أَزْرَقْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْكُرَةُ مُسْتَدِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللُّعْبَةُ جَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللُّعْبَةُ",
@@ -6678,10 +7580,20 @@
     "text": "الْحَبْلُ طَوِيلْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَبْلُ",
@@ -6811,10 +7723,20 @@
     "text": "الرَّقْصُ مُمْتِعْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السِّبَاقُ سَرِيعْ",
@@ -6901,10 +7823,20 @@
     "text": "الصُّورَةُ جَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللَّوْنُ جَمِيلْ",
@@ -6935,10 +7867,20 @@
     "text": "النَّرْدُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-8",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السَّاعَةُ",
@@ -7086,10 +8028,20 @@
     "text": "الْمِفْتَاحُ تَحْتَ الْوِسَادَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْوِسَادَةْ",
@@ -7147,10 +8099,20 @@
     "text": "السَّلَّةُ الْكَبِيرَةُ تَحْتَ الْمَقْعَدْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَدِيقَةُ الْوَاسِعَةُ خَلْفَ الْبَيْتْ",
@@ -7336,10 +8298,20 @@
     "text": "الْحَفِيدُ يُسَاعِدُ الْجَدَّةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "جَدِّي يَجْلِسُ فِي الْحَدِيقَةْ",
@@ -7381,19 +8353,39 @@
     "text": "الصَّيَّادُ الصَّبُورُ عِنْدَ الْبَحْرْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "صَدِيقِي الْمَاهِرُ يَرْسُمُ فِي الْغُرْفَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "جَدَّةُ الطِّفْلِ تَجْلِسُ فَوْقَ الْمَقْعَدْ",
@@ -7613,10 +8605,20 @@
     "text": "الْأُذُنُ تَسْمَعُ الصَّوْتْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الدَّمُ فِي الْقَلْبْ",
@@ -7649,19 +8651,39 @@
     "text": "الْأَسْنَانُ النَّظِيفَةُ فِي الْفَمْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "أُذُنِي تَسْمَعُ صَوْتَ أُمِّي",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّبِيبُ يَنْظُرُ فِي الْأُذُنْ",
@@ -7685,10 +8707,20 @@
     "text": "الْعَظْمُ الصُّلْبُ تَحْتَ الْكَتِفْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّبِيبُ الْمَاهِرُ يَنْظُرُ فِي أَسْنَانِي",
@@ -7802,10 +8834,20 @@
     "text": "اللَّحْمُ فِي الْقِدْرْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللَّحْمُ",
@@ -7874,10 +8916,20 @@
     "text": "جَدِّي يَشْرَبُ الْقَهْوَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "التُّفَّاحَةُ الْحَمْرَاءُ فِي الصَّحْنْ",
@@ -7919,10 +8971,20 @@
     "text": "أُمِّي تَطْبُخُ الْفُولَ السَّاخِنْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "أُخْتِي تَقْطِفُ الْفَرَاوِلَةَ فِي الْحَدِيقَةْ",
@@ -7946,10 +9008,20 @@
     "text": "التَّاجِرُ الْكَرِيمُ يَبِيعُ الْبُرْتُقَالَ الْحُلْوْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحِصَانُ",
@@ -8122,10 +9194,20 @@
     "text": "الْأَرْنَبُ يَأْكُلُ الْجَزَرْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقِرْدُ يَأْكُلُ الْمَوْزْ",
@@ -8212,10 +9294,20 @@
     "text": "الْعُصْفُورُ فَوْقَ النَّافِذَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السِّنْجَابُ يَقْفِزُ فَوْقَ الشَّجَرَةْ",
@@ -8275,10 +9367,20 @@
     "text": "الْعُصْفُورُ الصَّغِيرُ يُغَرِّدُ فَوْقَ الشَّجَرَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السُّلَحْفَاةُ الصَّبُورَةُ تَمْشِي أَمَامَ الْبَابْ",
@@ -8496,10 +9598,20 @@
     "text": "الْحَجَرُ الصُّلْبُ تَحْتَ التُّرَابْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الشَّلَّالُ الْجَمِيلُ يَنْزِلُ فِي النَّهْرْ",
@@ -8575,19 +9687,39 @@
     "text": "الْقِصَّةْ",
     "category": "story_word",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِمْحَاةُ فِي الْمَقْلَمَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْخَرِيطَةُ فَوْقَ الْجِدَارْ",
@@ -8701,10 +9833,20 @@
     "text": "الْحَقِيبَةُ الثَّقِيلَةُ فَوْقَ الْمَقْعَدْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "التِّلْمِيذُ الْمَاهِرُ يَرْسُمُ النَّخْلَةْ",
@@ -8719,10 +9861,20 @@
     "text": "التِّلْمِيذُ الْمُجْتَهِدُ يَقْرَأُ الْقِصَّةَ الْجَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مُعَلِّمُ الْمَدْرَسَةِ يَشْرَحُ الْحِسَابَ السَّهْلْ",
@@ -8755,10 +9907,20 @@
     "text": "الْقُفَّازُ",
     "category": "story_word",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "نَاعِمْ",
@@ -8773,10 +9935,20 @@
     "text": "الْخَاتَمُ",
     "category": "story_word",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "التَّاجُ",
@@ -8994,10 +10166,20 @@
     "text": "الْجَزْمَةُ السَّوْدَاءُ الْجَدِيدَةُ تَحْتَ السَّرِيرْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السَّيَّارَةُ",
@@ -9053,10 +10235,20 @@
     "text": "الشَّارِعُ",
     "category": "story_word",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَطَارُ",
@@ -9114,10 +10306,20 @@
     "text": "الْحَافِلَةُ فِي الْمَحَطَّةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَحَطَّةْ",
@@ -9222,10 +10424,24 @@
     "text": "أُمِّي تَشْتَرِي مِنَ السُّوقْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "أَخِي يَرْكَبُ الدَّرَّاجَةَ الْجَدِيدَةْ",
@@ -9276,10 +10492,20 @@
     "text": "الْحَافِلَةُ الْكَبِيرَةُ تَقِفُ فِي الْمَحَطَّةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبُرْجُ الْمُرْتَفِعُ أَمَامَ مَحَطَّةِ الْقِطَارْ",
@@ -9321,10 +10547,20 @@
     "text": "الدُّمْيَةُ فَوْقَ السَّرِيرْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّبْلُ فِي الْمَلْعَبْ",
@@ -9393,10 +10629,20 @@
     "text": "الْحَاسُوبُ فَوْقَ الْمَكْتَبْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبَالُونُ الْأَحْمَرُ فَوْقَ الشَّجَرَةْ",
@@ -9456,10 +10702,20 @@
     "text": "جَدِّي يَضَعُ الْعُودَ فِي الْخِزَانَةْ",
     "category": "sentence",
     "requestedBy": "session-9a",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الصُّورَةُ الْمُلَوَّنَةُ فَوْقَ جِدَارِ الْغُرْفَةْ",
@@ -9483,10 +10739,20 @@
     "text": "اللَّيْمُونُ أَصْفَرْ",
     "category": "sentence",
     "requestedBy": "session-9a-close",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللَّيْمُونُ",
@@ -9600,10 +10866,20 @@
     "text": "حَسَنٌ يُسَاعِدُ الْجَدَّةْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "يُسَاعِدُ",
@@ -9816,10 +11092,20 @@
     "text": "سَامِي يَأْكُلُ الشُّورْبَةْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "سَامِي يَشْكُرُ أُمِّي",
@@ -9906,10 +11192,20 @@
     "text": "الْقِطَّةُ تَنْظُرُ مِنَ النَّافِذَةْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقِطَّةُ",
@@ -10014,10 +11310,20 @@
     "text": "مَاذَا يَأْكُلُ الْأَرْنَبْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "زَهْرَةُ الْحَقْلْ",
@@ -10032,10 +11338,20 @@
     "text": "الزَّهْرَةُ فِي الْحَقْلْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَقْلْ",
@@ -10293,10 +11609,20 @@
     "text": "قُفَّازُ حَسَنْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "حَسَنٌ يَلْبَسُ الْمِعْطَفَ الثَّقِيلْ",
@@ -10374,19 +11700,43 @@
     "text": "الْقُفَّازُ يَسْقُطُ فَوْقَ الْعُشْبْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "يَسْقُطُ",
     "category": "story_word",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعُشْبْ",
@@ -10509,19 +11859,39 @@
     "text": "حَافِلَةُ الْمَدْرَسَةْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "سَامِي يَقِفُ فِي الْمَحَطَّةْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "يَقِفُ",
@@ -10689,10 +12059,20 @@
     "text": "زَيْدٌ يَلْعَبُ فِي الْمَلْعَبْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْكُرَةُ الْحَمْرَاءُ جَدِيدَةْ",
@@ -10779,10 +12159,20 @@
     "text": "زَيْدٌ يَشْكُرُ الْجَارْ",
     "category": "sentence",
     "requestedBy": "session-9",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَارْ",
@@ -11714,10 +13104,20 @@
     "text": "الشَّعْرْ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْأَسْنَانْ",
@@ -12338,10 +13738,20 @@
     "text": "التُّفَّاحَةْ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبُرْتُقَالْ",
@@ -12356,10 +13766,20 @@
     "text": "الْبَطِّيخْ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْفَرَاوِلَةْ",
@@ -12419,10 +13839,20 @@
     "text": "الشَّايْ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقَهْوَةْ",
@@ -12455,10 +13885,20 @@
     "text": "الشُّوكُولَاتَةْ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْفُولْ",
@@ -12590,10 +14030,20 @@
     "text": "اللَّيْمُونَ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَزَرَ",
@@ -12608,10 +14058,20 @@
     "text": "الطَّمَاطِمَ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْخِيَارَ",
@@ -12680,10 +14140,20 @@
     "text": "الشُّوكُولَاتَةَ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْفُولَ",
@@ -13393,10 +14863,20 @@
     "text": "النَّعْلُ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "السِّوَارُ",
@@ -13562,10 +15042,20 @@
     "text": "الشُّورْتَ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الصُّنْدُوقَ",
@@ -13607,10 +15097,20 @@
     "text": "الدَّرَّاجَةُ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السَّفِينَةُ",
@@ -13634,21 +15134,39 @@
     "text": "الْجِسْرُ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "السُّوقُ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "failCount": 1,
-    "lastFailModel": "gemini-2.5-flash-preview-tts",
-    "model": "gemini-3.1-flash-tts-preview"
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "الْعِيَادَةُ",
@@ -13800,10 +15318,20 @@
     "text": "الْعِيَادَةْ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَسْجِدْ",
@@ -14362,10 +15890,20 @@
     "text": "الْبَالُونَ",
     "category": "story_word",
     "requestedBy": "fix-fill-dress",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْحَاسُوبَ",
@@ -14398,10 +15936,24 @@
     "text": "أَرْضْ",
     "category": "word",
     "requestedBy": "session-12",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "يَوْمْ",
@@ -14713,10 +16265,20 @@
     "text": "سِلْكْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "عُدَّةْ",
@@ -14758,9 +16320,17 @@
     "text": "وْ",
     "category": "letter_haraka",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "استبدال نواة Antura بسُلافات: التسجيل ينطق صوت الحرف لا اسمه، ويخلط المتقارب (بلاغ المالك ٥ أغسطس)",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
     "model": "gemini-3.1-flash-tts-preview"
   },
   {
@@ -14812,10 +16382,20 @@
     "text": "سَاحِرْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اِبْتِسَامَةْ",
@@ -15230,10 +16810,20 @@
     "text": "بِنْصِرْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "سُرُورْ",
@@ -15347,10 +16937,20 @@
     "text": "أَنَانَاسْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "زَيْتُونَةْ",
@@ -16114,19 +17714,43 @@
     "text": "مِلَفّْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 3
   },
   {
     "text": "رَقْمْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "عِلْمْ",
@@ -16213,10 +17837,20 @@
     "text": "طَرْحْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "تَعْلِيمْ",
@@ -16249,10 +17883,20 @@
     "text": "مُغَلَّفْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "تَدْرِيسْ",
@@ -16348,10 +17992,20 @@
     "text": "طَرْحَةْ",
     "category": "word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "غَسِيلْ",
@@ -17207,10 +18861,20 @@
     "text": "الصُّنْبُورُ نَظِيفْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقُفْلُ صُلْبْ",
@@ -17279,10 +18943,24 @@
     "text": "الطَّنْجَرَةُ سَاخِنَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الشَّفْرَةُ خَطِيرَةْ",
@@ -17513,10 +19191,20 @@
     "text": "سَرِيرُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "نَافِذَةُ",
@@ -17585,10 +19273,20 @@
     "text": "سِكِّينُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 3
   },
   {
     "text": "حَمَّامُ",
@@ -17603,19 +19301,39 @@
     "text": "صَابُونُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "سَلَّةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مِكْنَسَةُ",
@@ -17666,10 +19384,20 @@
     "text": "مِرْوَحَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "خِزَانَةُ",
@@ -17711,10 +19439,20 @@
     "text": "قُفْلُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مُنَبِّهُ",
@@ -17729,10 +19467,20 @@
     "text": "مِشْطُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مُثَلَّجُ",
@@ -17792,10 +19540,20 @@
     "text": "مَخْزَنُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مِسْمَارُ",
@@ -18080,19 +19838,39 @@
     "text": "الْاِبْتِسَامَةُ جَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبَحَّارُ صَبُورْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الضَّابِطُ صَبُورْ",
@@ -18197,19 +19975,39 @@
     "text": "الْعَمَّةُ طَيِّبَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السَّبَّاكُ مَاهِرْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السَّبَّاكُ",
@@ -18233,10 +20031,20 @@
     "text": "الْمَرِيضُ يَنَامْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَمَاعَةُ كَبِيرَةْ",
@@ -18467,10 +20275,20 @@
     "text": "دِمَاغِي سَرِيعْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الرَّاحَةُ نَاعِمَةْ",
@@ -18557,10 +20375,20 @@
     "text": "الْمِعْدَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعَطَشُ صَعْبْ",
@@ -18575,10 +20403,20 @@
     "text": "الشَّفَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "خَدِي نَاعِمْ",
@@ -18611,10 +20449,20 @@
     "text": "الْحَنْجَرَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "التَّعَبُ صَعْبْ",
@@ -18656,10 +20504,20 @@
     "text": "الرُّكْبَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 2
   },
   {
     "text": "بِنْصِرِي صَغِيرْ",
@@ -18755,10 +20613,20 @@
     "text": "الْعَافِيَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الدِّمَاغْ",
@@ -18800,10 +20668,20 @@
     "text": "الظُّفْرْ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقَبْضَةْ",
@@ -19349,10 +21227,20 @@
     "text": "الزَّيْتُونَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْفَطِيرَةُ سَاخِنَةْ",
@@ -19421,10 +21309,20 @@
     "text": "الْبَسْكَوِيتُ حُلْوْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّبَقُ نَظِيفْ",
@@ -19448,10 +21346,20 @@
     "text": "الْمِشْمِشُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "الْفُطْرُ صَغِيرْ",
@@ -19511,10 +21419,20 @@
     "text": "الْمَأْكَلُ لَذِيذْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْفُلْفُلْ",
@@ -19637,10 +21555,20 @@
     "text": "الْفُطْرْ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْأَرُزّْ",
@@ -19808,10 +21736,20 @@
     "text": "الْبَسْكَوِيتَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّبَقَ",
@@ -19826,10 +21764,20 @@
     "text": "الْفُطْرَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْأَرُزَّ",
@@ -19871,10 +21819,20 @@
     "text": "الْمَعْكَرُونَةَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللَّبَنَ",
@@ -20150,10 +22108,20 @@
     "text": "الْفَهْدُ يَجْرِي",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْأَخْطَبُوطُ غَرِيبْ",
@@ -20168,10 +22136,24 @@
     "text": "الْعُقَابُ يَطِيرْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "اللَّامَا طَوِيلَةْ",
@@ -20186,10 +22168,20 @@
     "text": "الثَّوْرُ قَوِيّْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَامُوسُ كَبِيرْ",
@@ -20213,10 +22205,20 @@
     "text": "الْبَطْرِيقُ يَمْشِي",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "النَّمْلَةُ صَغِيرَةْ",
@@ -20303,10 +22305,20 @@
     "text": "الضِّفْدَعَةُ تَقْفِزْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْقِرْشُ خَطِيرْ",
@@ -20474,10 +22486,24 @@
     "text": "الْبُرْكَانُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الْغَيْمَةُ",
@@ -20555,10 +22581,20 @@
     "text": "صُلْبْ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الشَّلَّالُ",
@@ -20600,10 +22636,20 @@
     "text": "الرِّيشَةُ خَفِيفَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْخَرِيفُ جَمِيلْ",
@@ -20708,10 +22754,20 @@
     "text": "الْغَيْمَةُ خَفِيفَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الزَّرْعُ صَغِيرْ",
@@ -20726,28 +22782,62 @@
     "text": "الْبِرْكَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الْكَوْكَبَةُ بَعِيدَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبَادِيَةُ وَاسِعَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "وَاسِعَةْ",
@@ -20780,10 +22870,20 @@
     "text": "النَّبْعُ بَارِدْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الصَّيْفُ سَاخِنْ",
@@ -21023,10 +23123,20 @@
     "text": "الْمَقْلَمَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْكَاتِبُ يَكْتُبْ",
@@ -21050,10 +23160,20 @@
     "text": "الْاِمْتِحَانُ صَعْبْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَدْوَلُ وَاضِحْ",
@@ -21131,10 +23251,20 @@
     "text": "الْعِلْمُ غَالِي",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الصَّفُّ نَظِيفْ",
@@ -21158,10 +23288,20 @@
     "text": "الْوَرَقَةُ رَفِيعَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "رَفِيعَةْ",
@@ -21275,10 +23415,20 @@
     "text": "الْمُغَلَّفُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "التَّدْرِيسُ مُفِيدْ",
@@ -21401,10 +23551,20 @@
     "text": "الْجَمْعْ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعَالِمْ",
@@ -21682,10 +23842,20 @@
     "text": "السِّلْسِلَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِشْجَبُ",
@@ -21754,10 +23924,20 @@
     "text": "الْعَبَاءَةُ وَاسِعَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّرْحَةُ جَمِيلَةْ",
@@ -21790,10 +23970,20 @@
     "text": "الصُّدْرِيَّةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "خَفِيفَةْ",
@@ -21826,10 +24016,24 @@
     "text": "السُّتْرَةُ ثَقِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الزِّرُّ صَغِيرْ",
@@ -21844,19 +24048,39 @@
     "text": "الْمِكْوَاةُ سَاخِنَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "النَّسِيجُ نَاعِمْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعِقْدُ غَالِي",
@@ -21880,10 +24104,20 @@
     "text": "الْقِلَادَةُ جَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْكُمُّ قَصِيرْ",
@@ -21907,10 +24141,20 @@
     "text": "الْمِشْبَكُ صَغِيرْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِشْبَكُ",
@@ -22141,10 +24385,20 @@
     "text": "فُسْتَانُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مِعْطَفُ",
@@ -22159,19 +24413,39 @@
     "text": "قُبَّعَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "وِشَاحُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "قُفَّازُ",
@@ -22213,19 +24487,39 @@
     "text": "خَاتَمُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "صَنْدَلُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "رَبْطَةُ",
@@ -22303,10 +24597,20 @@
     "text": "طَاقِيَّةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "سِوَارُ",
@@ -22321,10 +24625,20 @@
     "text": "ثَوْبُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "عِمَامَةُ",
@@ -22348,19 +24662,39 @@
     "text": "عَبَاءَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "طَرْحَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 2
   },
   {
     "text": "غَسِيلُ",
@@ -22375,10 +24709,20 @@
     "text": "سُتْرَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "زِرُّ",
@@ -22438,10 +24782,20 @@
     "text": "الْقَاطِرَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِرْكَبُ",
@@ -22627,10 +24981,20 @@
     "text": "الرَّصِيفُ طَوِيلْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَقْبَرَةُ قَرِيبَةْ",
@@ -22663,10 +25027,20 @@
     "text": "الْعَرَبَةُ كَبِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَصْرِفُ قَرِيبْ",
@@ -22717,10 +25091,20 @@
     "text": "الْفُنْدُقُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْجَرَّارُ ثَقِيلْ",
@@ -22753,19 +25137,43 @@
     "text": "الْمِطْفَأَةُ حَمْرَاءْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِيكْرُوبَاصُ كَبِيرْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الْمَتْجَرُ مَفْتُوحْ",
@@ -22789,10 +25197,20 @@
     "text": "السَّاحَةُ وَاسِعَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَلْجَأُ صَغِيرْ",
@@ -22825,10 +25243,20 @@
     "text": "الْمَشْرَبُ قَرِيبْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "السُّورُ طَوِيلْ",
@@ -22852,10 +25280,20 @@
     "text": "الْمِنَارَةُ مُرْتَفِعَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "النَّهْرْ",
@@ -23005,10 +25443,20 @@
     "text": "الرَّافِعَةْ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَشْرَبْ",
@@ -23032,10 +25480,20 @@
     "text": "الْحَافِلَةَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الطَّيَّارَةَ",
@@ -23095,19 +25553,39 @@
     "text": "الْعِيَادَةَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَسْجِدَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمَلْعَبَ",
@@ -23239,19 +25717,39 @@
     "text": "الْمَقْبَرَةَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الشَّاحِنَةَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْعَرَبَةَ",
@@ -23338,10 +25836,20 @@
     "text": "الْمَرْكَبَةَ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الرَّافِعَةَ",
@@ -23473,12 +25981,20 @@
     "text": "الْمِضْرَبُ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "failCount": 1,
-    "lastFailModel": "gemini-2.5-flash-preview-tts",
-    "model": "gemini-3.1-flash-tts-preview"
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "الْوَرْدِي",
@@ -23655,10 +26171,20 @@
     "text": "الرَّسْمَةُ جَمِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبَنَفْسَجِي جَمِيلْ",
@@ -23727,10 +26253,20 @@
     "text": "الرَّمَادِي غَامِقْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبِيَانُو كَبِيرْ",
@@ -23745,10 +26281,20 @@
     "text": "التَّلْوِينُ مُمْتِعْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِضْرَبُ خَفِيفْ",
@@ -23781,10 +26327,20 @@
     "text": "الْبِطَاقَةُ صَغِيرَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمِزْمَارُ صَاخِبْ",
@@ -23799,19 +26355,39 @@
     "text": "الزَّحْلُوقَةُ طَوِيلَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْبُنِّي غَامِقْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "الْمُوسِيقَا جَمِيلَةْ",
@@ -23835,10 +26411,20 @@
     "text": "اللُّغْزُ صَعْبْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
+    "priority": 10,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-pro-preview-tts"
+    "model": "gemini-2.5-pro-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-pro-preview-tts",
+    "failCount": 1
   },
   {
     "text": "اللُّغْزُ فِي الْكِتَابِ فَوْقَ الْمَقْعَدْ",
@@ -24095,8 +26681,17 @@
       {
         "reason": "ردّ المالك بعلّة مشخَّصة: الصوت يسمّي ولا يقرأ الرمز",
         "at": "2026-08-04"
+      },
+      {
+        "reason": "تقاعد: لم تعد بيانات التطبيق تطلبه",
+        "at": "2026-08-04"
+      },
+      {
+        "reason": "تقاعد: خرجت من جرد المنطوق بعد شقّها نصّين (حكم المالك)",
+        "at": "2026-08-04"
       }
-    ]
+    ],
+    "retired": true
   },
   {
     "text": "لُؤْلُؤْ",
@@ -24147,200 +26742,295 @@
     "text": "الْفِيلُ وَالْكَعْبَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
-    "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الْكَعْبَةُ بَيْتُ اللَّٰهْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْكَعْبَةُ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "اللَّٰهْ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "failCount": 1
   },
   {
     "text": "مَلِكٌ يَمْشِي مَعَ الْجَيْشْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "مَلِكٌ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الْجَيْشْ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "فِيلٌ كَبِيرٌ أَمَامَ الْجَيْشْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "فِيلٌ",
     "category": "story_word",
     "requestedBy": "session-7",
-    "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "lastFailModel": "gemini-3.1-flash-tts-preview",
+    "failCount": 1
   },
   {
     "text": "كَبِيرٌ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "الْفِيلُ يَقِفُ أَمَامَ الْكَعْبَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْفِيلُ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "الْكَعْبَةْ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "طَيْرٌ كَثِيرٌ يَطِيرُ فَوْقَ الْجَيْشْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "طَيْرٌ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "كَثِيرٌ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "يَطِيرُ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "الطَّيْرُ يَحْمِلُ حَجَرَا",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الطَّيْرُ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "حَجَرَا",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "الْحَجَرُ يَنْزِلُ فَوْقَ الْجَيْشْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "اللَّٰهُ يَحْفَظُ الْكَعْبَةْ",
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "اللَّٰهُ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "يَحْفَظُ",
     "category": "story_word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "مَاذَا يَحْمِلُ الطَّيْرْ",
     "category": "sentence",
     "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
+        "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع ثانٍ (٥ أغسطس): سكون الوقف، والتنوين، وتسمية الحرف بحركته",
+        "requeuedAt": "2026-08-04"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الهمزةُ تُكتب وحدها، أو تركب على ألف، أو على واو، أو على ياء.",
+    "category": "sentence",
+    "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts#prose-heard"
+  },
+  {
+    "text": "والتاءُ المربوطة في آخر الكلمة تقف عليها هاءً.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts#prose-heard"
   }
 ]

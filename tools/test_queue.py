@@ -31,6 +31,8 @@ def sandbox(entries):
     gen.OUT_DIR = tmp / "audio"
     gen.QUEUE_FILE = tmp / "audio_queue.json"
     gen.RECITATIONS_FILE = tmp / "recitations.json"   # لا تلاوات في البيئة المعزولة
+    gen.SPEND_FILE = tmp / "spend.json"     # وميزانيةٌ نظيفة: سقفُ اليوم الحقيقي
+                                            # كان يوقف الفحص متى نفد في الإنتاج
     gen.QUEUE_FILE.write_text(json.dumps(entries, ensure_ascii=False), encoding="utf-8")
     return tmp
 
@@ -48,13 +50,19 @@ def fake_encode(pcm, rate, path, trim=True):
 
 
 def stub(calls, fail_on=None, quota_on=None, empty_on=()):
+    """المصرِّف يرسل **صورة النصّ المنطوقة** (`speech_form`) لا النصّ الخام،
+    فتُطابَق أسماءُ الفحص بها كي يقيس الفحصُ ما يجري فعلاً لا ما كان."""
+    quota = gen.speech_form(quota_on) if quota_on else None
+    fail = gen.speech_form(fail_on) if fail_on else None
+    empties = {gen.speech_form(t) for t in empty_on}
+
     def fake(text, style, *a, **k):
         calls.append((text, style))
-        if text == quota_on:
+        if quota and text == quota:
             raise gen.QuotaExhausted(1234)
-        if text in empty_on:
+        if text in empties:
             raise gen.EmptyAudio("لا صوت في الاستجابة")
-        if text == fail_on:
+        if fail and text == fail:
             raise gen.TTSError("خطأ مصطنع")
         return b"\x00\x01" * 24000, 24000
     gen.gemini_pcm = fake
@@ -63,7 +71,7 @@ def stub(calls, fail_on=None, quota_on=None, empty_on=()):
 def main():
     real_out, real_queue, real_tts = gen.OUT_DIR, gen.QUEUE_FILE, gen.gemini_pcm
     real_recit = gen.RECITATIONS_FILE
-    real_encode = gen.pcm_to_mp3
+    real_encode, real_spend_f = gen.pcm_to_mp3, gen.SPEND_FILE
     gen.pcm_to_mp3 = fake_encode          # لا يشترط الفحص مرمِّزاً مثبَّتاً
 
     # ————— ١. الترتيب والحالة والفهرس —————
@@ -82,10 +90,10 @@ def main():
     curriculum = gen.parse_curriculum(gen.CURRICULUM.read_text(encoding="utf-8"))
 
     ok(failed == 0, "التصريف بلا فشل")
-    ok([t for t, _ in calls] == ["مَدّ", "الشَّمْس"], "الترتيب: الأولوية الأصغر أولاً ثم الأقدمية")
+    ok([t for t, _ in calls] == [gen.speech_form("مَدّ"), gen.speech_form("الشَّمْس")], "الترتيب: الأولوية الأصغر أولاً ثم الأقدمية")
     ok(calls[0][1].startswith("انطق ببطء شديد: "), "style_hint يسبق النص بدل افتراضي الفئة")
     ok(calls[1][1] == gen.STYLE["word"], "بلا style_hint: تعليمة الفئة الافتراضية")
-    ok("قَديم" not in [t for t, _ in calls], "المُصرَّف سابقاً (done) لا يُعاد توليده")
+    ok(gen.speech_form("قَديم") not in [t for t, _ in calls], "المُصرَّف سابقاً (done) لا يُعاد توليده")
     ok(all(e["status"] == "done" for e in queue), "كل مدخل صار done")
     ok(queue[1]["doneAt"] == gen.TODAY, "doneAt بتاريخ اليوم")
     ok((gen.OUT_DIR / f"{gen.key_for('مَدّ')}.mp3").exists(), "الملف كُتب باسم مفتاح النص")
@@ -161,8 +169,10 @@ def main():
     ok(route(entries[3], True) == gen.MODEL_LEXICON, "الكلمة الإملائية المفردة ← 2.5-flash")
     ok(route(entries[4], False) == "" and route(entries[5], False) == gen.MODEL_CORE,
        "قبل الإجازة: الكلمة محبوسة والمقطع يمضي على 3.1")
-    ok(route({"text": "س", "category": "word", "model": "x-model"}, True) == "x-model",
-       "التعيين الصريح في المدخل يعلو على القاعدة")
+    ok(route({"text": "س", "category": "word", "model": gen.MODEL_SENTENCE}, True)
+       == gen.MODEL_SENTENCE, "التعيين الصريح بنموذجٍ معروف يعلو على القاعدة")
+    ok(route({"text": "س", "category": "word", "model": "antura-cc-by"}, True)
+       != "antura-cc-by", "وسجلٌّ ليس اسم نموذج لا يُقبل أمرَ توجيه")
     ok(route(entries[1], True) != route(entries[2], True),
        "الذرّية بصيغتها المعدَّلة: المقاطع موحّدة على 3.1 والكلمة على 2.5")
 
@@ -375,7 +385,7 @@ def main():
 
     gen.OUT_DIR, gen.QUEUE_FILE, gen.gemini_pcm = real_out, real_queue, real_tts
     gen.RECITATIONS_FILE = real_recit
-    gen.pcm_to_mp3 = real_encode
+    gen.pcm_to_mp3, gen.SPEND_FILE = real_encode, real_spend_f
     print(f"\n{len(PASS)}/{len(PASS) + len(FAIL)} تحقّقاً ناجحاً")
     return 1 if FAIL else 0
 

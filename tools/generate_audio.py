@@ -67,13 +67,17 @@ APPROVAL_FILE = ROOT / "tools" / "model_approval.json"
 
 # تعليمة الأداء تُكتب قبل النص فتوجّه الأداء ولا تُنطق (سلوك مثبَّت في Gemini TTS).
 STYLE = {
-    "letter_name": "انطق بتأنٍّ شديد ووضوح تام، بمخرج صحيح، كمعلم قرآن يعلّم طفلاً في السادسة: ",
+    "letter_name": ("انطق اسم هذا الحرف العربي كاملاً — الاسمَ لا صوتَ الحرف — "
+                    "بوضوح وتأنٍّ معتدل، كما ينطقه معلم لطفل في السادسة، مرة واحدة: "),
     "letter_haraka": "انطق بتأنٍّ شديد ووضوح تام، بمخرج صحيح، كمعلم قرآن يعلّم طفلاً في السادسة: ",
     "syllable": "انطق هذا المقطع بتأنٍّ ووضوح لطفل يتعلم التهجئة: ",
-    "word": "انطق الكلمة بوضوح وودّ لطفل: ",
+    # حكم المالك (٥ أغسطس ٢٠٢٦): خمسٌ من خمس اختار صيغةً فيها تعليمة إظهار
+    # الحرف الأخير — بلاغُه أن الآخر يُبدَل (ل←ن · ب←د · ت←ك).
+    "word": "انطق الكلمة بوضوح وودّ لطفل، وأظهرْ آخرَ كل كلمة نطقاً بيّناً بلا إبدال ولا ابتلاع، مرة واحدة: ",
     # فئتان تخصّان قائمة الانتظار (docs/AUDIO_QUEUE.md)
-    "sentence": "اقرأ هذه الجملة بتأنٍّ ووضوح وودّ، كمعلم يقرأ لطفل في السادسة: ",
-    "story_word": "انطق الكلمة بوضوح وودّ لطفل يتابع قصة: ",
+    "sentence": ("اقرأ هذه الجملة بتأنٍّ ووضوح وودّ، كمعلم يقرأ لطفل في السادسة، "
+                 "وأظهرْ آخرَ كل كلمة نطقاً بيّناً بلا إبدال ولا ابتلاع، مرة واحدة: "),
+    "story_word": "انطق الكلمة بوضوح وودّ لطفل يتابع قصة، وأظهرْ آخرَ كل كلمة نطقاً بيّناً بلا إبدال ولا ابتلاع، مرة واحدة: ",
 }
 CATEGORY_AR = {
     "letter_name": "اسم حرف",
@@ -233,13 +237,13 @@ class KeyPool:
             try:
                 if name == VERTEX_KEY:
                     _pace(f"{name}:{model}")
-                    pcm, rate = value.synth(text, style, model, self.voice)
+                    pcm, rate = value.synth(speech_form(text), style, model, self.voice)
                     bump_usd(model, len(style + text) // 3 + 8, len(pcm) / 2 / rate)
                     if usd_left() <= 0:
                         print(f"  🛑 Vertex: بلغ سقف اليوم {VERTEX_DAILY_USD}$ — "
                               f"يتوقّف ويستدعي مراجعةً بشرية", file=sys.stderr)
                 else:
-                    pcm, rate = gemini_pcm(text, style, model, self.voice, value,
+                    pcm, rate = gemini_pcm(speech_form(text), style, model, self.voice, value,
                                            pace_key=f"{name}:{model}")
                 if blocked and blocked != VERTEX_KEY:   # نجاح الثاني بعد نفاد الأول
                     note_independence(model, blocked, name,
@@ -1100,6 +1104,7 @@ def requeue(texts: list, reason: str) -> int:
             e.update(status="pending", priority=min(e.get("priority", 100), URGENT_PRIORITY))
             e.pop("failCount", None)
             e.pop("lastFailModel", None)
+            e.pop("model", None)              # السجلّ في fixHistory، فلا يُوجّه
             n += 1
     if n:
         save_queue(disk)
@@ -1174,8 +1179,12 @@ def route_model(entry: dict, lexicon_ok: bool | None = None) -> str:
     والذرّية بصيغتها المعدَّلة: المقاطع موحّدة كلها على نموذج واحد (3.1) فلا تتجاور
     مسحتان داخل صفّ البلاطات نفسه، والكلمة الكاملة تنفرد بنموذجها.
     """
-    if entry.get("model"):                       # تعيين صريح من المدير يعلو على القاعدة
-        return entry["model"]
+    forced = entry.get("model")
+    # `model` سجلٌّ لما أنتج الملف، وكان يُقرأ أيضاً أمرَ توجيه — فمدخلٌ أُعيد
+    # يُوجَّه قسراً إلى منتجه (ومنه «antura-cc-by» وليس نموذجاً). فلا يُقبل أمراً
+    # إلا إن كان اسمَ نموذجٍ نعرفه.
+    if forced and forced in PRICE_PER_M:
+        return forced
     if lexicon_ok is None:
         lexicon_ok = is_approved(MODEL_LEXICON)
     if entry.get("category") in SHORT_CATEGORIES:
@@ -1225,10 +1234,62 @@ def quoted_symbols(text: str) -> list:
     return found
 
 
+HARAKA_DESC = {"َ": "مفتوحاً", "ِ": "مكسوراً", "ُ": "مضموماً", "ْ": "ساكناً",
+               "ً": "منوّناً بالفتح", "ٌ": "منوّناً بالضم", "ٍ": "منوّناً بالكسر"}
+TANWEEN_SOUND = {"ً": "َنْ", "ٌ": "ُنْ", "ٍ": "ِنْ"}
+_LETTER_NAMES = None
+
+
+def letter_name(ch: str) -> str:
+    global _LETTER_NAMES
+    if _LETTER_NAMES is None:
+        src = CURRICULUM.read_text(encoding="utf-8")
+        _LETTER_NAMES = {m.group(1): m.group(2)
+                         for m in re.finditer(r"'(.)':\s*\{\s*name:\s*'([^']+)'", src)}
+    return _LETTER_NAMES.get(ch, ch)
+
+
+def letter_haraka_style(text: str) -> str:
+    """تعليمةٌ **تسمّي الحرف وحركته** — لا نصّاً مجرّداً يُخمَّن.
+
+    بلاغ المالك (٥ أغسطس ٢٠٢٦): «كاف» تُلفظ «تاف»، و«طَ» تُلفظ «كا»، و«بِ» تُلفظ
+    «با» لا «بي»، و«قُ» تُلفظ «ق» بلا ضمّة. الحرفُ المفرد بحركته نصٌّ غامض على
+    المولّد — حرفان بلا سياق — فيُخمِّن. وتسميةُ الحرف («حرف الطاء») وحركته
+    («مفتوحاً») ترفع الغموض من أصله.
+    """
+    if len(text) != 2 or text[1] not in HARAKA_DESC:
+        return ""
+    return (f"انطق حرف {letter_name(text[0])} {HARAKA_DESC[text[1]]}، "
+            f"صوتاً واحداً قصيراً بمخرج صحيح، لطفل يتعلم القراءة: ")
+
+
+def speech_form(text: str) -> str:
+    """صورةُ النصّ **كما تُنطق** — تُرسل للمولّد، ولا تمسّ المفتاح ولا البيانات.
+
+    بلاغا المالك (٥ أغسطس ٢٠٢٦): التاءُ المربوطة الساكنة تُنطق تاءً والعربُ تقف
+    عليها هاءً؛ والتنوينُ يُبتلع فيُسمع حركةً قصيرة («بً» كـ«با»). فتُكتب في
+    **الطلب** بصورتها المنطوقة، ويبقى النصّ في المنهج والمعجم والمفتاح كما هو.
+    """
+    if len(text) == 2 and text[1] in TANWEEN_SOUND:
+        return text[0] + TANWEEN_SOUND[text[1]]
+    if text.endswith("ةْ"):
+        text = text[:-2] + "هْ"
+    elif text.endswith("ة"):
+        text = text[:-1] + "هْ"
+    # سكونُ الوقف الصريح يدفع المولّد إلى نبرٍ زائد على آخر الكلمة؛ والعربيُّ
+    # يكتبها بلا علامة ويقف عليها طبعاً. (حكم المالك: ٣ من ٤ عيّنات للمقترح.)
+    if len(text) > 2 and text.endswith("ْ"):
+        text = text[:-1]
+    return text
+
+
 def style_for(entry: dict) -> str:
     hint = (entry.get("style_hint") or "").strip()
     if hint:
         return hint.rstrip(":：").rstrip() + ": "
+    named = letter_haraka_style(entry.get("text", ""))
+    if named:
+        return named
     return STYLE[entry.get("category", "word")]
 
 
