@@ -2983,9 +2983,9 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 10,
-    "status": "pending",
+    "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-3.1-flash-tts-preview",
+    "model": "vertex#3.1-flash#no-repeat",
     "fixHistory": [
       {
         "was": "gemini-3.1-flash-tts-preview",

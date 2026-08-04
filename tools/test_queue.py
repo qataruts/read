@@ -35,6 +35,18 @@ def sandbox(entries):
     return tmp
 
 
+def fake_encode(pcm, rate, path, trim=True):
+    """ترميزٌ صوريّ للفحص: يكتب إطار mp3 صحيح الرأس بلا ffmpeg ولا lameenc.
+
+    الحارس يجب أن يعمل في كل بيئة (أمر المدير ٤ أغسطس ٢٠٢٦) — واشتراطُ مرمِّزٍ
+    مثبَّت يجعل حارسَ القائمة رهينةَ بيئةٍ بعينها، فيسكت حيث يجب أن ينطق.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frames = max(1, len(pcm) // 4608)
+    # ≥ حدّ `verify` الأدنى (١٥٠٠ بايت) كي لا يتهم الفحصُ ملفَّه الصوريّ بالبتر
+    path.write_bytes(b"\xff\xfb\x90\x64" + b"\x00" * max(1600, 100 * frames))
+
+
 def stub(calls, fail_on=None, quota_on=None, empty_on=()):
     def fake(text, style, *a, **k):
         calls.append((text, style))
@@ -51,6 +63,8 @@ def stub(calls, fail_on=None, quota_on=None, empty_on=()):
 def main():
     real_out, real_queue, real_tts = gen.OUT_DIR, gen.QUEUE_FILE, gen.gemini_pcm
     real_recit = gen.RECITATIONS_FILE
+    real_encode = gen.pcm_to_mp3
+    gen.pcm_to_mp3 = fake_encode          # لا يشترط الفحص مرمِّزاً مثبَّتاً
 
     # ————— ١. الترتيب والحالة والفهرس —————
     print("تصريف كامل:")
@@ -332,6 +346,7 @@ def main():
 
     gen.OUT_DIR, gen.QUEUE_FILE, gen.gemini_pcm = real_out, real_queue, real_tts
     gen.RECITATIONS_FILE = real_recit
+    gen.pcm_to_mp3 = real_encode
     print(f"\n{len(PASS)}/{len(PASS) + len(FAIL)} تحقّقاً ناجحاً")
     return 1 if FAIL else 0
 
