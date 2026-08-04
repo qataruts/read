@@ -2039,7 +2039,9 @@
     "requestedBy": "session-7",
     "priority": 100,
     "status": "pending",
-    "doneAt": null
+    "doneAt": null,
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "مَوْ",
@@ -2055,8 +2057,9 @@
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "قَا",
@@ -2073,7 +2076,9 @@
     "requestedBy": "session-7",
     "priority": 100,
     "status": "pending",
-    "doneAt": null
+    "doneAt": null,
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "طِي",
@@ -2090,15 +2095,18 @@
     "requestedBy": "session-7",
     "priority": 100,
     "status": "pending",
-    "doneAt": null
+    "doneAt": null,
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "لَيْمُونْ",
     "category": "word",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
   },
   {
     "text": "لَيْ",
@@ -2196,7 +2204,7 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 10,
-    "status": "pending",
+    "status": "done",
     "doneAt": "2026-08-04",
     "model": "gemini-3.1-flash-tts-preview",
     "fixHistory": [
@@ -2744,8 +2752,8 @@
     "category": "syllable",
     "requestedBy": "session-7",
     "priority": 10,
-    "status": "pending",
-    "doneAt": "2026-08-03",
+    "status": "done",
+    "doneAt": "2026-08-04",
     "model": "gemini-3.1-flash-tts-preview",
     "fixHistory": [
       {
@@ -4606,8 +4614,9 @@
     "category": "sentence",
     "requestedBy": "session-8",
     "priority": 100,
-    "status": "pending",
-    "doneAt": null
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الْجُبْنُ لَذِيذْ",
