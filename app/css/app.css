@@ -2042,8 +2042,12 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
 
 /* ————— رفُّ المكتبة: أغلفةٌ على رفّ (فيصير الاسمُ صورةً لا استعارة) ————— */
 .shelf-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
-  gap: .9rem; padding: .2rem .2rem 1rem; margin: 0; list-style: none;
+  /* **شبكةٌ ٣×٣ لا صفٌّ يلتفّ** (أمر المالك): التسعةُ تستوي شبكةً فيصير الرفُّ
+     مقصوداً؛ و`auto-fit` كان يعطي ٧+٢ أو ٥+٤ بحسب العرض — يبدو حادثَ التفافٍ لا
+     تصميماً. والحدُّ الأعلى يمنع الغلافَ أن يتضخّم على شاشةٍ عريضة. */
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 34rem; margin-inline: auto;
+  gap: .9rem; padding: .2rem .2rem 1rem; margin: 0 auto; list-style: none;
   /* لوحُ الرفّ تحت الأغلفة — خطٌّ واحدٌ يكفي للإيحاء بالخشب */
   border-bottom: 6px solid color-mix(in srgb, var(--accent-stories) 45%, var(--line));
   border-radius: 0 0 6px 6px;
