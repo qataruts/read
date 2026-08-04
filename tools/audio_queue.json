@@ -21097,5 +21097,109 @@
     "priority": 100,
     "status": "pending",
     "doneAt": null
+  },
+  {
+    "text": "ما يُكتَب، ومَن يكتُب، وأين يُحفَظ المكتوب.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التعلُّم، ومَن يُعلِّم، وأين يُتعلَّم.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "المعرفةُ، ومَن يملكها، ومَن يُبلِّغها.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرغيفُ، ومَن يخبزه، وأين يُخبَز.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللهوُ، ومَن يلعب، وأين يُلعَب.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ما يطير في السماء، ومَن يقوده، وأين يُقلِع.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الداءُ، ومَن أصابه، ومَن يُداويه.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "البردُ الجامد، وما يُحفَظ به، وما يُصنَع منه.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصورةُ المرسومة، ومَن يرسمها.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ما يُشرَب، وأين يُشرَب.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ضمُّ الشيء إلى الشيء — في الناس وفي العدد.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الهواءُ الجاري، وما يُديره فيَهُبّ.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ما يُركَب من مركبات، ومَن يركبه.",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
   }
 ]

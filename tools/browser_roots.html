@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار «شبكات الجذور»</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+const timeout = setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 130000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 5000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const { ROOTS, rootById } = await import('./js/curriculum.js');
+const { allNodes } = await import('./js/progress.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+
+const played = [];
+const spoken = [];
+const jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      played.push(manifest[key] ?? `?${key}`);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { spoken.push(text); this.text = text; } };
+}
+
+function idsBefore(id) {
+  const out2 = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out2;
+    out2.push(node.id);
+  }
+  return out2;
+}
+
+async function seed(nodeIds, extra = {}) {
+  win.localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, records: [], mic: false, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+    ...extra,
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(150);
+}
+
+const stored = () => JSON.parse(win.localStorage.getItem('muallim.progress.v1'));
+
+if (frame.contentDocument?.readyState !== 'complete') {
+  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+}
+attach();
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+const lastPlayed = () => played[played.length - 1];
+const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
+
+async function goto(hash) {
+  win.location.hash = hash;
+  await sleep(200);
+}
+
+/** الحروف المجرّدة — بها نقارن نصَّ الشاشة بنصّ البيانات مهما اختلف التشكيل (الخفوت). */
+const bare = (s) => (s || '').replace(/[ً-ْٰـ]/g, '');
+
+try {
+  const tree = ROOTS.find((r) => r.id === 'katb') || ROOTS[0];
+  const nodeId = `roots:${tree.id}`;
+
+  // ————— ١) المحطة على الخريطة في موضعها المحسوب —————
+  await seed(idsBefore(nodeId));
+  await goto('#/');
+  const station = await waitFor(() => $$('.station--roots').find(
+    (el) => el.textContent.includes(tree.title)), 'محطة الشجرة على الخريطة');
+  ok(Boolean(station), `محطة «شجرة ${tree.title}» على الخريطة في موضعها المحسوب`);
+  ok(station.textContent.includes(tree.sense),
+    'وسطرُ المعنى الجامع تحت عنوانها (به تُقرأ عائلةَ معنى لا حروف)');
+  ok(!station.classList.contains('station--locked'),
+    'ومفتوحةٌ عند اكتمال ثالث أعضائها — لا تنتظر بستاناً كاملاً');
+
+  // ————— ٢) الشجرة: لا يُعرض غير المدروس أصلاً —————
+  await goto(`#/roots/${tree.id}`);
+  await waitFor(() => $('.root-trunk'), 'جذع الشجرة');
+  ok(bare($('.root-trunk').textContent) === bare(tree.root),
+    `الجذعُ حروفُ الجذر «${tree.root}»`);
+
+  const branchText = texts('.root-branch');
+  ok(branchText.length >= 3, `${branchText.length} أغصانٍ معروضة`);
+  const shown = new Set(branchText.map(bare));
+  ok([...shown].every((b) => tree.members.some((m) => bare(m) === b)),
+    'وكلُّ غصنٍ عضوٌ معلَن في العائلة');
+
+  // العضو الذي لم يبلغه الطفل: لا عنصرَ في الشجرة يحمله — لا قفلٌ ولا إغراء.
+  // والمقارنةُ **بنصّ العنصر كاملاً لا باحتوائه**: «مكتب» جزءٌ من «مكتبة» رسماً،
+  // فالاحتواءُ يكذب حيث يصدق التطابق.
+  const unlearned = tree.members.filter((m) => !shown.has(bare(m)));
+  const onScreen = new Set([...$$('.root-branch'), ...$$('.root-option'), ...$$('.word-text')]
+    .map((el) => bare(el.textContent.trim())));
+  ok(unlearned.every((m) => !onScreen.has(bare(m))),
+    `وما لم يدرسه لا يظهر أصلاً — لا قفلَ مرئيّ (${unlearned.length} عضواً مخفيّاً)`);
+  ok($$('.root-branch .lock, .root-branch[disabled]').length === 0,
+    'ولا غصنَ مقفلٌ معروض');
+
+  // ————— ٣) سطرُ المعنى والأغصان تنطق من ملفاتها —————
+  // أسطرُ المعاني الثلاثة عشر هي **النصوص الجديدة الوحيدة** في هذه الحزمة، وتنتظر
+  // تصريفَ جلسة الصوتيات. فالمحروس هنا أن النقرة **تطلب نطقَها** — من ملفٍ إن وُجد،
+  // ومن الاحتياط إن لم يوجد بعدُ (وهو عينُ ما يسمح به بروتوكول قائمة الانتظار).
+  const senses = new Set(ROOTS.map((r) => r.sense));
+  const before = played.length + spoken.length;
+  $('.root-sense').click();
+  await waitFor(() => played.length + spoken.length > before, 'نطق سطر المعنى', 6000);
+  ok(lastPlayed() === tree.sense || spoken.includes(tree.sense) || pendingAudio.has(tree.sense),
+    'ونقرةُ سطر المعنى تنطقه (من ملفه، أو احتياطاً حتى تُصرَّف قائمةُ الانتظار)');
+
+  // وكلماتُ ب٢ كذلك في القائمة ولم تُصرَّف بعدُ، فالنطقُ منها أو من الاحتياط
+  const mark = played.length + spoken.length;
+  const firstBranch = branchText[0];
+  $$('.root-branch')[0].click();
+  await waitFor(() => played.length + spoken.length > mark, 'نطق الغصن', 6000);
+  const heard = played.length > mark ? lastPlayed() : spoken[spoken.length - 1];
+  ok(bare(heard) === bare(firstBranch),
+    `ونقرةُ الغصن تنطق كلمتَه («${heard}»)`);
+
+  // ————— ٤) «اجمع العائلة»: جولة كاملة —————
+  btn('تابع').click();
+  await sleep(200);
+  await waitFor(() => $('.root-option'), 'حوض اجمع العائلة');
+  ok($$('.root-option').length === 3, 'حوضُ «اجمع العائلة» ثلاثةُ خيارات');
+
+  // **لا صوت قبل الاختيار**: القراءةُ هي المقيسة هنا
+  const quiet = played.length + spoken.length;
+  await sleep(500);
+  ok(played.length + spoken.length === quiet,
+    'ولا صوتَ يُشغَّل قبل أن يختار (القراءة هي المقيسة لا السماع)');
+
+  // الخطأ يُسمِع ما نقره هو، ويُسجَّل في ليتنر
+  const opts = $$('.root-option');
+  const wrongEl = opts.find((el) => !tree.members.some((m) => bare(m) === bare(el.textContent)));
+  ok(Boolean(wrongEl), 'وفي الحوض مشتّتٌ من خارج العائلة');
+  const wrongText = wrongEl.textContent.trim();
+  const m0 = played.length + spoken.length;
+  wrongEl.click();
+  await waitFor(() => played.length + spoken.length > m0, 'نطق الخطأ', 6000);
+  const heardWrong = played.length > m0 ? lastPlayed() : spoken[spoken.length - 1];
+  ok(bare(heardWrong) === bare(wrongText),
+    `والخطأ يُسمعه ما نقره هو («${wrongText}») لا الصواب`);
+
+  const rightEl = $$('.root-option').find(
+    (el) => tree.members.some((m) => bare(m) === bare(el.textContent)));
+  const rightText = rightEl.textContent.trim();
+  const m1 = played.length + spoken.length;
+  rightEl.click();
+  await waitFor(() => played.length + spoken.length > m1, 'نطق الصواب', 6000);
+  const heardRight = played.length > m1 ? lastPlayed() : spoken[spoken.length - 1];
+  ok(bare(heardRight) === bare(rightText), 'والصوابُ يُنطق كلمتَه');
+
+  // ————— ٥) القياس دخل ليتنر بمفتاح العائلة —————
+  const skills = stored().skills;
+  const keys = Object.keys(skills).filter((k) => k.includes(`root-${tree.id}`));
+  ok(keys.length === 1, `والقياس دخل ليتنر بمفتاح «${keys[0]}» — عائلةٌ لا حرف`);
+  ok(keys[0].endsWith('|root'), 'ونوعُه `root`');
+  const rec = skills[keys[0]];
+  ok(rec.wrong >= 1 && rec.right >= 1, 'وسُجِّل الخطأ والصواب كلاهما');
+
+  // ————— ٦) إتمام المحطة —————
+  await waitFor(() => $('.celebrate') || $('.root-option'), 'استمرار الجولات', 8000);
+  for (let i = 0; i < 8 && !$('.celebrate'); i++) {
+    const good = $$('.root-option').find(
+      (el) => tree.members.some((m) => bare(m) === bare(el.textContent)));
+    if (!good) break;
+    good.click();
+    await sleep(1100);
+  }
+  ok(Boolean($('.celebrate')), 'وتُختم المحطة باحتفالٍ بعد جولاتها');
+  ok((stored().stars[nodeId] || 0) >= 1, 'وتُحفظ نجومُها فتُفتح ما بعدها');
+
+  // ————— ٧) صفرُ نطقٍ آليّ وصفرُ أعطاب —————
+  // أسطرُ المعاني معلَنةٌ منتظِرة: النطقُ الاحتياطي لها مشروعٌ حتى تُصرَّف
+  const strayTts = spoken.filter((t) => !pendingAudio.has(t) && !senses.has(t));
+  ok(true, `(نطقٌ احتياطيّ مشروع: ${spoken.length} نصاً كلُّها في القائمة أو أسطرُ معانٍ)`);
+  ok(strayTts.length === 0,
+    `ولم يُستعمل النطق الآلي إلا لنصٍّ ينتظر التصريف (${strayTts.length})`);
+  ok(jsErrors.length === 0, `ولا أخطاء جافاسكربت (${jsErrors.join(' · ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, `استثناء: ${e.message}`);
+}
+
+clearTimeout(timeout);
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

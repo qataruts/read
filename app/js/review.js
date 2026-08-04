@@ -12,7 +12,9 @@
 // في `KINDS` تمرينُه هنا — وإلا لبقيت مهاراتُه في صندوق ليتنر الأول أبداً، فيكذب
 // «الحروف المتقنة» في لوحة وليّ الأمر على وليّ الأمر.
 
-import { HARAKAT, contrastPairs, markOf, syllableSkill, wordSkill } from './curriculum.js';
+import {
+  HARAKAT, ROOTS, contrastPairs, markOf, memberSay, rootById, syllableSkill, wordSkill,
+} from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard } from './words.js';
@@ -73,6 +75,35 @@ function contrastItem(letter, haraka, pairs, rnd) {
   };
 }
 
+/**
+ * تمرين «اجمع العائلة» — جولةٌ واحدة من شجرة الجذر (حزمة الجذور): الخيارات عضوٌ
+ * من العائلة ومشتّتان من خارجها، وأذكاهما «الحروفُ بلا المعنى» إن وُجد.
+ *
+ * **ولا مهارةَ تُقاس بلا تمرينٍ يراجعها**: الشجرة تكتب مهاراتها بنوع `root`، فلولا
+ * هذا التمرين لبقيت في صندوق ليتنر الأول أبداً. ومادّتُه كلماتٌ منطوقةٌ محسوبة
+ * (أعضاءُ العائلة وحصيلةُ الطفل)، فلا نصَّ جديد يدخل المراجعة.
+ */
+function rootItem(rootId, words, rnd) {
+  const root = rootById(String(rootId).replace(/^root-/, ''));
+  if (!root) return null;
+  const texts = words.map((w) => w.text ?? w.read ?? (w.tiles || []).join(''));
+  const known = new Set(texts);
+  const branches = root.members.filter((m) => known.has(m));
+  if (!branches.length) return null;
+  const outside = [...new Set(texts)].filter((t) => !root.members.includes(t));
+  const smart = root.stranger ? [root.stranger] : [];
+  const others = [...smart, ...shuffle(outside, rnd)].slice(0, 2);
+  if (others.length < 2) return null;
+  const target = pick(branches, rnd);
+  return {
+    id: `root|${root.id}`,
+    kind: progress.KINDS.ROOT,
+    root,
+    target,
+    options: shuffle([target, ...others.filter((o) => o !== target)], rnd),
+  };
+}
+
 function buildItem(word, words, rnd) {
   if (!word) return null;
   const pool = [...new Set(words.flatMap((w) => w.tiles))];
@@ -124,6 +155,7 @@ function itemForSkill(skill, letters, words, sentences, pairs, rnd) {
   if (skill.kind === progress.KINDS.CONTRAST) {
     return contrastItem(skill.letter, skill.haraka, pairs, rnd);
   }
+  if (skill.kind === progress.KINDS.ROOT) return rootItem(skill.letter, words, rnd);
   if (skill.kind === progress.KINDS.BUILD) {
     return buildItem(wordForSkill(skill.letter, skill.haraka, words, rnd), words, rnd);
   }
@@ -166,7 +198,10 @@ export function buildSession({
     // تمييز الحرف والحركة يحتاج الحرف في جدول حصيلته؛ أمّا التركيب والترتيب فمادّتهما
     // كلمةٌ أو جملةٌ من حصيلته — فشرطُهما وجودها (الهمزة والتاء المربوطة تُدرَّسان في
     // المرحلة القرآنية ولا تظهران في المجموعات، وترد في كلمات البساتين)، وإلا فلا تمرين.
-    if (!(skill.kind in longs) && !known.includes(skill.letter)) continue;
+    // العائلةُ الصرفية مادّتُها كلماتٌ لا حرفٌ بعينه (مفتاحُها `root-<العائلة>`)،
+    // فتُستثنى من شرط الحرف كما استُثنى التركيبُ والترتيب.
+    if (skill.kind !== progress.KINDS.ROOT
+      && !(skill.kind in longs) && !known.includes(skill.letter)) continue;
     add(itemForSkill(skill, known, words, sentences, pairs, rnd));
   }
 
@@ -177,6 +212,7 @@ export function buildSession({
     ...shuffle(known, rnd).map((c) => () => harakaItem(c, pick(HARAKAT, rnd).key, rnd)),
     ...shuffle(pairs, rnd).map((p) => () =>
       contrastItem(pick(p.letters, rnd), pick(HARAKAT, rnd).key, pairs, rnd)),
+    ...shuffle(ROOTS, rnd).map((r) => () => rootItem(r.id, words, rnd)),
     ...shuffle(words, rnd).map((w) => () => buildItem(w, words, rnd)),
     ...shuffle(sentences, rnd).map((s) => () => orderItem(s, sentences, rnd)),
   ];
@@ -193,6 +229,7 @@ export function itemTexts(item) {
   if (item.kind === progress.KINDS.CONTRAST) return item.options.map((c) => c + item.mark);
   if (item.kind === progress.KINDS.HARAKA) return item.options.map((k) => item.letter + k.mark);
   if (item.kind === progress.KINDS.BUILD) return [...item.board.map((t) => t.text), item.word.say];
+  if (item.kind === progress.KINDS.ROOT) return [...item.options.map(memberSay), item.root.sense];
   if (item.kind === progress.KINDS.ORDER) {
     return [...item.board.map((t) => t.text), item.sentence.text, item.sentence.target.say];
   }
@@ -251,7 +288,8 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
         : item.kind === progress.KINDS.ORDER ? orderView(item)
           : item.kind === progress.KINDS.HARAKA ? harakaView(item)
             : item.kind === progress.KINDS.CONTRAST ? contrastView(item)
-              : quizView(item));
+              : item.kind === progress.KINDS.ROOT ? rootView(item)
+                : quizView(item));
     const ahead = items[state.index + 1];
     if (ahead) audio.preload(itemTexts(ahead));
   }
@@ -318,6 +356,38 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
   }
 
   // ————— ١ب) ميّز بين: الخياران هما الزوج المتشابه نفسه (الحزمة ١٣) —————
+
+  /**
+   * «اجمع العائلة» في المراجعة: **لا صوتَ قبل الاختيار** (القراءةُ هي المقيسة هنا
+   * لا السماع)، والخطأُ يُسمِع ما نُقر. والخياراتُ بنصّها كاملَ الشكل — حصانةُ الحوض.
+   */
+  function rootView(item) {
+    let locked = false;
+    const row = h('div', { class: 'row vrow' }, item.options.map((text) => {
+      const btn = h('button', {
+        class: 'vchip root-option',
+        'aria-label': text,
+        onclick: () => {
+          if (locked) return;
+          const correct = text === item.target;
+          score(item, `root-${item.root.id}`, null, correct);
+          if (!correct) return void wrong(btn, () => audio.play(memberSay(text)));
+          locked = true;
+          right(btn);
+          audio.play(memberSay(text));
+        },
+      }, h('span', { class: 'vchip-face' }, text));
+      return btn;
+    }));
+
+    return h('div', {},
+      h('h2', {}, `أيُّ كلمةٍ من شجرة ${item.root.title}؟`),
+      h('p', { class: 'hint' }, item.root.sense),
+      h('div', { class: 'root-trunk root-trunk--small' },
+        ...[...item.root.root].map((c) => h('span', { class: 'root-letter' }, c))),
+      row,
+    );
+  }
 
   function contrastView(item) {
     let locked = false;

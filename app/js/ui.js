@@ -64,6 +64,7 @@ export function nodeTitle(node) {
   if (node.type === 'quran') return node.title;
   if (node.type === 'gate') return node.gate.title;
   if (node.type === 'contrast') return node.contrast.title;
+  if (node.type === 'roots') return `شجرة ${node.root.title}`;
   if (node.type === 'garden') return `باقة ${arNum(node.bundle.index)} — ${node.garden.title}`;
   if (node.type === 'ladder') return `جمل ${node.garden.title} — درجة ${arNum(node.rung.index)}`;
   if (node.type === 'library') return `قصة «${node.story.title}»`;
@@ -78,6 +79,7 @@ export function nodeWhere(node) {
   if (node.type === 'quran') return QURAN.title;
   if (node.type === 'gate') return 'بوابة الإتقان';
   if (node.type === 'contrast') return 'محطة ميّز بين';
+  if (node.type === 'roots') return 'شبكات الجذور';
   if (node.type === 'garden') return `بستان ${node.garden.title}`;
   if (node.type === 'ladder') return `سلّم جمل ${node.garden.title}`;
   if (node.type === 'library') return `مكتبة ${node.garden.title}`;
@@ -99,6 +101,7 @@ export function nodeFace(node) {
   if (node.type === 'quran') return node.face;
   if (node.type === 'gate') return node.gate.face;
   if (node.type === 'contrast') return node.contrast.face;
+  if (node.type === 'roots') return icon('roots');   // أيقونتُنا الخطية لا إيموجي
   if (node.type === 'garden') return node.garden.emoji;
   if (node.type === 'ladder') return icon('book');
   if (node.type === 'library') return node.story.emoji;
@@ -203,6 +206,7 @@ const LANDMARKS = {
   // البوابة: قوسٌ على عمودين ومصراعاه — معلمُ محطة الإتقان قبل المفاصل الكبرى
   gate: '<path d="M6 44h52" /><path d="M13 44V25a19 19 0 0 1 38 0v19" /><path d="M32 44V6" /><path d="M22 44V27a10 10 0 0 1 20 0v17" />',
   // الميزان: كفّتان في مستوى واحد — معلمُ محطة «ميّز بين» (وزنُ الشبيهين بالأذن)
+  roots: '<path d="M32 56V26" /><path d="M32 34 18 20" /><path d="M32 34l14-14" /><path d="M32 26 24 12" /><path d="M32 26l8-14" />',
   scales: '<path d="M32 8v34" /><path d="M22 42h20" /><path d="M8 18h48" /><path d="M8 18v10" />'
     + '<path d="M56 18v10" /><path d="M2 28a6 6 0 0 0 12 0" /><path d="M50 28a6 6 0 0 0 12 0" />',
 };
@@ -312,6 +316,11 @@ export function faceEl(value, className, tag = 'span') {
 // أيقونات الواجهة — لغةُ المعالم نفسُها: خطٌّ بلا ملء، يتبع لون نصّه (`currentColor`).
 // كلُّها في صندوق 24×24، فيكفي المقاسَ سطرُها.
 const ICONS = {
+  // شجرةُ الجذر — جذعٌ يتفرّع: وجهُ محطة العائلة الصرفية (لغةُ الواجهة SVG لا إيموجي)
+  roots: '<path d="M12 21v-8"/><path d="M12 15 7.5 10.5"/><path d="m12 15 4.5-4.5"/>'
+    + '<path d="M12 12 8.5 6"/><path d="m12 12 3.5-6"/><circle cx="7.5" cy="9.6" r="1.5"/>'
+    + '<circle cx="16.5" cy="9.6" r="1.5"/><circle cx="8.5" cy="5" r="1.5"/>'
+    + '<circle cx="15.5" cy="5" r="1.5"/>',
   // مكبّر الصوت — زرّ «اسمع» وأذنُ الصورة
   ear: '<path d="M4 9.5h3.2L12 5.5v13L7.2 14.5H4z"/>'
     + '<path d="M15.6 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.4a8 8 0 0 1 0 11.2"/>',

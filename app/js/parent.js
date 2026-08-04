@@ -5,6 +5,7 @@
 // (pill · vchip · note · chip) وتُلوَّن بمتغيّر --accent، فلا تحتاج تنسيقاً جديداً.
 
 import * as progress from './progress.js';
+import { rootById } from './curriculum.js';
 import * as recordings from './recordings.js';
 import * as recorder from './recorder.js';
 import { FADE_AT, BARE_AT, levelOf, fadeText } from './fade.js';
@@ -541,6 +542,10 @@ function journeySection(rerender) {
 function dashboard(rerender = () => {}) {
   const letters = progress.studiedLetters();
   const stats = progress.letterStats();
+  const roots = progress.skills()
+    .filter((s) => s.kind === progress.KINDS.ROOT)
+    .map((s) => ({ ...s, title: rootById(String(s.letter).replace(/^root-/, ''))?.title || s.letter }))
+    .filter((s) => s.title);
   const mastered = stats.filter((s) => s.mastered);
   const weak = stats.filter((s) => s.struggling);
   const learning = stats.filter((s) => !s.mastered && !s.struggling);
@@ -594,6 +599,20 @@ function dashboard(rerender = () => {}) {
       learning.length
         ? h('div', { class: 'audit-row' }, learning.map((s) => letterChip(s, ACCENT)))
         : emptyNote('لا شيء في المنتصف.')),
+
+    // **الجذور قسمٌ خاصٌّ بها**: العائلةُ ليست حرفاً، فلا تدخل لوحةَ الحروف (وإلا ظهر
+    // «حرفٌ» اسمُه `root-katb`)، ولكنها مقيسةٌ في ليتنر كسائر المهارات فتُقرأ هنا.
+    ...section(`عائلات الجذور (${arNum(roots.length)})`,
+      roots.length
+        ? [h('div', { class: 'audit-row' }, roots.map((s) => h('span', {
+          class: 'vchip vchip--tag',
+          css: { '--chip': s.box >= progress.MASTERED_BOX ? GOOD : s.wrong >= 2 ? BAD : ACCENT },
+          title: `${s.title} — ${arNum(s.right)} صواب، ${arNum(s.wrong)} خطأ`,
+        }, s.title))),
+          h('p', { class: 'hint' },
+            'الوعي الصرفي: أن يعرف أن «كَاتِب» و«مَكْتَب» و«مَكْتَبَة» من أصلٍ واحد '
+            + '— من أقوى ما يسرّع القراءة في العربية.')]
+        : emptyNote('لم يبلغ شجرةً بعدُ — تُفتح حين يدرس ثلاث كلمات من أسرةٍ واحدة.')),
 
     ...section('دقائق آخر سبعة أيام',
       h('div', { class: 'audit-row' }, week.map((day) => {

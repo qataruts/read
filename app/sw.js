@@ -51,6 +51,7 @@ const SHELL = [
   'js/curriculum.js',
   'js/fade.js',
   'js/garden.js',
+  'js/roots.js',
   'js/gate.js',
   'js/ladder.js',
   'js/lesson.js',

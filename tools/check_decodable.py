@@ -205,6 +205,62 @@ def parse_contrasts(src: str) -> list:
     return out
 
 
+def parse_roots(src: str) -> list:
+    """يقرأ شبكات الجذور (حزمة الجذور): كل عائلة بمعناها وأعضائها المعلَنين."""
+    out = []
+    for m in re.finditer(r"id:\s*'([^']+)',\s*\n\s*root:\s*'([^']+)'", src):
+        chunk = src[m.start():]
+        end = chunk.find("\n  },")
+        chunk = chunk[:end if end > 0 else len(chunk)]
+        out.append({
+            "id": m.group(1),
+            "root": m.group(2),
+            "title": one(r"title:\s*'([^']*)'", chunk, ""),
+            "sense": one(r"sense:\s*'([^']*)'", chunk, ""),
+            "stranger": one(r"stranger:\s*'([^']*)'", chunk, ""),
+            "members": re.findall(r"'([^']*)'", one(r"members:\s*\[([^\]]*)\]", chunk, "")),
+        })
+    return out
+
+
+def check_roots(roots, lexicon_roots, curriculum_roots) -> tuple:
+    """عقدُ العائلة الصرفية (حزمة الجذور).
+
+    **الأعضاء معلَنون لا مشتقّون بالحروف** — وهذه القاعدة بنيويةٌ لا وصيّة: الفاحص
+    يتحقّق أن كل عضوٍ موجودٌ في مصدره (معجمٍ أو منهج) وأن **جذرَه المعلَن هناك هو
+    جذرُ العائلة**، فلا يتسلّل عضوٌ بالحروف وحدَها. ويتحقّق كذلك أن العائلة ثلاثةٌ
+    فأكثر، وألّا تقع كلمةٌ في عائلتين، وأن «الحروفَ بلا المعنى» **ليست عضواً**.
+    """
+    errors, warnings, spoken = [], [], []
+    known = {**curriculum_roots, **lexicon_roots}      # نصّ الكلمة ← جذرُها المعلَن
+    seen = {}
+    for fam in roots:
+        label = f"[جذر/{fam['id']}]"
+        for field in ("id", "root", "title", "sense"):
+            if not fam.get(field):
+                errors.append(f"{label}: بلا {field}")
+        if len(fam["members"]) < 3:
+            errors.append(f"{label}: {len(fam['members'])} أعضاء (لا شجرةَ دون ثلاثة)")
+        for member in fam["members"]:
+            if member not in known:
+                errors.append(f"{label}: العضو «{member}» ليس كلمةَ معجمٍ ولا منهجٍ معلَنة الجذر")
+            elif known[member] != fam["root"]:
+                errors.append(f"{label}: العضو «{member}» جذرُه «{known[member]}» "
+                              f"لا «{fam['root']}» — العضويةُ بالجذر المعلَن لا بالحروف")
+            if member in seen:
+                errors.append(f"{label}: العضو «{member}» في عائلة «{seen[member]}» أيضاً "
+                              "— لا كلمةَ في عائلتين")
+            seen.setdefault(member, fam["id"])
+        if fam["stranger"]:
+            if fam["stranger"] in fam["members"]:
+                errors.append(f"{label}: «{fam['stranger']}» مشتّتٌ وعضوٌ معاً — لا يجتمعان")
+            if known.get(fam["stranger"]) != fam["root"]:
+                errors.append(f"{label}: مشتّتُ «الحروف بلا المعنى» «{fam['stranger']}» "
+                              f"ليس من جذر «{fam['root']}» — فلا يؤدّي درسَه")
+        spoken.append(fam["sense"])          # سطرُ المعنى وحدَه جديدٌ على الصوت
+    return errors, warnings, spoken
+
+
 def check_contrasts(contrasts, groups, letters) -> tuple:
     """مفكوكية محطات المواجهة: لا يُواجَه الطفل بحرفٍ لم يُدرَّس بعد.
 
@@ -293,10 +349,13 @@ def parse_quran(src: str) -> dict:
     def worded(chunk):
         # `pictured: false` اختياريّ بعد الصورة («صدق الصورة») — الكلمةُ التي لا
         # تصوّرها صورةٌ صادقة تبقى بطاقةً تُنطَق ولا تصير هدفَ «اقرأ واختر».
-        return [(m.group(1), m.group(2), m.group(3) != "false")
+        # و`root` اختياريّ كذلك (حزمة الجذور): به تلتحق كلمةُ المنهج بشجرة عائلتها،
+        # وهو **حروفُ جذرٍ لا نصٌّ يُقرأ** فلا يدخل فحصَ المفكوكية.
+        return [(m.group(1), m.group(2), m.group(3) != "false", m.group(4) or "")
                 for m in re.finditer(
                     r"read:\s*'([^']*)'\s*,\s*emoji:\s*'([^']*)'"
-                    r"(?:\s*,\s*pictured:\s*(true|false))?", chunk)]
+                    r"(?:\s*,\s*pictured:\s*(true|false))?"
+                    r"(?:\s*,\s*root:\s*'([^']*)')?", chunk)]
 
     signs = []
     for chunk in chunks_by_key(region(letters, "signs:"), "sign"):
@@ -435,9 +494,9 @@ def check_quran(quran, taught, letters, source):
 
     # ٢. مادة القراءة بالرسم الإملائي: مفكوكة بكل قواعد المنهج
     allowed = set(MARKS) | TANWEEN | {SHADDA, SUN_RULE}
-    imla = [(text, emoji, pic, "درس الحرفين")
-            for s in quran["letters"]["signs"] for text, emoji, pic in s["words"]]
-    imla += [(text, emoji, pic, "كلمات القرآن") for text, emoji, pic in quran["words"]["items"]]
+    imla = [(w[0], w[1], w[2], "درس الحرفين")
+            for s in quran["letters"]["signs"] for w in s["words"]]
+    imla += [(w[0], w[1], w[2], "كلمات القرآن") for w in quran["words"]["items"]]
     if len(quran["words"]["items"]) < 5:
         errors.append("[قرآن] كلمات المرحلة أقلّ من خمس")
     for text, emoji, pictured, where in imla:
@@ -477,7 +536,7 @@ def check_quran(quran, taught, letters, source):
             errors.append(f"[قرآن/{level['id']}] درجةٌ بلا كلمات")
         if not level["size"]:
             errors.append(f"[قرآن/{level['id']}] درجةٌ بلا حدٍّ معلَن (size)")
-        for text, _emoji, _pic in level["items"]:
+        for text, *_ in level["items"]:
             n = len(bare(text))
             fits = n >= level["size"] if level["size"] == last_size else n == level["size"]
             if level["size"] and not fits:
@@ -700,8 +759,10 @@ def parse_curriculum(src: str):
         if g:
             groups[g]["letters"].extend(re.findall(r"'([^']+)'", m.group(1)))
 
+    # `root` اختياريّ (حزمة الجذور): به تلتحق كلمةُ المنهج بشجرة عائلتها
     word_re = re.compile(
-        r"\{\s*tiles:\s*\[([^\]]*)\]\s*,\s*say:\s*'([^']*)'\s*,\s*emoji:\s*'([^']*)'\s*\}"
+        r"\{\s*tiles:\s*\[([^\]]*)\]\s*,\s*say:\s*'([^']*)'\s*,\s*emoji:\s*'([^']*)'"
+        r"(?:\s*,\s*root:\s*'([^']*)')?\s*\}"
     )
     for m in word_re.finditer(src):
         g = owner(m.start())
@@ -710,6 +771,7 @@ def parse_curriculum(src: str):
                 "tiles": re.findall(r"'([^']+)'", m.group(1)),
                 "say": m.group(2),
                 "emoji": m.group(3),
+                "root": m.group(4) or "",
             })
 
     return letters, [groups[g] for g in order], parts
@@ -782,7 +844,7 @@ def text_errors(text, label, taught, letters, allowed):
 
 
 def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran=None,
-          contrasts=()):
+          contrasts=(), roots=()):
     errors, warnings = [], []
     seen_letters = set()   # الحروف المدروسة تراكمياً
     audio_texts = set()
@@ -911,6 +973,29 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
         warnings += c_warnings
         audio_texts.update(c_spoken)
 
+    # شبكات الجذور: جذورُ الأعضاء من مصادرها — المعجمُ يعلنها في `root`، والمنهجُ
+    # في كلمتيه الملحقتين. فالعضويةُ بالجذر المعلَن لا بمطابقة الحروف.
+    if roots:
+        lex_roots = {}
+        lex_path = ROOT / "app" / "data" / "lexicon.json"
+        if lex_path.exists():
+            for entry in json.loads(lex_path.read_text(encoding="utf-8")).get("words", []):
+                if entry.get("root"):
+                    lex_roots[entry["word"]] = entry["root"]
+        cur_roots = {}
+        for group in groups:
+            for word in group["words"]:
+                if word.get("root"):
+                    cur_roots["".join(word["tiles"])] = word["root"]
+        if quran:
+            for item in quran["words"]["items"]:
+                if len(item) > 3 and item[3]:
+                    cur_roots[item[0]] = item[3]
+        r_errors, r_warnings, r_spoken = check_roots(roots, lex_roots, cur_roots)
+        errors += r_errors
+        warnings += r_warnings
+        audio_texts.update(r_spoken)
+
     # ٣ج. المرحلة القرآنية (§١.٢ و§٥.٦): خاتمة الرحلة — حصيلة الطفل فيها كاملة.
     quran_literals = set()
     if quran:
@@ -923,6 +1008,7 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
         audio_texts.update(q_spoken)
         mushaf_texts.update(q_mushaf)
         quran_literals = set(q_spoken) | set(q_mushaf) | set(q_station) | {
+            *[w[3] for w in quran["words"]["items"] if len(w) > 3 and w[3]],
             quran["title"], quran["basmala"],
             *[quran[k][f] for k in ("letters", "words", "rasm", "muqattaat") for f in ("title", "face")],
             *[s[f] for s in quran["letters"]["signs"] for f in ("sign", "name")],
@@ -951,7 +1037,10 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
         for c in contrasts:
             seen_literals |= {c["title"], c["face"], c["hint"],
                               *[ch for p in c["pairs"] for ch in p["letters"]]}
-        for name in ("SKILLS", "STORIES", "CONTRASTS"):
+        for fam in roots:
+            seen_literals |= {fam["id"], fam["root"], fam["title"], fam["sense"],
+                              fam["stranger"], *fam["members"]}
+        for name in ("SKILLS", "STORIES", "CONTRASTS", "ROOTS"):
             for lit in re.findall(r"'([^']*)'", parts.get(name, "")):
                 if re.search(r"[ء-ي]", lit) and lit not in seen_literals:
                     errors.append(f"[{name}] نصّ لم يقرأه الفاحص: «{lit}» — راجع محلّل الملف")
@@ -1238,11 +1327,12 @@ def main():
     skills = parse_skills(parts.get("SKILLS", ""))
     stories = parse_stories(parts.get("STORIES", ""))
     contrasts = parse_contrasts(parts.get("CONTRASTS", ""))
+    roots = parse_roots(parts.get("ROOTS", ""))
     quran = parse_quran(parts.get("QURAN", ""))
     if args.self_test:
         sys.exit(self_test(letters, skills, stories, parts, quran, contrasts, groups))
     sys.exit(check(letters, groups, skills, stories, parts, quiet=args.quiet, quran=quran,
-                   contrasts=contrasts))
+                   contrasts=contrasts, roots=roots))
 
 
 if __name__ == "__main__":

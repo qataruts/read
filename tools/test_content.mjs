@@ -108,9 +108,10 @@ const { GARDENS } = await import(new URL('lexicon.js', APP));
 const { RUNGS } = await import(new URL('sentences.js', APP));
 const { LIBRARY } = await import(new URL('library.js', APP));
 const BUNDLES = GARDENS.reduce((s, g) => s + g.bundles.length, 0);
+const { ROOTS } = await import(new URL('curriculum.js', APP));
 ok(nodes.length === GROUPS.reduce((s, g) => s + g.letters.length + 1, 0)
   + SKILLS.length + STORIES.length + CONTRASTS.length + GATES.length + quranParts().length
-  + BUNDLES + RUNGS.length + LIBRARY.length,
+  + BUNDLES + RUNGS.length + LIBRARY.length + ROOTS.length,
   `عقد الرحلة = عقد المجموعات + ${SKILLS.length} مهارات + ٣ قصص + ${CONTRASTS.length} محطة «ميّز بين»`
   + ` + بوابتان + خاتمة قرآنية + ${BUNDLES} باقة + ${RUNGS.length} درجة جمل`
   + ` + ${LIBRARY.length} قصة مكتبة (${nodes.length} عقدة)`);

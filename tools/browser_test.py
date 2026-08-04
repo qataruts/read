@@ -13,6 +13,7 @@
     python3 tools/browser_test.py --gate       # بوابتا الإتقان (الحزمة ١٤)
     python3 tools/browser_test.py --parent     # صلابة التقدّم وتحكّم وليّ الأمر (الحزمة ١١)
     python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
+    python3 tools/browser_test.py --roots      # شبكات الجذور (حزمة الجذور)
     python3 tools/browser_test.py --fade       # خفوت التشكيل ز١→ز٣ (المرحلة ز)
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
@@ -69,6 +70,7 @@ PAGES = {
     "/__gate.html": TOOLS / "browser_gate.html",
     "/__gate_shots.html": TOOLS / "browser_gate_shots.html",
     "/__contrast.html": TOOLS / "browser_contrast.html",
+    "/__roots.html": TOOLS / "browser_roots.html",
     "/__contrast_shots.html": TOOLS / "browser_contrast_shots.html",
     "/__device.html": TOOLS / "browser_device.html",
     "/__welcome.html": TOOLS / "browser_welcome.html",
@@ -331,6 +333,8 @@ def main():
     ap.add_argument("--gate", action="store_true", help="بوابتا الإتقان: العبور والإخفاق والإعادة والترحيل")
     ap.add_argument("--parent", action="store_true",
                     help="صلابة التقدّم وتحكّم وليّ الأمر: ترقية عامل الخدمة والنسخة الاحتياطية (الحزمة ١١)")
+    ap.add_argument("--roots", action="store_true",
+                    help="شبكات الجذور: الشجرة و«اجمع العائلة» وقياسُها")
     ap.add_argument("--contrast", action="store_true",
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--fade", action="store_true",
@@ -391,6 +395,7 @@ def main():
         page = ("__welcome.html" if args.welcome
                 else "__fade.html" if args.fade
                 else "__parent.html" if args.parent
+                else "__roots.html" if args.roots
                 else "__contrast.html" if args.contrast
                 else "__gate.html" if args.gate
                 else "__map.html" if args.map

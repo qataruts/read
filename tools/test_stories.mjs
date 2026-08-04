@@ -85,7 +85,10 @@ const misplaced = GARDENS.filter((garden) => {
 });
 ok(misplaced.length === 0,
   `وقصصُ كل بستان تلي درجاتِ سلّمه مباشرةً${misplaced.length ? ' — ' + misplaced.map((g) => g.id).join('، ') : ''}`);
-ok(ids.at(-1) === storyIds.at(-1), 'وآخر الرحلة قصةُ مكتبةٍ لا درجةُ جمل');
+// أشجارُ الجذور تلي كتلةَ بستانها فقد تقع في الذيل (حزمة الجذور) — والمحروسُ أن
+// آخرَ **صلب** الرحلة قصةُ مكتبة: تدرّجُ البستان كلماتٌ ← جملٌ ← قصة.
+ok(ids.filter((id) => !id.startsWith('roots:')).at(-1) === storyIds.at(-1),
+  'وآخر الرحلة قصةُ مكتبةٍ لا درجةُ جمل');
 ok(p.maxTotalStars() === ids.length * p.MAX_STARS,
   `والرحلة صارت ${ids.length} عقدة و${p.maxTotalStars()} نجمة`);
 

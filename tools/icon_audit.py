@@ -171,7 +171,7 @@ def collect() -> tuple:
     # المرحلة القرآنية: كلماتها الإملائية أحواضُ «اقرأ واختر» — الصورة سؤالٌ يُحكَم به
     quran_letter_words = []
     for sign in quran["letters"]["signs"]:
-        for read, emoji, pictured in sign["words"]:
+        for read, emoji, pictured, *_root in sign["words"]:
             entry = Entry(
                 read, emoji, "curriculum.js",
                 f"القرآنية · {quran['letters']['title']} — {sign['name']}", "أ",
@@ -188,7 +188,7 @@ def collect() -> tuple:
     # فالتطابق داخل الدرجة خطأ، وبين درجتين تعارضٌ عبر الرحلة لا حوضٌ واحد.
     for level in quran["words"]["levels"]:
         level_items = []
-        for read, emoji, pictured in level["items"]:
+        for read, emoji, pictured, *_root in level["items"]:
             entry = Entry(
                 read, emoji, "curriculum.js",
                 f"القرآنية · {level['title']}", "أ",

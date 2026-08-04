@@ -1917,3 +1917,52 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
 /* وثبةُ الفرح في سطر الإتقان وسطرِ الختام: بلون النجمة (وهو لون الاحتفال في اللوح) */
 .hint .ui-icon,
 .note .ui-icon { color: var(--star); }
+
+
+/* ————— شبكات الجذور (حزمة الجذور) ————— */
+
+.station--roots { --accent: var(--accent-pause); }
+.node--roots .node-face svg { width: 1.6rem; height: 1.6rem; }
+
+/* الجذعُ: حروفُ الجذر كبيرةً متباعدة — هي أصلُ العائلة، فتُرى أوّلاً */
+.root-trunk {
+  display: flex; justify-content: center; gap: .5rem;
+  margin: .75rem 0 .5rem;
+}
+.root-letter {
+  font-family: var(--font-quran, inherit);
+  font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--paper));
+  border-radius: var(--r-md, .8rem);
+  padding: .3rem .6rem; min-width: 2.2rem; text-align: center;
+}
+.root-trunk--small .root-letter { font-size: clamp(1.4rem, 5vw, 2rem); padding: .2rem .45rem; }
+
+/* سطرُ المعنى: يُنقَر فيُسمَع — وهو الجامعُ الذي أقرّه المدير */
+.root-sense {
+  display: block; width: 100%; max-width: 34rem; margin: 0 auto .75rem;
+  background: none; border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: var(--r-md, .8rem); padding: .5rem .75rem;
+  font-size: 1.05rem; color: var(--ink); cursor: pointer; text-align: center;
+}
+.root-sense:active { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+.root-branches { flex-wrap: wrap; justify-content: center; gap: .6rem; }
+.root-branch {
+  background: var(--card); border: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: var(--r-md, .8rem); padding: .6rem .9rem;
+  font-size: clamp(1.1rem, 4.5vw, 1.5rem); cursor: pointer;
+}
+.root-branch.good { border-color: var(--accent); }
+.root-count { margin-top: .6rem; }
+
+/* حوضُ الخيارات: بنصّه كاملَ الشكل دائماً (ز١) — لا خفوتَ يفضح الجواب */
+.root-options { flex-wrap: wrap; justify-content: center; gap: .6rem; }
+.root-option {
+  background: var(--card); border: 2px solid var(--line, #0002);
+  border-radius: var(--r-md, .8rem); padding: .65rem 1rem;
+  font-size: clamp(1.15rem, 5vw, 1.6rem); cursor: pointer; min-height: 3rem;
+}
+.root-option.good { border-color: var(--good, #2e7d32); }
+.root-option.bad { border-color: var(--bad, #c62828); }

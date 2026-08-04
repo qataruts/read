@@ -6,7 +6,8 @@
 // ولوحة وليّ الأمر. لا نصّ منطوق جديد هنا — القياس لا يضيف محتوى.
 
 import {
-  GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, gateBefore, quranParts, bareLetters,
+  GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, ROOTS,
+  gateBefore, quranParts, bareLetters,
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf, stemOf } from './sentences.js';
@@ -20,7 +21,15 @@ export const WORDS_PART = 'words';   // عقدة لعبة الكلمات في آ
 /** أنواع التمارين المقيسة — أسماؤها ثابتة لأنها تُخزَّن في مفاتيح المهارات. */
 export const KINDS = {
   QUIZ: 'quiz', HARAKA: 'haraka', BUILD: 'build', ORDER: 'order', CONTRAST: 'contrast',
+  ROOT: 'root',
 };
+
+/**
+ * مهارةُ العائلة الصرفية: مقيسةٌ في ليتنر كسائرها، **ولا حرفَ لها**. فمفتاحُها
+ * `root-<العائلة>` لا حرفٌ × حركة، وتُستثنى من لوحة الحروف كي **لا يظهر حرفٌ وهميّ
+ * في لوحة وليّ الأمر** (حكم المدير في الحزمة ١٣ — والعلّةُ هي هي).
+ */
+export const isRootSkill = (skill) => skill?.kind === KINDS.ROOT;
 
 /** تباعد ليتنر بالأيام: كل إجابة صحيحة ترفع الصندوق، والخطأ يعيده إلى الصفر. */
 export const BOX_DAYS = [0, 1, 2, 4, 8, 16];
@@ -108,7 +117,7 @@ function migrateJourney() {
     if (node.type === 'gate') {
       state.stars[node.id] = MAX_STARS;           // بوابةٌ عبَر مفصلَها قبل وجودها ⇒ مجتازة
       changed = true;
-    } else if (node.type === 'contrast' || node.type === 'quran') {
+    } else if (node.type === 'contrast' || node.type === 'quran' || node.type === 'roots') {
       // محطةٌ استحدثناها خلف موضع الطفل: نجمةُ إتمامٍ واحدة تفكّ حبسه ولا تدّعي إتقاناً —
       // فتبقى تدعوه إلى لعبها (النجوم لا تنقص، فما يكسبه حين يلعبها يعلو عليها).
       // ويشمل ذلك محطاتِ «كلمات السورة» المستحدثة أمام سورٍ قرأها الطفل (الحزمة ١٢):
@@ -245,6 +254,51 @@ export function libraryNodes(garden) {
 }
 
 /**
+ * عقدة «شجرة الجذر» (حزمة الجذور): عقدةٌ واحدة لكل عائلة.
+ */
+export function rootNodes(root) {
+  return [{ id: `roots:${root.id}`, type: 'roots', part: root.id, root }];
+}
+
+/**
+ * **موضعُ كل شجرةٍ محسوبٌ لا مكتوب**: العقدةُ التي يكتمل بها **ثالثُ عضوٍ مدروس**.
+ *
+ * فالشجرة لا تُفتح على غصنين — ثلاثةٌ أدنى ما تُرى به عائلةً لا مصادفة. وكلُّ عضوٍ
+ * تُسلِّمه عقدةٌ بعينها: كلمةُ المعجم باقتُها، وكلمةُ المنهج عقدةُ درسها. فتُرتَّب
+ * مواضعُ الأعضاء ويُؤخذ ثالثُها، وتُوضَع الشجرةُ بعد **القسم** الذي يحويه.
+ *
+ * وبهذا تتحرّك المواضعُ وحدَها: كلمةٌ تُضاف إلى عائلةٍ في الدفعة القادمة قد تُقدّم
+ * شجرتَها، ولا سطرَ يُعدَّل. تعود: معرّف القسم ← عائلاتٌ تليه.
+ */
+function rootPlacement(sections) {
+  const deliver = new Map();          // نصّ الكلمة ← رقم القسم الذي يُسلّمها
+  sections.forEach((section, index) => {
+    for (const node of section.nodes) {
+      if (node.type === 'garden') {
+        for (const word of node.bundle.words) if (!deliver.has(word.word)) deliver.set(word.word, index);
+      } else if (node.type === 'group') {
+        for (const word of node.group.words || []) {
+          const text = (word.tiles || []).join('');
+          if (text && !deliver.has(text)) deliver.set(text, index);
+        }
+      } else if (node.type === 'quran' && node.item?.read && !deliver.has(node.item.read)) {
+        deliver.set(node.item.read, index);
+      }
+    }
+  });
+
+  const after = new Map();
+  for (const root of ROOTS) {
+    const places = root.members.map((m) => deliver.get(m)).filter((i) => i !== undefined).sort((a, b) => a - b);
+    if (places.length < 3) continue;        // تفشل مغلقةً: عائلةٌ لا يبلغها الطفلُ ثلاثاً لا عقدةَ لها
+    const at = places[2];
+    if (!after.has(at)) after.set(at, []);
+    after.get(at).push(root);
+  }
+  return after;
+}
+
+/**
  * الرحلة كاملةً بأقسامها بالترتيب: مجموعة ← ما بعدها من مهارات وقصص ← محطة «ميّز بين»
  * إن كانت لها ← … ← بوابة المصحف ← المرحلة القرآنية ← بوابة الحديقة ←
  * (بستان ← سلّم جمله ← قصصه) × البساتين.
@@ -285,8 +339,27 @@ export function journey() {
       out.push({ kind: 'library', id: `library:${garden.id}`, garden, nodes: stories });
     }
   }
-  journeyCache = out;
-  return out;
+  // أقسامُ الأشجار تُدرَج بعد بنائها كلِّها — فموضعُها يُقاس على الرحلة التامّة.
+  // وتُؤخَّر إلى آخر كتلة بستانها (باقاتُه ثم سلّمُه ثم مكتبتُه): الشجرةُ ثمرةُ ما
+  // دُرِس، فلا تُقحَم بين البستان ودرجاته فتقطع تدرّجَه المُقَرّ في الحزمة ٨.
+  const after = rootPlacement(out);
+  const sameGarden = (a, b) => a?.garden && b?.garden && a.garden.id === b.garden.id;
+  const withRoots = [];
+  out.forEach((section, index) => {
+    withRoots.push(section);
+    const trees = after.get(index) || [];
+    if (!trees.length) return;
+    // إن تلت هذا القسمَ أقسامُ بستانِه نفسِه (سلّمٌ أو مكتبة) فالشجرةُ بعدها
+    let tail = index;
+    while (sameGarden(out[tail + 1], out[index]) && out[tail + 1].kind !== 'garden') tail++;
+    if (tail !== index) { (after.get(tail) || after.set(tail, []).get(tail)).push(...trees); return; }
+    for (const root of trees) {
+      withRoots.push({ kind: 'roots', id: `roots:${root.id}`, root, nodes: rootNodes(root) });
+    }
+  });
+
+  journeyCache = withRoots;
+  return withRoots;
 }
 
 /** كل عقد الرحلة بالترتيب — عليها يقوم القفل التسلسلي وحساب النجوم. */
@@ -536,6 +609,7 @@ export function weakestSkills() {
 export function letterStats() {
   const byLetter = new Map();
   for (const s of skills()) {
+    if (isRootSkill(s)) continue;      // العائلةُ ليست حرفاً — لها قسمُها في اللوحة
     const acc = byLetter.get(s.letter)
       || { letter: s.letter, right: 0, wrong: 0, minBox: MAX_BOX, kinds: 0, seen: 0 };
     acc.right += s.right;

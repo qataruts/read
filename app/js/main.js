@@ -15,6 +15,7 @@ import { renderQuran } from './quran.js';
 import { renderGate } from './gate.js';
 import { renderContrast } from './contrast.js';
 import { renderGarden } from './garden.js';
+import { renderRoots } from './roots.js';
 import { renderLadder } from './ladder.js';
 import { renderParent, skillsText } from './parent.js';
 import {
@@ -97,6 +98,7 @@ function renderMap() {
       : section.kind === 'quran' ? quranEl(section, next, folded)
         : section.kind === 'gate' ? gateEl(section, next, folded)
           : section.kind === 'contrast' ? contrastEl(section, next, folded)
+            : section.kind === 'roots' ? rootsEl(section, next, folded)
             : section.kind === 'garden' ? gardenEl(section, next, folded)
               : section.kind === 'ladder' ? ladderEl(section, next, folded)
                 : section.kind === 'library' ? libraryEl(section, next, folded)
@@ -284,6 +286,35 @@ function contrastEl(section, next, folded) {
 }
 
 /**
+ * شجرة الجذر (حزمة الجذور): محطةٌ لكل عائلة صرفية، موضعُها **محسوب** — حيث يكتمل
+ * ثالثُ عضوٍ مدروس. وسطرُ المعنى تحت العنوان: هو الجامعُ الذي أقرّه المدير، وبه
+ * تُقرأ العائلةُ عائلةَ معنى لا عائلةَ حروف.
+ */
+function rootsEl(section, next, folded) {
+  const root = section.root;
+  const node = section.nodes[0];
+  const unlocked = progress.isNodeUnlockedById(node.id);
+  const done = progress.isDone(node.id);
+
+  return trackEl({
+    id: section.id,
+    folded,
+    className: `station station--roots${unlocked ? '' : ' station--locked'}${done ? ' station--done' : ''}`,
+    accent: PAUSE_ACCENT,
+    mark: 'roots',
+    label: `شجرة ${root.title}${unlocked ? '' : ' — مقفلة'}`,
+    badge: icon('roots'),
+    title: `شجرة ${root.title}`,
+    sub: root.sense,
+    meta: unlocked
+      ? [h('b', {}, `★ ${arNum(progress.getStars(node.id))}`), ` / ${arNum(progress.MAX_STARS)}`]
+      : [icon('lock'), ' مقفلة'],
+    nodes: section.nodes,
+    next,
+  });
+}
+
+/**
  * بستان موضوعات (الحزمة ٧): محطةٌ لكل موضوع، عقدها باقات من خمس كلمات.
  * تأتي بعد المرحلة القرآنية — هنا يتوسّع الرصيد بعد أن اكتمل فكّ الشيفرة.
  */
@@ -381,7 +412,7 @@ function accentOf(node, group) {
   if (node.type === 'ladder') return SENTENCE_ACCENT;
   if (node.type === 'library') return STORY_ACCENT;
   if (node.type === 'skill' || node.type === 'story' || node.type === 'gate'
-    || node.type === 'contrast') return PAUSE_ACCENT;
+    || node.type === 'contrast' || node.type === 'roots') return PAUSE_ACCENT;
   return accentFor(group);
 }
 
@@ -578,6 +609,9 @@ async function render() {
   } else if (name === 'contrast' && arg1) {
     if (!guard(`contrast:${decodeURIComponent(arg1)}`)) return;
     screen = renderContrast(decodeURIComponent(arg1)) || renderMap();
+  } else if (name === 'roots' && arg1) {
+    if (!guard(`roots:${decodeURIComponent(arg1)}`)) return;
+    screen = renderRoots(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'garden' && arg1) {
     if (!guard(`garden:${decodeURIComponent(arg1)}`)) return;
     screen = renderGarden(decodeURIComponent(arg1)) || renderMap();
