@@ -41,6 +41,10 @@ const p = await import(new URL('progress.js', APP));
 // كلٌّ بميزان الآخر — فاختلط رصيدُ الكلمات وموضعُ العقدة.
 const LIBRARY = ALL_STORIES.filter((s) => s.garden);
 const SURAH_STORIES = ALL_STORIES.filter((s) => s.surah);
+// و**رفُّ المكتبة** محورٌ ثالث (حزمة المكتبة، ١٢ أغسطس ٢٠٢٦): موضعُه ذيلُ الرحلة،
+// ورصيدُه الرحلةُ كلُّها — فلا يُقاس بميزان البستان ولا بميزان السورة، وله §١أ أدناه.
+const SHELF = ALL_STORIES.filter((s) => s.shelf);
+const shelfIds = SHELF.map((s) => `shelf:${s.id}`);
 
 let fails = 0;
 const ok = (cond, msg) => { if (!cond) { fails++; console.log('  ✗', msg); } else console.log('  ✓', msg); };
@@ -70,8 +74,8 @@ ok(LIBRARY.map((s) => s.level).every((lv, i, a) => !i || lv >= a[i - 1]),
 ok(LIBRARY.every((s) => s.pages.every((page) => page.emoji && page.text
   && page.words.join(' ') === page.text)),
   'ولكل صفحة مشهدُها ونصُّها، ونصُّها المنطوق هو كلماتها بعينها (لا مصدر ثانٍ)');
-ok(LIBRARY.every((s) => s.title && s.emoji && s.question),
-  'ولكل قصة عنوانٌ ووجهٌ وسؤالُ فهم');
+ok(LIBRARY.every((s) => s.title && s.emoji && s.questions.length),
+  `ولكل قصة عنوانٌ ووجهٌ وسؤالُ فهمٍ لكل مقطع (${LIBRARY.reduce((n, s) => n + s.questions.length, 0)} سؤالاً)`);
 
 const texts = LIBRARY.flatMap((s) => s.pages.map((page) => page.text));
 ok(new Set(texts).size === texts.length, `ولا جملة مكرَّرة في المكتبة (${texts.length} جملة)`);
@@ -94,10 +98,14 @@ const misplaced = GARDENS.filter((garden) => {
 });
 ok(misplaced.length === 0,
   `وقصصُ كل بستان تلي درجاتِ سلّمه مباشرةً${misplaced.length ? ' — ' + misplaced.map((g) => g.id).join('، ') : ''}`);
-// أشجارُ الجذور تلي كتلةَ بستانها فقد تقع في الذيل (حزمة الجذور) — والمحروسُ أن
-// آخرَ **صلب** الرحلة قصةُ مكتبة: تدرّجُ البستان كلماتٌ ← جملٌ ← قصة.
-ok(ids.filter((id) => !id.startsWith('roots:')).at(-1) === storyIds.at(-1),
-  'وآخر الرحلة قصةُ مكتبةٍ لا درجةُ جمل');
+// أشجارُ الجذور تلي كتلةَ بستانها فقد تقع في الذيل (حزمة الجذور)، و**رفُّ المكتبة
+// بعدها كلِّها** (حزمة المكتبة) — والمحروسُ أن آخرَ **صلب** الرحلة قراءةٌ لا تمرين:
+// تدرّجُ البستان كلماتٌ ← جملٌ ← قصة، ثم الرفُّ يتوّجها بالقراءة الطويلة.
+const spine = ids.filter((id) => !id.startsWith('roots:'));
+ok(spine.at(-1) === shelfIds.at(-1) && shelfIds.length > 0,
+  `وآخر الرحلة قصةُ رفٍّ لا درجةُ جمل (${shelfIds.length} على الرفّ)`);
+ok(ids.indexOf(shelfIds[0]) > ids.lastIndexOf(storyIds.at(-1)),
+  'ورفُّ المكتبة بعد مكتبات البساتين كلِّها — رصيدُه الرحلةُ كلُّها');
 ok(p.maxTotalStars() === ids.length * p.MAX_STARS,
   `والرحلة صارت ${ids.length} عقدة و${p.maxTotalStars()} نجمة`);
 
@@ -142,7 +150,7 @@ for (const story of LIBRARY) {
   const known = stemsBefore(`library:${story.id}`);
   const words = [...story.title.split(' '),
     ...story.pages.flatMap((page) => page.words),
-    ...story.question.words];
+    ...story.questions.flatMap((q) => q.words)];
   for (const word of words) {
     checked++;
     const stem = stemOf(word);
@@ -157,7 +165,15 @@ ok(true, `لا كلمة خارج المدروس في المكتبة كلها (${
 // عليهما معاً — وإلا حُسبت مفرداتُ قصةِ السورة «معطَّلة» وهي مستعمَلة.
 for (const story of SURAH_STORIES) {
   for (const word of [...story.title.split(' '),
-    ...story.pages.flatMap((page) => page.words), ...story.question.words]) {
+    ...story.pages.flatMap((page) => page.words), ...story.questions.flatMap((q) => q.words)]) {
+    const st = stemOf(word);
+    if (support.has(st)) usedSupport.add(support.get(st));
+  }
+}
+// وقصصُ الرفّ تشترك في الحقل نفسِه — فيُجرد استعمالُها معهما (لا معجم ميت)
+for (const story of SHELF) {
+  for (const word of [...story.title.split(' '),
+    ...story.pages.flatMap((page) => page.words), ...story.questions.flatMap((q) => q.words)]) {
     const st = stemOf(word);
     if (support.has(st)) usedSupport.add(support.get(st));
   }
@@ -174,27 +190,32 @@ ok(heroes.every((hero) => LIBRARY.some((s) => s.pages.some((page) =>
 
 // ————— ٤. سؤال الفهم: جوابٌ مقروءٌ من القصة لا مخمَّن —————
 
+let asks = 0;
 for (const story of LIBRARY) {
-  const q = story.question;
   const inStory = new Set(story.pages.flatMap((page) => page.words.map(stemOf)));
   const known = stemsBefore(`library:${story.id}`);
-  if (q.options.length !== 3) bad(`[${story.id}] خيارات السؤال ≠ ٣`);
-  if (!q.options.includes(q.answer)) bad(`[${story.id}] الجواب ليس بين الخيارات`);
-  if (new Set(q.options.map((w) => w.emoji)).size !== 3) bad(`[${story.id}] صورتان متشابهتان`);
-  if (!inStory.has(stemOf(q.answer.word))) bad(`[${story.id}] الجواب ليس في نصّ القصة`);
-  for (const option of q.options) {
-    if (!WORDS.includes(option)) bad(`[${story.id}] خيارٌ ليس كلمةَ معجم`);
-    if (!known.has(stemOf(option.word))) bad(`[${story.id}] خيارٌ لم يبلغه الطفل بعد`);
-    if (option !== q.answer && inStory.has(stemOf(option.word))) {
-      bad(`[${story.id}] مشتّتٌ «${option.word}» في نصّ القصة (السؤال يحتمل جوابين)`);
+  for (const q of story.questions) {
+    asks++;
+    // **حدُّ المقطع**: الجوابُ ممّا قرأه إلى صفحته لا ممّا بعدها
+    const upto = new Set(story.pages.slice(0, q.upto).flatMap((page) => page.words.map(stemOf)));
+    if (q.options.length !== 3) bad(`[${story.id}] خيارات السؤال ≠ ٣`);
+    if (!q.options.includes(q.answer)) bad(`[${story.id}] الجواب ليس بين الخيارات`);
+    if (new Set(q.options.map((w) => w.emoji)).size !== 3) bad(`[${story.id}] صورتان متشابهتان`);
+    if (!upto.has(stemOf(q.answer.word))) bad(`[${story.id}/${q.upto}] الجواب ليس فيما قرأه`);
+    for (const option of q.options) {
+      if (!WORDS.includes(option)) bad(`[${story.id}] خيارٌ ليس كلمةَ معجم`);
+      if (!known.has(stemOf(option.word))) bad(`[${story.id}] خيارٌ لم يبلغه الطفل بعد`);
+      if (option !== q.answer && inStory.has(stemOf(option.word))) {
+        bad(`[${story.id}] مشتّتٌ «${option.word}» في نصّ القصة (السؤال يحتمل جوابين)`);
+      }
+    }
+    const body = q.words.filter((w) => !['مَنْ', 'مَاذَا', 'أَيْنَ'].includes(w));
+    if (body.some((w) => !upto.has(stemOf(w)))) {
+      bad(`[${story.id}/${q.upto}] في السؤال كلمةٌ خارج ما قرأه`);
     }
   }
-  const body = q.words.filter((w) => !['مَنْ', 'مَاذَا', 'أَيْنَ'].includes(w));
-  if (body.some((w) => !inStory.has(stemOf(w)))) {
-    bad(`[${story.id}] في السؤال كلمةٌ خارج نصّ القصة`);
-  }
 }
-ok(true, `وسؤالُ كل قصة يُجاب من نصّها وحده (${LIBRARY.length} سؤالاً بثلاث صور)`);
+ok(true, `وسؤالُ كل مقطع يُجاب ممّا قرأه إليه (${asks} سؤالاً بثلاث صور)`);
 
 // ————— ٥. النجوم: متابعةٌ + نجمةُ فهم —————
 
@@ -214,18 +235,39 @@ const have = new Set(Object.values(manifest));
 const pending = new Set(queue.filter((e) => e.status !== 'done').map((e) => e.text));
 const voiced = (t) => have.has(t) || pending.has(t);
 
-const spoken = new Set([
-  ...libraryTexts(),
-  ...LIBRARY.flatMap((s) => s.question.options.map((w) => w.say)),
-]);
-const stray = [...spoken].filter((t) => !voiced(t));
+// **بوّابةُ الصوت حالةٌ يعرفها الحارس، لا ثغرةٌ يتغاضى عنها** (١٢ أغسطس ٢٠٢٦):
+// عقدُ الحزمة ٩ أنّ **مادّةَ القصة لا تدخل قائمةَ الصوت قبل حكم المدير بعينه**.
+// فبين التأليف والحكم تمرّ القصةُ بحالٍ مشروعة: مبنيّةٌ ولا صوتَ لها. وكان هذا
+// الحارسُ يُحمِرّ فيها (بينما `check_lexicon` يكتفي بتنبيه) — فيدفع الجلسةَ إمّا إلى
+// إطعام القائمة قبل الحكم أو إلى الالتزام على شجرةٍ حمراء، وكلاهما نقضٌ للعقد.
+//
+// فالتمييزُ **مشتقٌّ لا معلَن**: قصةٌ **لا نصَّ لها مصروفٌ ولا منتظِر** هي المنتظرةُ
+// للبوابة (تُذكَر بأسمائها ولا تُخفى)، وقصةٌ **بعضُها مصروفٌ وبعضُه ضائع** انحدارٌ
+// حقيقيّ يُحمِرّ. فالحالةُ الوسطى وحدَها مأذونة، وتُغلَق من نفسها يوم تُطعَم القائمة.
+const storyOf = new Map();
+for (const st of ALL_STORIES) {
+  for (const t of [...storyTexts(st), ...st.questions.flatMap((q) => q.options.map((w) => w.say))]) {
+    if (!storyOf.has(t)) storyOf.set(t, st.id);
+  }
+}
+const spoken = new Set(storyOf.keys());
+// و**العلامةُ عنوانُ القصة**: نصٌّ يُؤلَّف لها وحدها ويدخل القائمة أوّلَ ما تدخل،
+// فإن كان بلا صوتٍ فالقصةُ كلُّها لم تُطعَم بعد. وإن كان مصروفاً فقد عبرت البوابة —
+// وكلُّ نصٍّ ضائعٍ بعدها انحدارٌ يُحمِرّ.
+const atGate = new Set(ALL_STORIES.filter((st) => !voiced(st.title)).map((st) => st.id));
+const stray = [...spoken].filter((t) => !voiced(t) && !atGate.has(storyOf.get(t)));
 ok(stray.length === 0,
   `كل ما تنطقه شاشات المكتبة له ملف أو مكان في القائمة (${spoken.size} نصاً: `
   + `${[...spoken].filter((t) => have.has(t)).length} جاهز، `
   + `${[...spoken].filter((t) => pending.has(t) && !have.has(t)).length} منتظِر)`
   + `${stray.length ? ' — بلا حساب: ' + stray.slice(0, 6).join('، ') : ''}`);
-ok(libraryTexts().every((t) => voiced(t)),
-  'ومادّةُ القصص دخلت القائمة بعد اعتماد المدير (بند الحزمة ٩/٤: لا صوت قبل حكم العين)');
+if (atGate.size) {
+  const waiting = [...spoken].filter((t) => atGate.has(storyOf.get(t))).length;
+  console.log(`  ⏸ ${atGate.size} قصةً عند بوابة الاعتماد بلا صوت (${waiting} نصاً): `
+    + `${[...atGate].join('، ')} — لا قائمةَ صوت قبل حكم المدير (بند الحزمة ٩/٤)`);
+}
+ok([...spoken].every((t) => voiced(t) || atGate.has(storyOf.get(t))),
+  'ومادّةُ القصص المعتمَدة دخلت القائمة كلُّها (بند الحزمة ٩/٤: لا صوت قبل حكم العين)');
 ok(LIBRARY.every((s) => storyTexts(s).length === new Set(storyTexts(s)).size),
   'ولا تكرار في قائمة نصوص أي قصة');
 
@@ -238,14 +280,21 @@ ok(LIBRARY.every((s) => storyTexts(s).length === new Set(storyTexts(s)).size),
 // حارسٍ تشمله السَّوقة القياسية (`tools/test_*.mjs`) — فلا يعود فحصٌ يملكه المشروع
 // ولا يراه أحد.
 
-console.log('\n— المولّد ومادّتُه (make_stories.py) —');
-for (const [flag, what] of [
-  ['--self-test', 'المولّد ومادّتُه سليمان (المعجم المعلَن، وحدود المستوى، والسؤال)'],
-  ['--check', 'وملفاتُ app/data/stories هي عينُ خرج المولّد (لا تُحرَّر قصةٌ بيد)'],
+// **وثمرةُ العهد نفسِه، ثانيةً** (١٢ أغسطس ٢٠٢٦): `check_lexicon.py --self-test` —
+// وهو **فحصُ الفاحص** الذي يحرس عقدَ القصص كلَّه — لم يكن في سَوقةِ أحدٍ كذلك، فبقي
+// **أحمرَ بتسع عشرة شكوى** على HEAD (ثبّتُّه بشجرة عملٍ نظيفة قبل أن أنسبه لنفسي).
+// وعلّتُه أنّ حدودَ حجم المنظومة (٨ بساتين، ٢٥٠ كلمة، باقتان) أُضيفت إليه بعد كتابته
+// فصارت مادّتُه المُصطنَعة الصغيرة تخالفها — لا لأنّ قاعدةً انكسرت. فعُزلت الحدودُ
+// بمفتاح `corpus` المعلَن، ودخل الفحصُ السَّوقة: **فحصُ الفاحص أولى ما لا يُترك أعمى.**
+console.log('\n— المولّد والفاحص في السَّوقة (فحصٌ لا يُشغَّل ليس حارساً) —');
+for (const [tool, flag, what] of [
+  ['make_stories.py', '--self-test', 'المولّد ومادّتُه سليمان (المعجم المعلَن، وحدود المستوى، والسؤال)'],
+  ['make_stories.py', '--check', 'وملفاتُ app/data/stories هي عينُ خرج المولّد (لا تُحرَّر قصةٌ بيد)'],
+  ['check_lexicon.py', '--self-test', 'والفاحصُ نفسُه يمسك المخالفات كلَّها (فحصُ الفاحص)'],
 ]) {
   const run = spawnSync('python3',
-    [fileURLToPath(new URL('make_stories.py', import.meta.url)), flag], { encoding: 'utf8' });
-  ok(run.status === 0, `[${flag}] ${what}`
+    [fileURLToPath(new URL(tool, import.meta.url)), flag], { encoding: 'utf8' });
+  ok(run.status === 0, `[${tool} ${flag}] ${what}`
     + (run.status === 0 ? '' : `\n${(run.stdout || '').split('\n').filter((l) => l.includes('✗')).join('\n')}`));
 }
 

@@ -32,7 +32,7 @@ const {
 } = await import(new URL('app/js/curriculum.js', ROOT));
 const { GARDENS } = await import(new URL('app/js/lexicon.js', ROOT));
 const { RUNGS, fillOptionTexts } = await import(new URL('app/js/sentences.js', ROOT));
-const { LIBRARY } = await import(new URL('app/js/library.js', ROOT));
+const { LIBRARY, readsAloud } = await import(new URL('app/js/library.js', ROOT));
 
 const REQUESTED_BY = process.env.QUEUE_BY || 'session-7';
 
@@ -104,13 +104,15 @@ function newTexts() {
   }
   // مكتبة القصص: العنوان، ثم كل جملة، ثم كلماتُها مفردةً — فكلُّ كلمةٍ زرٌّ يُسمعها
   // الطفل في شاشة القراءة، وسؤالُ الفهم جملةٌ تُنطق بعد الإجابة.
+  // **وجملُ الرفّ لا تدخل**: «القصةُ تُقرأ لا تُسمع» (حزمة المكتبة) — يسقط الكاريوكي
+  // وأذنُ السطر فلا صوتَ لجملة، وتبقى كلماتُها مفردةً (نقرةُ الكلمة شبكةُ الأمان).
   for (const story of LIBRARY) {
     add(story.title, 'sentence');
     for (const page of story.pages) {
-      add(page.text, 'sentence');
+      if (readsAloud(story)) add(page.text, 'sentence');
       for (const word of page.words) add(word, 'story_word');
     }
-    if (story.question) add(story.question.text, 'sentence');
+    for (const q of story.questions || []) add(q.text, 'sentence');
   }
   const forbidden = quranMushafTexts().filter((t) => out.has(t));
   if (forbidden.length) {

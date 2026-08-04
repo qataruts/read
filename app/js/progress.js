@@ -11,7 +11,7 @@ import {
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf, stemOf } from './sentences.js';
-import { libraryOf, storiesOfSurah } from './library.js';
+import { libraryOf, shelfStories, storiesOfSurah } from './library.js';
 
 const STORE_KEY = 'muallim.progress.v1';
 export const VERSION = 2;            // ١ = نجوم فقط (تُرقّى تلقائياً بلا فقد)
@@ -276,6 +276,22 @@ export function libraryNodes(garden) {
 }
 
 /**
+ * عقد «رفّ المكتبة» (حزمة المكتبة، ١٢ أغسطس ٢٠٢٦): القصص الطويلة في **ذيل الرحلة**.
+ *
+ * **علّةُ الموضع**: الطلاقةُ تُبنى بأميال قراءةٍ حقيقية، والقصةُ الطويلة تحتاج رصيداً
+ * واسعاً — وأوسعُ نقطةٍ في الرحلة هي آخرُها (٧٩١ مفردة معلَنة). فهنا وحدَه تحتمل
+ * الصفحاتُ عشراً والجملةُ ستّ كلمات.
+ *
+ * **والترحيلُ رحيمٌ بالبناء**: القسمُ يُلحَق في الذيل، فمن أتمّ الرحلة يجد عقداً
+ * جديدةً تُفتَح له بالتسلسل، ولا يُقفَل عليه شيءٌ أتمّه ولا يُزحزَح موضعُ عقدةٍ قبله.
+ */
+export function shelfNodes() {
+  return shelfStories().map((story) => ({
+    id: `shelf:${story.id}`, type: 'shelf', part: story.id, story,
+  }));
+}
+
+/**
  * عقدة «شجرة الجذر» (حزمة الجذور): عقدةٌ واحدة لكل عائلة.
  */
 export function rootNodes(root) {
@@ -379,6 +395,11 @@ export function journey() {
       withRoots.push({ kind: 'roots', id: `roots:${root.id}`, root, nodes: rootNodes(root) });
     }
   });
+
+  // **رفُّ المكتبة آخِرَ الرحلة** — بعد البساتين وسلالمها ومكتباتها وأشجارها كلِّها:
+  // القراءةُ الطويلة ثمرةُ الرحلة لا محطةٌ فيها، ورصيدُها الرصيدُ كلُّه.
+  const shelf = shelfNodes();
+  if (shelf.length) withRoots.push({ kind: 'shelf', id: 'shelf', nodes: shelf });
 
   journeyCache = withRoots;
   return withRoots;

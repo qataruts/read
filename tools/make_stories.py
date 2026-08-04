@@ -35,8 +35,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_lexicon import (
-    STORIES_DIR, STORY_FIELDS, STORY_INDEX, STORY_LEVELS, SUPPORT_FIELD,
-    bare, dump_story, load, load_stories, stem, taught_words,
+    SHELF, SHELF_LEVELS, STORIES_DIR, STORY_FIELDS, STORY_INDEX, STORY_LEVELS, SUPPORT_FIELD,
+    bare, curriculum_word, dump_story, load, load_stories, segments_of, stem, taught_words,
 )
 from make_sentences import FATHA, all_bases as sentence_bases, render, strip_end
 
@@ -108,6 +108,32 @@ LIBRARY_SUPPORT = [
     "سَعِيدْ", "سَعِيدَةْ", "حَزِينْ",
     # مذكَّرُ فعلين أُعلن مؤنّثهما في معجم الجمل (الفعل يُطابِق فاعله): جارٌ يَحمل، وسامي يَقف
     "يَحْمِلْ", "يَقِفْ",
+]
+
+
+# ————— معجم «رفّ المكتبة» المعلَن (حزمة المكتبة، ١٢ أغسطس ٢٠٢٦) —————
+#
+# **لِمَ معجمٌ ثالث؟** لعلّة المعجم الثاني نفسِها: الموضعُ يحكم الميزانية. ورفُّ المكتبة
+# في **ذيل الرحلة** فرصيدُه الرحلةُ كلُّها (٧٩١ مفردة) — وهو أوسعُ الثلاثة. فما يُعلَن
+# هنا زيادةٌ على ذلك كلِّه: **أفعالُ الحدث وأدواتُه** التي لا تُبنى بها جملةُ بستانٍ
+# قصيرة، وتلزم القصةَ الطويلة.
+#
+# **وأبطالُ الخرافة لم يُعلَنوا**: `أَسَدْ` و`ثَعْلَبْ` و`غُرَابْ` و`جَرَادْ` و`نَمْلْ`
+# كلُّها **كلماتُ منهجٍ** درسها الطفل في مجموعاته السبع، و`فَأْرْ` و`حَمَامَةْ` و`جُبْنْ`
+# في معجم البساتين. وهذا هو مكسبُ الورقة: تراثٌ كاملٌ بخمسة أسماء.
+
+# **ولا معجمَ ميت**: المعلَنُ هنا ما تستعمله قصةٌ مبنيّةٌ اليوم لا ما قد يلزم غداً
+# (يرفض المولّدُ والفاحصُ كليهما مفردةً معلَنةً لا تُستعمَل). فهذه زيادةُ **المستوى
+# الرابع** وحدَه، ويزيدها المستويان بعده حين يُبنيان — وهو عينُ معنى «دفعةٌ بكل مستوى».
+SHELF_SUPPORT = [
+    # أفعالُ الحدث: طلبٌ وعطاءٌ وتركٌ وصعود
+    "يَطْلُبْ", "يُعْطِي", "يَتْرُكْ", "يَصْعَدْ",
+    # مؤنّثُ ما يلزم مؤنّثاً (الفعل يُطابق فاعله): النملةُ تجمع وتحفر وتُعطي
+    "تَجْمَعْ", "تَحْفِرْ", "تُعْطِي",
+    # صفةُ الحال — والحبكةُ تُبنى بها لا بالتصريح بالعبرة
+    "جَائِعْ", "دَافِئْ",
+    # ما تحتاجه القصةُ اسماً
+    "رَفّْ",
 ]
 
 
@@ -257,6 +283,81 @@ SPECS = [
         "ask": ("أَيْنَ يَلْعَبْ~v زَيْدْ", "مَلْعَبْ", ["مَتْحَفْ", "سُوقْ"]),
     },
 
+    # ————— رفُّ المكتبة · المستوى ٤: عشرُ صفحاتٍ (٣–٦ كلمات) —————
+    #
+    # موضعُها **ذيلُ الرحلة**، فرصيدُها الرحلةُ كلُّها — ولذلك وحدَها تحتمل الطول.
+    # ورافدان: **تراثٌ عامّ يُعاد تأليفُه** بهذا العقد نفسِه (لا حرفَ يُنقل من نصٍّ
+    # منشور — حقوقٌ ومفكوكيةٌ معاً)، و**تأليفٌ مقيَّد** يعود فيه أبطالُ المنهج.
+    #
+    # وخيطُ كلٍّ: بدايةٌ ← حدثٌ ← **خاتمةٌ طيبة** (بند الحزمة ٩/٢) — والعبرةُ تُرى ولا تُقال.
+    {
+        "id": "namla-wajarad", "level": 4, "shelf": SHELF, "emoji": "🐜",
+        # خرافةُ النملة والجرادة، مُعادةَ التأليف. **وشرطُ المدير محفوظٌ بحرفه**
+        # (١٢ أغسطس ٢٠٢٦): لا هلاكَ للجراد ولا ردَّ له خائباً — النملةُ تُعطي،
+        # ويأكلان معاً. فالجدُّ يُرى في الصفحات، والكرمُ يُرى في الخاتمة.
+        "title": "نَمْلَةْ~n +جَرَادْ~p",
+        "pages": [
+            ("فِي حَقْلْ~i نَمْلَةْ~N صَغِيرَةْ", "🌾"),
+            ("نَمْلَةْ~n تَجْمَعْ~v ذُرَةْ~a فِي صَيْفْ~p", "🌽"),
+            ("جَرَادْ~N يَلْعَبْ~v فَوْقَ عُشْبْ~p", "🦗"),
+            ("جَرَادْ~n سَعِيدْ~n فَوْقَ عُشْبْ~i أَخْضَرْ~p", "🎵"),
+            ("نَمْلَةْ~n تَحْفِرْ~v بَيْتْ~a دَافِئْ~p", "🕳️"),
+            ("خَرِيفْ~n بَارِدْ~n يَنْزِلْ~v فَوْقَ حَقْلْ~p", "🍂"),
+            ("جَرَادْ~n جَائِعْ~n يَبْحَثْ~v فِي حَقْلْ~p", "🥀"),
+            ("جَرَادْ~n يَطْلُبْ~v ذُرَةْ~a مِنَ نَمْلَةْ~p", "🙏"),
+            ("نَمْلَةْ~n طَيِّبَةْ~n تُعْطِي جَرَادْ~a ذُرَةْ~p", "🤝"),
+            ("جَرَادْ~n سَعِيدْ~n يَأْكُلْ~v مَعَ نَمْلَةْ~p", "🍽️"),
+        ],
+        "asks": [
+            ("مَاذَا تَجْمَعْ~v نَمْلَةْ~p", "ذُرَةْ", ["جَزَرْ", "مَوْزْ"]),
+            ("مَنْ يَطْلُبْ~v ذُرَةْ~p", "جَرَادْ", ["نَحْلَةْ", "فَرَاشَةْ"]),
+        ],
+    },
+    {
+        "id": "thalab-walinab", "level": 4, "shelf": SHELF, "emoji": "🦊",
+        # خرافةُ الثعلب والعنب. والخاتمةُ طيبة: يترك ما لا يبلغه ويجد ما يبلغه —
+        # فلا ينصرف الطفلُ على خيبة.
+        "title": "ثَعْلَبْ~n +عِنَبْ~p",
+        "pages": [
+            ("فِي غَابَةْ~i ثَعْلَبْ~N جَائِعْ", "🌳"),
+            ("عِنَبْ~n فَوْقَ شَجَرَةْ~i عَالِيَةْ~p", "🍇"),
+            ("ثَعْلَبْ~n جَائِعْ~n يَنْظُرْ~v فَوْقَ شَجَرَةْ~p", "👀"),
+            ("ثَعْلَبْ~n يَقْفِزْ~v أَمَامَ شَجَرَةْ~p", "🦊"),
+            ("ثَعْلَبْ~n يَصْعَدْ~v فَوْقَ حَجَرْ~i كَبِيرْ~p", "🪨"),
+            ("عِنَبْ~n بَعِيدْ~n فَوْقَ شَجَرَةْ~i عَالِيَةْ~p", "📏"),
+            ("ثَعْلَبْ~n حَزِينْ~n يَنْزِلْ~v مِنَ حَجَرْ~p", "😔"),
+            ("ثَعْلَبْ~n يَتْرُكْ~v عِنَبْ~a حَامِضْ~p", "🙄"),
+            ("ثَعْلَبْ~n يَجِدْ~v تُفَّاحَةْ~a حُلْوَةْ~p", "🍎"),
+            ("ثَعْلَبْ~n سَعِيدْ~n يَأْكُلْ~v تُفَّاحَةْ~p", "😋"),
+        ],
+        "asks": [
+            ("أَيْنَ عِنَبْ~p", "شَجَرَةْ", ["سَلَّةْ", "صَحْنْ"]),
+            ("مَاذَا يَأْكُلْ~v ثَعْلَبْ~p", "تُفَّاحَةْ", ["سَمَكْ", "خُبْزْ"]),
+        ],
+    },
+    {
+        "id": "sami-walmaktaba", "level": 4, "shelf": SHELF, "emoji": "📚",
+        # تأليفٌ مقيَّد: يعود سامي — يبحث فيجد، ثمّ **يُعطي** صديقَه ما وجد.
+        "title": "سَامِي فِي مَكْتَبَةْ~p",
+        "pages": [
+            ("سَامِي فِي مَكْتَبَةْ~i كَبِيرَةْ~p", "🏫"),
+            ("قِصَّةْ~n جَمِيلَةْ~n فَوْقَ رَفّْ~i مُرْتَفِعْ~p", "📚"),
+            ("سَامِي يَبْحَثْ~v فِي مَكْتَبَةْ~p", "🔍"),
+            ("سُلَّمْ~n صَغِيرْ~n أَمَامَ رَفّْ~p", "🪜"),
+            ("سَامِي يَصْعَدْ~v فَوْقَ سُلَّمْ~p", "🧗"),
+            ("سَامِي يَجِدْ~v قِصَّةْ~a جَمِيلَةْ~p", "🎉"),
+            # (بصيغتها المجرَّدة تصادم جملةَ «شُورْبَةُ أُمِّي» — فردّها حارسُ التكرار)
+            ("سَامِي يَجْلِسْ~v فَوْقَ مَقْعَدْ~i صَغِيرْ~p", "🪑"),
+            ("سَامِي يَقْرَأْ~v قِصَّةْ~a طَوِيلَةْ~p", "📖"),
+            ("صَدِيقْ~n صَغِيرْ~n أَمَامَ سَامِي", "🧒"),
+            ("سَامِي يُعْطِي صَدِيقْ~a قِصَّةْ~p", "🤗"),
+        ],
+        "asks": [
+            ("أَيْنَ يَبْحَثْ~v سَامِي", "مَكْتَبَةْ", ["مَتْحَفْ", "مَخْبَزْ"]),
+            ("مَاذَا يَقْرَأْ~v سَامِي", "قِصَّةْ", ["رِسَالَةْ", "خَرِيطَةْ"]),
+        ],
+    },
+
     # ————— قصص المرحلة القرآنية: «لا سورةَ قَصَصيّةٌ قبل قصتها» —————
     #
     # عبرت البوابةَ الثلاثية كاملةً (فاحص ← مدير ← **مالك**): الورقة
@@ -325,12 +426,14 @@ def compose(spec: str, bases: dict, unknown: list, *, title: bool = False) -> st
 
 
 def all_bases(data: dict) -> dict:
-    """كل ما يجوز أن يرد في التأليف: أصول ٩أ + معجما المكتبة والمرحلة القرآنية."""
+    """كل ما يجوز أن يرد في التأليف: أصول ٩أ + معاجم المكتبة والقرآنية والرفّ."""
     out = sentence_bases(data)
     for text in LIBRARY_SUPPORT:
         out[text] = "library"
     for text in QURAN_SUPPORT:
         out[text] = "quran"
+    for text in SHELF_SUPPORT:
+        out[text] = "shelf"
     return out
 
 
@@ -340,37 +443,54 @@ def build(data: dict) -> tuple:
     unknown = []
     out = []
     for spec in SPECS:
+        # **مقاطعُ الأسئلة يملكها الفاحص** كما تملك حدودَ المستوى: المؤلِّف يكتب
+        # الأسئلة بترتيبها، و`segments_of` تُلبسها مواضعَها — فلو تغيّر طولُ القصة
+        # تحرّك عددُها وحدَه، ولا رقمَ يُكتب بيد.
+        pages = spec["pages"]
+        marks = segments_of(len(pages)) if spec.get("shelf") else [len(pages)]
+        asks = spec["asks"] if "asks" in spec else [spec["ask"]]
+        if len(asks) != len(marks):
+            raise ValueError(f"«{spec['id']}»: {len(asks)} سؤالاً و{len(marks)} مقطعاً "
+                             f"({len(pages)} صفحة ⇐ {marks}) — سؤالٌ لكل مقطع")
         story = {
             "id": spec["id"],
             "level": spec["level"],
-            # محورُ الموضع: بستانٌ للمكتبة، وسورةٌ لقصص المرحلة القرآنية — ولا يجتمعان.
+            # محاورُ الموضع ثلاثة: بستانٌ للمكتبة، وسورةٌ للقرآنية، ورفٌّ للطويلة.
             "garden": spec.get("garden", ""),
             "surah": spec.get("surah", ""),
+            "shelf": spec.get("shelf", ""),
             "title": compose(spec["title"], bases, unknown, title=True),
             "emoji": spec["emoji"],
             "pages": [{"text": compose(text, bases, unknown), "emoji": emoji}
-                      for text, emoji in spec["pages"]],
-            "question": {
-                "text": compose(spec["ask"][0], bases, unknown),
-                "answer": spec["ask"][1],
-                "distractors": list(spec["ask"][2]),
-            },
+                      for text, emoji in pages],
+            "questions": [{
+                "upto": upto,
+                "text": compose(ask[0], bases, unknown),
+                "answer": ask[1],
+                "distractors": list(ask[2]),
+            } for upto, ask in zip(marks, asks)],
         }
         out.append({key: story[key] for key in STORY_FIELDS})
     return out, unknown
 
 
+def story_texts(story: dict) -> list:
+    """كلُّ نصٍّ مؤلَّفٍ في قصة: عنوانُها وصفحاتُها وأسئلةُ مقاطعها."""
+    return [story["title"], *(p["text"] for p in story["pages"]),
+            *(a["text"] for a in story["questions"])]
+
+
 def library_support(stories: list) -> list:
     """المعلَن بعد طرح ما لا تستعمله قصة (لا معجم ميت — كما في مساند ٩أ).
 
-    والقائمتان تُعلَنان في حقلٍ واحد لأنّ الفاحص يقرأ حقلاً واحداً — وتفريقُهما في
-    الشيفرة لا في الملف: `LIBRARY_SUPPORT` لقصص البساتين و`QURAN_SUPPORT` لقصة السورة.
+    والقوائمُ الثلاث تُعلَن في حقلٍ واحد لأنّ الفاحص يقرأ حقلاً واحداً — وتفريقُها في
+    الشيفرة لا في الملف: `LIBRARY_SUPPORT` لقصص البساتين، و`QURAN_SUPPORT` لقصة السورة،
+    و`SHELF_SUPPORT` لرفّ المكتبة. والميزانياتُ ثلاثٌ لأنّ المواضع ثلاثة.
     """
     used = {stem(word) for story in stories
-            for text in [story["title"], story["question"]["text"],
-                         *(p["text"] for p in story["pages"])]
-            for word in text.split()}
-    return [text for text in [*LIBRARY_SUPPORT, *QURAN_SUPPORT] if stem(text) in used]
+            for text in story_texts(story) for word in text.split()}
+    return [text for text in [*LIBRARY_SUPPORT, *QURAN_SUPPORT, *SHELF_SUPPORT]
+            if stem(text) in used]
 
 
 def index_of(stories: list) -> dict:
@@ -440,23 +560,30 @@ def self_test(data: dict) -> int:
     ok(stem("زَيْدٌ") == stem("زَيْدْ") == stem("زَيْدَا"),
        "وجذعُها واحدٌ فيعرفها الفاحص من إعلانها الموقوف")
 
-    # **محوران لا محور**: قصصُ المكتبة (بستان) وقصصُ المرحلة القرآنية (سورة). ولكلٍّ
-    # ترتيبُه: المكتبةُ ترتفع مستوياتُها مع البساتين، والقرآنيةُ ترتيبُها ترتيبُ سورها.
+    # **ثلاثةُ محاور لا محوران**: بستانٌ للمكتبة، وسورةٌ للقرآنية، ورفٌّ للطويلة.
+    # ولكلٍّ ترتيبُه: المكتبةُ ترتفع مع البساتين، والقرآنيةُ بترتيب سورها، والرفُّ
+    # بسلّمه الخاصّ (٤–٦) في ذيل الرحلة.
     lib = [s for s in stories if s["garden"]]
     qur = [s for s in stories if s["surah"]]
-    ok(len(lib) + len(qur) == len(stories) and not any(s["garden"] and s["surah"] for s in stories),
-       f"لكل قصةٍ محورُ موضعٍ واحد: {len(lib)} في البساتين و{len(qur)} عند سورتها")
+    shelf = [s for s in stories if s["shelf"]]
+    axes = [sum(1 for axis in ("garden", "surah", "shelf") if s[axis]) for s in stories]
+    ok(len(lib) + len(qur) + len(shelf) == len(stories) and set(axes) == {1},
+       f"لكل قصةٍ محورُ موضعٍ واحد: {len(lib)} في البساتين و{len(qur)} عند سورتها "
+       f"و{len(shelf)} على الرفّ")
     ok(len(lib) == 10 and [s["level"] for s in lib] == sorted(s["level"] for s in lib),
        "وقصصُ المكتبة عشرٌ ومستوياتُها ترتفع مع الرحلة "
        + "(" + "، ".join(str(s["level"]) for s in lib) + ")")
+    ok(all(s["level"] in SHELF_LEVELS for s in shelf)
+       and [s["level"] for s in shelf] == sorted(s["level"] for s in shelf),
+       f"وقصصُ الرفّ من سلّمه {list(SHELF_LEVELS)} ومستوياتُها ترتفع كذلك "
+       + "(" + "، ".join(str(s["level"]) for s in shelf) + ")")
 
     # **قصةُ المرحلة القرآنية تسبق البساتين كلَّها**، فميزانيتُها كلماتُ المنهج
     # ومعجمُها المعلَن — ولا كلمةَ بستانٍ إلا بـ«التقديم المعلَن» بقيوده الثلاثة.
     lex_place = {w["word"]: w["theme"] for w in data["words"]}
     trespass, forward = [], set()
     for story in qur:
-        for text in [story["title"], story["question"]["text"],
-                     *(p["text"] for p in story["pages"])]:
+        for text in story_texts(story):
             for word in text.split():
                 base = next((b for b in lex_place if stem(b) == stem(word)), None)
                 if not base:
@@ -499,32 +626,46 @@ def self_test(data: dict) -> int:
 
     # كلماتُ المنهج بصيغتها المعلَنة — حوضُ خيارات قصةِ السورة (لا معجمَ البساتين)
     curriculum = {t for t in bases if bare(stem(t)) in taught_words()}
-    bad_ask = []
+    bad_ask, marks_off = [], []
     for story in stories:
-        stems = {stem(w) for p in story["pages"] for w in p["text"].split()}
-        ask = story["question"]
-        if stem(ask["answer"]) not in stems:
-            bad_ask.append(f"{story['id']}: جوابٌ خارج النصّ")
-        if any(stem(d) in stems for d in ask["distractors"]):
-            bad_ask.append(f"{story['id']}: مشتّتٌ في النصّ")
-        # **مصدرُ الخيارات يتبع محورَ القصة** (حكم المدير): قصةُ المكتبة بعد البساتين
-        # فخياراتُها من معجمها؛ وقصةُ السورة **قبلها كلِّها** فخياراتُها من كلمات
-        # المنهج — وهو عينُ ما يعرفه الطفل عند تلك النقطة، وإسقاطُ السؤال يُفقر القصة.
-        pool = lex if story["garden"] else set(BROUGHT_FORWARD) | curriculum
-        if {ask["answer"], *ask["distractors"]} - pool:
-            outside = sorted({ask["answer"], *ask["distractors"]} - pool)
-            bad_ask.append(f"{story['id']}: خيارٌ خارج حوضه ({'، '.join(outside)})")
-        # خيارات السؤال صورٌ — فالكلمةُ غير المصوَّرة لا تدخلها («صدق الصورة»)
-        if blind := {ask["answer"], *ask["distractors"]} & unpictured:
-            bad_ask.append(f"{story['id']}: خيارٌ غير مصوَّر ({'، '.join(sorted(blind))})")
-    ok(not bad_ask, "وسؤالُ كل قصة: جوابُه في نصّها ومشتّتاته خارجه"
+        # **مقاطعُ الأسئلة محسوبةٌ من الصفحات** — لا يكتبها المؤلِّف ولا المولّد
+        want = segments_of(len(story["pages"])) if story["shelf"] else [len(story["pages"])]
+        if [a["upto"] for a in story["questions"]] != want:
+            marks_off.append(f"{story['id']}: {[a['upto'] for a in story['questions']]} ≠ {want}")
+        for ask in story["questions"]:
+            # **حدُّ المقطع**: الجوابُ ممّا قرأه إلى صفحته، والمشتّتُ خارج القصة كلِّها
+            stems = {stem(w) for p in story["pages"][:ask["upto"]] for w in p["text"].split()}
+            whole = {stem(w) for p in story["pages"] for w in p["text"].split()}
+            if stem(ask["answer"]) not in stems:
+                bad_ask.append(f"{story['id']}/{ask['upto']}: جوابٌ خارج مقطعه")
+            if any(stem(d) in whole for d in ask["distractors"]):
+                bad_ask.append(f"{story['id']}/{ask['upto']}: مشتّتٌ في النصّ")
+            # **مصدرُ الخيارات يتبع محورَ القصة** (حكم المدير): قصةُ المكتبة بعد البساتين
+            # فخياراتُها من معجمها؛ وقصةُ السورة **قبلها كلِّها** فمن كلمات المنهج؛
+            # و**قصةُ الرفّ في ذيل الرحلة فمن الاثنين معاً** — أبطالُ الخرافة كلماتُ منهج.
+            pool = (lex | curriculum) if story["shelf"] else (
+                lex if story["garden"] else set(BROUGHT_FORWARD) | curriculum)
+            options = {ask["answer"], *ask["distractors"]}
+            if options - pool:
+                bad_ask.append(f"{story['id']}/{ask['upto']}: خيارٌ خارج حوضه "
+                               f"({'، '.join(sorted(options - pool))})")
+            # خيارات السؤال صورٌ — فالكلمةُ غير المصوَّرة لا تدخلها («صدق الصورة»)
+            if blind := options & unpictured:
+                bad_ask.append(f"{story['id']}/{ask['upto']}: خيارٌ غير مصوَّر "
+                               f"({'، '.join(sorted(blind))})")
+    ok(not bad_ask, "وسؤالُ كل مقطع: جوابُه فيما قرأه إليه ومشتّتاته خارج القصة"
        + (f" — {bad_ask[:3]}" if bad_ask else ""))
+    ok(not marks_off, "ومقاطعُ الأسئلة محسوبةٌ من الصفحات لا مكتوبةً بيد"
+       + (f" — {marks_off}" if marks_off else ""))
+    asks = [a["text"] for s in stories for a in s["questions"]]
+    ok(len(set(asks)) == len(asks), f"ولا سؤالَ مكرَّراً في المكتبة ({len(asks)} سؤالاً)")
 
-    idle = [t for t in LIBRARY_SUPPORT if t not in library_support(stories)]
-    ok(not idle, f"وكلُّ مفردةٍ في معجم المكتبة تستعملها قصة ({len(LIBRARY_SUPPORT)} مفردة)"
+    declared = [*LIBRARY_SUPPORT, *SHELF_SUPPORT]
+    idle = [t for t in declared if t not in library_support(stories)]
+    ok(not idle, f"وكلُّ مفردةٍ في معجمَي المكتبة والرفّ تستعملها قصة ({len(declared)} مفردة)"
        + (f" — معطَّل: {idle}" if idle else ""))
     known, stems = taught_words(), {stem(t) for t in data.get(SUPPORT_FIELD) or []}
-    shared = sorted(t for t in LIBRARY_SUPPORT
+    shared = sorted(t for t in declared
                     if bare(stem(t)) in known or stem(t) in stems or t in lex)
     ok(not shared, "ولا مفردةَ معلَنةٍ يعرفها الطفل أصلاً — معجمُ المنهج والجمل متاحٌ "
        "للقصص كما هو، والمعلَنُ هنا زيادتُها وحدها"
@@ -584,13 +725,15 @@ def main():
         print(f"كُتبت في app/data/stories/ ({len(stories)} ملفاً + الفهرس)")
     else:
         for story in stories:
-            print(f"\n— {story['title']} {story['emoji']} "
-                  f"(مستوى {story['level']} · {story['garden']})")
+            where = (f"بستان {story['garden']}" if story["garden"]
+                     else f"سورة {story['surah']}" if story["surah"]
+                     else f"رفّ {story['shelf']}")
+            print(f"\n— {story['title']} {story['emoji']} (مستوى {story['level']} · {where})")
             for page in story["pages"]:
                 print(f"   {page['emoji']} {page['text']}")
-            ask = story["question"]
-            print(f"   ؟ {ask['text']} → {ask['answer']} "
-                  f"(مقابل {'، '.join(ask['distractors'])})")
+            for ask in story["questions"]:
+                print(f"   ؟ [مقطع ← ص{ask['upto']}] {ask['text']} → {ask['answer']} "
+                      f"(مقابل {'، '.join(ask['distractors'])})")
     sys.exit(0)
 
 

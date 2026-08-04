@@ -67,7 +67,7 @@ export function nodeTitle(node) {
   if (node.type === 'roots') return `شجرة ${node.root.title}`;
   if (node.type === 'garden') return `باقة ${arNum(node.bundle.index)} — ${node.garden.title}`;
   if (node.type === 'ladder') return `جمل ${node.garden.title} — درجة ${arNum(node.rung.index)}`;
-  if (node.type === 'library') return `قصة «${node.story.title}»`;
+  if (node.type === 'library' || node.type === 'shelf') return `قصة «${node.story.title}»`;
   return '';
 }
 
@@ -83,6 +83,7 @@ export function nodeWhere(node) {
   if (node.type === 'garden') return `بستان ${node.garden.title}`;
   if (node.type === 'ladder') return `سلّم جمل ${node.garden.title}`;
   if (node.type === 'library') return `مكتبة ${node.garden.title}`;
+  if (node.type === 'shelf') return 'رفّ المكتبة';
   return 'محطة المهارات والقصص';
 }
 
@@ -104,7 +105,7 @@ export function nodeFace(node) {
   if (node.type === 'roots') return icon('roots');   // أيقونتُنا الخطية لا إيموجي
   if (node.type === 'garden') return node.garden.emoji;
   if (node.type === 'ladder') return icon('book');
-  if (node.type === 'library') return node.story.emoji;
+  if (node.type === 'library' || node.type === 'shelf') return node.story.emoji;
   return '';
 }
 

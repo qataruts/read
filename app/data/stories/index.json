@@ -21,7 +21,17 @@
     "طَيْرْ",
     "جَيْشْ",
     "مَلِكْ",
-    "اللَّٰهْ"
+    "اللَّٰهْ",
+    "يَطْلُبْ",
+    "يُعْطِي",
+    "يَتْرُكْ",
+    "يَصْعَدْ",
+    "تَجْمَعْ",
+    "تَحْفِرْ",
+    "تُعْطِي",
+    "جَائِعْ",
+    "دَافِئْ",
+    "رَفّْ"
   ],
   "stories": [
     "miftah-sami",
@@ -34,6 +44,9 @@
     "quffaz-hasan",
     "hafilat-almadrasa",
     "kurat-zayd",
+    "namla-wajarad",
+    "thalab-walinab",
+    "sami-walmaktaba",
     "alfil-walkaaba"
   ]
 }

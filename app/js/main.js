@@ -102,7 +102,8 @@ function renderMap() {
             : section.kind === 'garden' ? gardenEl(section, next, folded)
               : section.kind === 'ladder' ? ladderEl(section, next, folded)
                 : section.kind === 'library' ? libraryEl(section, next, folded)
-                  : interludeEl(section, next, folded));
+                  : section.kind === 'shelf' ? shelfEl(section, next, folded)
+                    : interludeEl(section, next, folded));
   }
 
   if (DEV) {
@@ -405,12 +406,44 @@ function libraryEl(section, next, folded) {
   });
 }
 
+/**
+ * قسمُ «رفّ المكتبة» — القراءةُ الطويلة في ذيل الرحلة (حزمة المكتبة).
+ * قسمٌ واحد لا قسمٌ لكل بستان، فليس له بستانٌ يُنسَب إليه: رصيدُه الرحلةُ كلُّها.
+ */
+function shelfEl(section, next, folded) {
+  const unlocked = progress.isNodeUnlockedById(section.nodes[0].id);
+  const complete = section.nodes.every((n) => progress.isDone(n.id));
+  const earned = section.nodes.reduce((sum, n) => sum + progress.getStars(n.id), 0);
+  const levels = [...new Set(section.nodes.map((n) => n.story.level))];
+  const pages = section.nodes.reduce((sum, n) => sum + n.story.pages.length, 0);
+
+  return trackEl({
+    id: section.id,
+    folded,
+    // صنفٌ خاصّ به لا صنفُ المكتبة: قسمٌ واحدٌ في الذيل لا قسمٌ لكل بستان،
+    // وحرّاسُ الشاشة تعدّ محطاتِ المكتبة بصنفها فلا يختلط العدّان.
+    className: `station station--library station--shelf${unlocked ? '' : ' station--locked'}${complete ? ' station--done' : ''}`,
+    accent: STORY_ACCENT,
+    mark: 'book',
+    label: `رفّ المكتبة${unlocked ? '' : ' — مقفل'}`,
+    badge: icon('books'),
+    title: 'رفّ المكتبة',
+    sub: `${arCount(section.nodes.length, ['قصة طويلة', 'قصتان طويلتان', 'قصص طويلة', 'قصة طويلة'])} `
+      + `· ${arCount(pages, ['صفحة', 'صفحتان', 'صفحات', 'صفحة'])} · مستوى ${levels.map(arNum).join('–')}`,
+    meta: unlocked
+      ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
+      : [icon('lock'), ' مقفل'],
+    nodes: section.nodes,
+    next,
+  });
+}
+
 /** لون العقدة في بطاقة «تابع من هنا»: لون مجموعتها، أو لون محطتها الخاصة. */
 function accentOf(node, group) {
   if (node.type === 'quran') return QURAN_ACCENT;
   if (node.type === 'garden') return accentForGarden(node.garden);
   if (node.type === 'ladder') return SENTENCE_ACCENT;
-  if (node.type === 'library' || node.type === 'prophet') return STORY_ACCENT;
+  if (node.type === 'library' || node.type === 'prophet' || node.type === 'shelf') return STORY_ACCENT;
   if (node.type === 'skill' || node.type === 'story' || node.type === 'gate'
     || node.type === 'contrast' || node.type === 'roots') return PAUSE_ACCENT;
   return accentFor(group);
@@ -499,7 +532,7 @@ function nodeButton(node, next) {
 
   const btn = h('button', {
     class: `node node--${node.type} node--${state}${isNext ? ' node--next' : ''}`,
-    css: ['story', 'library', 'prophet'].includes(node.type) ? { '--accent': STORY_ACCENT } : {},
+    css: ['story', 'library', 'prophet', 'shelf'].includes(node.type) ? { '--accent': STORY_ACCENT } : {},
     'aria-label': `${label} — ${open ? (stars ? `${arNum(stars)} نجوم · يمكن إعادته` : 'مفتوح') : 'مقفل'}`,
     onclick: () => {
       if (!open) {
@@ -620,6 +653,10 @@ async function render() {
     screen = renderLadder(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'library' && arg1) {
     if (!guard(`library:${decodeURIComponent(arg1)}`)) return;
+    screen = renderLibraryStory(decodeURIComponent(arg1)) || renderMap();
+  } else if (name === 'shelf' && arg1) {
+    // قصةُ الرفّ الطويلة تُقرأ بشاشة القصة نفسِها — مُصيِّرٌ واحد لا ثانيَ له
+    if (!guard(`shelf:${decodeURIComponent(arg1)}`)) return;
     screen = renderLibraryStory(decodeURIComponent(arg1)) || renderMap();
   } else if (name === 'prophet' && arg1) {
     // قصةُ السورة تُقرأ بشاشة القصة نفسِها — مُصيِّرٌ واحد لا ثانيَ له

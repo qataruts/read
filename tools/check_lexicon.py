@@ -101,15 +101,33 @@ FILL_OPTIONS = 3               # خيارات «أكمل الجملة» (نظي�
 # من هنا): فالعقد مكتوبٌ في الحارس لا في المؤلِّف، ولا يوسّعه المؤلِّف على نفسه.
 STORIES_DIR = ROOT / "app" / "data" / "stories"
 STORY_INDEX = STORIES_DIR / "index.json"
-STORY_FIELDS = ("id", "level", "garden", "surah", "title", "emoji", "pages", "question")
-# محورُ الموضع اثنان لا واحد (البند ٤): «garden» لقصص المكتبة بعد البساتين،
-# و«surah» لقصص المرحلة القرآنية قبلها — ويملأ أحدُهما ويفرغ الآخر، ولا يجتمعان.
-QUESTION_FIELDS = ("text", "answer", "distractors")
+STORY_FIELDS = ("id", "level", "garden", "surah", "shelf", "title", "emoji", "pages", "questions")
+# **محاورُ الموضع ثلاثة** (حكم المدير على `REVIEW_LIBRARY.md`، ١٢ أغسطس ٢٠٢٦):
+# «garden» لقصص المكتبة بعد سلّم بستانها، و«surah» لقصص المرحلة القرآنية قبل البساتين،
+# و«shelf» لقصص **رفّ المكتبة** الطويلة في **ذيل الرحلة**. يملأ واحدٌ منها ويفرغ اثنان.
+#
+# ولِمَ محورٌ ثالث ولم يكفِ `garden: play`؟ لأنّ موضعَ قصةِ البستان محسوبٌ من كلماتها
+# («أوّل موضعٍ تكتمل فيه»)، فقصةُ الرفّ الطويلة تنجرّ إلى بستانٍ مبكّر أو تُجبَر على
+# حشوِ كلمةِ لعبٍ لتستقيم للحساب — **قيدٌ فنيّ يفرض نفسه على المعنى**. والرفُّ رصيدُه
+# الرحلةُ كلُّها، فلا موضعَ بستانيَّ له أصلاً.
+SHELF = "library"          # معرّفُ الرفّ الوحيد اليوم (والحقلُ يحمل معرّفاً كأخويه)
+STORY_AXES = ("garden", "surah", "shelf")
+QUESTION_FIELDS = ("upto", "text", "answer", "distractors")
+# و`upto` رقمُ الصفحة التي يُسأل عندها — **سؤالٌ لكل مقطعٍ لا سؤالٌ في الخاتمة**
+# (بند الحزمة ٥): يُشتقّ من عدد الصفحات (`segments_of`) فلا يُكتب بيد.
+SEGMENT_PAGES = 5          # المقطعُ خمسُ صفحاتٍ فأقلّ، وعددُ الأسئلة ⌈الصفحات ÷ ٥⌉
 STORY_LEVELS = {          # المستوى ← (عدد الصفحات، طول الجملة بالكلمات)
     1: {"pages": (3, 3), "words": (2, 3)},
     2: {"pages": (5, 6), "words": (2, 4)},
     3: {"pages": (8, 8), "words": (3, 5)},
+    # **رفُّ المكتبة** — سلّمُ الطول المُقَرّ (١٢ أغسطس ٢٠٢٦): تدرّجٌ متّصلٌ بلا قفزة،
+    # أكبرُ نموٍّ فيه ×١٫٥ دون قفزتَي القائم (×١٫٩)، وزيادتُه المطلقة هي نفسُها
+    # (+١ كلمة في الجملة، +٢ صفحة). والحدُّ الأعلى ثمانِ كلماتٍ: ما يسع سطراً واحداً.
+    4: {"pages": (9, 10), "words": (3, 6)},
+    5: {"pages": (11, 12), "words": (4, 7)},
+    6: {"pages": (13, 14), "words": (4, 8)},
 }
+SHELF_LEVELS = (4, 5, 6)   # مستوياتُ الرفّ — ولا تُخلَط بمستويات البساتين
 ASK_WORDS = ("مَنْ", "مَاذَا", "أَيْنَ")   # أدوات الاستفهام — وحدها لا تلزمها القصة
 QUESTION_OPTIONS = 3                       # «ثلاث صور — لعبة لا امتحان» (بند الحزمة)
 AL_RE = re.compile(r"^اْ?لْ?(.+)$")        # «الْ» التعريف (والشمسية بلا سكون)
@@ -335,7 +353,17 @@ def load(path: Path = LEXICON) -> dict:
 # ————— الفحص —————
 
 
-def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> int:
+def check(data: dict, letters: dict, known: set = None, quiet: bool = False,
+          corpus: bool = True) -> int:
+    """فحصُ المعجم. و`corpus=False` **لفحصِ الفاحص وحدَه** (`--self-test`).
+
+    **علّةُ هذا المفتاح** (١٢ أغسطس ٢٠٢٦): فحصُ الفاحص يقيس **القواعد** بمادّةٍ
+    مُصطنَعة صغيرة (بستانٌ واحد وكلمةٌ واحدة)، وقد أُضيفت إلى `check` بعده **حدودُ
+    حجمِ المنظومة** (٨ بساتين، ٢٥٠ كلمة، باقتان، حوضُ مشتّتين) — فصار فحصُ الفاحص
+    يسقط بستّ شكاوى **لا علاقةَ لها بما يفحصه**، لا لأنّ قاعدةً انكسرت بل لأنّ
+    مادّتَه أصغرُ من المنظومة. فتُعزَل حدودُ الحجم عن حدود القاعدة بمفتاحٍ **معلَن
+    لا صامت**: الأصلُ `True`، ولا يطفئه إلا فحصُ الفاحص.
+    """
     errors, warnings = [], []
     known = taught_words() if known is None else known
     taught = set(letters)
@@ -388,9 +416,9 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
     if not isinstance(size, int) or size < 3:
         errors.append(f"[بنية] bundleSize غير صالح: {size!r}")
         size = 5
-    if not MIN_THEMES <= len(themes) <= MAX_THEMES:
+    if corpus and not MIN_THEMES <= len(themes) <= MAX_THEMES:
         errors.append(f"[بنية] البساتين {len(themes)} (المطلوب {MIN_THEMES}–{MAX_THEMES})")
-    if len(words) < MIN_WORDS:
+    if corpus and len(words) < MIN_WORDS:
         errors.append(f"[بنية] الكلمات {len(words)} (طبقة ب١ لا تقلّ عن {MIN_WORDS})")
 
     theme_ids = []
@@ -594,7 +622,7 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
         pool = [e for e in by_garden.get(theme_id(themes, place), [])
                 if e.get("word") != target and e.get(PICTURED) is not False
                 and wearable(e.get("word", ""), dress, naked)]
-        if len(pool) < FILL_OPTIONS - 1:
+        if corpus and len(pool) < FILL_OPTIONS - 1:
             errors.append(f"{label}: حوضُ «أكمل الجملة» {len(pool)} كلمة "
                           f"(المطلوب {FILL_OPTIONS - 1} مشتّتين يلبسان ثوب الموضع)")
         for entry in pool:
@@ -614,10 +642,10 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
     # ٣. البساتين وباقاتها
     for theme in themes:
         count = by_theme.get(theme.get("id"), 0)
-        if count % size:
+        if corpus and count % size:
             errors.append(f"[بستان {theme.get('id')}] {count} كلمة لا تنقسم "
                           f"باقاتٍ من {size}")
-        if count < MIN_BUNDLES * size:
+        if corpus and count < MIN_BUNDLES * size:
             errors.append(f"[بستان {theme.get('id')}] {count} كلمة "
                           f"(أقلّ من {MIN_BUNDLES} باقتين)")
 
@@ -690,6 +718,20 @@ def load_stories() -> tuple:
         out.append(json.loads(path.read_text(encoding="utf-8")) if path.exists()
                    else {"id": story_id, "missing": True})
     return index, out
+
+
+def segments_of(pages: int) -> list:
+    """مقاطعُ القصة ⇐ رقمُ آخر صفحةٍ في كل مقطع. **محسوبٌ لا مكتوب**.
+
+    «سؤالٌ لكل مقطعٍ من القصة لا سؤالٌ واحد في آخرها» (بند الحزمة ٥): المقطعُ
+    `SEGMENT_PAGES` صفحاتٍ فأقلّ، والعددُ ⌈الصفحات ÷ ٥⌉ — وتُوزَّع الصفحاتُ عليها
+    **بالتساوي** فلا يبقى مقطعٌ ذيليٌّ من صفحةٍ واحدة (١٤ ⇒ ٥+٥+٤ لا ٥+٥+٤ بترتيبٍ
+    آخر). فتغييرُ طول القصة يحرّك عددَ أسئلتها وحدَه، ولا رقمَ يُكتب في بياناتٍ ولا حارس.
+    """
+    if pages <= 0:
+        return []
+    count = -(-pages // SEGMENT_PAGES)          # ⌈pages ÷ SEGMENT_PAGES⌉
+    return [pages * (i + 1) // count for i in range(count)]
 
 
 def dump_story(story: dict) -> str:
@@ -847,6 +889,9 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             seen.setdefault(" ".join(sentence["words"]), f"قصة المنهج «{story['title']}»")
 
     audio_texts = set()
+    # سؤالُ المقطع نصٌّ يُنطَق كغيره — فلا يتكرّر في المكتبة (وقصةٌ صارت أسئلتُها ثلاثةً
+    # أحوجُ ما تكون إلى هذا: «مَاذَا يَأْكُلُ الْأَرْنَبْ» مرّتين سؤالٌ واحد في أذنه).
+    seen_asks = {}
     seen_ids, levels, pages_count = [], [], 0
 
     for i, story in enumerate(stories, 1):
@@ -871,15 +916,13 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
         if not bounds:
             errors.append(f"{label}: مستوى مجهول «{level}» (المستويات {sorted(STORY_LEVELS)})")
             continue
-        levels.append((level, story.get("garden") or ""))
-
-        # **محورا الموضع** (البند ٤): بستانٌ لقصص المكتبة، وسورةٌ لقصص المرحلة
-        # القرآنية — يملأ أحدُهما ويفرغ الآخر. وقصةُ السورة تقع **قبل البساتين
-        # كلِّها**، فلا موضعَ بستانيّ لها (`base = 0`) وميزانيتُها كلماتُ المنهج.
-        garden, surah = story.get("garden") or "", story.get("surah") or ""
-        if bool(garden) == bool(surah):
-            errors.append(f"{label}: محورُ موضعها ملتبس — بستانٌ «{garden}» وسورةٌ «{surah}» "
-                          "(يملأ أحدُهما ويفرغ الآخر)")
+        # **محاورُ الموضع ثلاثة**: بستانٌ لقصص المكتبة، وسورةٌ لقصص المرحلة القرآنية،
+        # و**رفٌّ** للقصص الطويلة في ذيل الرحلة. يملأ واحدٌ ويفرغ اثنان.
+        garden, surah, shelf = (story.get(axis) or "" for axis in STORY_AXES)
+        filled = [axis for axis, val in zip(STORY_AXES, (garden, surah, shelf)) if val]
+        if len(filled) != 1:
+            errors.append(f"{label}: محورُ موضعها ملتبس — المملوء {filled or 'لا شيء'} "
+                          f"(يملأ واحدٌ من {list(STORY_AXES)} ويفرغ اثنان)")
             continue
         if garden and garden not in [t.get("id") for t in themes]:
             errors.append(f"{label}: بستان مجهول «{garden}»")
@@ -887,6 +930,17 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
         if surah and surah not in quran_surah_ids():
             errors.append(f"{label}: سورةٌ مجهولة «{surah}» (ليست في المنهج)")
             continue
+        if shelf and shelf != SHELF:
+            errors.append(f"{label}: رفٌّ مجهول «{shelf}» (الرفُّ الوحيد «{SHELF}»)")
+            continue
+        levels.append((level, garden, shelf))
+        # **قصةُ الرفّ مستواها من مستوياته**: سلّمُ الرفّ فوق سلّم البساتين، فلا تنزل
+        # قصةٌ طويلةٌ إلى مستوىً بستانيّ ولا ترتفع قصةُ بستانٍ إلى مستوى رفّ.
+        if shelf and level not in SHELF_LEVELS:
+            errors.append(f"{label}: مستوى {level} ليس من مستويات الرفّ {list(SHELF_LEVELS)}")
+        if not shelf and level in SHELF_LEVELS:
+            errors.append(f"{label}: مستوى {level} للرفّ وحدَه (هذه قصةُ "
+                          + ("بستان" if garden else "سورة") + ")")
         base = theme_place(themes, garden) if garden else 0
 
         # **علاماتُ الرسم مدروسةٌ لقصة السورة**: موضعُها بعد درس الرسم من المرحلة
@@ -928,13 +982,39 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             audio_texts.add(text)
             audio_texts.update(page_words)
 
-        # سؤال الفهم: جوابه مستدلٌّ من نصّ القصة وحده
-        story_stems = {stem(w) for page in pages for w in str(page.get("text", "")).split()}
-        ask = story.get("question") or {}
-        where = f"{label} سؤال"
-        if sorted(ask) != sorted(QUESTION_FIELDS):
-            errors.append(f"{where}: حقوله {sorted(ask)} (المطلوب {list(QUESTION_FIELDS)})")
-        else:
+        # ————— أسئلة الفهم: سؤالٌ لكل مقطعٍ في الرفّ، وواحدٌ في الخاتمة لغيره —————
+        #
+        # **حوضُ الخيارات يتبع محورَ القصة**: قصةُ البستان من معجمه؛ وقصةُ السورة من
+        # كلمات المنهج (قبل البساتين كلِّها)؛ و**قصةُ الرفّ من الاثنين معاً** (حكم المدير،
+        # ١٢ أغسطس ٢٠٢٦) — فبطلُها من المنهج غالباً (`أَسَدْ` `ثَعْلَبْ` `غُرَابْ`)،
+        # و«ألّا تُسأل قصةُ الأسد عن الأسد» عيبٌ ظاهر.
+        def option_item(text):
+            return lex_word.get(text) or (curriculum_word(text) if (surah or shelf) else None)
+
+        # **حدُّ المقطع من الجواب لا من القصة كلِّها**: سؤالُ المقطع يُجاب ممّا قرأه
+        # الطفلُ **إلى صفحته**، فلا يُسأل عن حدثٍ لم يبلغه ولا يُشتّت بما سيقرؤه بعدُ.
+        def stems_upto(upto):
+            return {stem(w) for page in pages[:upto]
+                    for w in str(page.get("text", "")).split()}
+
+        story_stems = stems_upto(len(pages))
+        asks = story.get("questions")
+        want_marks = segments_of(len(pages)) if shelf else [len(pages)]
+        if not isinstance(asks, list):
+            errors.append(f"{label}: «questions» ليست قائمة (سؤالٌ لكل مقطع)")
+            asks = []
+        elif [a.get("upto") for a in asks if isinstance(a, dict)] != want_marks:
+            errors.append(f"{label}: مقاطعُ الأسئلة {[a.get('upto') for a in asks]} "
+                          f"والمحسوبُ من {len(pages)} صفحة {want_marks} "
+                          "(⌈الصفحات ÷ ٥⌉ — لا يُكتب بيد)")
+        for ask in asks:
+            upto = ask.get("upto") if isinstance(ask, dict) else None
+            where = f"{label} سؤال المقطع {upto}"
+            if not isinstance(ask, dict) or sorted(ask) != sorted(QUESTION_FIELDS):
+                errors.append(f"{where}: حقوله {sorted(ask) if isinstance(ask, dict) else ask} "
+                              f"(المطلوب {list(QUESTION_FIELDS)})")
+                continue
+            seen_upto = stems_upto(upto if isinstance(upto, int) else len(pages))
             ask_text = str(ask.get("text", "") or "").strip()
             ask_words = ask_text.split()
             for word in ask_words:
@@ -943,12 +1023,15 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             if not any(w in ASK_WORDS for w in ask_words):
                 errors.append(f"{where}: «{ask_text}» بلا أداة استفهام ({'، '.join(ASK_WORDS)})")
             place = max(place, place_of(ask_words, where))
-            # أداةُ الاستفهام وحدها لا تلزمها القصة — وما سواها يلزمه نصُّها
+            # أداةُ الاستفهام وحدها لا تلزمها القصة — وما سواها يلزمه **نصُّ مقطعه**
             body = [w for w in ask_words if w not in ASK_WORDS]
-            outside = [w for w in body if stem(w) not in story_stems]
+            outside = [w for w in body if stem(w) not in seen_upto]
             if outside:
-                errors.append(f"{where}: «{'، '.join(outside)}» ليست في نصّ القصة — "
-                              "سؤال الفهم يُجاب من القصة وحدها لا من خارجها")
+                errors.append(f"{where}: «{'، '.join(outside)}» ليست فيما قرأه إلى الصفحة "
+                              f"{upto} — سؤالُ المقطع يُجاب من مقطعه لا ممّا بعده")
+            if ask_text in seen_asks:
+                errors.append(f"{where}: سؤالٌ مكرَّر — سبق في {seen_asks[ask_text]}")
+            seen_asks.setdefault(ask_text, f"قصة «{story_id}»")
             audio_texts.add(ask_text)
 
             answer = str(ask.get("answer", "") or "")
@@ -958,29 +1041,27 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             if len(set(options)) != len(options):
                 errors.append(f"{where}: خيارٌ مكرَّر ({'، '.join(options)})")
             for n, option in enumerate(options):
-                # **حوضُ الخيارات يتبع محورَ القصة** (حكم المدير على ورقة الأنبياء):
-                # قصةُ المكتبة بعد البساتين فخياراتُها من معجمها؛ وقصةُ السورة قبلها
-                # كلِّها فخياراتُها من **كلمات المنهج** — وهو عينُ ما يعرفه الطفل هناك.
-                item = lex_word.get(option) or (curriculum_word(option) if surah else None)
+                item = option_item(option)
                 if item is None:
                     errors.append(f"{where}: الخيار «{option}» ليس من حوضه "
-                                  + ("(كلماتُ المنهج لقصة السورة)" if surah
+                                  + ("(معجمُ البساتين وكلماتُ المنهج للرفّ)" if shelf
+                                     else "(كلماتُ المنهج لقصة السورة)" if surah
                                      else "(ليس كلمةَ معجم — لا صورة له)"))
                     continue
-                if not surah and theme_place(themes, item.get("theme")) > base:
+                if garden and theme_place(themes, item.get("theme")) > base:
                     errors.append(f"{where}: الخيار «{option}» من بستانٍ بعد «{garden}» "
                                   "(لم يبلغه الطفل بعد)")
                 if item.get(PICTURED) is False:
                     errors.append(f"{where}: الخيار «{option}» غير مصوَّر — "
                                   "وخيارات سؤال الفهم صورٌ («صدق الصورة»)")
-                inside = stem(option) in story_stems
-                if n == 0 and not inside:
-                    errors.append(f"{where}: الجواب «{option}» ليس في نصّ القصة")
-                if n and inside:
+                # الجوابُ فيما قرأه إلى هنا، والمشتّتُ خارج القصة **كلِّها** —
+                # فمشتّتٌ يظهر في صفحةٍ لاحقة يجعل السؤالَ كاذباً بعد أن يقرأها.
+                if n == 0 and stem(option) not in seen_upto:
+                    errors.append(f"{where}: الجواب «{option}» ليس فيما قرأه إلى الصفحة {upto}")
+                if n and stem(option) in story_stems:
                     errors.append(f"{where}: المشتّت «{option}» في نصّ القصة — "
                                   "فالسؤال يحتمل جوابين")
-            picked = [lex_word.get(o) or (curriculum_word(o) if surah else None) for o in options]
-            emojis = [it["emoji"] for it in picked if it]
+            emojis = [it["emoji"] for it in map(option_item, options) if it]
             if len(set(emojis)) != len(emojis):
                 errors.append(f"{where}: صورتان متشابهتان في الخيارات")
 
@@ -988,10 +1069,14 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             errors.append(f"{label}: بستانُها المعلَن «{garden}» وكلماتُها تكتمل في "
                           f"«{theme_id(themes, place)}» (قاعدة «أوّل موضع تكتمل كلماته»)")
 
-    levels = [lv for lv, g in levels if g]        # محورُ المكتبة وحده
-    if levels != sorted(levels):
-        errors.append(f"[المكتبة] المستويات لا ترتفع مع الرحلة: {levels} — "
-                      "قصةٌ أطولُ قبل أقصر منها تُرهق الطفل")
+    # **المستوياتُ ترتفع مع الرحلة في كل محورٍ على حدة**: البساتينُ سلّمُها ١–٣،
+    # والرفُّ سلّمُه ٤–٦ — ولو خُلطا لبدا الرفُّ «نازلاً» بعد آخر بستان.
+    for axis, seq in (("المكتبة", [lv for lv, g, s in levels if g]),
+                      ("الرفّ", [lv for lv, g, s in levels if s])):
+        if seq != sorted(seq):
+            errors.append(f"[{axis}] المستويات لا ترتفع مع الرحلة: {seq} — "
+                          "قصةٌ أطولُ قبل أقصر منها تُرهق الطفل")
+    levels = [lv for lv, g, s in levels]
     idle = sorted(set(library_support) - used_support)
     if idle:
         errors.append(f"[معجم المكتبة] {len(idle)} مفردة معلَنة لا تستعملها قصة: "
@@ -1139,13 +1224,13 @@ def self_test(letters: dict) -> int:
 
     def run(entry_patch=None, words=None, support=("صَغِيرْ",), themes=(theme,), ladder=()):
         entry = {**good, **(entry_patch or {})}
-        data = {"bundleSize": 1, "themes": list(themes),
+        data = {"bundleSize": 5, "themes": list(themes),
                 SENTENCE_FIELD: list(ladder),
                 SUPPORT_FIELD: list(support),
                 "words": words if words is not None else [entry]}
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            check(data, letters, known, quiet=True)
+            check(data, letters, known, quiet=True, corpus=False)
         return buf.getvalue()
 
     ok("«مِفْتَاحْ»]" not in run(), "كلمة سليمة لا يُسجَّل عليها خطأ")
@@ -1244,14 +1329,17 @@ def self_test(letters: dict) -> int:
        "وردُّها مراجعةُ المدير بالعين (وهي ثالثةُ خطّ الإنتاج لا زائدةٌ عليه)")
 
     # ٥. عقد «مصنع القصص» (الحزمة ٩): المكتبة تُفحص بمادّةٍ مُصطنَعة لا بملفات القرص
+    ASK = {"upto": 3, "text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِفْتَاحْ",
+           "distractors": ["مِصْبَاحْ", "سَرِيرْ"]}
     story = {
-        "id": "t1", "level": 1, "garden": "t", "title": "مِفْتَاحُ سَامِي", "emoji": "🔑",
+        "id": "t1", "level": 1, "garden": "t", "surah": "", "shelf": "",
+        "title": "مِفْتَاحُ سَامِي", "emoji": "🔑",
         "pages": [{"text": "سَامِي أَمَامَ الْمِفْتَاحْ", "emoji": "🚪"},
                   {"text": "الْمِفْتَاحُ كَبِيرْ", "emoji": "🔑"},
                   {"text": "سَامِي يَحْمِلُ الْمِفْتَاحْ", "emoji": "🎉"}],
-        "question": {"text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِفْتَاحْ",
-                     "distractors": ["مِصْبَاحْ", "سَرِيرْ"]},
+        "questions": [dict(ASK)],
     }
+    ask_patch = lambda **kw: {"questions": [{**ASK, **kw}]}
     extra = [{**good, "word": "مِصْبَاحْ", "root": "صبح", "emoji": "💡",
               "tiles": syllabify("مِصْبَاحْ", letters), "sentence": "الْمِصْبَاحُ مُنِيرْ"},
              {**good, "word": "سَرِيرْ", "root": "سرر", "emoji": "🛏️",
@@ -1260,7 +1348,7 @@ def self_test(letters: dict) -> int:
     def runs(story_patch=None, support=("سَامِي", "يَحْمِلْ", "مَنْ"), stories=None):
         lib = ({SUPPORT_FIELD: list(support)},
                stories if stories is not None else [{**story, **(story_patch or {})}])
-        data = {"bundleSize": 1, "themes": [theme], SENTENCE_FIELD: [],
+        data = {"bundleSize": 5, "themes": [theme], SENTENCE_FIELD: [],
                 SUPPORT_FIELD: ["صَغِيرْ", "مُنِيرْ", "كَبِيرْ", "أَمَامَ"],
                 "words": [dict(good), *extra]}
         buf = io.StringIO()
@@ -1288,21 +1376,64 @@ def self_test(letters: dict) -> int:
     ok("جملة مكرَّرة" in runs({"pages": [story["pages"][0], story["pages"][0],
                                         story["pages"][2]]}),
        "وجملةٌ مكرَّرة في المنظومة تُمسَك (حارس ٩أ)")
-    ok("ليست في نصّ القصة" in runs({"question": {**story["question"],
-                                                 "text": "مَنْ يَحْمِلُ الْمِصْبَاحْ"}}),
+    ok("ليست فيما قرأه" in runs(ask_patch(text="مَنْ يَحْمِلُ الْمِصْبَاحْ")),
        "وسؤالٌ فيه كلمةٌ خارج نصّ القصة يُمسَك (الجواب يُستدلّ من القصة وحدها)")
-    ok("بلا أداة استفهام" in runs({"question": {**story["question"],
-                                                "text": "سَامِي يَحْمِلُ الْمِفْتَاحْ"}}),
+    ok("بلا أداة استفهام" in runs(ask_patch(text="سَامِي يَحْمِلُ الْمِفْتَاحْ")),
        "وسؤالٌ بلا أداة استفهام يُمسَك")
-    ok("الجواب" in runs({"question": {"text": "مَنْ يَحْمِلُ الْمِفْتَاحْ", "answer": "مِصْبَاحْ",
-                                      "distractors": ["مِفْتَاحْ", "سَرِيرْ"]}}),
+    ok("الجواب" in runs(ask_patch(answer="مِصْبَاحْ", distractors=["مِفْتَاحْ", "سَرِيرْ"])),
        "وجوابٌ ليس في نصّ القصة يُمسَك")
-    ok("المشتّت" in runs({"question": {**story["question"],
-                                       "distractors": ["مِفْتَاحْ", "سَرِيرْ"]}}),
+    ok("المشتّت" in runs(ask_patch(distractors=["مِفْتَاحْ", "سَرِيرْ"])),
        "ومشتّتٌ داخل نصّ القصة يُمسَك (وإلا احتمل السؤال جوابين)")
-    ok("ليس كلمةَ معجم" in runs({"question": {**story["question"],
-                                              "distractors": ["سَامِي", "سَرِيرْ"]}}),
+    ok("ليس من حوضه" in runs(ask_patch(distractors=["سَامِي", "سَرِيرْ"])),
        "وخيارٌ بلا صورةٍ في المعجم يُمسَك")
+
+    # ————— حزمة «المكتبة» (١٢ أغسطس ٢٠٢٦): المحور الثالث، والمقاطع، والحوض الموسَّع —————
+    ok("محورُ موضعها ملتبس" in runs({"shelf": SHELF}),
+       "ومحوران مملوءان يُمسَكان (بستانٌ ورفٌّ معاً — يملأ واحدٌ ويفرغ اثنان)")
+    ok("محورُ موضعها ملتبس" in runs({"garden": ""}),
+       "ومحاورٌ كلُّها فارغة تُمسَك (قصةٌ بلا موضع)")
+    ok("ليس من مستويات الرفّ" in runs({"garden": "", "shelf": SHELF}),
+       "ومستوى بستانٍ في قصةِ رفٍّ يُمسَك (سلّمُ الرفّ ٤–٦ وحدَه)")
+    ok("للرفّ وحدَه" in runs({"level": 4}),
+       "ومستوى رفٍّ في قصةِ بستانٍ يُمسَك (ولا تنزل قصةٌ طويلة إلى سلّمٍ بستانيّ)")
+    ok("لا يُكتب بيد" in runs({"questions": [{**ASK, "upto": 2}]}),
+       "ومقطعُ سؤالٍ يخالف المحسوب من الصفحات يُمسَك (⌈الصفحات ÷ ٥⌉)")
+    ok(segments_of(3) == [3] and segments_of(10) == [5, 10] and segments_of(14) == [4, 9, 14],
+       "ومقاطعُ القصة محسوبةٌ من صفحاتها لا مكتوبة (٣⇐[٣] · ١٠⇐[٥،١٠] · ١٤⇐[٤،٩،١٤])")
+
+    # قصةُ الرفّ: تسعُ صفحاتٍ ⇐ مقطعان، وحوضُها معجمٌ **ومنهج** (خيارُ «بَابْ» كلمةُ منهج
+    # لا معجم — وهو عينُ ما لم يكن يجوز لقصة بستان). و«الْمِصْبَاحُ» و«السَّرِيرُ» خارج
+    # نصّها كلِّه فيصحّان مشتّتَين.
+    SHELF_SUPPORT_T = ["سَامِي", "يَحْمِلْ", "مَاذَا", "أَيْنَ", "فَوْقَ"]
+    # «الْبَابْ» (كلمةُ منهج) **لا تظهر قبل الصفحة الخامسة** — به يُختبَر حدُّ المقطع
+    shelf_pages = ["سَامِي أَمَامَ الْمِفْتَاحْ",
+                   "سَامِي يَحْمِلُ الْمِفْتَاحْ",
+                   "الْمِفْتَاحُ الصَّغِيرُ أَمَامَ سَامِي",
+                   "الْمِفْتَاحُ الْكَبِيرُ أَمَامَ سَامِي",
+                   "الْمِفْتَاحُ الصَّغِيرُ فَوْقَ الْبَابْ",
+                   "الْبَابُ الْكَبِيرُ أَمَامَ سَامِي",
+                   "سَامِي أَمَامَ الْبَابِ الْكَبِيرْ",
+                   "الْبَابُ الصَّغِيرُ أَمَامَ سَامِي",
+                   "الْمِفْتَاحُ الْكَبِيرُ فَوْقَ الْبَابْ"]
+    shelf_asks = [{"upto": 4, "text": "مَاذَا يَحْمِلُ سَامِي", "answer": "مِفْتَاحْ",
+                   "distractors": ["مِصْبَاحْ", "سَرِيرْ"]},
+                  {"upto": 9, "text": "أَيْنَ الْمِفْتَاحْ", "answer": "بَابْ",
+                   "distractors": ["سَرِيرْ", "مِصْبَاحْ"]}]
+    shelf_story = {**story, "garden": "", "shelf": SHELF, "level": 4,
+                   "pages": [{"text": t, "emoji": "🚪"} for t in shelf_pages],
+                   "questions": shelf_asks}
+    runsh = lambda st: runs(stories=[st], support=SHELF_SUPPORT_T)
+    ok("أخطاء المكتبة" not in runsh(shelf_story),
+       "وقصةُ رفٍّ سليمة تمرّ — وجوابُها «بَابْ» **كلمةُ منهج**: حوضُ الرفّ معجمٌ ومنهج")
+    ok("ليس من حوضه" in runs(ask_patch(distractors=["بَابْ", "سَرِيرْ"])),
+       "— وكلمةُ المنهج نفسُها تُردّ في قصةِ بستان (حوضُها معجمُه وحدَه)")
+    ok("الجواب «بَابْ» ليس فيما قرأه إلى الصفحة 4" in runsh(
+        {**shelf_story, "questions": [{**shelf_asks[1], "upto": 4}, shelf_asks[1]]}),
+       "وسؤالُ مقطعٍ جوابُه في صفحةٍ لم يبلغها الطفل بعدُ يُمسَك (يُجاب من مقطعه)")
+    ok("سؤالٌ مكرَّر" in runsh(
+        {**shelf_story, "questions": [shelf_asks[0], {**shelf_asks[0], "upto": 9}]}),
+       "وسؤالٌ مكرَّر في المكتبة يُمسَك (نصٌّ يُنطَق كغيره)")
+
     late = {"id": "t2", "title": "بستان ثانٍ", "emoji": "🌴"}
     ok("قاعدة «أوّل موضع تكتمل كلماته»" in _late_garden(story, extra, good, theme, late,
                                                         letters, known),
@@ -1346,12 +1477,12 @@ def _late_garden(story: dict, extra: list, good: dict, theme: dict, late: dict,
     """خرج فحص المكتبة على قصةٍ في البستان الأول تستعمل كلمةً من بستانٍ بعده."""
     words = [dict(good), extra[0], {**extra[1], "theme": "t2"}]
     pages = [*story["pages"][:2], {"text": "سَامِي يَحْمِلُ السَّرِيرْ", "emoji": "🛏️"}]
-    ask = {"text": "مَنْ يَحْمِلُ السَّرِيرْ", "answer": "سَرِيرْ", "distractors": ["مِفْتَاحْ",
-                                                                                 "مِصْبَاحْ"]}
-    data = {"bundleSize": 1, "themes": [theme, late], SENTENCE_FIELD: [],
+    ask = [{"upto": 3, "text": "مَنْ يَحْمِلُ السَّرِيرْ", "answer": "سَرِيرْ",
+            "distractors": ["مِفْتَاحْ", "مِصْبَاحْ"]}]
+    data = {"bundleSize": 5, "themes": [theme, late], SENTENCE_FIELD: [],
             SUPPORT_FIELD: ["صَغِيرْ", "مُنِيرْ", "كَبِيرْ", "أَمَامَ"], "words": words}
     lib = ({SUPPORT_FIELD: ["سَامِي", "يَحْمِلْ", "مَنْ"]},
-           [{**story, "pages": pages, "question": ask}])
+           [{**story, "pages": pages, "questions": ask}])
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         check_stories(data, letters, known, quiet=True, library=lib)
@@ -1360,10 +1491,10 @@ def _late_garden(story: dict, extra: list, good: dict, theme: dict, late: dict,
 
 def _no_support(good: dict, theme: dict, letters: dict, known: set) -> str:
     """خرج الفحص على ملفٍّ بلا حقل `support` أصلاً (لا قائمةٍ فارغة)."""
-    data = {"bundleSize": 1, "themes": [theme], "words": [dict(good)]}
+    data = {"bundleSize": 5, "themes": [theme], "words": [dict(good)]}
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        check(data, letters, known, quiet=True)
+        check(data, letters, known, quiet=True, corpus=False)
     return buf.getvalue()
 
 
@@ -1412,7 +1543,7 @@ def check_tatweel(data: dict, quiet: bool = False) -> int:
             if story.get("missing"):
                 continue
             texts = [story.get("title"), *(p.get("text") for p in story.get("pages") or []),
-                     (story.get("question") or {}).get("text")]
+                     *(a.get("text") for a in story.get("questions") or [])]
             for text in texts:
                 if hit(text):
                     errors.append(f"[قصة «{story.get('id')}»] «{text}» فيه تطويل")
@@ -1455,7 +1586,8 @@ def spoken_inventory(data: dict) -> list:
                 continue
             out.append((story.get("title"), f"قصة «{story.get('id')}»"))
             out += [(p.get("text"), f"قصة «{story.get('id')}»") for p in story.get("pages") or []]
-            out.append(((story.get("question") or {}).get("text"), f"قصة «{story.get('id')}»"))
+            out += [(a.get("text"), f"قصة «{story.get('id')}»")
+                    for a in story.get("questions") or []]
     return [(t, where) for t, where in out if t]
 
 

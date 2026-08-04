@@ -16,7 +16,7 @@
 // `tools/check_decodable.py` و`tools/check_lexicon.py`.
 
 import { storyById, storyTexts, sentenceText } from './curriculum.js';
-import { libraryStory, storyTexts as libraryStoryTexts } from './library.js';
+import { libraryStory, readsAloud, storyTexts as libraryStoryTexts } from './library.js';
 import { textWord } from './fade.js';   // عرضٌ بدرجات الخفوت — ولا احتساب هنا (الشاهد الواحد)
 import * as progress from './progress.js';
 import * as audio from './audio.js';
@@ -49,6 +49,15 @@ export function starsForLibrary(heard, total, correct) {
   return Math.max(1, starsForStory(heard, total) - 1 + (correct ? 1 : 0));
 }
 
+/**
+ * نجوم قصص **رفّ المكتبة** (حزمة المكتبة): لا جملَ تُسمَع هنا أصلاً، فعدّادُ المسموع
+ * لا يقيس شيئاً. والمقياسُ **الفهم**: نجمةٌ للقراءة دائماً، ونجمةٌ لكل مقطعٍ أُجيب من
+ * أوّل مرّة، بحدّ ثلاث. والحدُّ الأدنى نجمةٌ كسائر القصص — القراءةُ نفسُها إنجاز.
+ */
+export function starsForShelf(clean) {
+  return Math.max(1, Math.min(3, 1 + clean));
+}
+
 export function renderStory(storyId) {
   const story = storyById(storyId);
   if (!story) return null;
@@ -66,24 +75,52 @@ export function renderStory(storyId) {
 export function renderLibraryStory(storyId) {
   const story = libraryStory(storyId);
   if (!story) return null;
+  // **قصةُ الرفّ تُقرأ لا تُسمَع** (بند الحزمة): يسقط الكاريوكي وأذنُ السطر، فلا
+  // تدخل جملُها قائمةَ الصوت أصلاً — وتبقى نقرةُ الكلمة شبكةَ الأمان الوحيدة.
+  const shelf = Boolean(story.shelf);
   return readingScreen({
-    nodeId: `library:${story.id}`,
+    nodeId: `${shelf ? 'shelf' : 'library'}:${story.id}`,
     title: story.title,
     emoji: story.emoji,
     pill: `قصة · مستوى ${arNum(story.level)}`,
-    texts: [...libraryStoryTexts(story), ...(story.question?.options || []).map((w) => w.say)],
+    texts: [...libraryStoryTexts(story),
+      ...story.questions.flatMap((q) => q.options.map((w) => w.say))],
     lines: story.pages.map((p) => ({ words: p.words, emoji: p.emoji, text: p.text })),
-    question: story.question,
-    stars: ({ heard, total, correct }) => starsForLibrary(heard, total, correct),
+    questions: story.questions,
+    aloud: readsAloud(story),
+    readToMother: shelf,
+    stars: ({ heard, total, clean, asked }) => (shelf
+      ? starsForShelf(clean)
+      : starsForLibrary(heard, total, asked ? clean === asked : false)),
   });
 }
 
-function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, stars }) {
+/**
+ * @param {object[]} questions  سؤالٌ لكل مقطع، لكلٍّ `upto` (رقمُ صفحته الأخيرة).
+ *   والمقطعُ وحدةُ العرض: يقرأ صفحاتِه ثم يُسأل عنها ثم ينتقل. وقصصُ البساتين
+ *   والمنهج مقطعٌ واحد يسع الصفحات كلَّها، فالمسارُ واحدٌ لا مساران.
+ * @param {boolean} aloud       أتُسمَع جملُها؟ (كاريوكي وأذنُ السطر) — لا في الرفّ.
+ * @param {boolean} readToMother أتُختَم بخطوة «اِقْرَأْ لِأُمِّكْ»؟
+ */
+function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [],
+  aloud = true, readToMother = false, stars }) {
   const total = lines.length;
   const heard = new Set();      // فهارس الجمل التي سمعها الطفل (كلمةً كلمةً أو كاملةً)
+
+  // **المقاطع وحدةُ العرض**: حدودُها من `upto` الذي حسبه الفاحص من عدد الصفحات.
+  // وبلا سؤالٍ (قصةُ منهج) فمقطعٌ واحد يسع الصفحات كلَّها.
+  const segments = questions.length
+    ? questions.map((q, i) => ({
+      from: i ? questions[i - 1].upto : 0, to: q.upto, question: q,
+    }))
+    : [{ from: 0, to: total, question: null }];
+
   let done = false;
-  let asked = false;
-  let missed = false;           // أخطأ في سؤال الفهم مرةً على الأقل
+  let seg = 0;                  // المقطع المعروض
+  let asking = false;           // أفي سؤال هذا المقطع نحن؟
+  let mothered = false;         // أعُرضت خطوةُ «اقرأ لأمّك»؟
+  let clean = 0;                // مقاطعُ أُجيبت من أوّل مرّة
+  let missedHere = false;       // أخطأ في سؤال هذا المقطع
   let token = 0;                // يُبطِل الكاريوكي المعلَّق عند أي انتقال
   let root = null;
 
@@ -102,11 +139,17 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
   }
 
   function paintFoot() {
+    const many = segments.length > 1;
     foot.replaceChildren(
-      h('p', { class: 'hint' },
-        `سمعتَ ${arNum(heard.size)} من ${arCount(total, ['جملة', 'جملتين', 'جمل', 'جملة'])}`),
+      // **عدّادُ المسموع لا معنى له حيث لا تُسمَع جملة** — فيُستبدل بموضع القراءة:
+      // الطفلُ في الرفّ قارئٌ، وما يهمّه أين بلغ لا كم سمع.
+      h('p', { class: 'hint' }, aloud
+        ? `سمعتَ ${arNum(heard.size)} من ${arCount(total, ['جملة', 'جملتين', 'جمل', 'جملة'])}`
+        : `المقطع ${arNum(seg + 1)} من ${arNum(segments.length)}`
+          + ` · ${arCount(segments[seg].to - segments[seg].from, ['صفحة', 'صفحتان', 'صفحات', 'صفحة'])}`),
       h('button', { class: 'btn btn--primary btn--wide next', onclick: finish },
-        question ? 'أتممتُ القراءة ← السؤال' : 'أتممتُ القراءة ←'),
+        segments[seg].question ? 'أتممتُ القراءة ← السؤال'
+          : many ? 'أتممتُ القراءة ←' : 'أتممتُ القراءة ←'),
     );
   }
 
@@ -125,7 +168,11 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       ),
     );
 
-    lines.forEach((line, index) => {
+    // **يُعرَض مقطعُ القصة لا القصةُ كلُّها**: عشرُ صفحاتٍ في شاشةٍ واحدة تفيض عن
+    // الآيباد وتُرهق العين — والمقطعُ هو نفسُه وحدةُ السؤال، فالعرضُ يتبع الفهم.
+    const { from, to } = segments[seg];
+    lines.slice(from, to).forEach((line, offset) => {
+      const index = from + offset;
       const said = new Set();
 
       // كلُّ كلمةٍ بدرجة خفوتها (حزمة الخفوت)، ونقرتُها تُسمعها **وتكشف شكلها** ثوانيَ:
@@ -146,7 +193,8 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       const el = h('div', { class: 'line' },
         faceEl(line.emoji, 'line-emoji'),
         h('p', { class: 'line-words' }, words),
-        h('button', {
+        // أذنُ السطر لا تُعرَض حيث لا صوتَ للجملة (الرفّ) — ولا يُعرَض زرٌّ لا يعمل
+        aloud && h('button', {
           class: 'btn line-ear',
           'aria-label': `اسمع الجملة كاملة: ${line.text}`,
           onclick: () => readAloud(index, false),
@@ -156,21 +204,25 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       sheet.append(el);
     });
 
-    // زرّ الكاريوكي: يتلو من أول جملة ويُظلّل المسموعة (بند الحزمة ٩/٥)
-    sheet.append(h('div', { class: 'row karaoke' },
-      h('button', {
-        class: 'btn btn--wide read-all',
-        onclick: (e) => (e.currentTarget.dataset.on ? stopAll() : readAloud(0, true)),
-      }, icon('ear'), ' اسمع القصة كاملة'),
-    ));
-    // و«اقرأ لي» تحته: يسمع القصةَ بصوتنا، ثم يقرؤها بصوته (الحزمة ١٠)
-    if (recordRow) sheet.append(recordRow);
+    // زرّ الكاريوكي: يتلو من أول جملة ويُظلّل المسموعة (بند الحزمة ٩/٥).
+    // **ولا كاريوكي في الرفّ**: «القصةُ تُقرأ لا تُسمع» — الطفلُ هناك قارئ.
+    if (aloud) {
+      sheet.append(h('div', { class: 'row karaoke' },
+        h('button', {
+          class: 'btn btn--wide read-all',
+          onclick: (e) => (e.currentTarget.dataset.on ? stopAll() : readAloud(from, true)),
+        }, icon('ear'), ' اسمع القصة كاملة'),
+      ));
+      // و«اقرأ لي» تحته: يسمع القصةَ بصوتنا، ثم يقرؤها بصوته (الحزمة ١٠)
+      if (recordRow) sheet.append(recordRow);
+    }
     return sheet;
   }
 
   /** تظليل الجملة المسموعة وحدها — يتبعها الطفل بعينه كما يتبع السطر المتلوّ. */
   function highlight(index) {
-    lineEls.forEach((el, i) => el.classList.toggle('line--now', i === index));
+    const base = segments[seg].from;      // `lineEls` مقطعُ الشاشة لا القصةُ كلُّها
+    lineEls.forEach((el, i) => el.classList.toggle('line--now', base + i === index));
   }
 
   function stopAll() {
@@ -194,7 +246,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       btn.dataset.on = '1';
       btn.textContent = '■ أوقِف القراءة';
     }
-    for (let i = from; i < total; i++) {
+    for (let i = from; i < segments[seg].to; i++) {   // ولا يتعدّى الكاريوكي مقطعَه
       highlight(i);
       markHeard(i);
       await audio.play(lines[i].text);
@@ -222,8 +274,10 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
   const recordRow = recordBlock({
     nodeId,
     title,
-    label: 'اقرأ لي',
-    hint: 'نسمعك… اقرأ القصة بصوتك',
+    // **وسمُ الرفّ «اِقْرَأْ لِأُمِّكْ»** (حكم المدير، ١٢ أغسطس ٢٠٢٦) — مذكَّراً
+    // كخطاب التطبيق كلِّه («اقرأ بعينك»، «أتممتَ القراءة»)، ولا يُشقّ لشاشةٍ وحدها.
+    label: readToMother ? 'اِقْرَأْ لِأُمِّكْ' : 'اقرأ لي',
+    hint: readToMother ? 'نسمعك… اقرأ القصة لأمّك بصوتك' : 'نسمعك… اقرأ القصة بصوتك',
     stopAll,
     root: () => root,
   });
@@ -233,9 +287,10 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
   // «لعبة لا امتحان»: لا صوت قبل الاختيار (الحكم على القراءة لا على السمع)، والخطأ
   // يُسمعه ما اختاره ليقارنه بما قرأ — ولا يُحجَب عنه الجواب ولا تُقفل الشاشة.
 
-  function askView() {
+  function askView(question) {
     let locked = false;
     const options = shuffle(question.options);
+    const many = segments.length > 1;
 
     const row = h('div', { class: 'row picrow' }, options.map((word) => {
       const btn = h('button', {
@@ -244,7 +299,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
         onclick: async () => {
           if (locked) return;
           if (word !== question.answer) {
-            missed = true;
+            missedHere = true;
             shake(btn);
             btn.classList.add('bad');
             setTimeout(() => btn.classList.remove('bad'), 700);
@@ -253,20 +308,21 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
           }
           locked = true;
           btn.classList.add('good');
+          if (!missedHere) clean++;     // مقطعٌ أُجيب من أوّل مرّة
           // **لا احتساب هنا** (قاعدة الشاهد الواحد — `fade.js`): إصابةُ صورةِ السؤال
           // شاهدٌ على فهم جملته لا على قراءة كلِّ كلمةٍ فيها، واحتمالُها الثلث.
           const mine = ++token;
           await audio.play(word.say);
           if (!live(mine)) return;
           await new Promise((r) => setTimeout(r, AFTER_PICK_MS));
-          if (live(mine)) celebrate();
+          if (live(mine)) advance();
         },
       }, faceEl(word.emoji, 'pic-emoji'));
       return btn;
     }));
 
     return h('div', { class: 'ask' },
-      h('h2', {}, 'سؤال القصة'),
+      h('h2', {}, many ? `سؤال المقطع ${arNum(seg + 1)}` : 'سؤال القصة'),
       h('p', { class: 'hint' }, 'اقرأ السؤال، ثم اختر صورته'),
       h('p', { class: 'sentence' },
         question.words.map((word) => textWord(word, { className: 'sentence-word' }))),
@@ -274,14 +330,56 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
     );
   }
 
+  // ————— «اِقْرَأْ لِأُمِّكْ» — خطوةٌ أخيرة لا عقدةٌ ثانية —————
+  //
+  // نظيرُ «الترديد» في شاشة السورة بحرفه: خطوةٌ في الشاشة نفسِها، **بلا مؤقّت**،
+  // والانتقالُ بيده. وكتلتُها `record.js` نفسُها — فحاملُ صوت الطفل ملفٌّ واحد لا
+  // نسختان تفترقان، والخصوصيةُ مطلقة (محليّ، `blob:`، صفرُ شبكة).
+
+  function motherView() {
+    return h('div', { class: 'ask' },
+      h('h2', {}, 'اِقْرَأْ لِأُمِّكْ'),
+      h('p', { class: 'hint' }, 'قرأتَ القصة كلها — اقرأها الآن بصوتك، واسمع نفسك'),
+      // **أيقونتُنا الخطية لا إيموجي**: هذه لغةُ الواجهة لا بيانٌ من المنهج
+      // («أيقونات لا إيموجي» — DESIGN §٦)، ولا وجهَ لهذه الخطوة في بياناتٍ تُقرأ.
+      faceEl(icon('family'), 'celebrate-face', 'div'),
+      recordRow || h('p', { class: 'note' }, 'اقرأ القصة لأمّك بصوتك — ثم أتمِم'),
+      h('div', { class: 'row foot' },
+        h('button', { class: 'btn btn--primary btn--wide next', onclick: celebrate },
+          'أتممتُ ←'),
+      ),
+    );
+  }
+
   // ————— الختام —————
 
+  /** «أتممتُ القراءة»: إلى سؤال المقطع إن كان له سؤال، وإلا إلى ما بعده. */
   function finish() {
     stopAll();
     recorder.release();     // انتهت القراءة: يُطلق الميكروفون ولو كان مفتوحاً
-    if (question && !asked) {
-      asked = true;
-      body.replaceChildren(askView());
+    const question = segments[seg].question;
+    if (question && !asking) {
+      asking = true;
+      missedHere = false;
+      body.replaceChildren(askView(question));
+      foot.replaceChildren();
+      return;
+    }
+    advance();
+  }
+
+  /** بعد سؤال المقطع (أو بلا سؤال): إلى المقطع الذي يليه، أو إلى خاتمة القصة. */
+  function advance() {
+    asking = false;
+    if (seg < segments.length - 1) {
+      seg++;
+      paint();
+      return;
+    }
+    // **خطوةُ «اِقْرَأْ لِأُمِّكْ» آخِرَ القصة** — بعد أن قرأها كلَّها وأجاب عن مقاطعها
+    if (readToMother && !mothered) {
+      mothered = true;
+      body.replaceChildren(motherView());
       foot.replaceChildren();
       return;
     }
@@ -291,7 +389,8 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
   function celebrate() {
     stopAll();
     done = true;
-    const won = stars({ heard: heard.size, total, correct: question ? !missed : false });
+    const asked = questions.length;
+    const won = stars({ heard: heard.size, total, clean, asked });
     const before = progress.getStars(nodeId);
     progress.setStars(nodeId, won);
     const last = !progress.nextNode();
@@ -302,10 +401,11 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       h('h2', {}, 'قرأتَ قصة كاملة!'),
       starsRow(won, 'big-stars'),
       h('p', { class: 'hint' }, won === 3
-        ? cheer('سمعتَ الجمل كلها وأجبتَ عن السؤال — أحسنت!')
-        : question
-          ? 'أعِد القراءة واسمع كل جملة، وأجب عن السؤال من أول مرة.'
-          : 'أعِد القراءة واسمع كل جملة لتزيد نجومك.'),
+        ? cheer(aloud ? 'سمعتَ الجمل كلها وأجبتَ عن السؤال — أحسنت!'
+          : `قرأتَ ${arCount(total, ['صفحة', 'صفحتين', 'صفحات', 'صفحة'])} وأجبتَ عن الأسئلة كلها — أحسنت!`)
+        : !asked ? 'أعِد القراءة واسمع كل جملة لتزيد نجومك.'
+          : aloud ? 'أعِد القراءة واسمع كل جملة، وأجب عن السؤال من أول مرة.'
+            : 'أعِد القراءة، وأجب عن أسئلة المقاطع من أول مرة.'),
       before > won && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
       last && h('p', { class: 'note' }, icon('party'),
         ' أتممتَ الرحلة كلها — من الحرف الأول إلى المكتبة.'),
@@ -315,8 +415,11 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
           class: 'btn',
           onclick: () => {
             done = false;
-            asked = false;
-            missed = false;
+            seg = 0;
+            asking = false;
+            mothered = false;
+            clean = 0;
+            missedHere = false;
             heard.clear();
             paint();
           },

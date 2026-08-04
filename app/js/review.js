@@ -18,6 +18,7 @@ import {
 } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
+import { credit } from './fade.js';   // شاهدُ «رتّب» — الكلمةُ في موضعها (مدخلٌ واحد)
 import { buildBoard } from './words.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar, letterTitle, wordText,
@@ -675,6 +676,16 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
         audio.play(tile.text);         // يسمع ما اختاره فيقارنه بما تحتاجه الجملة
         return wrong(btn);
       }
+      // **شاهدُ المراجعة** (حكم المدير، ١٢ أغسطس ٢٠٢٦ — حزمة المكتبة): «رتّب» هنا هو
+      // «رتّب» في السلّم بعينه — الكلمةُ المطلوبة **في موضعها** بين بلاطاتٍ ومشتّتات،
+      // فهو **موضعُ شاهدٍ واحد** بحدّه المُقَرّ في `fade.js`. وكان يُقاس في ليتنر ولا
+      // يُحتسب في عدّاد الخفوت، فبقيت العتباتُ لا تُبلَغ: ٨ كلماتٍ في الرحلة كلِّها
+      // تبلغ ز٣ و٥٢٩ تبقى ز١ (محسوبٌ من البيانات، `docs/REVIEW_LIBRARY.md` §٧).
+      //
+      // **وهو اتّساقٌ لا توسيع**: المادّةُ جملةٌ أتمّ الطفلُ درجتَها، والتمرينُ هو هو،
+      // بل **تباعدُه أنظف** — وحدةُ يوم ليتنر هي وحدةُ يوم العدّاد نفسُها. والحدُّ
+      // قائمٌ كما هو (`MAX_ORDER = 1` لكل جلسة ⇒ خمسُ كلماتٍ في اليوم على الأكثر).
+      credit(expected);
       btn.disabled = true;
       btn.classList.add('tile--used');
       slotEls[filled].textContent = tile.text;

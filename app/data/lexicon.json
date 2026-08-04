@@ -273,7 +273,7 @@
     {"word": "رِيحْ", "tiles": ["رِي", "حْ"], "root": "روح", "theme": "nature", "emoji": "🌬️", "sentence": "الرِّيحُ قَوِيَّةْ"},
     {"word": "ثَلْجْ", "tiles": ["ثَ", "لْ", "جْ"], "root": "ثلج", "theme": "nature", "emoji": "❄️", "sentence": "الثَّلْجُ بَارِدْ"},
     {"word": "نَهْرْ", "tiles": ["نَ", "هْ", "رْ"], "root": "نهر", "theme": "nature", "emoji": "🏞️", "sentence": "النَّهْرُ طَوِيلْ"},
-    {"word": "غَابَةْ", "tiles": ["غَا", "بَةْ"], "root": "غيب", "theme": "nature", "emoji": "🌲", "sentence": "الْغَابَةُ كَبِيرَةْ"},
+    {"word": "غَابَةْ", "tiles": ["غَا", "بَةْ"], "root": "غيب", "theme": "nature", "emoji": "🌲", "pictured": false, "sentence": "الْغَابَةُ كَبِيرَةْ"},
     {"word": "زَهْرَةْ", "tiles": ["زَ", "هْ", "رَةْ"], "root": "زهر", "theme": "nature", "emoji": "🌸", "sentence": "الزَّهْرَةُ جَمِيلَةْ"},
     {"word": "عُشْبْ", "tiles": ["عُ", "شْ", "بْ"], "root": "عشب", "theme": "nature", "emoji": "🌿", "sentence": "الْعُشْبُ أَخْضَرْ"},
     {"word": "حَجَرْ", "tiles": ["حَ", "جَ", "رْ"], "root": "حجر", "theme": "nature", "emoji": "🪨", "sentence": "الْحَجَرُ صُلْبْ"},

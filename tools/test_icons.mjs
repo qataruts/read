@@ -106,11 +106,21 @@ ok(badPick.size === 0,
   `ولا غيرَ مصوَّرةٍ مشتّتاً مصوَّراً في ${SENTENCES.length * 80} سحبةَ خيارات`
   + (badPick.size ? ` — ${[...badPick].join('، ')}` : ''));
 
-console.log('\n— حوض ٣: سؤال فهم القصة —');
-const asked = LIBRARY.filter((s) => s.question);
-const badAsk = asked.filter((s) => s.question.options.some((o) => o.pictured === false));
-ok(asked.length === LIBRARY.length && LIBRARY.length === 11,   // ١٠ في البساتين + قصةُ سورة الفيل
-  `كل القصص احتفظت بسؤالها (${asked.length}/${LIBRARY.length}) — لم يسقط سؤالٌ بالإخراج`);
+console.log('\n— حوض ٣: أسئلة فهم القصة (سؤالٌ لكل مقطع) —');
+// **العددُ محسوبٌ من الملفات لا مكتوبٌ بيد** (قاعدة «لا رقمَ مكتوبٌ بيدٍ في حارس»):
+// كان هنا `LIBRARY.length === 11` فانكسر بأوّل قصةٍ تُضاف. والمقيسُ الحقيقيّ أنّ
+// **الإخراجَ لم يُسقِط سؤالاً**: يقارَن ما في القرص بما بلغ الشاشة، عدداً بعدد.
+const { readFileSync } = await import('node:fs');
+const STORIES = new URL('../app/data/stories/', import.meta.url);
+const readJson = (name) => JSON.parse(readFileSync(new URL(name, STORIES), 'utf8'));
+const onDisk = readJson('index.json').stories
+  .reduce((sum, id) => sum + (readJson(`${id}.json`).questions || []).length, 0);
+const onScreen = LIBRARY.reduce((sum, s) => sum + s.questions.length, 0);
+const badAsk = LIBRARY.filter((s) => s.questions.some(
+  (q) => q.options.some((o) => o.pictured === false)));
+ok(onScreen === onDisk && onDisk > 0,
+  `كل سؤالٍ على القرص بلغ الشاشة (${onScreen}/${onDisk} في ${LIBRARY.length} قصة) — `
+  + 'لم يسقط سؤالٌ بالإخراج');
 ok(badAsk.length === 0,
   'ولا خيارَ غيرَ مصوَّر في أيّ سؤال (خياراتُه صورٌ لا نصّ)'
   + (badAsk.length ? ` — ${badAsk.map((s) => s.id).join('، ')}` : ''));

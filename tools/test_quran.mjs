@@ -103,9 +103,9 @@ ok(stageIds.filter((id) => id.startsWith('quran:')).join('|') === parts.map((x) 
   `وهي كتلةٌ متصلة بعد الرحلة كلها (${stageIds.length} عقدة: ${parts.length} محطة و${prophetNodes.length} قصة)`);
 ok(ids.slice(quranStart + parts.length + prophetNodes.length).every((id) => id.startsWith('garden:')
   || id.startsWith('ladder:') || id.startsWith('library:') || id.startsWith('roots:')
-  || id === 'gate:gardens'),
+  || id.startsWith('shelf:') || id === 'gate:gardens'),
   'ولا يليها إلا بوابة الحديقة (١٤) وبساتين الموضوعات (٧) وسلالم جملها (٨) '
-  + 'ومكتبة قصصها (٩) وأشجار جذورها (الجذور)');
+  + 'ومكتبة قصصها (٩) وأشجار جذورها (الجذور) ورفُّ قراءتها الطويلة (المكتبة)');
 ok(ids[quranStart - 1] === 'gate:quran',
   'ويسبقها مباشرةً بوابة الإتقان — لا مصحف بحروف هشّة (الحزمة ١٤)');
 // عقد التأسيس: حروف المجموعات ولعبها + المهارات + القصص + البوابتان + المرحلة القرآنية

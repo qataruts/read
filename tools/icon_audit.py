@@ -253,18 +253,25 @@ def collect() -> tuple:
             story["title"], story["emoji"], f"stories/{story['id']}.json",
             "الوجه", "ج", ["ui.js وجه العقدة في الخريطة", "story.js عنوان القصة"],
         ))
-        question = story.get("question") or {}
-        options = [question.get("answer"), *(question.get("distractors") or [])]
-        pool = []
-        for option in options:
-            word = lex_word.get(option)
-            if not word:
-                continue
-            pool.append(Entry(
-                word["word"], word["emoji"], f"stories/{story['id']}.json",
-                "خيارات سؤال الفهم", "أ", ["story.js سؤال الفهم (الصورة خيار)"],
-            ))
-        pools.append((f"سؤال قصة {story['id']}", "story.js askView", pool))
+        # **حوضٌ لكل مقطعٍ لا حوضٌ للقصة** (حزمة المكتبة، ١٢ أغسطس ٢٠٢٦): صار للقصة
+        # الطويلة سؤالٌ لكل مقطع، وكلُّ سؤالٍ حوضُ صورٍ قائمٌ بنفسه — فيُجرد وحدَه.
+        # و**حوضُ قصةِ الرفّ معجمٌ ومنهجٌ معاً** (حكم المدير)، فيدخل الجردَ مصدران:
+        # وبه انكشف أن `شَجَرَةْ` (منهج) و`غَابَةْ` (معجم) كانتا صورةً واحدة 🌲.
+        for question in story.get("questions") or []:
+            options = [question.get("answer"), *(question.get("distractors") or [])]
+            pool = []
+            for option in options:
+                word = lex_word.get(option)
+                if not word and story.get("shelf"):
+                    word = cl.curriculum_word(option)
+                if not word:
+                    continue
+                pool.append(Entry(
+                    word["word"], word["emoji"], f"stories/{story['id']}.json",
+                    "خيارات سؤال الفهم", "أ", ["story.js سؤال الفهم (الصورة خيار)"],
+                ))
+            pools.append((f"سؤال قصة {story['id']} (مقطع ← ص{question.get('upto')})",
+                          "story.js askView", pool))
 
     return entries, pools
 

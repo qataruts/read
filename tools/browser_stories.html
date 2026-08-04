@@ -129,22 +129,31 @@ try {
   // ————— ١) الخريطة: مكتبةٌ بعد سلّم كل بستان —————
   await seed([]);
   await waitFor(() => $('.station'), 'الخريطة');
-  ok($$('.station--library').length === GARDENS.filter((g) => libraryOf(g.id).length).length,
-    `الخريطة فيها ${arNum($$('.station--library').length)} مكتبات — مكتبةٌ بعد كل بستان`);
+  // **محطاتُ المكتبة بساتينُها وحدها**: رفُّ المكتبة يشاركها لونَها ومعلمَها
+  // ويفترق بصنفه `station--shelf` — فلا يختلط العدّان (حزمة المكتبة).
+  const libStations = () => $$('.station--library:not(.station--shelf)');
+  ok(libStations().length === GARDENS.filter((g) => libraryOf(g.id).length).length,
+    `الخريطة فيها ${arNum(libStations().length)} مكتبات — مكتبةٌ بعد كل بستان`);
   const stations = $$('.station');
-  ok($$('.station--library').every((el, i) =>
+  ok(libStations().every((el, i) =>
     stations.indexOf(el) === stations.indexOf($$('.station--ladder')[i]) + 1),
     'وكل مكتبة تلي سلّم جملها مباشرةً (كلماتُ البستان ← جملُه ← قصةٌ تجمعها)');
-  ok($$('.station--library').every((s) => s.classList.contains('station--locked')),
+  ok(libStations().every((s) => s.classList.contains('station--locked')),
     'وكلها مقفلة في بداية الرحلة');
+  ok($$('.station--shelf').length === 1
+    && stations.indexOf($('.station--shelf')) === stations.length - 1,
+    'ورفُّ المكتبة قسمٌ واحد في **ذيل** الرحلة — رصيدُه الرحلةُ كلُّها');
   unfoldAll();
   // محطةُ المكتبة قصصُ **البساتين** وحدها — وقصصُ السور عقدُها في المرحلة القرآنية
-  const SHELF = LIBRARY.filter((s) => s.garden);
-  ok($$('.station--library .node').length === SHELF.length,
-    `وعقدُها قصصُ المكتبة كلها (${arNum(SHELF.length)} قصة)`);
+  const GARDEN_STORIES = LIBRARY.filter((s) => s.garden);
+  const SHELF_STORIES = LIBRARY.filter((s) => s.shelf);
+  ok(libStations().reduce((n, el) => n + el.querySelectorAll('.node').length, 0) === GARDEN_STORIES.length,
+    `وعقدُها قصصُ المكتبة كلها (${arNum(GARDEN_STORIES.length)} قصة)`);
+  ok($$('.station--shelf .node').length === SHELF_STORIES.length,
+    `وعقدُ الرفّ قصصُه الطويلة (${arNum(SHELF_STORIES.length)} قصة)`);
   ok(!!$('.station--library .station-mark svg'), 'ولها معلمها البصري على الدرب (DESIGN §٦)');
 
-  const first = LIBRARY[0];
+  const first = GARDEN_STORIES[0];
   await goto(`#/library/${encodeURIComponent(first.id)}`);
   ok(!!$('.station') && !$('.story'), 'والدخول المباشر على قصة مقفلة يعيده إلى الخريطة');
 
@@ -201,17 +210,17 @@ try {
   const mark = heardLog.length;
   $('.foot .next').click();
   await waitFor(() => $('.ask'), 'سؤال الفهم');
-  ok(texts('.ask .sentence-word').join(' ') === first.question.text,
+  ok(texts('.ask .sentence-word').join(' ') === first.questions[0].text,
     `سؤال الفهم معروضٌ للقراءة («${texts('.ask .sentence-word').join(' ')}»)`);
   ok($$('.ask .piccard').length === 3 && heardLog.length === mark,
     'وثلاث صور بلا صوت قبل الاختيار — الحكم على القراءة لا على السمع');
-  ok($$('.ask .piccard').map(picOf).includes(first.question.answer.emoji),
+  ok($$('.ask .piccard').map(picOf).includes(first.questions[0].answer.emoji),
     'وصورة الجواب بين الصور الثلاث');
   checkTargets('سؤال الفهم');
 
   const cards = () => $$('.ask .piccard');
-  const wrongCard = cards().find((c) => picOf(c) !== first.question.answer.emoji);
-  const wrongWord = first.question.options.find((w) => w.emoji === picOf(wrongCard));
+  const wrongCard = cards().find((c) => picOf(c) !== first.questions[0].answer.emoji);
+  const wrongWord = first.questions[0].options.find((w) => w.emoji === picOf(wrongCard));
   wrongCard.click();
   await sleep(150);
   ok(wrongCard.classList.contains('bad') && !!$('.ask'),
@@ -219,7 +228,7 @@ try {
   ok(lastHeard() === wrongWord.say, `ويُسمعه ما اختاره لا الصواب (${lastHeard()})`);
   await sleep(250);
 
-  cards().find((c) => picOf(c) === first.question.answer.emoji).click();
+  cards().find((c) => picOf(c) === first.questions[0].answer.emoji).click();
   await waitFor(() => $('.celebrate'), 'ختام القصة', 8000);
   ok($$('.big-stars .on').length === 2,
     `تابع الجمل كلها وأخطأ في السؤال ⇒ نجمتان (${$$('.big-stars .on').length})`);
@@ -230,7 +239,7 @@ try {
     'ولا مهارة حرفية تُسجَّل في القراءة — المقيس فيها جملةٌ وفهمٌ لا حرفٌ بحركة');
 
   // ————— ٦) قصة من بستان آخر: أطولُ مستوى، وإصابةٌ من أول مرة —————
-  const top = LIBRARY.at(-1);
+  const top = GARDEN_STORIES.at(-1);
   await seed(idsBefore(`library:${top.id}`));
   await goto(`#/library/${encodeURIComponent(top.id)}`);
   await waitFor(() => $('.story'), `شاشة قصة ${top.id}`);
@@ -245,7 +254,7 @@ try {
 
   $('.foot .next').click();
   await waitFor(() => $('.ask'), 'سؤال قصة المستوى الثالث');
-  $$('.ask .piccard').find((c) => picOf(c) === top.question.answer.emoji).click();
+  $$('.ask .piccard').find((c) => picOf(c) === top.questions[0].answer.emoji).click();
   await waitFor(() => $('.celebrate'), 'ختامها', 8000);
   ok($$('.big-stars .on').length === 3 && stored().stars[`library:${top.id}`] === 3,
     'وإصابةُ السؤال من أول مرة مع متابعة الجمل ⇒ ثلاث نجوم محفوظة');
@@ -253,8 +262,53 @@ try {
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
   unfoldAll();
-  ok($$('.station--library').at(-1).querySelectorAll('.node--done').length === 1,
+  ok(libStations().at(-1).querySelectorAll('.node--done').length === 1,
     'والخريطة تُظهر القصة المقروءة في مكتبتها');
+
+  // ————— ٦أ) رفُّ المكتبة: القراءةُ الطويلة على الشاشة نفسِها —————
+  //
+  // المحروسُ أربعة، وكلُّها **فروقٌ عن قصة البستان لا تكرارٌ لها**: العرضُ **مقطعاً
+  // مقطعاً** (لا عشرُ صفحاتٍ في شاشة)، و**لا صوتَ لجملة** (تُقرأ لا تُسمع)، وسؤالٌ
+  // لكل مقطع، وخاتمةُ **«اِقْرَأْ لِأُمِّكْ»**.
+  const shelfStory = SHELF_STORIES[0];
+  await seed(idsBefore(`shelf:${shelfStory.id}`));
+  await goto(`#/shelf/${encodeURIComponent(shelfStory.id)}`);
+  await waitFor(() => $('.story'), `شاشة قصة الرفّ ${shelfStory.id}`);
+  const segTo = shelfStory.questions.map((q) => q.upto);
+  ok($$('.line').length === segTo[0] && shelfStory.pages.length > segTo[0],
+    `تُعرَض صفحاتُ المقطع وحدَه (${arNum($$('.line').length)} من ${arNum(shelfStory.pages.length)}) `
+    + '— لا القصةُ كلُّها في شاشة');
+  ok(!$('.read-all') && !$('.line-ear'),
+    'ولا كاريوكي ولا أذنَ سطر — «القصةُ تُقرأ لا تُسمع» (بند الحزمة)');
+  checkTargets('قصة الرفّ');
+  const shelfMark = heardLog.length;
+  $('.line-words .story-word').click();
+  await sleep(200);
+  ok(heardLog.length > shelfMark,
+    `ونقرةُ الكلمة تبقى شبكةَ الأمان الوحيدة (${lastHeard()})`);
+
+  // مقطعٌ ← سؤالُه ← المقطعُ الذي يليه
+  $('.foot .next').click();
+  await waitFor(() => $('.ask'), 'سؤال المقطع الأول');
+  ok(texts('.ask .sentence-word').join(' ') === shelfStory.questions[0].text,
+    `وسؤالُ المقطع الأول معروضٌ للقراءة («${texts('.ask .sentence-word').join(' ')}»)`);
+  $$('.ask .piccard').find((c) => picOf(c) === shelfStory.questions[0].answer.emoji).click();
+  await waitFor(() => $('.line'), 'المقطع الثاني', 8000);
+  ok($$('.line').length === segTo[1] - segTo[0],
+    `وبإصابته يُفتَح المقطعُ الذي يليه (${arNum($$('.line').length)} صفحة)`);
+
+  $('.foot .next').click();
+  await waitFor(() => $('.ask'), 'سؤال المقطع الثاني');
+  $$('.ask .piccard').find((c) => picOf(c) === shelfStory.questions[1].answer.emoji).click();
+  await waitFor(() => $('.ask h2')?.textContent.includes('لِأُمِّكْ') || $('.celebrate'),
+    'خطوة اقرأ لأمّك', 8000);
+  ok(!!$('.ask h2') && $('.ask h2').textContent.includes('لِأُمِّكْ'),
+    `وتُختَم بخطوة «${$('.ask h2')?.textContent.trim()}» — خطوةٌ في الشاشة لا عقدةٌ ثانية`);
+  $('.ask .foot .next').click();
+  await waitFor(() => $('.celebrate'), 'ختام قصة الرفّ', 8000);
+  ok($$('.big-stars .on').length === 3 && stored().stars[`shelf:${shelfStory.id}`] === 3,
+    `وإصابةُ المقطعين من أول مرة ⇒ ثلاث نجوم بمعرّف عقدة الرفّ `
+    + `(${$$('.big-stars .on').length})`);
 
   // ————— ٧) اكتمال الرحلة: بقصةٍ لا بدرجة جمل —————
   await seed(allNodes().map((n) => n.id));

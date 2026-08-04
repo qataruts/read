@@ -41,28 +41,38 @@ async function readLibrary() {
 const wordsOf = (text) => String(text ?? '').split(/\s+/).filter(Boolean);
 
 /**
- * القصة في شكلٍ تفهمه الشاشة: صفحاتُها كلماتٌ مفصولة، وخيارات سؤالها **كلمات معجمٍ**
- * بصورها (يفرض الفاحص أن الجواب في نصّ القصة وأن المشتّتين خارجه).
+ * القصة في شكلٍ تفهمه الشاشة: صفحاتُها كلماتٌ مفصولة، وخيارات أسئلتها **كلمات معجمٍ**
+ * بصورها (يفرض الفاحص أن الجواب في مقطعه وأن المشتّتين خارج القصة).
  *
- * وخياراتُ سؤال الفهم **صورٌ** لا نصّ — فالكلمةُ غير المصوَّرة تُسقِط السؤال كلَّه
+ * و**سؤالٌ لكل مقطع** (حزمة المكتبة): `questions` قائمةٌ، لكلٍّ `upto` — رقمُ الصفحة
+ * التي يُسأل عندها، محسوبةً من عدد الصفحات في الفاحص لا مكتوبةً بيد. وقصصُ البساتين
+ * والسور سؤالٌ واحد `upto` آخِرُ صفحاتها، فالشكلُ واحدٌ للجميع.
+ *
+ * وخياراتُ سؤال الفهم **صورٌ** لا نصّ — فالكلمةُ غير المصوَّرة تُسقِط سؤالَها
  * («صدق الصورة» — DESIGN §٦). ويرفضها `check_lexicon.py` في البيانات أصلاً،
  * وهذا حارسُ الشاشة إن تسرّبت: سؤالٌ لا يُسأل خيرٌ من سؤالٍ يظلم.
  */
 function asStory(raw) {
-  // وحوضُ الخيارات يتبع محورَ القصة: قصةُ البستان من معجمه، وقصةُ السورة **من
-  // كلمات المنهج** — فهي قبل البساتين كلِّها (حكم المدير، حزمة قصص الأنبياء).
-  const options = [raw.question?.answer, ...(raw.question?.distractors || [])]
-    .map((word) => (raw.surah ? curriculumWord(word) || lexiconWord(word) : lexiconWord(word)))
-    .filter((word) => word && word.pictured !== false);
+  // وحوضُ الخيارات يتبع محورَ القصة: قصةُ البستان من معجمه، وقصةُ السورة من كلمات
+  // المنهج (قبل البساتين كلِّها)، و**قصةُ الرفّ من الاثنين** — فهي في ذيل الرحلة
+  // وأبطالُها كلماتُ منهجٍ غالباً (حكم المدير، ١٢ أغسطس ٢٠٢٦).
+  const fromCurriculum = Boolean(raw.surah || raw.shelf);
+  const ask = (q) => {
+    const options = [q?.answer, ...(q?.distractors || [])]
+      .map((word) => (fromCurriculum ? curriculumWord(word) || lexiconWord(word) : lexiconWord(word)))
+      .filter((word) => word && word.pictured !== false);
+    return options.length === 3 ? {
+      upto: q.upto,
+      text: q.text,
+      words: wordsOf(q.text),
+      answer: options[0],
+      options,
+    } : null;
+  };
   return {
     ...raw,
     pages: (raw.pages || []).map((page) => ({ ...page, words: wordsOf(page.text) })),
-    question: options.length === 3 ? {
-      text: raw.question.text,
-      words: wordsOf(raw.question.text),
-      answer: options[0],
-      options,
-    } : null,
+    questions: (raw.questions || []).map(ask).filter(Boolean),
   };
 }
 
@@ -79,12 +89,28 @@ export const libraryOf = (gardenId) => LIBRARY.filter((s) => s.garden === garden
  */
 export const storiesOfSurah = (surahId) => LIBRARY.filter((s) => s.surah === surahId);
 
-/** كل ما تنطقه القصة: عنوانها، وجملُها، وكلماتُها مفردةً (كلُّ كلمةٍ زرٌّ يُسمعها). */
+/**
+ * قصصُ «رفّ المكتبة» — القسمُ الأخير من الرحلة (حزمة المكتبة، ١٢ أغسطس ٢٠٢٦).
+ *
+ * **ولِمَ محورٌ ثالث؟** لأنّ موضعَ قصةِ البستان **محسوبٌ من كلماتها**، فالقصةُ
+ * الطويلة تنجرّ إلى بستانٍ مبكّر أو تُجبَر على حشو كلمةٍ لتستقيم للحساب. والرفُّ
+ * رصيدُه الرحلةُ كلُّها، فلا موضعَ بستانيَّ له أصلاً — وهناك وحدَه يحتمل الطول.
+ */
+export const shelfStories = () => LIBRARY.filter((s) => s.shelf);
+
+/**
+ * **هل تُسمَع جملُ هذه القصة؟** لا في الرفّ (بند الحزمة: «القصةُ تُقرأ لا تُسمع» —
+ * الطفلُ هناك قارئٌ لا مستمع، فيسقط الكاريوكي وأذنُ السطر). وتبقى **نقرةُ الكلمة**
+ * في الرفّ وغيره: شبكةُ الأمان الوحيدة لمن تعثّر في كلمة.
+ */
+export const readsAloud = (story) => !story.shelf;
+
+/** كل ما تنطقه القصة: عنوانها، وجملُها (إن كانت تُسمَع)، وكلماتُها مفردةً. */
 export function storyTexts(story) {
   return [...new Set([
     story.title,
-    ...story.pages.flatMap((page) => [page.text, ...page.words]),
-    ...(story.question ? [story.question.text] : []),
+    ...story.pages.flatMap((page) => (readsAloud(story) ? [page.text, ...page.words] : page.words)),
+    ...story.questions.map((q) => q.text),
   ])];
 }
 

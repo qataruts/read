@@ -88,9 +88,10 @@ const misplaced = LADDERS.filter((ladder) => {
 });
 ok(misplaced.length === 0,
   `ودرجات كل بستان تلي باقاته مباشرةً${misplaced.length ? ' — ' + misplaced.map((l) => l.id).join('، ') : ''}`);
-// أشجارُ الجذور محطاتٌ تلي كتلةَ بستانها (حزمة الجذور)، فقد تقع في ذيل الرحلة —
-// والمحروسُ هنا تدرّجُ البستان نفسِه: سلّمُه ثم مكتبتُه بلا فاصلٍ بينهما.
-const spine = ids.filter((id) => !id.startsWith('roots:'));
+// أشجارُ الجذور محطاتٌ تلي كتلةَ بستانها (حزمة الجذور)، فقد تقع في ذيل الرحلة،
+// و**رفُّ المكتبة** بعدها كلِّها (حزمة المكتبة) — والمحروسُ هنا تدرّجُ البستان
+// نفسِه: سلّمُه ثم مكتبتُه بلا فاصلٍ بينهما، فيُقاس على صلبٍ بلا جذورٍ ولا رفّ.
+const spine = ids.filter((id) => !id.startsWith('roots:') && !id.startsWith('shelf:'));
 ok(spine.at(-1).startsWith('library:')
   && spine.indexOf(rungIds.at(-1)) === spine.length - 1 - LIBRARY_LAST,
   'وآخرُ سلّمٍ يليه قصصُ مكتبته وحدها (الحزمة ٩)');
