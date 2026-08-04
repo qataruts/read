@@ -1113,7 +1113,10 @@ def requeue(texts: list, reason: str) -> int:
 
 def queue_pending(queue: list) -> list:
     """المصفوفون بالأولوية (الأصغر أسبق) ثم بالأقدمية (ترتيب الإضافة)."""
-    pending = [(i, e) for i, e in enumerate(queue) if e.get("status", "pending") != "done"]
+    # المتقاعد (`retired`) خرج من حاجة التطبيق فلا يُخطَّط له توليد — كان يُعدّ
+    # منتظِراً أبداً فيُبقي القائمةَ على رقمٍ كاذب لا عملَ خلفه.
+    pending = [(i, e) for i, e in enumerate(queue)
+               if e.get("status", "pending") != "done" and not e.get("retired")]
     pending.sort(key=lambda p: (p[1].get("priority", 100), p[0]))
     return pending
 
@@ -1263,6 +1266,27 @@ def letter_haraka_style(text: str) -> str:
             f"صوتاً واحداً قصيراً بمخرج صحيح، لطفل يتعلم القراءة: ")
 
 
+HARAKA_MARKS = "ًٌٍَُِّْٰ"
+PROSE_MAX_RATIO = 0.35      # الفاصل مقيس: القصة ٠٫٧٧–٠٫٩١ والنثر الإرشادي ٠٫٠٢–٠٫٠٦
+PROSE_DIR = ROOT / "scratch" / "prose"
+
+
+def vowel_ratio(text: str) -> float:
+    letters = sum(1 for c in text if "ء" <= c <= "ي")
+    marks = sum(1 for c in text if c in HARAKA_MARKS)
+    return marks / max(letters, 1)
+
+
+def is_prose(entry: dict) -> bool:
+    """جملةٌ إرشادية (نثرٌ بلا شكلٍ كامل) — عرفُها: لا تُعتمد حتى تُسمَع بأذن.
+
+    القياس بنيويّ لا بمصدر الطلب: جملُ القصص مشكولةٌ بالكامل والنثرُ الإرشادي
+    يشكّل الملتبس وحده. فالعرف يُفرَض بالبنية ولا يعتمد على تذكّر أحد.
+    """
+    return (entry.get("category") == "sentence"
+            and vowel_ratio(entry.get("text", "")) < PROSE_MAX_RATIO)
+
+
 def speech_form(text: str) -> str:
     """صورةُ النصّ **كما تُنطق** — تُرسل للمولّد، ولا تمسّ المفتاح ولا البيانات.
 
@@ -1276,10 +1300,11 @@ def speech_form(text: str) -> str:
         text = text[:-2] + "هْ"
     elif text.endswith("ة"):
         text = text[:-1] + "هْ"
-    # سكونُ الوقف الصريح يدفع المولّد إلى نبرٍ زائد على آخر الكلمة؛ والعربيُّ
-    # يكتبها بلا علامة ويقف عليها طبعاً. (حكم المالك: ٣ من ٤ عيّنات للمقترح.)
-    if len(text) > 2 and text.endswith("ْ"):
-        text = text[:-1]
+    # **سكونُ الوقف يبقى** (رجوعٌ عن إسقاطه، ٥ أغسطس ٢٠٢٦): جُرّب إسقاطُه فاختاره
+    # المالك في ٣ عيّنات من ٤، ثم كشفت دفعةُ المكتبة (١٩٠ نصاً) أنه **يُحرّك
+    # الحرفَ الأخير** في عشرين نصاً — «الْوَلَدْ» تُنطق «الولدُ». فالسكونُ الصريح
+    # هو علامةُ الوقف، وحذفُه يترك الآخر بلا حكمٍ فيُشكِّله المولّد.
+    # ويبقى معه في التعليمة «أظهرْ آخرَ كل كلمة» — إظهارٌ بلا تحريك.
     return text
 
 
@@ -1356,6 +1381,14 @@ def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
             continue
         try:
             pcm, rate, used_key = pool.call(text, style_for(entry), m)
+            if is_prose(entry):
+                # عرف النثر: يُولَّد إلى scratch ولا يدخل التطبيق حتى يُسمع
+                PROSE_DIR.mkdir(parents=True, exist_ok=True)
+                pcm_to_mp3(pcm, rate, PROSE_DIR / f"{key_for(text)}.mp3")
+                mark_hold(text, "جملة إرشادية: تنتظر سماع المالك (عرف النثر)")
+                made += 1
+                print(f"  ⏸ {label} → scratch/prose (لا تُعتمد حتى تُسمع)")
+                continue
             pcm_to_mp3(pcm, rate, path)
             mark_done(text, m)                  # دمجاً لا استبدالاً — وبعد كل نصّ
             made += 1

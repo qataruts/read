@@ -351,18 +351,23 @@ def main():
     tmp = sandbox([
         {"text": 'الهمزة تُكتب «ء» هكذا', "category": "sentence", "requestedBy": "session-6",
          "priority": 100, "status": "pending", "doneAt": None},
-        {"text": "جملةٌ نظيفة تسمّي ولا تقتبس.", "category": "sentence",
+        {"text": "جُمْلَةٌ نَظِيفَةٌ تُسَمِّي وَلَا تَقْتَبِسْ.", "category": "sentence",
          "requestedBy": "session-6", "priority": 100, "status": "pending", "doneAt": None},
     ])
     calls = []
     stub(calls)
     gen.drain_queue(None, "Sulafat", "k")
     queue = gen.load_queue()
-    ok(len(calls) == 1 and calls[0][0].startswith("جملةٌ نظيفة"),
+    ok(len(calls) == 1 and calls[0][0].startswith("جُمْلَةٌ نَظِيفَة"),
        "لا يُنفَق طلبٌ على نصٍّ يقتبس رمزاً — يُحجَز قبل التوليد")
     ok(queue[0].get("hold", "").startswith("رمز مقتبس"),
        "ويُقيَّد سببُ الحجز في المدخل")
-    ok(queue[1]["status"] == "done", "والنظيف يمضي في طريقه")
+    ok(queue[1]["status"] == "done", "والنظيف المشكول يمضي في طريقه")
+    # عرف النثر: الجملة الإرشادية (نثرٌ بلا شكلٍ كامل) لا تُعتمد حتى تُسمع
+    ok(gen.is_prose({"category": "sentence", "text": "الهمزة تُكتب وحدها أو تركب"}),
+       "النثر الإرشادي يُعرف بنسبة تشكيله فيُحجَز للسماع")
+    ok(not gen.is_prose({"category": "sentence", "text": "النَّمْلَةُ وَالْجَرَادْ"}),
+       "وجملةُ القصة المشكولة تمضي بلا حجز")
     calls.clear()
     stub(calls)
     gen.drain_queue(None, "Sulafat", "k")

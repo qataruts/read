@@ -1,12 +1,12 @@
 {
- "checkedAt": "2026-08-04",
+ "checkedAt": "2026-08-05",
  "lineages": {
   "sulafat": "سُلافات (مولَّد — أي نموذج، AI Studio أو Vertex)",
   "antura": "نواة Antura البشرية (CC-BY)",
   "husary": "تلاوة الحصري (المصحف)"
  },
  "counts": {
-  "sulafat": 2719,
+  "sulafat": 2908,
   "husary": 68
  },
  "files": {
@@ -190,6 +190,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "02d3edd44e8d": {
+   "text": "السُّلَّمَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "02eb68c84c58": {
    "text": "الْمُثَلَّجُ لَذِيذْ",
    "lineage": "sulafat",
@@ -224,6 +229,11 @@
    "text": "إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ",
    "lineage": "husary",
    "evidence": "بيان التلاوة (tools/recitations.json)"
+  },
+  "03ee5193608f": {
+   "text": "الْعُصْفُورَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "041686b72efa": {
    "text": "غَنَمْ",
@@ -290,6 +300,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "0509e71058a8": {
+   "text": "الْحَزِينَةُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "05113bd48826": {
    "text": "ظَهْرِي عَرِيضْ",
    "lineage": "sulafat",
@@ -300,13 +315,28 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts#prose-heard"
   },
+  "052fd5cc9532": {
+   "text": "الْحَمَامَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "053b963ffeac": {
    "text": "الْفَلَّاحُ يَزْرَعْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "0541acad8133": {
+   "text": "الْغَابَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "054d3bab502b": {
    "text": "الطَّمَاطِمْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "0564d52baed3": {
+   "text": "الْمَقْعَدِ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -342,6 +372,11 @@
   },
   "062b1d5377da": {
    "text": "وَاضِحْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "0648cf60e53f": {
+   "text": "الْجَمِيلْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -427,6 +462,11 @@
   },
   "07cd7b505da4": {
    "text": "اللَّٰهْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "07d337982afa": {
+   "text": "الْوَلَدُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -535,6 +575,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "09fa70c84bdb": {
+   "text": "يَخْرُجُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "0a076b6132ae": {
    "text": "الدَّمُ أَحْمَرْ",
    "lineage": "sulafat",
@@ -575,6 +620,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "0a4e04550718": {
+   "text": "الْبَيْتَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "0a9e52158f91": {
    "text": "الْقَمَرُ فَوْقَ الْجَبَلْ",
    "lineage": "sulafat",
@@ -592,6 +642,11 @@
   },
   "0add001cb26c": {
    "text": "الْمِلَفُّ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "0ae3fb47c4e5": {
+   "text": "فَأْرٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -714,6 +769,11 @@
    "text": "اللُّعْبَةَ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "0cccf67a4abc": {
+   "text": "مَاذَا تَجْمَعُ النَّمْلَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "0ce31d8555bd": {
    "text": "غُصْنْ",
@@ -840,6 +900,16 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "0f474702ebdd": {
+   "text": "الْجَائِعَةُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "0f679be1570c": {
+   "text": "يَفُوزُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "0f8d2816f32b": {
    "text": "الْكَعْكَ",
    "lineage": "sulafat",
@@ -907,6 +977,11 @@
   },
   "10abb370395e": {
    "text": "بَنَفْسَجِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "10aecaec6342": {
+   "text": "غُرَابٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -1080,6 +1155,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "13514d74fb98": {
+   "text": "الرَّفِّ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "13603e854b02": {
    "text": "الطَّبِيبُ يُدَاوِي",
    "lineage": "sulafat",
@@ -1215,6 +1295,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "16a57a09c0eb": {
+   "text": "الْكَبِيرُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "16c0256f7843": {
    "text": "اللَّحْمُ فِي الْقِدْرْ",
    "lineage": "sulafat",
@@ -1244,6 +1329,11 @@
    "text": "ضَيْفْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "17b3d14ec0a9": {
+   "text": "الْحَمَامَةُ وَالْجَمَاعَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "17dc07edabed": {
    "text": "لِحَسَنٍ جَمَلْ",
@@ -1350,6 +1440,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "19707486fe07": {
+   "text": "مَنْ يَمْشِي مَعَ جُحَا",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "1986cabe0c08": {
    "text": "صَفَّارَةْ",
    "lineage": "sulafat",
@@ -1437,6 +1532,11 @@
   },
   "1b135f240009": {
    "text": "الْبَطَاطَا",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "1b2e222224b0": {
+   "text": "حِمَارٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -1650,6 +1750,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "1f08b5828177": {
+   "text": "أَيْنَ يَجْرِي زَيْدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "1f0f2c71c07b": {
    "text": "جَمَاعَتِي",
    "lineage": "sulafat",
@@ -1750,10 +1855,20 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "20b87a9aa801": {
+   "text": "الْغُرَابْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "20b9bd8582b3": {
    "text": "الْحِسَابُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "20c4135fa1ef": {
+   "text": "جُحَا",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "20d5187d0e2e": {
    "text": "الْحَلَاوَةُ",
@@ -1777,6 +1892,11 @@
   },
   "214946f768ba": {
    "text": "الرَّسَّامُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "214a3f43f71c": {
+   "text": "الْكَبِيرَةُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -1830,6 +1950,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "228df41c8884": {
+   "text": "السَّرِيعُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "229a6e0b6db2": {
    "text": "الْقَارِبْ",
    "lineage": "sulafat",
@@ -1880,8 +2005,18 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "2353820d7b0e": {
+   "text": "صَغِيرٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "23694095a53a": {
    "text": "سَحَابْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "23816bb62ec4": {
+   "text": "تَصِيحُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -1982,6 +2117,11 @@
   },
   "25879991644a": {
    "text": "الْكَأْسُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "25a60290e6b0": {
+   "text": "الْحِمَارَ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -2105,6 +2245,11 @@
    "lineage": "husary",
    "evidence": "بيان التلاوة (tools/recitations.json)"
   },
+  "2870672d9773": {
+   "text": "الْفَأْرَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "28b0fe168870": {
    "text": "الشُّوكُولَاتَةُ حُلْوَةْ",
    "lineage": "sulafat",
@@ -2129,6 +2274,11 @@
    "text": "السِّلْكُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "293e10ae34a9": {
+   "text": "مَنْ يَضَعُ الْحَبْلْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "29a3b37a1347": {
    "text": "الدَّمْ",
@@ -2155,6 +2305,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "2a88c37f89ce": {
+   "text": "الْجَرَادُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "2a90ebda543b": {
    "text": "الدُّلْفِينُ",
    "lineage": "sulafat",
@@ -2174,6 +2329,11 @@
    "text": "الْحَجَرُ يَنْزِلُ فَوْقَ الْجَيْشْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "2ac89740e168": {
+   "text": "الْكَأْسْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "2acf019ff367": {
    "text": "الْمَخْبُوزَ",
@@ -2229,6 +2389,11 @@
    "text": "فَرَاوِلَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "2b7f803e90de": {
+   "text": "الشَّجَرَةِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "2b8aec82b149": {
    "text": "سُتْرَةْ",
@@ -2305,6 +2470,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "2d90618008c7": {
+   "text": "الْغُرَابُ وَالْجُبْنْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "2d96687a0824": {
    "text": "الْكُرَةَ",
    "lineage": "sulafat",
@@ -2320,10 +2490,20 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "2da0a016c368": {
+   "text": "الْحَبْلْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "2dc582099691": {
    "text": "النَّظَّارَةُ جَدِيدَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "2dcbeb1e8751": {
+   "text": "الصَّغِيرَةَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "2dd2157d1dbe": {
    "text": "النَّافِذَةُ مَفْتُوحَةْ",
@@ -2429,6 +2609,11 @@
    "text": "الْعَرَقُ فِي الْوَجْهْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "2f1468268a82": {
+   "text": "أَسَدٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "2f5b0b7fc8bc": {
    "text": "الْقُبَّعَةُ فَوْقَ الرَّأْسْ",
@@ -2575,6 +2760,16 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "3228ee201eee": {
+   "text": "مَاذَا يَحْمِلُ الْغُرَابْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "3240438cf6d2": {
+   "text": "زَيْدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "3244845ea6cc": {
    "text": "الطَّيَّارَةُ عَالِيَةْ",
    "lineage": "sulafat",
@@ -2614,6 +2809,11 @@
    "text": "جَدِّي كَبِيرْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "3308c26b57f2": {
+   "text": "الصَّبُورَةُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "3311c371da07": {
    "text": "الْمُكَعَّبُ",
@@ -2664,6 +2864,16 @@
    "text": "الْحُقْنَةُ فِي الذِّرَاعْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "3416d791a006": {
+   "text": "الْعِنَبُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "3421f7d9f5eb": {
+   "text": "الْحَزِينُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "342ebbf276f7": {
    "text": "مِعْصَمِي صَغِيرْ",
@@ -2820,6 +3030,11 @@
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
   },
+  "36f2fb17ac66": {
+   "text": "الْجَرَادَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "371914e95c19": {
    "text": "الْمَشْيُ مُفِيدْ",
    "lineage": "sulafat",
@@ -2950,6 +3165,11 @@
    "lineage": "husary",
    "evidence": "بيان التلاوة (tools/recitations.json)"
   },
+  "38c1e5f4041f": {
+   "text": "سَامِي فِي الْمَكْتَبَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "38cf33480c87": {
    "text": "النَّهْرُ",
    "lineage": "sulafat",
@@ -3000,6 +3220,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "39b31c438ee1": {
+   "text": "الرَّفّْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "39f4ddf6f321": {
    "text": "زَيْدَا",
    "lineage": "sulafat",
@@ -3030,6 +3255,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "3a8ee9611bec": {
+   "text": "حَزِينٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "3a90f46e0740": {
    "text": "عَالِمْ",
    "lineage": "sulafat",
@@ -3054,6 +3284,11 @@
    "text": "صَ",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "3abf3ac35d9b": {
+   "text": "جَرَادٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "3ae30ae19d38": {
    "text": "الشُّرْطَةُ",
@@ -3125,10 +3360,25 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "3bb02417bc29": {
+   "text": "حَسَنْ وَالْعُصْفُورْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "3bb6c43eb92d": {
    "text": "جْ",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "3be36e4566a1": {
+   "text": "مَاذَا يَقْطَعُ الْفَأْرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "3be753987860": {
+   "text": "تَجْمَعُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "3bedadc9ce7e": {
    "text": "رَفِيعْ",
@@ -3192,6 +3442,11 @@
   },
   "3ce4cefecdf0": {
    "text": "الْمَشْيَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "3cfc405db2cc": {
+   "text": "سَرِيعٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -3260,6 +3515,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "3e7e11cfff75": {
+   "text": "أَيْنَ يَبْحَثُ سَامِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "3e9d47672b56": {
    "text": "الصَّحْنُ",
    "lineage": "sulafat",
@@ -3275,6 +3535,11 @@
    "lineage": "husary",
    "evidence": "بيان التلاوة (tools/recitations.json)"
   },
+  "3ef1a43005ed": {
+   "text": "زَيْدْ وَالسِّبَاقْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "3f0578187e08": {
    "text": "تَقِفُ",
    "lineage": "sulafat",
@@ -3289,6 +3554,11 @@
    "text": "الْمِصْعَدُ سَرِيعْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "3fabadc4e89f": {
+   "text": "يُعْطِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "3fb17b27e146": {
    "text": "النَّغْمَةُ",
@@ -3340,6 +3610,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "40bd67b131b7": {
+   "text": "الْحَبْلِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "40beecaeaf47": {
    "text": "بَنْطَالْ",
    "lineage": "sulafat",
@@ -3369,6 +3644,11 @@
    "text": "مطر",
    "lineage": "sulafat",
    "evidence": "نصّ منهج مكتوبٌ بعد أرشفة edge (تبديل سُلافات الشامل)"
+  },
+  "4194cacd4d17": {
+   "text": "الْأَسَدُ وَالْفَأْرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "41acd9f42594": {
    "text": "الرَّبِيعُ",
@@ -3590,6 +3870,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "44767a34bc25": {
+   "text": "رَجُلٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "4480e81cdd13": {
    "text": "زاي",
    "lineage": "sulafat",
@@ -3607,6 +3892,11 @@
   },
   "449db2373b95": {
    "text": "الْمِكْيَاجُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "44a6ff5aed1a": {
+   "text": "الْأَسَدِ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -3800,6 +4090,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "47236492757a": {
+   "text": "الْفَأْرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "475116032b02": {
    "text": "ظُفْرِي قَصِيرْ",
    "lineage": "sulafat",
@@ -3885,6 +4180,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "48e2d463000b": {
+   "text": "يَطْلُبُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "48e73c18563a": {
    "text": "الشَّهَادَةُ جَمِيلَةْ",
    "lineage": "sulafat",
@@ -3912,6 +4212,11 @@
   },
   "4948ad2f9fdc": {
    "text": "الْجَرَسْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "49786e868cd1": {
+   "text": "الْجَمَاعَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -3950,6 +4255,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "4a186876dfc9": {
+   "text": "يَضْحَكُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "4a18b6147d1c": {
    "text": "الْمِصْعَدُ",
    "lineage": "sulafat",
@@ -3970,6 +4280,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "4a65db693e5e": {
+   "text": "الْعُشّْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "4a6db3a80965": {
    "text": "زَبُونْ",
    "lineage": "sulafat",
@@ -3984,6 +4299,11 @@
    "text": "ظَا",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "4aabee130b54": {
+   "text": "الْحَقْلِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "4abd17b1ab31": {
    "text": "الْقِشْطَةَ",
@@ -4060,6 +4380,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "4c7119885603": {
+   "text": "الْوَلَدِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "4c9d942e516d": {
    "text": "الْمَقْلَمَةُ",
    "lineage": "sulafat",
@@ -4072,6 +4397,11 @@
   },
   "4ca5ad6c91d4": {
    "text": "أَنْفْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "4cc55a43d4f6": {
+   "text": "يُحَاوِلُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -4134,6 +4464,11 @@
    "text": "ضفدع",
    "lineage": "sulafat",
    "evidence": "نصّ منهج مكتوبٌ بعد أرشفة edge (تبديل سُلافات الشامل)"
+  },
+  "4e13197346c0": {
+   "text": "الزَّمِيلِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "4e2a01ba7323": {
    "text": "كَعْبَةْ",
@@ -4214,6 +4549,11 @@
    "text": "لُ",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "4fafd3d5b520": {
+   "text": "الْعِنَبَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "4fba8aca9e9c": {
    "text": "الْأَنَانَاسْ",
@@ -4380,6 +4720,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "52c9d519eb8b": {
+   "text": "مَاذَا يَقْرَأُ سَامِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "52d3abdae61d": {
    "text": "طَيِّبَةْ",
    "lineage": "sulafat",
@@ -4459,6 +4804,11 @@
    "text": "الْجَزْمَةُ سَوْدَاءْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "53e3b15ab8f5": {
+   "text": "الْحِمَارِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "53f6514e5c0a": {
    "text": "نَمِرْ",
@@ -4554,6 +4904,11 @@
    "text": "صِحَّتِي",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "557991b2e4f3": {
+   "text": "الْجَدِيدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "5583f6e30004": {
    "text": "حَاسُوبْ",
@@ -4685,6 +5040,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "589e92af0819": {
+   "text": "الْكَبِيرَةِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "58ea20f4a897": {
    "text": "الْمَكْتَبَةُ وَاسِعَةْ",
    "lineage": "sulafat",
@@ -4697,6 +5057,11 @@
   },
   "590c01ec882a": {
    "text": "لَيْمُونْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "5914611f3bc0": {
+   "text": "تَنْزِلُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -4845,8 +5210,18 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "5b7dc2c72105": {
+   "text": "النَّمْلَةُ وَالْجَرَادْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "5b7dc92e404e": {
    "text": "الذُّرَةُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "5b8883986f9c": {
+   "text": "الطَّيِّبْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -5025,6 +5400,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "5ed0ccd699a0": {
+   "text": "مَاذَا يَرْكَبُ جُحَا",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "5eddc400d4c3": {
    "text": "الْعِقْدُ غَالِي",
    "lineage": "sulafat",
@@ -5175,6 +5555,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "61c3f2cc2181": {
+   "text": "أَيْنَ يَجْلِسُ جُحَا",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "61c6b4c692db": {
    "text": "قَلْبِي",
    "lineage": "sulafat",
@@ -5194,6 +5579,11 @@
    "text": "مِغْرَفَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "61ec39318abe": {
+   "text": "مَنْ يَقْطَعُ الْحَبْلْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "62163ea3aa21": {
    "text": "اللَّاعِبُ",
@@ -5595,6 +5985,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "685a8f269160": {
+   "text": "جَائِعَةٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "685c67fa5035": {
    "text": "الصَّيَّادُ الصَّبُورُ عِنْدَ الْبَحْرْ",
    "lineage": "sulafat",
@@ -5602,6 +5997,11 @@
   },
   "6861305f096a": {
    "text": "الْمِلْحْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "68978ad5c2d2": {
+   "text": "تَطِيرُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -5980,6 +6380,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "6e7e728925ad": {
+   "text": "ثَعْلَبٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "6e8fa1e90a5d": {
    "text": "الْجَمَاعَةُ كَبِيرَةْ",
    "lineage": "sulafat",
@@ -6045,10 +6450,20 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "6fab990e9837": {
+   "text": "الْغَابَةِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "6fafdb7ba608": {
    "text": "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ",
    "lineage": "husary",
    "evidence": "بيان التلاوة (tools/recitations.json)"
+  },
+  "6fc74b41f3c1": {
+   "text": "الْغُصْنْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "6fcb5f7c767f": {
    "text": "السَّقْفُ مُرْتَفِعْ",
@@ -6150,6 +6565,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "71a0318324ae": {
+   "text": "السَّعِيدَةُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "71ae38dbdf0f": {
    "text": "التَّلُّ",
    "lineage": "sulafat",
@@ -6177,6 +6597,11 @@
   },
   "722057876282": {
    "text": "أَزْرَقْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "7220d5ca5840": {
+   "text": "الرَّفِيعُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -6415,6 +6840,16 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "76fcaba75642": {
+   "text": "الثَّعْلَبُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "7721e647239d": {
+   "text": "تَحْفِرُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "7752d015a38b": {
    "text": "السَّاعَةُ",
    "lineage": "sulafat",
@@ -6450,6 +6885,11 @@
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
   },
+  "781774b00c7a": {
+   "text": "الْكَبِيرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "782e9bdcc61c": {
    "text": "الْمِحْفَظَةُ صَغِيرَةْ",
    "lineage": "sulafat",
@@ -6459,6 +6899,11 @@
    "text": "صَوْتْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "783237b2d5eb": {
+   "text": "مَاذَا تَأْكُلُ الْجَمَاعَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "78477774e215": {
    "text": "الشَّعْرَ",
@@ -6499,6 +6944,11 @@
    "text": "قلم",
    "lineage": "sulafat",
    "evidence": "نصّ منهج مكتوبٌ بعد أرشفة edge (تبديل سُلافات الشامل)"
+  },
+  "78ea38c3edb4": {
+   "text": "مَاذَا تَنْزِلُ فَوْقَ حَسَنْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "790095bc4a8f": {
    "text": "النَّبْضْ",
@@ -6745,6 +7195,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "7d7aeb1c944b": {
+   "text": "ثُمَّ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "7d9e1862096e": {
    "text": "مِعْطَفُ",
    "lineage": "sulafat",
@@ -6799,6 +7254,11 @@
    "text": "الْجَارُ أَمَامَ الدَّارْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "7e6a77496c25": {
+   "text": "صَيَّادٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "7e708f07e5cf": {
    "text": "كِتَابَةْ",
@@ -7095,6 +7555,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "83aa3156c096": {
+   "text": "السُّلَّمْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "83b87f3e8144": {
    "text": "الْعَجُوزُ",
    "lineage": "sulafat",
@@ -7185,8 +7650,18 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "857cee3056f8": {
+   "text": "الْكَهْفْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "85878ccc6748": {
    "text": "الْعَدَدُ كَبِيرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "8591c5daa1c2": {
+   "text": "مَاذَا يَحْمِلُ الزَّمِيلْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
@@ -7315,6 +7790,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "88d075a02de5": {
+   "text": "الْمُرْتَفِعْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "88e75a0bff1d": {
    "text": "طَا",
    "lineage": "sulafat",
@@ -7327,6 +7807,11 @@
   },
   "89236f03aaef": {
    "text": "قُبَّعَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "893189f64cbd": {
+   "text": "الْغُرَابُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -7367,6 +7852,11 @@
   },
   "89ecdf1fc1c9": {
    "text": "رَسَّامْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "8a018b1edbbb": {
+   "text": "السَّعِيدُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -7439,6 +7929,11 @@
    "text": "شين",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "8ad67bf29757": {
+   "text": "الْحُلْوَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "8ad793d0922e": {
    "text": "الْعِيَادَةُ",
@@ -7550,6 +8045,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "8c5219d823a3": {
+   "text": "تُعْطِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "8c558e360065": {
    "text": "الْمُمَرِّضَةُ",
    "lineage": "sulafat",
@@ -7580,6 +8080,11 @@
    "lineage": "husary",
    "evidence": "بيان التلاوة (tools/recitations.json)"
   },
+  "8cf6c0ed2855": {
+   "text": "مَاذَا يَسْقُطُ مِنَ الْعُشّْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "8cf81b6ae073": {
    "text": "الطَّرْحِ",
    "lineage": "sulafat",
@@ -7607,6 +8112,11 @@
   },
   "8d30b069f473": {
    "text": "نَحْلَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "8d8354b3ad58": {
+   "text": "النَّائِمْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -7645,6 +8155,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "8e267a5fa33a": {
+   "text": "السُّلَّمُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "8e664350f0e6": {
    "text": "طَقْسْ",
    "lineage": "sulafat",
@@ -7675,6 +8190,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "8ee6e638a5e4": {
+   "text": "الزَّمِيلَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "8f12c2b30987": {
    "text": "النَّاعِمْ",
    "lineage": "sulafat",
@@ -7682,6 +8202,11 @@
   },
   "8f1cebd6dd43": {
    "text": "زَرْعْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "8f303ab9fc2a": {
+   "text": "الْكَهْفِ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -7742,6 +8267,11 @@
   },
   "906374609e26": {
    "text": "يَنْزِلُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "90773c84e7e8": {
+   "text": "نَمْلَةٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -7854,6 +8384,11 @@
    "text": "ءَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "923046325bfe": {
+   "text": "مَاذَا يَضَعُ الصَّيَّادْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "923c3dcd782d": {
    "text": "وَتَكُونُ ٱلْجِبَالُ كَٱلْعِهْنِ ٱلْمَنفُوشِ",
@@ -8005,6 +8540,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "94fbb12bb0dd": {
+   "text": "جَائِعٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "9520f1b70db9": {
    "text": "الْمُنَبِّهُ صَاخِبْ",
    "lineage": "sulafat",
@@ -8120,6 +8660,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "969be369f91f": {
+   "text": "أَيْنَ يَنْظُرُ الْعُصْفُورْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "969eeb6dc046": {
    "text": "وَيَمْنَعُونَ ٱلْمَاعُونَ",
    "lineage": "husary",
@@ -8144,6 +8689,11 @@
    "text": "الْحَاسُوبُ سَرِيعْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "96e1e10d03a2": {
+   "text": "الْمَرَّةَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "96e209eef1fb": {
    "text": "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
@@ -8210,6 +8760,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "985a57262b72": {
+   "text": "جُحَا وَالْحِمَارْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "989a97a8f79a": {
    "text": "الْمَطْبُوخُ سَاخِنْ",
    "lineage": "sulafat",
@@ -8234,6 +8789,11 @@
    "text": "صَوْتِي جَمِيلْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "98e2fb9dbb6f": {
+   "text": "السَّرِيعْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "98eadbf4488c": {
    "text": "الشُّورْبَةُ سَاخِنَةْ",
@@ -8282,6 +8842,11 @@
   },
   "996fba3c2c32": {
    "text": "دُكَّانْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "9980ac0aa55c": {
+   "text": "الْحَجَرِ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -8345,6 +8910,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "9a7dc903fdc6": {
+   "text": "يَصِيحُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "9aa176191207": {
    "text": "أُمِّي تَطْبُخُ الشُّورْبَةْ",
    "lineage": "sulafat",
@@ -8379,6 +8949,11 @@
    "text": "كُوبُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "9b2af17f77bc": {
+   "text": "الرَّفِيعْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "9b3049b93140": {
    "text": "زَيْدٌ",
@@ -8715,6 +9290,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "a09e4d460312": {
+   "text": "الطَّوِيلَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "a0a8e2e0cfd0": {
    "text": "الرِّيحُ",
    "lineage": "sulafat",
@@ -8777,6 +9357,16 @@
   },
   "a140a28b3db3": {
    "text": "الْجَمْعُ سَهْلْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "a144f3b7b1e0": {
+   "text": "الْجَائِعُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "a152d34aa1b2": {
+   "text": "أَيْنَ يَنَامُ الْأَسَدْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
@@ -9010,8 +9600,18 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "a61f208222cf": {
+   "text": "الْقَوِيُّ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "a61fde8bf2b1": {
    "text": "ظُفْرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "a627d1375e10": {
+   "text": "الصَّدِيقَ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -9027,6 +9627,11 @@
   },
   "a67c45078201": {
    "text": "رَاحَتِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "a6a689b649f5": {
+   "text": "حَمَامَةٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -9074,6 +9679,11 @@
    "text": "نَافِذَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "a78827d20e92": {
+   "text": "طَيِّبٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "a7a7c449a7c8": {
    "text": "الْمَسْجِدْ",
@@ -9210,6 +9820,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "a9fa157e8964": {
+   "text": "الْقِصَّةَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "aa15a6ec89b6": {
    "text": "الْقِرْدُ يَأْكُلُ الْمَوْزْ",
    "lineage": "sulafat",
@@ -9224,6 +9839,11 @@
    "text": "السِّلْسِلَةُ طَوِيلَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "aa577e08b619": {
+   "text": "جَائِعْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "aa65b217ef35": {
    "text": "جِلْدْ",
@@ -9265,6 +9885,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "ab565eb34960": {
+   "text": "النَّمْلَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "ab58c558ce72": {
    "text": "الثَّوْرُ",
    "lineage": "sulafat",
@@ -9294,6 +9919,11 @@
    "text": "زِي",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "abdd5b6bd8a2": {
+   "text": "الْبَارِدُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "abf2fb682d51": {
    "text": "يد",
@@ -9342,6 +9972,11 @@
   },
   "ac9e12919771": {
    "text": "مِلْعَقَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "ac9e3a545ebe": {
+   "text": "الصَّغِيرَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -9434,6 +10069,11 @@
    "text": "ظِ",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "ae2448d27494": {
+   "text": "الْوَاسِعْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "ae3cf39fd29e": {
    "text": "تَدْرِيسْ",
@@ -9570,10 +10210,20 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "b05968bf6c6b": {
+   "text": "الضَّعِيفُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "b05de9e7fd06": {
    "text": "عُشّْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "b08a6f110efa": {
+   "text": "يَتْرُكُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "b08bc45d955c": {
    "text": "الطَّمَاطِمُ",
@@ -9622,6 +10272,11 @@
   },
   "b14f8c7024d4": {
    "text": "السُّوقُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "b17535375cf5": {
+   "text": "الْحِمَارْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
@@ -9832,6 +10487,11 @@
   },
   "b633cdff7a0e": {
    "text": "الْحَمَّامُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "b634bd6b5926": {
+   "text": "يُمْسِكُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -10110,8 +10770,18 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "baa03719743c": {
+   "text": "يَصْعَدُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "babbf1511d88": {
    "text": "يَلْبَسُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "bad06b6717f1": {
+   "text": "الْعُشْبِ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -10160,6 +10830,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "bb84bb4a37c4": {
+   "text": "الصَّغِيرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "bb85940d1c87": {
    "text": "كُوبْ",
    "lineage": "sulafat",
@@ -10189,6 +10864,11 @@
    "text": "نَوْمْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "bc14a551b04a": {
+   "text": "الْوَلَدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "bc5708bd8e75": {
    "text": "الشَّلَّالُ",
@@ -10380,6 +11060,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "bf6eebcfd919": {
+   "text": "أَيْنَ الْعِنَبْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "bf7887a899a0": {
    "text": "يَكْتُبْ",
    "lineage": "sulafat",
@@ -10495,6 +11180,16 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "c1f854329b3e": {
+   "text": "يَسْمَعُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "c22b09106785": {
+   "text": "الرَّفِيعَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "c24266e5ffe6": {
    "text": "الْمَكْتَبَةُ الْكَبِيرَةُ أَمَامَ حَدِيقَةِ الْمَدْرَسَةْ",
    "lineage": "sulafat",
@@ -10530,6 +11225,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "c2845e62a09b": {
+   "text": "مَنْ يُعْطِي الْغُرَابَ التُّوتْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "c29a840de4f2": {
    "text": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
    "lineage": "husary",
@@ -10555,6 +11255,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "c30b8bc399c9": {
+   "text": "حَسَنْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "c37def74e8c1": {
    "text": "الْحُقْنَةُ",
    "lineage": "sulafat",
@@ -10564,6 +11269,11 @@
    "text": "جيم",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "c38f0e838126": {
+   "text": "الْبَيْضَاءُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "c39b606d2164": {
    "text": "الْقِرْدُ",
@@ -10695,6 +11405,11 @@
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
   },
+  "c578863d98fd": {
+   "text": "زَمِيلٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "c579b0790577": {
    "text": "فُسْتَانْ",
    "lineage": "sulafat",
@@ -10704,6 +11419,11 @@
    "text": "الْخَبَّازُ فِي الْمَخْبَزْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "c58c9a3f4ab7": {
+   "text": "سَعِيدٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "c594ed59804e": {
    "text": "جَارِي",
@@ -10730,6 +11450,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "c5a82f05cf4c": {
+   "text": "قَوِيّْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "c5cd3bad9c06": {
    "text": "قَلَمٌ",
    "lineage": "sulafat",
@@ -10745,6 +11470,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "c6366cd6015c": {
+   "text": "يَصْحُو",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "c63a5ec1340f": {
    "text": "دِرَاسَةْ",
    "lineage": "sulafat",
@@ -10757,6 +11487,11 @@
   },
   "c6789fe01992": {
    "text": "الرَّسْمِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "c68e48c7c3d3": {
+   "text": "يَقْرَأُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -10930,6 +11665,16 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "c9570dce9474": {
+   "text": "الْحَجَرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "c9768c117e97": {
+   "text": "الْعُشِّ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "c982fc7a5ebb": {
    "text": "نَجْمْ",
    "lineage": "sulafat",
@@ -11029,6 +11774,11 @@
    "text": "الْمُعَلِّمُ يَشْرَحْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "cb6987c63369": {
+   "text": "يَقْطَعُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "cb7313691ef7": {
    "text": "الْجُوعُ صَعْبْ",
@@ -11155,6 +11905,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "ce188a97fa26": {
+   "text": "الصَّيْفْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "ce1a3412e931": {
    "text": "لِسَانِي",
    "lineage": "sulafat",
@@ -11169,6 +11924,16 @@
    "text": "سُكَّرْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "ce2b3e225a6c": {
+   "text": "السِّبَاقِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "ce581e3fb7a1": {
+   "text": "الدَّافِئْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "ce645cdd96bf": {
    "text": "مُوسِيقَا",
@@ -11269,6 +12034,11 @@
    "text": "حُو",
    "lineage": "sulafat",
    "evidence": "نصّ منهج مكتوبٌ بعد أرشفة edge (تبديل سُلافات الشامل)"
+  },
+  "d039d15493f3": {
+   "text": "يَنَامُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "d044c6996abb": {
    "text": "الطِّفْلُ",
@@ -11435,6 +12205,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "d2b0afdfb281": {
+   "text": "عُصْفُورٌ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "d2c3364c6ecb": {
    "text": "مِيدَالِيَّةْ",
    "lineage": "sulafat",
@@ -11447,6 +12222,11 @@
   },
   "d2fadb928de8": {
    "text": "تُرَابْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "d301745c49f3": {
+   "text": "الْمِنْقَارَ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -11490,8 +12270,18 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "d3a556f7ea68": {
+   "text": "السُّلَّمِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "d3af2656c640": {
    "text": "الْمِشْطُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "d3c46805be2a": {
+   "text": "مُعَلِّمٌ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -11659,6 +12449,11 @@
    "text": "مَنْ يُعَالِجُ الضِّرْسْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "d60bd19cb87b": {
+   "text": "الْمَلْعَبِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "d616e18d2dcd": {
    "text": "الدُّمْيَةُ فَوْقَ السَّرِيرْ",
@@ -11835,6 +12630,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "d8d94d023afb": {
+   "text": "التُّوتَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "d8dd4f2860d4": {
    "text": "النَّمْلَةُ صَغِيرَةْ",
    "lineage": "sulafat",
@@ -11955,6 +12755,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "db5762aad876": {
+   "text": "الطَّوِيلْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "db6c81008e45": {
    "text": "زْ",
    "lineage": "sulafat",
@@ -12030,13 +12835,13 @@
    "lineage": "sulafat",
    "evidence": "نصّ منهج مكتوبٌ بعد أرشفة edge (تبديل سُلافات الشامل)"
   },
-  "dc649fee36a6": {
-   "text": "الْغَابَةُ",
+  "dc64b67c10dd": {
+   "text": "يَطِيرُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
-  "dc64b67c10dd": {
-   "text": "يَطِيرُ",
+  "dc69a8e4a7f0": {
+   "text": "الْحُلْوْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -12067,6 +12872,11 @@
   },
   "dd0b36687edf": {
    "text": "السَّيَّارَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "dd102be178d9": {
+   "text": "الْجَمِيلَةُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -12110,6 +12920,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "ddd4e064cf0f": {
+   "text": "الثَّعْلَبُ وَالْعِنَبْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "dde59c669a7e": {
    "text": "مَرَضْ",
    "lineage": "sulafat",
@@ -12119,6 +12934,11 @@
    "text": "ضِ",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "dded23f1c608": {
+   "text": "السَّعِيدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "de0c61eb4d61": {
    "text": "مَاعِزْ",
@@ -12180,6 +13000,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "dfd5aeba01a6": {
+   "text": "يَضَعُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "dfdb46606449": {
    "text": "الْإِبْرَةُ",
    "lineage": "sulafat",
@@ -12217,6 +13042,16 @@
   },
   "e09a93937881": {
    "text": "طِفْلِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "e09e674b61a3": {
+   "text": "الْأَخْضَرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "e0e5ad8e84a7": {
+   "text": "الْأَسَدُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -12270,6 +13105,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "e1ca7ad0461f": {
+   "text": "مَنْ يَحْمِلُ الْجُبْنْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "e1f9c076cdb1": {
    "text": "الْحَرِيرُ نَاعِمْ",
    "lineage": "sulafat",
@@ -12309,6 +13149,11 @@
    "text": "الْخَيْطُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "e28cb7e529cf": {
+   "text": "الْكَبِيرَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "e2a40595258c": {
    "text": "رُ",
@@ -12395,10 +13240,20 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "e4263af3a2bd": {
+   "text": "الْمِنْقَارِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "e43a63ddfbaa": {
    "text": "مِ",
    "lineage": "sulafat",
    "evidence": "تثبيتٌ (2026-08-04): استُبدلت نواة Antura كلها بسُلافات: التسجيل ينطق صوت الحرف لا اسمه ويخلط المتقارب (حكم المالك ٥ أغسطس)"
+  },
+  "e4b2f836fbcf": {
+   "text": "مَاذَا يَأْكُلُ الثَّعْلَبْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
   "e4b99c93387e": {
    "text": "الْغَسِيلُ",
@@ -12670,10 +13525,20 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "e94c6318da9b": {
+   "text": "تَأْكُلُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "e957869cfe56": {
    "text": "السِّرْوَالُ وَاسِعْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "e96e81825a92": {
+   "text": "الطَّيِّبَةُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "e97ca63a6dff": {
    "text": "الْمِعْطَفُ",
@@ -12682,6 +13547,11 @@
   },
   "e9910a921be8": {
    "text": "صَوْتِي",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "e99956852c73": {
+   "text": "الْبَعِيدُ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -12809,6 +13679,11 @@
    "text": "الْمَحَطَّةُ قَرِيبَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "ec027f518200": {
+   "text": "التُّوتْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "ec0c56b3b9a2": {
    "text": "كلب",
@@ -12995,8 +13870,23 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "ef014ed3a60a": {
+   "text": "الْجَدِيدَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
+  "ef08a493ea1b": {
+   "text": "مَنْ يَطْلُبُ الذُّرَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "ef1bef54955a": {
    "text": "الْبَطَاطِسْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "ef26344e622e": {
+   "text": "الْعَالِيَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -13220,6 +14110,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "f2c0fd137778": {
+   "text": "الْغُرَابِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "f2e1af8f133e": {
    "text": "السُّتْرَةَ",
    "lineage": "sulafat",
@@ -13270,6 +14165,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "f39a0b723471": {
+   "text": "الصَّخْرَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
+  },
   "f3ef193db4fb": {
    "text": "الْعَدَدُ",
    "lineage": "sulafat",
@@ -13295,6 +14195,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "f43854f9f8a6": {
+   "text": "التَّلّْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "f457faf0beba": {
    "text": "عَجُوزْ",
    "lineage": "sulafat",
@@ -13307,6 +14212,11 @@
   },
   "f468da63bfc0": {
    "text": "مَاهِرْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "f482b4df5b4e": {
+   "text": "الطَّوِيلَ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
@@ -13430,6 +14340,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "f62fd80db0fb": {
+   "text": "مَنْ يَجْلِسُ مَعَ زَيْدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
   "f638daea57e9": {
    "text": "الرِّجْلَ",
    "lineage": "sulafat",
@@ -13505,6 +14420,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
+  "f7b264320fe7": {
+   "text": "الْبَعِيدْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "f7ccb52d8b97": {
    "text": "زَيْتُونَةْ",
    "lineage": "sulafat",
@@ -13565,6 +14485,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
   },
+  "f9316639a58f": {
+   "text": "الطَّرِيقِ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "f9362744a78e": {
    "text": "السَّهْمُ سَرِيعْ",
    "lineage": "sulafat",
@@ -13579,6 +14504,11 @@
    "text": "اللَّاعِبُ يَلْعَبْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "f98ec68da145": {
+   "text": "الْغُرَابَ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "f9ae117c6cda": {
    "text": "الْإِسْعَافُ",
@@ -13655,6 +14585,11 @@
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
+  "faff5f6bcefc": {
+   "text": "الزَّمِيلْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
   "fb22d6612dab": {
    "text": "الْجَزِيرَةُ",
    "lineage": "sulafat",
@@ -13669,6 +14604,11 @@
    "text": "وَرَقَةْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
+  },
+  "fb4daa04b099": {
+   "text": "الْجَمِيلَةْ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-3.1-flash-tts-preview"
   },
   "fb53e5a551f3": {
    "text": "تِمْسَاحْ",
@@ -13774,6 +14714,11 @@
    "text": "الْمِذْيَاعُ صَاخِبْ",
    "lineage": "sulafat",
    "evidence": "سجلّ القائمة: gemini-2.5-pro-preview-tts"
+  },
+  "fd2dfdb8e673": {
+   "text": "يَأْخُذُ",
+   "lineage": "sulafat",
+   "evidence": "سجلّ القائمة: gemini-2.5-flash-preview-tts"
   },
   "fd32c345492e": {
    "text": "الْبَغْلُ قَصِيرْ",

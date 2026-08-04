@@ -14315,7 +14315,14 @@
     "priority": 100,
     "status": "done",
     "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "model": "gemini-2.5-flash-preview-tts",
+    "retired": true,
+    "fixHistory": [
+      {
+        "reason": "تقاعد: لم تعد بيانات التطبيق تطلبه",
+        "at": "2026-08-05"
+      }
+    ]
   },
   {
     "text": "الْحَجَرُ",
@@ -26689,6 +26696,14 @@
       {
         "reason": "تقاعد: خرجت من جرد المنطوق بعد شقّها نصّين (حكم المالك)",
         "at": "2026-08-04"
+      },
+      {
+        "reason": "تقاعد: شُقّت نصّين واعتُمد بديلاها (حكم المالك)",
+        "at": "2026-08-04"
+      },
+      {
+        "reason": "تقاعد: مردودةٌ بعلّة الرمز المقتبس، وشُقّت نصّين اعتُمدا (حكم المالك)",
+        "at": "2026-08-05"
       }
     ],
     "retired": true
@@ -27032,5 +27047,1913 @@
     "status": "done",
     "doneAt": "2026-08-04",
     "model": "gemini-2.5-pro-preview-tts#prose-heard"
+  },
+  {
+    "text": "النَّمْلَةُ وَالْجَرَادْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْحَقْلِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "نَمْلَةٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "تَجْمَعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الصَّيْفْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "جَرَادٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَرَادُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السَّعِيدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْعُشْبِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْأَخْضَرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "تَحْفِرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْبَيْتَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الدَّافِئْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْبَارِدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَائِعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَطْلُبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "النَّمْلَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الطَّيِّبَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "تُعْطِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَرَادَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مَاذَا تَجْمَعُ النَّمْلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَنْ يَطْلُبُ الذُّرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الثَّعْلَبُ وَالْعِنَبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْغَابَةِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "ثَعْلَبٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "جَائِعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْعِنَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الشَّجَرَةِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْعَالِيَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الثَّعْلَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَصْعَدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَجَرِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْكَبِيرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْبَعِيدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَزِينُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَجَرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَتْرُكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْعِنَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْبَعِيدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحُلْوَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "أَيْنَ الْعِنَبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَأْكُلُ الثَّعْلَبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "سَامِي فِي الْمَكْتَبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْكَبِيرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْجَمِيلَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الرَّفِّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْمُرْتَفِعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "السُّلَّمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الرَّفّْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السُّلَّمْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْقِصَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَمِيلَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْمَقْعَدِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الصَّغِيرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَقْرَأُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الطَّوِيلَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "يُعْطِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الصَّدِيقَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "أَيْنَ يَبْحَثُ سَامِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَقْرَأُ سَامِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْغُرَابُ وَالْجُبْنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "غُرَابٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْغُرَابُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "جَائِعٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْغُرَابِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَمِيلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْمِنْقَارَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْمِنْقَارِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "عُصْفُورٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "طَيِّبٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْغُرَابْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْغُرَابَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "التُّوتْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "التُّوتَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحُلْوْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَحْمِلُ الْغُرَابْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَنْ يَحْمِلُ الْجُبْنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَنْ يُعْطِي الْغُرَابَ التُّوتْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "جُحَا وَالْحِمَارْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "جُحَا",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "failCount": 1,
+    "lastFailModel": "gemini-2.5-flash-preview-tts",
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْوَلَدِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "حِمَارٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "صَغِيرٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الطَّرِيقِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الطَّوِيلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "رَجُلٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحِمَارَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَضْحَكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْوَلَدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْكَبِيرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْوَلَدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْحِمَارِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحِمَارْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "السَّعِيدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مَنْ يَمْشِي مَعَ جُحَا",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَرْكَبُ جُحَا",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "أَيْنَ يَجْلِسُ جُحَا",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "حَسَنْ وَالْعُصْفُورْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْعُشّْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْعُصْفُورَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السُّلَّمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السُّلَّمِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "يَضَعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْبَيْضَاءُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "تَنْزِلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "حَسَنْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "سَعِيدٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْعُشِّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَسْقُطُ مِنَ الْعُشّْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "أَيْنَ يَنْظُرُ الْعُصْفُورْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَاذَا تَنْزِلُ فَوْقَ حَسَنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْأَسَدُ وَالْفَأْرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْكَبِيرَةِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "أَسَدٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "قَوِيّْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْأَسَدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْقَوِيُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَنَامُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْكَهْفِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "فَأْرٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الصَّخْرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْأَسَدِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "النَّائِمْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَصْحُو",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "ثُمَّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يُمْسِكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْفَأْرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الضَّعِيفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَصِيحُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْكَهْفْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "التَّلّْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "صَيَّادٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الطَّوِيلَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَبْلِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْغَابَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "يَسْمَعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَقْطَعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَبْلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْفَأْرَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "أَيْنَ يَنَامُ الْأَسَدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَنْ يَضَعُ الْحَبْلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَقْطَعُ الْفَأْرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "زَيْدْ وَالسِّبَاقْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْمَلْعَبِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْوَاسِعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "زَمِيلٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "سَرِيعٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "زَيْدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السَّرِيعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الْجَدِيدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "حَزِينٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مُعَلِّمٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الطَّيِّبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يُحَاوِلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْمَرَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَدِيدَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الزَّمِيلِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السَّرِيعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الزَّمِيلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَفُوزُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "السِّبَاقِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَأْخُذُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الزَّمِيلَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْكَأْسْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَحْمِلُ الزَّمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَنْ يَجْلِسُ مَعَ زَيْدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "أَيْنَ يَجْرِي زَيْدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "الْحَمَامَةُ وَالْجَمَاعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "حَمَامَةٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "جَائِعَةٌ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "تَطِيرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْكَبِيرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَمَامَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الصَّغِيرَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْغُصْنْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الرَّفِيعَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَائِعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "تَأْكُلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الصَّغِيرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الرَّفِيعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْجَمَاعَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الْحَزِينَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "تَصِيحُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "الصَّبُورَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "يَخْرُجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "الرَّفِيعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 10,
+    "status": "done",
+    "doneAt": "2026-08-05",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ سماع المالك (٥ أغسطس): سكون الوقف يُحرَّك، وتكرار في بعضها",
+        "requeuedAt": "2026-08-05"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
+  },
+  {
+    "text": "السَّعِيدَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-flash-preview-tts"
+  },
+  {
+    "text": "مَاذَا يَضَعُ الصَّيَّادْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَاذَا تَأْكُلُ الْجَمَاعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
+  },
+  {
+    "text": "مَنْ يَقْطَعُ الْحَبْلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "done",
+    "doneAt": "2026-08-04",
+    "model": "gemini-2.5-pro-preview-tts"
   }
 ]
