@@ -1216,8 +1216,13 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
     if quran:
         all_letters = set(letters)
         source = quran_source()
-        ok(len(quran["surahs"]) == 4 and [len(s["ayat"]) for s in quran["surahs"]] == [7, 4, 5, 6],
-           f"محلّل السور يقرأ الأربع بآياتها ({[len(s['ayat']) for s in quran['surahs']]})")
+        # **العددُ محسوبٌ من المصدر لا مكتوبٌ بيد** (قاعدة «لا رقمَ مكتوبٌ بيدٍ في
+        # حارس»): كان `== 4` و`== [7, 4, 5, 6]` فانكسر يومَ صارت السورُ اثنتي عشرة —
+        # وبقي أحمرَ صامتاً لأنّ هذا الفحص لم يكن في سَوقةِ أحد. والمقيسُ الحقيقيّ أنّ
+        # **المحلّل يقرأ ما في الملفّ**: لكل سورةٍ آياتٌ معدودة، ولا سورةَ فارغة.
+        counts = [len(s["ayat"]) for s in quran["surahs"]]
+        ok(len(counts) >= 4 and all(counts),
+           f"محلّل السور يقرأ السورَ كلَّها بآياتها ({len(counts)} سورة: {counts})")
         ok(len(quran["rasm"]["signs"]) >= 5 and all(s["read"] and s["rule"] for s in quran["rasm"]["signs"]),
            f"ومحلّل علامات الرسم يقرأ {len(quran['rasm']['signs'])} علامة بأمثلتها")
         ok(bool(source) and len(source) >= 22, f"والمصدر المرجعي مقروء ({len(source)} آية)")
@@ -1274,8 +1279,10 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
            "وكلمة إملائية ناقصة الشكل تُمسَك كغيرها من مادة القراءة")
 
         broken = json.loads(json.dumps(quran))
+        # (والعنصرُ يزيد حقولاً مع الحزم — فيُنسَخ بطوله ويُبدَّل الثالثُ وحدَه،
+        #  لا يُفكَّك بعددٍ ثابت: الفحصُ يتبع البيانات ولا يفرض عليها شكلاً)
         broken["words"]["levels"][0]["items"] = [
-            [t, e, False] for t, e, _ in broken["words"]["levels"][0]["items"]]
+            [*item[:2], False, *item[3:]] for item in broken["words"]["levels"][0]["items"]]
         ok(any("بلا كلمةٍ مصوَّرة" in e for e in check_quran(broken, all_letters, letters, source)[0]),
            "وحوضُ «اقرأ واختر» إن فقد كلَّ كلمةٍ مصوَّرة يُمسَك (لا جولةَ فيه أصلاً)")
         ok(any("غير مصوَّرة" in w for w in check_quran(quran, all_letters, letters, source)[1]),

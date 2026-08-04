@@ -979,7 +979,10 @@ def check_stories(data: dict, letters: dict, known: set = None, quiet: bool = Fa
             if text in seen:
                 errors.append(f"{where}: جملة مكرَّرة — سبقت في {seen[text]} («{text}»)")
             seen.setdefault(text, f"قصة «{story_id}»")
-            audio_texts.add(text)
+            # **جملةُ الرفّ لا تُنطَق**: «القصةُ تُقرأ لا تُسمع» — سقط الكاريوكي
+            # وأذنُ السطر، فلا يُطلَب لها صوت. وتبقى كلماتُها مفردةً (نقرةُ الكلمة).
+            if not shelf:
+                audio_texts.add(text)
             audio_texts.update(page_words)
 
         # ————— أسئلة الفهم: سؤالٌ لكل مقطعٍ في الرفّ، وواحدٌ في الخاتمة لغيره —————

@@ -31,7 +31,11 @@
     "تُعْطِي",
     "جَائِعْ",
     "دَافِئْ",
-    "رَفّْ"
+    "رَفّْ",
+    "يَضْحَكْ",
+    "تَنْزِلْ",
+    "مِنْقَارْ",
+    "جُحَا"
   ],
   "stories": [
     "miftah-sami",
@@ -47,6 +51,9 @@
     "namla-wajarad",
     "thalab-walinab",
     "sami-walmaktaba",
+    "ghurab-waljubn",
+    "juha-walhimar",
+    "hasan-walusfur",
     "alfil-walkaaba"
   ]
 }

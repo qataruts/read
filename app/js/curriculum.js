@@ -1129,12 +1129,22 @@ export const wordBySay = (say) => GROUPS.flatMap((g) => g.words).find((w) => w.s
  * `curriculum_word` بـ`check_lexicon.py`، ويقرأ كلاهما من هذا الملف لا من نسخةٍ ثانية.
  */
 export function curriculumWord(text) {
+  // **ولها `say` كأخواتها من المعجم** (إصلاح ١٢ أغسطس ٢٠٢٦): كانت تعود بلا صوتٍ
+  // منطوق، فخيارُ سؤالِ الفهم من كلمات المنهج يُنقَر عند الخطأ **فلا يُسمِع شيئاً**
+  // — وقاعدةُ الخطأ عندنا أن «يُسمعه ما اختاره ليقارنه بما قرأ»، فسقطت صامتةً في
+  // قصة الفيل منذ حزمة الأنبياء. ولكلٍّ صيغةٌ منطوقة واحدة لها ملفُّها سلفاً:
+  // كلمةُ المجموعة `say` («تمر»)، والإملائيةُ نصُّها المشكول `read` («جَرَادْ»).
+  // فالإصلاحُ **صفرُ إضافةٍ صوتية**، ويحرسه `test_stories.mjs`.
   const tiled = GROUPS.flatMap((g) => g.words)
     .find((w) => w.tiles.join('') === text);
-  if (tiled) return { word: text, emoji: tiled.emoji, pictured: tiled.pictured !== false };
+  if (tiled) {
+    return { word: text, say: tiled.say, emoji: tiled.emoji, pictured: tiled.pictured !== false };
+  }
   const imla = [...quranWordItems(),
     ...QURAN.letters.signs.flatMap((s) => s.words)].find((w) => w.read === text);
-  return imla ? { word: text, emoji: imla.emoji, pictured: imla.pictured !== false } : null;
+  return imla
+    ? { word: text, say: imla.read, emoji: imla.emoji, pictured: imla.pictured !== false }
+    : null;
 }
 
 /**

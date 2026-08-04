@@ -32,7 +32,11 @@ const voiced = new Set([...Object.values(manifest),
   ...queue.filter((e) => e.status !== 'done').map((e) => e.text)]);
 
 const SHELF_MODE = process.argv.includes('--shelf');
-const LIBRARY = SHELF_MODE ? shelfStories() : ALL.filter((s) => s.garden);
+// **وبوّابةٌ لكل مستوى** (حكم المدير: «ثلاثُ قصصٍ في كل بوابةِ مراجعة أصدقُ فحصاً
+// من تسع»): `--level N` يقصر الورقة على شريحته، فلا يُعاد على المدير ما أقرّه.
+const LEVEL = Number((process.argv.find((a) => a.startsWith('--level=')) || '').split('=')[1]) || 0;
+const LIBRARY = (SHELF_MODE ? shelfStories() : ALL.filter((s) => s.garden))
+  .filter((s) => !LEVEL || s.level === LEVEL);
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 const pages = LIBRARY.reduce((s, x) => s + x.pages.length, 0);
 const waiting = SHELF_MODE
@@ -46,7 +50,7 @@ const asks = (story) => story.questions.map((q, i) =>
 const lines = [];
 const P = (s = '') => lines.push(s);
 
-P(SHELF_MODE ? '# ورقة مراجعة: رفّ المكتبة — المستوى الرابع (حزمة المكتبة)'
+P(SHELF_MODE ? `# ورقة مراجعة: رفّ المكتبة — ${LEVEL ? `المستوى ${arNum(LEVEL)}` : 'كل المستويات'} (حزمة المكتبة)`
   : '# ورقة مراجعة: «مصنع القصص» — الحزمة ٩');
 P();
 P('> **المطلوب من المدير**: قراءةُ المعنى والحبكة والذوق، وأن تكون الخاتمة طيبة،');
@@ -131,7 +135,7 @@ if (!SHELF_MODE && !named) {
     + 'ولإعادة توليدها عمداً: node tools/review_stories.mjs docs/REVIEW_STORIES.md');
   process.exit(1);
 }
-const path = named || 'docs/REVIEW_SHELF.md';
+const path = named || `docs/REVIEW_SHELF${LEVEL || ''}.md`;
 writeFileSync(new URL(path, ROOT), `${lines.join('\n')}\n`, 'utf8');
 console.log(`ورقة المراجعة: ${path} — ${LIBRARY.length} قصة في ${pages} صفحة، `
   + `و${waiting} نصاً ينتظر اعتمادك قبل قائمة الصوت`);

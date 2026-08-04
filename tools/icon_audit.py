@@ -109,6 +109,38 @@ ACCEPTED = [
 ]
 
 
+# ————— «الصورةُ صادقةٌ للاثنين» — حكمٌ للصنف لا للأفراد —————
+#
+# **حكم المالك (١٢ أغسطس ٢٠٢٦)**: اشتراكُ كلمتين في رمزٍ ليس التباساً إذا كانت
+# الصورةُ **صادقةً عليهما معاً**. وهو صنفان:
+#   • **الاسمُ الجمعيّ ووحدتُه**: `نَمْلَة`/`نَمْل` و`زَيْتُونَة`/`زَيْتُون` — 🐜 نملةٌ
+#     صدقاً، وهي عينُ ما يدلّ على جنسها؛ ولا صورةَ ثانيةٌ أصدقُ منها لواحدتها.
+#   • **المترادفُ القريب**: `بُسْتَان`/`جَنَّة` — والجنةُ بستانٌ في أصل اللغة.
+# **والمنعُ اجتماعُهما في حوضٍ واحد لا اشتراكُهما في رمز** — وذاك يمسكه حارسُ الحوض
+# (خطأٌ لا تنبيه) وهو باقٍ على حاله. فما يسقط هنا **إثقالُ البوابة** بزوجٍ حُكم فيه.
+#
+# ويُقيَّد **صنفاً** لا فرداً: تُعلَن العلاقةُ ودالّتُها، فلا يُرفع إلى المدير كلُّ
+# زوجٍ من نوعها مستقبلاً — وأيُّ زوجٍ خارجها يبقى مرفوعاً كما كان.
+TRUTHFUL_PAIRS = [
+    ("الجمعيّ ووحدتُه", "الاسمُ الجمعيّ ووحدتُه: تاءُ الوحدة تُزاد على الجنس "
+     "(نَمْلَة/نَمْل · زَيْتُونَة/زَيْتُون)، والصورةُ الواحدة صادقةٌ عليهما",
+     lambda a, b: a and b and (a == b + "ة" or b == a + "ة")),
+    ("مترادفٌ قريب", "مترادفٌ قريبٌ مُعلَن: بُسْتَان/جَنَّة — والجنةُ بستانٌ في أصل اللغة",
+     lambda a, b: {a, b} == {"بستان", "جنة"}),
+]
+
+
+def truthful(stems) -> str:
+    """علّةُ صدقِ الصورة على هذه الكلمات جميعاً — أو "" إن لم تكن من صنفٍ معلَن."""
+    items = sorted(stems)
+    if len(items) != 2:
+        return ""          # ثلاثٌ فأكثر: تُرفع كما هي، فالصنفُ يُقاس على زوج
+    for _name, why, matches in TRUTHFUL_PAIRS:
+        if matches(*items) or matches(*reversed(items)):
+            return why
+    return ""
+
+
 class Entry:
     """زوج (كلمة، صورة) بموضعه من المنظومة ودرجة صرامته."""
 
@@ -361,12 +393,23 @@ def report(entries, pools, quiet=False) -> int:
                         or ORDER.index(entry.grade) < ORDER.index(bucket[stem][1])):
                     bucket[stem] = (entry.word, entry.grade)
         repeated = {e: w for e, w in shared.items() if len(w) > 1}
-        conflicts = {e: set(w.values()) for e, w in taught.items() if len(w) > 1}
+        all_conflicts = {e: w for e, w in taught.items() if len(w) > 1}
+        # ما صدقت عليه الصورةُ للاثنين يخرج من التعارض بحكمٍ للصنف — ويُطبَع معلَناً
+        # لا صامتاً: الجردُ يعرض ما أسقطه وعلّتَه، فلا يكون الإسقاطُ إخفاءً.
+        truthful_pairs, conflicts = {}, {}
+        for emoji, bucket in all_conflicts.items():
+            why = truthful(set(bucket))
+            (truthful_pairs if why else conflicts)[emoji] = (set(bucket.values()), why)
         print(f"  صورٌ تخدم أكثر من كلمة: {len(repeated)} "
-              f"(منها {len(conflicts)} على كلمتين مُعلَّمتين فأكثر)")
+              f"(منها {len(conflicts)} تعارضاً على كلمتين مُعلَّمتين، "
+              f"و{len(truthful_pairs)} صادقةً للاثنين)")
+        if truthful_pairs:
+            print("\n  صادقةٌ للاثنين — حكمُ صنفٍ لا فرد (لا تُرفَع):")
+            for emoji, (words, why) in sorted(truthful_pairs.items()):
+                print(f"    {emoji}  ←  {'، '.join(w for w, _g in sorted(words))} — {why}")
         if conflicts:
             print("\n  تعارضٌ عبر الرحلة (صورةٌ واحدة لكلمتين مُعلَّمتين):")
-            for emoji, words in sorted(conflicts.items(), key=lambda kv: -len(kv[1])):
+            for emoji, (words, _why) in sorted(conflicts.items(), key=lambda kv: -len(kv[1][0])):
                 shown = "، ".join(f"{w} ({g})" for w, g in sorted(words))
                 print(f"    {emoji}  ←  {shown}")
         print()
