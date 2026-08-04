@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>لقطات الصفحة التعريفية — شاشات التطبيق نفسها</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    /* لا زينةَ ولا إطار: اللقطة شاشةُ التطبيق كما يراها الطفل، وإلا كانت دعايةً لا صدقاً */
+    html, body { margin: 0; }
+    .dev { display: none; }        /* أدوات التجربة تقود ولا تدخل اللقطة */
+  </style>
+</head>
+<body>
+<div id="app" class="app" aria-live="polite"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+// عطبٌ يُكتب في الصفحة نفسِها — فاللقطة البيضاء الصامتة تحيّر (كما في browser_device.html)
+const shout = (what) => {
+  const box = document.createElement('pre');
+  box.style.cssText = 'color:#b00;font:14px/1.6 monospace;white-space:pre-wrap';
+  box.textContent = 'عطب: ' + what;
+  document.body.prepend(box);
+};
+window.addEventListener('error', (e) => shout(e.message));
+window.addEventListener('unhandledrejection', (e) => shout(e.reason?.stack || e.reason));
+
+// صفحةُ لقطاتٍ لا تُسجّل عامل خدمة: `main.js` يسجّله عند استيراده (لقطةُ الخريطة)،
+// ولا شأن للقطة بخزنِ شيء على القرص.
+Object.defineProperty(navigator, 'serviceWorker', {
+  configurable: true,
+  value: { register: () => Promise.resolve(), addEventListener() {} },
+});
+</script>
+
+<script type="module">
+/**
+ * لقطات «رحلة التعلم» في الصفحة التعريفية (`app/welcome/`) — **من التطبيق نفسِه**.
+ *
+ * لماذا صفحةٌ لا يدُ مصمّم: الصفحة التعريفية تَعِد المعلمَ بما في التطبيق، فصورتُها
+ * يجب أن تكون التطبيقَ لا رسماً له. فهذه الصفحة تستورد وحدات التطبيق وتبني الشاشة
+ * كما تُبنى للطفل، ويلتقطها `tools/make_welcome_shots.py` بمقاس آيباد حقيقيّ.
+ * وأيُّ تغيّرٍ في الشاشات يظهر في اللقطة بإعادة التوليد — لا بتحرير صورة.
+ *
+ * والطفلُ المزروع **واحدٌ في كل اللقطات**: أتمّ المجموعات الأربع الأولى، وحروفُ
+ * الرابعة (ق ك ف) ما زالت تتعثّر في سجلّ ليتنر، وله دقائقُ أسبوع — فتصدُق لوحةُ
+ * وليّ الأمر والخريطةُ معاً، ولا تتناقض لقطتان أمام معلّمٍ يقرؤهما جميعاً.
+ */
+import * as progress from './js/progress.js';
+import { renderLesson } from './js/lesson.js';
+import { renderWordsGame } from './js/words.js';
+import { renderStory } from './js/story.js';
+import { renderQuran } from './js/quran.js';
+import { renderParent } from './js/parent.js';
+
+// صوتٌ لا ينتهي: الحالةُ المعروضة تتجمّد فلا تنتقل الخطوة تلقائياً قبل اللقطة
+window.Audio = class { play() { return new Promise(() => {}); } pause() {} };
+Element.prototype.scrollIntoView = () => {};
+
+// ————— تقدُّم طفلٍ في منتصف الرحلة —————
+
+const all = progress.allNodes();
+const front = all.findIndex((n) => n.id === 'story:st1');        // مشتقٌّ لا مكتوب
+for (const node of all.slice(0, front)) progress.setStars(node.id, node.id.endsWith(':ق') ? 2 : 3);
+
+// سجلُّ ليتنر: متقَنٌ ومتعثّرٌ وما بينهما — **من حروفه هو** (المجموعات ١–٤ وحدها،
+// وإلا عرضت اللوحةُ حرفاً لم يدرسه صاحبُ اللقطات). لوحةُ وليّ الأمر تقرؤه لا تخترعه.
+const day = progress.dayNumber();
+const drill = (letter, haraka, kind, right, wrong) => {
+  for (let i = 0; i < right; i++) progress.recordAttempt(letter, haraka, kind, true, day - (right - i));
+  for (let i = 0; i < wrong; i++) progress.recordAttempt(letter, haraka, kind, false, day);
+};
+for (const ch of 'ابملنردس') drill(ch, 'fatha', 'quiz', 5, 0);
+for (const ch of 'تويه') drill(ch, 'kasra', 'quiz', 4, 0);
+for (const ch of 'قكف') drill(ch, 'fatha', 'quiz', 1, 3);        // أحدثُ حروفه — تتعثّر
+drill('ع', 'fatha', 'build', 3, 1);
+drill('ع', 'damma', 'haraka', 2, 1);
+
+const minutes = [11, 8, 14, 0, 9, 12, 7];
+for (const [i, m] of minutes.entries()) {
+  progress.addSeconds(m * 60, progress.dayKey(new Date(Date.now() - i * 86400000)));
+}
+progress.markReview(12, 11);
+
+// ————— الشاشات —————
+
+const app = document.getElementById('app');
+const $$ = (root, sel) => [...root.querySelectorAll(sel)];
+const hit = (el, label) => $$(el, 'button').find((b) => b.textContent.includes(label))?.click();
+
+/** لوحة وليّ الأمر خلف بوابتها: تُحلّ مسألةُ الضرب كما يحلّها الوالد. */
+function parentDashboard() {
+  const box = document.createElement('div');
+  const draw = () => box.replaceChildren(renderParent(draw));
+  draw();
+  const digits = box.querySelector('.giant').textContent
+    .split('×').map((s) => Number(s.replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+  box.querySelector('input').value = String(digits[0] * digits[1]);
+  hit(box, 'ادخل');
+  return box;
+}
+
+/** الخريطة: يبنيها `main.js` وحدَه (لا تُصدَّر) — كما في `browser_map_shots.html`. */
+async function map() {
+  app.id = 'app';
+  await import('./js/main.js');
+  return null;                                   // main.js يكتب في #app بنفسه
+}
+
+const SCREENS = {
+  map,
+  lesson: () => renderLesson('g1', 'ب'),
+  words: () => renderWordsGame('g2'),
+  story: () => renderStory('st1'),
+  quran: () => renderQuran('s1'),
+  parent: parentDashboard,
+};
+
+const params = new URLSearchParams(location.search);
+const wanted = params.get('screen') || 'map';
+const build = SCREENS[wanted];
+if (!build) shout('لا شاشة بهذا الاسم: ' + wanted);
+else {
+  // الخطوط قبل الرسم: لقطةٌ بخطٍّ احتياطيّ تكذب على العين (فخُّ font-display: swap)
+  await Promise.all([
+    document.fonts.load('144px "Noto Naskh Arabic"', 'اب'),
+    document.fonts.load('700 24px "Baloo Bhaijaan 2"', 'اب'),
+    document.fonts.load('40px "KFGQPC Uthmanic Script HAFS"', 'ٱ'),
+  ]);
+  const node = await build();
+  if (node) {
+    if (!node.nodeType) throw new Error('لم تُبنَ الشاشة (معرّف مجهول؟)');
+    app.replaceChildren(node);
+  }
+  document.querySelectorAll('.dev').forEach((d) => d.remove());
+  await document.fonts.ready;
+  // ورموزُ المحتوى صارت ملفات SVG (مهمة «أيقونات لا إيموجي») لا محارفَ يرسمها
+  // الخطّ — فتُنتظَر كما يُنتظَر الخطّ، وإلا خرجت لقطةُ الصفحة التعريفية بصورٍ خاوية.
+  await Promise.all([...document.images].map((img) => img.decode().catch(() => {})));
+  // طولُ المحتوى يُقاس ولا يُكتب: الملتقِط يشدّ النافذة إليه فلا يبقى في اللقطة
+  // ورقٌ خاوٍ تحت الشاشة (ولا يُقصّ منها شيء) — والقياس في نافذةٍ طويلة عمداً.
+  // (والمقيس أسفلُ صندوق التطبيق لا `scrollHeight`: الورقةُ تمتدّ ١٠٠dvh بحكم
+  //  `body { min-height }` فتقيس النافذةَ نفسَها لا ما فيها.)
+  if (params.get('measure')) {
+    fetch('/result', {
+      method: 'POST',
+      body: JSON.stringify([{
+        screen: wanted,
+        height: Math.ceil(app.getBoundingClientRect().bottom + scrollY),
+      }]),
+    });
+  }
+  document.documentElement.dataset.ready = '1';   // علامةُ الجاهزية للملتقِط
+}
+</script>
+</body>
+</html>

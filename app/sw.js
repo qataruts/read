@@ -27,7 +27,7 @@
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
 
-const VERSION = 'v14';  // v14: «الجسر القرآني» — كلمات السورة ودرجات الكلمات (الحزمة ١٢)
+const VERSION = 'v15';  // v15: «أيقونات لا إيموجي» — أصول Twemoji في app/emoji/
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = `muallim-audio-${VERSION}`;
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -70,6 +70,7 @@ const SHELL = [
   'js/words.js',
   'audio/manifest.json',
   'audio/versions.json',
+  'emoji/index.json',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/maskable-512.png',
@@ -95,6 +96,22 @@ async function precacheStories() {
   const cache = await caches.open(SHELL_CACHE);
   await Promise.all((index?.stories || []).map((id) =>
     cache.add(new URL(`data/stories/${id}.json`, self.registration.scope)).catch(() => {})));
+}
+
+/** خزن أيقونات الرموز **من فهرسها** (مهمة «أيقونات لا إيموجي»).
+ *
+ *  رفعُ نسخةٍ مبرَّرٌ هنا: كانت الصور محارفَ يرسمها خطُّ الجهاز فلا وزنَ لها، وصارت
+ *  ملفات SVG — فلولا خزنُها لظهر الطفلُ دون إنترنت أمام كلماتٍ بلا صور، وهي في
+ *  «اقرأ واختر» و«أكمل الجملة» السؤالُ نفسُه لا زينتَه. وثمنُها نصفُ ميغابايت مرّةً
+ *  واحدة (أقلُّ من ملفَّي صوت).
+ *
+ *  ومن الفهرس لا من قائمةٍ يدوية هنا — كالأصوات والقصص سواءً: رمزٌ جديد في المنهج
+ *  غداً يجلبه `tools/fetch_twemoji.py` فيدخل المخزون بلا سطرٍ في هذا الملف. */
+async function precacheEmoji() {
+  const index = await json('emoji/index.json');
+  const cache = await caches.open(SHELL_CACHE);
+  await Promise.all(Object.keys(index?.files || {}).map((key) =>
+    cache.add(new URL(`emoji/${key}.svg`, self.registration.scope)).catch(() => {})));
 }
 
 /** رابط ملف صوتٍ باسمه على القرص، موسوماً ببصمة محتواه (بلا بصمة: الرابط كما هو). */
@@ -134,6 +151,7 @@ self.addEventListener('install', (event) => {
     await Promise.all(SHELL.map((path) =>
       cache.add(new URL(path, self.registration.scope)).catch(() => {})));
     await precacheStories();
+    await precacheEmoji();
     await precacheAudio();
     await self.skipWaiting();
   })());

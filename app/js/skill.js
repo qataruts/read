@@ -16,7 +16,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { starsForErrors } from './lesson.js';
 import {
-  h, toast, go, arNum, starsRow, topbar,
+  h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar,
   PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
 } from './ui.js';
 
@@ -113,7 +113,7 @@ export function renderSkillLesson(skillId) {
         h('button', {
           class: 'btn btn--primary',
           onclick: () => audio.play(skill.rule),
-        }, '🔊 اسمع القاعدة'),
+        }, icon('ear'), ' اسمع القاعدة'),
       ),
       h('h3', { class: 'sub' }, 'أمثلة'),
       h('div', { class: 'row wordrow' }, examples.map((word) => h('button', {
@@ -121,7 +121,7 @@ export function renderSkillLesson(skillId) {
         'aria-label': `اسمع كلمة ${word.say}`,
         onclick: () => audio.play(word.say),
       },
-        h('span', { class: 'word-emoji' }, word.emoji),
+        faceEl(word.emoji, 'word-emoji'),
         h('span', { class: 'word-text' }, word.text),
       ))),
       nextButton(),
@@ -203,7 +203,7 @@ export function renderSkillLesson(skillId) {
       prompt,
       counter,
       h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: playTarget }, '🔊 اسمع مرة أخرى')),
+        h('button', { class: 'btn btn--primary', onclick: playTarget }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
     startRound();
@@ -224,11 +224,11 @@ export function renderSkillLesson(skillId) {
 
     body.replaceChildren(h('div', { class: 'celebrate' },
       mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, skill.face),
+      faceEl(skill.face, 'celebrate-face', 'div'),
       h('h2', {}, 'أحسنت!'),
       starsRow(stars, 'big-stars'),
       h('p', { class: 'hint' }, state.errors === 0
-        ? `عرفتَ ${skill.title} بلا خطأ! 🎉`
+        ? cheer(`عرفتَ ${skill.title} بلا خطأ!`)
         : 'صارت في يدك — وستراها في القصص والكلمات بعدها.'),
       before > stars && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
       h('div', { class: 'row foot' },

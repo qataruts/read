@@ -17,7 +17,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard } from './words.js';
 import {
-  h, toast, go, arNum, arCount, starsRow, topbar, letterTitle, wordText,
+  h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar, letterTitle, wordText,
   mascot, shuffle, pick, shake, pop, DEV,
 } from './ui.js';
 
@@ -312,7 +312,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
     return h('div', {},
       h('h2', {}, 'أيَّ حرف سمعت؟'),
       h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: play }, '🔊 اسمع مرة أخرى')),
+        h('button', { class: 'btn btn--primary', onclick: play }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
   }
@@ -347,7 +347,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       h('h2', {}, 'أيَّ حرف سمعت؟'),
       h('p', { class: 'hint' }, 'الحرفان متشابهان — أنصت للفرق'),
       h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: play }, '🔊 اسمع مرة أخرى')),
+        h('button', { class: 'btn btn--primary', onclick: play }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
   }
@@ -380,7 +380,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
     return h('div', {},
       h('h2', {}, `أيَّ حركة سمعت مع ${letterTitle(item.letter)}؟`),
       h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: play }, '🔊 اسمع مرة أخرى')),
+        h('button', { class: 'btn btn--primary', onclick: play }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
   }
@@ -439,8 +439,8 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
         'aria-label': `اسمع كلمة ${word.say}`,
         onclick: () => audio.play(word.say),
       },
-        h('span', { class: 'pic-emoji' }, word.emoji),
-        h('span', { class: 'pic-ear' }, '🔊'),
+        faceEl(word.emoji, 'pic-emoji'),
+        h('span', { class: 'pic-ear' }, icon('ear')),
       ),
       slots,
       built,
@@ -502,8 +502,8 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
         'aria-label': `اسمع كلمة ${sentence.target.word}`,
         onclick: () => audio.play(sentence.target.say),
       },
-        h('span', { class: 'pic-emoji' }, sentence.target.emoji),
-        h('span', { class: 'pic-ear' }, '🔊'),
+        faceEl(sentence.target.emoji, 'pic-emoji'),
+        h('span', { class: 'pic-ear' }, icon('ear')),
       ),
       slots,
       built,
@@ -582,17 +582,18 @@ export function renderReview() {
       const stars = starsForReview(errors, items.length);
       const streak = progress.reviewStreak();
       const line = errors === 0
-        ? 'مراجعة بلا خطأ واحد! 🎉'
+        ? cheer('مراجعة بلا خطأ واحد!')
         : `أصبتَ ${arNum(right)} من ${arNum(right + errors)} محاولة — وما أخطأتَ فيه يعود غداً.`;
 
       return h('div', { class: 'celebrate' },
         mascot('mascot mascot--cheer'),
-        h('div', { class: 'celebrate-face' }, '🔁'),
+        h('div', { class: 'celebrate-face' }, icon('repeat')),
         h('h2', {}, 'أتممتَ مراجعة اليوم!'),
         starsRow(stars, 'big-stars'),
         h('p', { class: 'hint' }, line),
         streak > 1 && h('p', { class: 'note' },
-          `🔥 ${arCount(streak, ['يوم', 'يومان متتاليان', 'أيام متتالية', 'يوماً متتالياً'])} من المراجعة`),
+          icon('flame'),
+        ` ${arCount(streak, ['يوم', 'يومان متتاليان', 'أيام متتالية', 'يوماً متتالياً'])} من المراجعة`),
         h('div', { class: 'row foot' },
           h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة')),
       );

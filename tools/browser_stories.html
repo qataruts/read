@@ -98,6 +98,10 @@ const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
 const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+// الرمزُ صار صورةَ SVG لا محرفاً (مهمة «أيقونات لا إيموجي»)، وهو معلَنٌ في
+// `data-emoji` على `<img>` — فتقرأ الاختباراتُ ما تراه العينُ لا نصّاً غاب.
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji
+  ?? el?.textContent.trim() ?? '';
 const lastHeard = () => heardLog[heardLog.length - 1];
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
 // الخريطة كسولة (إصلاح بطء الخريطة): محطاتٌ بعيدة عن جبهة الطفل تُرسم بطاقاتِ عناوين
@@ -199,13 +203,13 @@ try {
     `سؤال الفهم معروضٌ للقراءة («${texts('.ask .sentence-word').join(' ')}»)`);
   ok($$('.ask .piccard').length === 3 && heardLog.length === mark,
     'وثلاث صور بلا صوت قبل الاختيار — الحكم على القراءة لا على السمع');
-  ok(texts('.ask .piccard').includes(first.question.answer.emoji),
+  ok($$('.ask .piccard').map(picOf).includes(first.question.answer.emoji),
     'وصورة الجواب بين الصور الثلاث');
   checkTargets('سؤال الفهم');
 
   const cards = () => $$('.ask .piccard');
-  const wrongCard = cards().find((c) => c.textContent.trim() !== first.question.answer.emoji);
-  const wrongWord = first.question.options.find((w) => w.emoji === wrongCard.textContent.trim());
+  const wrongCard = cards().find((c) => picOf(c) !== first.question.answer.emoji);
+  const wrongWord = first.question.options.find((w) => w.emoji === picOf(wrongCard));
   wrongCard.click();
   await sleep(150);
   ok(wrongCard.classList.contains('bad') && !!$('.ask'),
@@ -213,7 +217,7 @@ try {
   ok(lastHeard() === wrongWord.say, `ويُسمعه ما اختاره لا الصواب (${lastHeard()})`);
   await sleep(250);
 
-  cards().find((c) => c.textContent.trim() === first.question.answer.emoji).click();
+  cards().find((c) => picOf(c) === first.question.answer.emoji).click();
   await waitFor(() => $('.celebrate'), 'ختام القصة', 8000);
   ok($$('.big-stars .on').length === 2,
     `تابع الجمل كلها وأخطأ في السؤال ⇒ نجمتان (${$$('.big-stars .on').length})`);
@@ -239,7 +243,7 @@ try {
 
   $('.foot .next').click();
   await waitFor(() => $('.ask'), 'سؤال قصة المستوى الثالث');
-  $$('.ask .piccard').find((c) => c.textContent.trim() === top.question.answer.emoji).click();
+  $$('.ask .piccard').find((c) => picOf(c) === top.question.answer.emoji).click();
   await waitFor(() => $('.celebrate'), 'ختامها', 8000);
   ok($$('.big-stars .on').length === 3 && stored().stars[`library:${top.id}`] === 3,
     'وإصابةُ السؤال من أول مرة مع متابعة الجمل ⇒ ثلاث نجوم محفوظة');

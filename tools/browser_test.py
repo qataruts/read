@@ -11,6 +11,7 @@
     python3 tools/browser_test.py --stories    # مكتبة «مصنع القصص» (المرحلة د)
     python3 tools/browser_test.py --record     # «اقرأ لي»: تسجيل صوت الطفل (المرحلة و)
     python3 tools/browser_test.py --gate       # بوابتا الإتقان (الحزمة ١٤)
+    python3 tools/browser_test.py --parent     # صلابة التقدّم وتحكّم وليّ الأمر (الحزمة ١١)
     python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
@@ -30,6 +31,7 @@
 import argparse
 import http.server
 import json
+import re
 import shutil
 import socketserver
 import subprocess
@@ -69,6 +71,8 @@ PAGES = {
     "/__contrast_shots.html": TOOLS / "browser_contrast_shots.html",
     "/__device.html": TOOLS / "browser_device.html",
     "/__welcome.html": TOOLS / "browser_welcome.html",
+    "/__parent.html": TOOLS / "browser_parent.html",
+    "/__parent_shots.html": TOOLS / "browser_parent_shots.html",
 }
 # نافذة Chrome بلا واجهة تحجز ٨٧ بكسلاً لإطارٍ وهميّ فوق المنظور — فلولا تعويضها لقِسنا
 # جهازاً أقصر من الجهاز. والصفحة تعيد منظورها الحقيقي، والعدّاء يرفض أي انحرافٍ عن المطلوب.
@@ -111,7 +115,22 @@ def make_server(port: int, results: list):
             super().__init__(*a, directory=str(APP), **kw)
 
         def do_GET(self):
-            if self.path.split("?")[0] == "/__queue.json":
+            path, _, query = self.path.partition("?")
+            # ترقيةُ نسخةِ عامل الخدمة في بيئة الاختبار (الحزمة ١١): `app/sw.js` **نفسُه**
+            # برقم نسخةٍ مرفوع — فتقع الترقية كما تقع على جهاز الطفل (تركيبٌ ثم تفعيلٌ
+            # يمحو مخزون السابقة)، ويُقاس عندها بقاءُ التقدّم. لا نسخةَ ثانية من الملف.
+            if path == "/sw.js" and "bump=" in query:
+                tag = re.sub(r"[^0-9A-Za-z-]", "", query.split("bump=")[1].split("&")[0])
+                src = (APP / "sw.js").read_text(encoding="utf-8")
+                body = re.sub(r"(const VERSION = '[^']*)'", rf"\1-bump{tag}'", src, count=1)
+                raw = body.encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/javascript; charset=utf-8")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
+            if path == "/__queue.json":
                 body = json.dumps(pending_texts(), ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -119,7 +138,7 @@ def make_server(port: int, results: list):
                 self.end_headers()
                 self.wfile.write(body)
                 return
-            page = PAGES.get(self.path.split("?")[0])
+            page = PAGES.get(path)
             if page:
                 body = page.read_bytes()
                 self.send_response(200)
@@ -271,6 +290,9 @@ def device_main(args):
                 print(f"  ✗ {r['label']}: عطب — {r['error']}")
                 bad.append((label, r["id"], r["error"]))
                 continue
+            if r.get("emoji"):
+                print(f"  ✗ {r['label']}: إيموجي بخطّ النظام في الشاشة — {r['emoji']}")
+                bad.append((label, r["id"], f"إيموجي نصّاً: {r['emoji']}"))
             over, over_x = r["over"], r["overX"]
             must = wide and r["id"] in LANDSCAPE_MUST_FIT
             fail = over_x > 0 or (must and over > 0)
@@ -286,7 +308,8 @@ def device_main(args):
         for label, sid, why in bad:
             print(f"  ✗ {label} · {sid}: {why}")
         return 1
-    print("\nكل الشاشات المحروسة تسع الوضع العرضي بلا سحب، ولا فائض أفقي في أي مقاس.")
+    print("\nكل الشاشات المحروسة تسع الوضع العرضي بلا سحب، ولا فائض أفقي في أي مقاس،"
+          "\nولا إيموجي بخطّ النظام في أيّ شاشة (مهمة «أيقونات لا إيموجي»).")
     return 0
 
 
@@ -304,6 +327,8 @@ def main():
     ap.add_argument("--stories", action="store_true", help="مكتبة «مصنع القصص» (المرحلة د)")
     ap.add_argument("--record", action="store_true", help="«اقرأ لي»: تسجيل صوت الطفل (المرحلة و)")
     ap.add_argument("--gate", action="store_true", help="بوابتا الإتقان: العبور والإخفاق والإعادة والترحيل")
+    ap.add_argument("--parent", action="store_true",
+                    help="صلابة التقدّم وتحكّم وليّ الأمر: ترقية عامل الخدمة والنسخة الاحتياطية (الحزمة ١١)")
     ap.add_argument("--contrast", action="store_true",
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
@@ -335,6 +360,7 @@ def main():
             out.unlink(missing_ok=True)   # وإلا لعُدَّت لقطةُ تشغيلٍ سابق نجاحاً فوريّاً
             # الصفحة التعريفية تُلتقط **كما تُنشَر** (لا صفحةَ قيادةٍ لها: لا جافاسكربت فيها)
             page, size = (("welcome/", "1100,7900") if args.welcome
+                          else ("__parent_shots.html", "1100,6400") if args.parent
                           else ("__contrast_shots.html", "1100,2600") if args.contrast
                           else ("__gate_shots.html", "1100,2400") if args.gate
                           else ("__map_shots.html", "1100,2600") if args.map
@@ -359,6 +385,7 @@ def main():
             return 0 if out.exists() else 1
 
         page = ("__welcome.html" if args.welcome
+                else "__parent.html" if args.parent
                 else "__contrast.html" if args.contrast
                 else "__gate.html" if args.gate
                 else "__map.html" if args.map

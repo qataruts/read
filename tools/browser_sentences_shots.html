@@ -78,7 +78,8 @@ async function driveTo(app, mechanic, sentences = rung.sentences) {
     const sentence = sentences[i];
     if (sentence.mechanic === mechanic) break;
     if (sentence.mechanic === 'read') {
-      $$(app, '.piccard').find((b) => b.textContent.trim() === sentence.target.emoji)?.click();
+      $$(app, '.piccard').find((b) => b.querySelector('[data-emoji]')?.dataset.emoji
+        === sentence.target.emoji)?.click();
     } else if (sentence.mechanic === 'fill') {
       $$(app, '.vchip--pic').find((b) => b.textContent.includes(sentence.target.word))?.click();
     } else {

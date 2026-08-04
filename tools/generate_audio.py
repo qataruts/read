@@ -44,6 +44,7 @@ QUEUE_FILE = ROOT / "tools" / "audio_queue.json"
 RECITATIONS_FILE = ROOT / "tools" / "recitations.json"   # يكتبه tools/fetch_recitation.py
 TODAY = datetime.date.today().isoformat()
 
+SUKUN_MARK = "ْ"
 HARAKAT = {"fatha": "َ", "kasra": "ِ", "damma": "ُ"}
 
 GEMINI_HOST = "https://generativelanguage.googleapis.com"
@@ -146,7 +147,13 @@ def note_independence(model: str, blocked: str, worked: str, seconds: dict) -> N
             data = json.loads(INDEPENDENCE_FILE.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             data = {}
-    verdict = "مستقلّان" if worked else "المشروع نفسه (نافذتا تجدد متقاربتان)"
+    # حكمٌ واحدٌ قاطع: **نجاحُ الثاني بعد نفاد الأول**. أمّا نفادُهما معاً بنافذتين
+    # متقاربتين فغيرُ قاطع البتّة — المفتاحان يُستهلكان في الفترة نفسها فتتقارب
+    # نافذتاهما ولو كانا مشروعين. (وقع ٤ أغسطس: 2.5-pro أثبت الاستقلال، ثم أوهم
+    # 3.1-flash بالعكس لأن الحصتين أُنفقتا معاً.) فلا يُنسخ الإثبات بشبهة.
+    verdict = "مستقلّان" if worked else "كلاهما نفد — غير قاطع"
+    if not worked and data.get(model, {}).get("verdict") == "مستقلّان":
+        return                                  # إثباتٌ سابق لا تنقضه ملاحظةٌ ضعيفة
     data[model] = {"testedAt": TODAY, "blockedKey": blocked, "otherKey": worked or "—",
                    "verdict": verdict, "retrySeconds": seconds}
     INDEPENDENCE_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=1),
@@ -168,7 +175,14 @@ class KeyPool:
         self.used = collections.Counter()   # (اسم المفتاح، نموذج) ← عدد ما وُلِّد
 
     def available(self, model: str) -> list:
-        return [(n, v) for n, v in self.keys if (n, model) not in self.exhausted]
+        """المتاح لهذا النموذج، **الأقدمُ استعمالاً أولاً**.
+
+        بلا هذا الترتيب يُستنزف المفتاح الأول وحده فيقيّدنا إيقاعُه (٨/دقيقة)،
+        والثاني نائم. وبالتناوب يصير سقفُ النموذج ١٦/دقيقة — ولكلّ مفتاح إيقاعُه
+        كما هو، فلا تجاوز لحدٍّ ولا خطر 429.
+        """
+        free = [(n, v) for n, v in self.keys if (n, model) not in self.exhausted]
+        return sorted(free, key=lambda kv: _LAST_REQUEST.get(f"{kv[0]}:{model}", 0.0))
 
     def all_exhausted(self, model: str) -> bool:
         return not self.available(model)
@@ -627,6 +641,25 @@ def recitation_texts() -> dict:
 
 CORE_CATEGORIES = ("letter_name", "letter_haraka", "syllable")
 DURATION_RATIO = 1.7        # مدة تتجاوز هذا × وسيط فئتها = شذوذ يُبلَّغ
+DURATION_SHORT = 0.55       # ومدة دونه × الوسيط = مبتورة (نطقٌ ناقص أو مقصوص)
+
+
+def shape_class(text: str, cat: str) -> str:
+    """طبقة المقارنة: الشكل الصوتيّ لا الفئة الإدارية.
+
+    فئة «مقطع» تخلط أربعة أطوالٍ مختلفة طبعاً — الساكن المفرد («بْ» ~٠٫٥ث)،
+    والمقطع البسيط («بَ»)، والمدّ («بَا» ~١٫٥ث)، والمركّب ذي الكلمتين
+    («سُكْ كَرْ» ~٢٫٥ث). فمقارنةُ الساكن بوسيطها كان يتّهم السليمَ بالبتر.
+    """
+    if cat != "syllable":
+        return cat
+    if " " in text:
+        return "syllable:مركّب"
+    if len(text) == 2 and text.endswith(SUKUN_MARK):
+        return "syllable:ساكن"
+    if len(text) == 3 and text[1] in HARAKAT.values() and text[2] in "اوي":
+        return "syllable:مدّ"
+    return "syllable:بسيط"
 
 
 def duration_outliers(texts: dict) -> list:
@@ -642,13 +675,16 @@ def duration_outliers(texts: dict) -> list:
             continue
         p = OUT_DIR / f"{key_for(text)}.mp3"
         if p.exists():
-            by_cat.setdefault(cat, []).append((text, mp3_duration(p)))
+            by_cat.setdefault(shape_class(text, cat), []).append((text, mp3_duration(p)))
     out = []
     for cat, items in by_cat.items():
+        if len(items) < 4:                  # طبقةٌ صغيرة لا وسيط لها يُعتدّ به
+            continue
         med = statistics.median(s for _t, s in items)
         if not med:
             continue
-        out += [(t, cat, s, med) for t, s in items if s > DURATION_RATIO * med]
+        out += [(t, cat, s, med) for t, s in items
+                if s > DURATION_RATIO * med or s < DURATION_SHORT * med]
     return sorted(out, key=lambda r: -r[2] / r[3])
 
 
@@ -683,8 +719,11 @@ def verify(texts: dict, pending: dict | None = None, min_bytes: int = 1500) -> i
 
     print(f"\nالتحقّق الختامي: {len(texts)} نصاً متوقَّعاً، {len(on_disk)} ملفاً على القرص.")
     for text, cat, sec, med in long_ones:
-        print(f"  ⚠ شذوذ مدة ({CATEGORY_AR[cat]}): «{text}» {sec:.2f}ث "
-              f"= {sec / med:.1f}× وسيط فئته ({med:.2f}ث) — يُسمَع للتحقّق من تكرار داخلي")
+        kind = "أطول" if sec > med else "أقصر"
+        why = "تكرار داخلي" if sec > med else "نطقٌ مبتور"
+        label = CATEGORY_AR.get(cat, cat).replace("syllable:", "مقطع ")
+        print(f"  ⚠ شذوذ مدة ({label}): «{text}» {sec:.2f}ث "
+              f"= {sec / med:.1f}× وسيط فئته ({med:.2f}ث) — {kind} من نظائره، يُسمَع لاحتمال {why}")
     if recitations:
         print(f"  🎧 {len(recitations)} تلاوةً بصوت قارئ (خارج الفهرس عمداً — لا تولَّد).")
     if pending:
@@ -793,6 +832,29 @@ def mark_failed(text: str, model: str) -> None:
         save_queue(disk)
 
 
+def requeue(texts: list, reason: str) -> int:
+    """يعيد نصّاً مُصرَّفاً إلى الانتظار بأولوية العيوب المسموعة (١٠).
+
+    سياسة `docs/AUDIO_QUEUE.md`: «المولَّد المكرر يعاد توليده بأولوية ١٠». وهذا
+    ليس مسّاً بالسجل التاريخي: الحالة تعود `pending` ويبقى `doneAt` و`model`
+    السابقان مقيَّدين في `fixHistory` — فيُعرف ما كان ولماذا أُعيد.
+    """
+    disk = load_queue()
+    n = 0
+    for e in disk:
+        if e.get("text") in texts:
+            e.setdefault("fixHistory", []).append(
+                {"was": e.get("model", ""), "doneAt": e.get("doneAt"), "reason": reason,
+                 "requeuedAt": TODAY})
+            e.update(status="pending", priority=min(e.get("priority", 100), URGENT_PRIORITY))
+            e.pop("failCount", None)
+            e.pop("lastFailModel", None)
+            n += 1
+    if n:
+        save_queue(disk)
+    return n
+    
+
 def queue_pending(queue: list) -> list:
     """المصفوفون بالأولوية (الأصغر أسبق) ثم بالأقدمية (ترتيب الإضافة)."""
     pending = [(i, e) for i, e in enumerate(queue) if e.get("status", "pending") != "done"]
@@ -801,15 +863,26 @@ def queue_pending(queue: list) -> list:
 
 
 def queue_texts(queue: list, status: str) -> dict:
-    """نصوص القائمة بحالة معيّنة ← فئتها."""
+    """نصوص القائمة بحالة معيّنة ← فئتها (والمتقاعد خارجها).
+
+    `retired`: مدخلٌ `done` حُذف ملفه عمداً (يتيمٌ دلاليّ لم تعد بياناتُ التطبيق
+    تطلبه). يبقى سجلّه التاريخيّ ولا يُنتظر له ملفٌ بعد، وإلا لأنذر التحقّقُ
+    الختاميّ عنه في كل دورة ولَطمَس تنبيهاتِه الحقيقية.
+    """
     return {e["text"]: e.get("category", "word")
-            for e in queue if e.get("status", "pending") == status}
+            for e in queue if e.get("status", "pending") == status and not e.get("retired")}
 
 
 def manifest_map() -> dict:
-    """مفتاح ← نصّ لكل ما يُتوقَّع أن له ملفاً (المنهج + منجَز القائمة)."""
+    """مفتاح ← نصّ **لكل ملفٍ موجود فعلاً** من المنهج ومنجَز القائمة.
+
+    الشرط «موجود على القرص» مقصود (حكم المدير ٤ أغسطس ٢٠٢٦ في يتيم جملة المدّ):
+    بحذف ملفٍ يخرج نصُّه من الفهرس ولا يعود إليه، ويبقى مدخلُ القائمة `done`
+    سجلاً تاريخياً لا يُمَسّ. وبه أيضاً لا يَعِد الفهرسُ بملفٍ غير موجود فيُهدر
+    طلبُ شبكةٍ فاشل قبل النطق الآلي.
+    """
     texts, _ = expected_texts()
-    return {key_for(t): t for t in texts}
+    return {key_for(t): t for t in texts if (OUT_DIR / f"{key_for(t)}.mp3").exists()}
 
 
 def expected_texts() -> tuple[dict, dict]:
@@ -1111,7 +1184,13 @@ def madd_targets(include_existing: bool = False) -> list:
             # وأمرُ المدير أن يُعاد بتعليمة المدّ المشددة ثلاثَ مرات لينتقي المالك.
             if include_existing or not (OUT_DIR / f"{key_for(text)}.mp3").exists():
                 out.append(text)
-    return sorted(out)
+
+    # الأبعد عن الطول المثالي أولاً: المبتور («لَا» ٠٫٦٥ث) قبل السليم، فإن نفدت
+    # الحصة في منتصف الدفعة كان ما أُنجز هو الأحوج.
+    def deviation(t: str) -> float:
+        p = OUT_DIR / f"{key_for(t)}.mp3"
+        return 99.0 if not p.exists() else abs(mp3_duration(p) - MADD_IDEAL_SEC)
+    return sorted(out, key=lambda t: (-deviation(t), t))
 
 
 def madd_batch(api_key, voice: str, variants: int = MADD_VARIANTS,
@@ -1566,6 +1645,16 @@ def main():
                     help="تسجيل إجازة المالك لنموذج (بعد سماعه)")
     ap.add_argument("--reject-model", metavar="MODEL", nargs="?", const=MODEL_LEXICON,
                     help="تسجيل رفض المالك لنموذج")
+    ap.add_argument("--style-hint", default="",
+                    help="مع --only-texts: تعليمة أداء تحلّ محلّ افتراضي الفئة")
+    ap.add_argument("--only-texts", metavar="TEXTS",
+                    help="إعادة توليد نصوص منهجٍ بعينها (مفصولة بفاصلة) — لإصلاح عيب مسموع")
+    ap.add_argument("--retire", metavar="TEXTS",
+                    help="تقاعد نصوص: حذف ملفاتها ووسمُ مدخلاتها (يتيمٌ لم يعد يُطلب)")
+    ap.add_argument("--requeue", metavar="TEXTS",
+                    help="إعادة نصوص (مفصولة بفاصلة) إلى الانتظار بأولوية ١٠ لعيبٍ مسموع")
+    ap.add_argument("--requeue-reason", default="عيب مسموع",
+                    help="سبب الإعادة كما يُقيَّد في سجل المدخل")
     ap.add_argument("--queue-status", action="store_true",
                     help="عرض حالة القائمة ونصوصها المنتظِرة (JSON) بلا أي طلب")
     ap.add_argument("--verify-only", action="store_true", help="تحقّق ختامي بلا توليد")
@@ -1590,6 +1679,32 @@ def main():
 
     if args.apply_madd_pick:
         sys.exit(apply_madd_pick(args.apply_madd_pick))
+
+    if args.retire:
+        wanted = [t.strip() for t in args.retire.split(",") if t.strip()]
+        disk = load_queue()
+        n = 0
+        for e in disk:
+            if e.get("text") in wanted:
+                e["retired"] = True
+                e.setdefault("fixHistory", []).append(
+                    {"reason": "تقاعد: لم تعد بيانات التطبيق تطلبه", "at": TODAY})
+                n += 1
+        if n:
+            save_queue(disk)
+        for t in wanted:
+            f = OUT_DIR / f"{key_for(t)}.mp3"
+            if f.exists():
+                f.unlink()
+        write_manifest(manifest_map())
+        print(f"تقاعد {n} نصاً (حُذفت ملفاتها وبقيت سجلاتها).")
+        sys.exit(0)
+
+    if args.requeue:
+        wanted = [t.strip() for t in args.requeue.split(",") if t.strip()]
+        n = requeue(wanted, args.requeue_reason)
+        print(f"أُعيد {n} نصاً إلى الانتظار بأولوية {URGENT_PRIORITY} ({args.requeue_reason}).")
+        sys.exit(0 if n else 1)
 
     if args.seam_audition:
         sys.exit(run_seam_audition(ROOT / "scratch" / "seam_audition"))
@@ -1693,6 +1808,19 @@ def main():
             ref = ROOT / args.replace_same_as
             if not ref.is_dir():
                 sys.exit(f"مجلد المرجع غير موجود: {ref}")
+        if args.only_texts:
+            wanted = {t.strip() for t in args.only_texts.split(",") if t.strip()}
+            unknown = wanted - set(curriculum)
+            if unknown:
+                sys.exit("ليست نصوص منهج: " + "، ".join(unknown))
+            curriculum = {t: c for t, c in curriculum.items() if t in wanted}
+            args.force = True               # الإصلاح يعيد التوليد فوق الموجود
+            if args.style_hint:
+                hint = args.style_hint.rstrip(":：").rstrip() + ": "
+                for cat in set(curriculum.values()):
+                    STYLE[cat] = hint       # تعليمةٌ موجَّهة لهذه الدفعة وحدها
+            print(f"إصلاح موجَّه: {len(curriculum)} نصاً"
+                  + (" بتعليمة خاصة" if args.style_hint else ""))
         failed = synthesize_gemini(curriculum, args.model, args.tts_voice, args.force, pool,
                                    ref, args.dry_run)
         if args.dry_run:

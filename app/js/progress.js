@@ -687,6 +687,180 @@ export function fluencyByStory() {
     .sort((a, b) => b.lastAt - a.lastAt);
 }
 
+// ————— النسخة الاحتياطية: نقلُ تقدّم الطفل بين الأجهزة (الحزمة ١١) —————
+//
+// **العلّة**: التقدّم في هذا الجهاز وحده — لا حساب ولا سحابة (قاعدة الخصوصية،
+// وهي عينُ ما تَعِد به الصفحة التعريفية). وثمنُها أن **محو بيانات المتصفّح أو حذف
+// التطبيق المثبَّت يمحو رحلة الطفل كلها**، وأن تبديل الجهاز يبدأ من الصفر. فالمخرج
+// ملفٌّ صغير يملكه وليّ الأمر: نجومٌ وصناديقُ ليتنر ودقائقُ ومراجعاتٌ ومددُ قراءات.
+//
+// و**لا ملفَّ صوتٍ واحداً فيه**: تسجيلات الطفل لا تغادر جهازه أبداً (الحزمة ١٠)،
+// والنسخة ملفٌّ يُنسَخ ويُرسَل ويُخزَّن حيث شاء وليّه — فدخولُ صوته فيها نقضٌ للقاعدة
+// من بابٍ خلفيّ. ولذلك بقيت مددُ القراءات هنا (`records`) وصوتُها في IndexedDB.
+
+export const BACKUP_KIND = 'muallim.progress';
+export const BACKUP_FORMAT = 1;      // شكل الملف نفسه — لا نسخة حالة الطفل (`VERSION`)
+
+/** النسخة كما تُكتب في الملف: ترويسةٌ تعرّف نفسها، وحالةُ الطفل كاملةً. */
+export function backup(at = Date.now()) {
+  return { kind: BACKUP_KIND, format: BACKUP_FORMAT, savedAt: at, state: snapshot() };
+}
+
+export function backupText(bundle = backup()) {
+  return JSON.stringify(bundle, null, 1);
+}
+
+/** اسم الملف بيومه — فتتراكم نسخُ وليّ الأمر مرتَّبةً بلا أن يطمس بعضها بعضاً. */
+export function backupName(date = new Date()) {
+  return `muallim-progress-${dayKey(date)}.json`;
+}
+
+/**
+ * قراءة ملفٍ اختاره وليّ الأمر. **لا يُستعاد مجهولٌ**: كل رفضٍ يُعلَن بسببه بالعربية،
+ * لأن الاستعادة تكتب فوق تقدّم قائم — وخطؤها لا يُستدرك.
+ * @returns {{bundle: object}|{error: string}}
+ */
+export function readBackup(text) {
+  let raw;
+  try {
+    raw = JSON.parse(String(text ?? ''));
+  } catch {
+    return { error: 'تعذّرت قراءة الملف — ليس ملفَ نسخةٍ صالحاً.' };
+  }
+  if (!raw || typeof raw !== 'object' || raw.kind !== BACKUP_KIND) {
+    return { error: 'هذا الملف ليس نسخةَ تقدّمٍ من «المُعلِّم».' };
+  }
+  const format = Number(raw.format);
+  if (!Number.isFinite(format)) return { error: 'ملف النسخة معطوب — لا يعلن شكله.' };
+  if (format > BACKUP_FORMAT) {
+    return { error: 'هذه النسخة من إصدارٍ أحدث من التطبيق — حدِّث التطبيق ثم استعِدها.' };
+  }
+  const state = migrate(raw.state);
+  if (!state) return { error: 'ملف النسخة معطوب — لا تقدّم فيه.' };
+  return { bundle: { ...raw, state } };
+}
+
+/**
+ * ما في النسخة بعبارة وليّ الأمر — يُعرض **قبل** التأكيد: نسخةٌ خاطئة تُستعاد فوق
+ * تقدّمٍ حقيقيّ خسارةٌ لا رجعة فيها، ورقمُ نجومها ويومُها يميّزانها في نظرة.
+ * والنجومُ تُحسب على عقد الرحلة الحالية وحدها (لا على مفاتيح لا وجود لها اليوم).
+ */
+export function backupSummary(bundle) {
+  const stars = bundle?.state?.stars || {};
+  const done = allNodes().filter((n) => stars[n.id] > 0);
+  return {
+    savedAt: bundle?.savedAt || 0,
+    nodes: done.length,
+    stars: done.reduce((sum, n) => sum + Math.min(MAX_STARS, stars[n.id]), 0),
+    skills: Object.keys(bundle?.state?.skills || {}).length,
+    records: (bundle?.state?.records || []).length,
+    seconds: bundle?.state?.seconds || 0,
+  };
+}
+
+/**
+ * الاستعادة: حالةُ النسخة تحلّ محلّ الحالة القائمة كاملةً (لا دمج — دمجُ رحلتين
+ * يصنع طفلاً ثالثاً لا وجود له). وتمرّ بترحيل الرحلة نفسِه، فنسخةٌ من إصدارٍ سابق
+ * لا تُحبَس عند عقدةٍ استُحدثت بعدها.
+ */
+export function restore(bundle) {
+  const next = bundle?.state;
+  if (!next || typeof next.stars !== 'object') return false;
+  state = { ...blank(), ...next, v: VERSION };
+  save();
+  migrateJourney();
+  return true;
+}
+
+// ————— تحكّم وليّ الأمر في الرحلة (الحزمة ١١، خلف بوابته الحسابية) —————
+
+/**
+ * فتحٌ يدويّ إلى عقدةٍ بعينها — لطفلٍ يعرف حروفه فلا يُحبَس في أوّلها.
+ * كل ما قبلها يُعدّ متماً **بنجمةٍ واحدة**: تفكّ القفل ولا تدّعي إتقاناً، فتبقى
+ * العقدةُ تدعوه إلى لعبها والنجومُ تعلو حين يلعبها (حكمُ الترحيل الرحيم نفسُه).
+ * ولا تُنقَص نجمةٌ كُسبت.
+ * @returns {number} عدد العقد التي فُتحت فعلاً
+ */
+export function unlockUpTo(id) {
+  const pending = unfinishedBefore(id);
+  for (const node of pending) state.stars[node.id] = 1;
+  if (pending.length) save();
+  return pending.length;
+}
+
+function unfinishedBefore(id) {
+  const index = indexOf(id);
+  return index < 0 ? [] : allNodes().slice(0, index).filter((n) => !getStars(n.id));
+}
+
+/** كم عقدةً ناقصة قبل هذه العقدة — ما سيفتحه `unlockUpTo` **قبل** أن يفعله. */
+export const pendingBefore = (id) => unfinishedBefore(id).length;
+
+/**
+ * تصفير محطةٍ لإعادة التدريب: نجومُ عقدها إلى الصفر، فتعود جبهةُ الفتح إليها.
+ *
+ * وثلاثة قيود مقصودة: **سجلّ ليتنر لا يُمسّ** (ما قِيس من مهارات الطفل حقٌّ له،
+ * وإعادةُ التدريب لا تمحو تاريخه — بند الحزمة)؛ و**نجومُ ما بعدها تبقى محفوظة**
+ * (تُقفل حتى يتمّ المحطة، فإذا أتمّها عادت كما كانت — إعادةُ قفلٍ لا محو)؛
+ * ودقائقُ الاستعمال والمراجعات ومددُ القراءات لا تُمسّ.
+ * @returns {number} عدد العقد التي صُفِّرت
+ */
+export function clearSection(sectionId) {
+  const section = journey().find((s) => s.id === sectionId);
+  if (!section) return 0;
+  let cleared = 0;
+  for (const node of section.nodes) {
+    if (!state.stars[node.id]) continue;
+    delete state.stars[node.id];
+    cleared++;
+  }
+  if (cleared) save();
+  return cleared;
+}
+
+/** حصيلةُ محطةٍ (عقدُها والمنجَز منها ونجومُه) — لعرض أثر التصفير **قبل** وقوعه. */
+export function sectionProgress(sectionId) {
+  const section = journey().find((s) => s.id === sectionId);
+  if (!section) return null;
+  const done = section.nodes.filter((n) => getStars(n.id) > 0);
+  return {
+    nodes: section.nodes.length,
+    done: done.length,
+    stars: done.reduce((sum, n) => sum + getStars(n.id), 0),
+  };
+}
+
+// ————— صلابة التخزين —————
+//
+// التقدّم في `localStorage`، والمتصفّح **يُخلي** تخزين المواقع حين يضيق القرص —
+// وiOS أشدّها في ذلك — فيذهب تقدّم الطفل بلا فعلٍ من أحد. والوسمُ الدائم يستثنيه
+// من الإخلاء. يُطلب عند بوابة وليّ الأمر (فعلُ بالغٍ لا فعلُ طفل)، و**رفضُه لا
+// يعطّل شيئاً**: الجواب يُعرض على وليّ الأمر ليعرف أنّ النسخة الاحتياطية آكد.
+
+const storageApi = () => (typeof navigator !== 'undefined' && navigator.storage) || null;
+
+/** طلب التخزين الدائم. يردّ `true`/`false`، و`null` إن كان المتصفّح لا يعرفه. */
+export async function askPersistence() {
+  const api = storageApi();
+  if (!api?.persist) return null;
+  try {
+    return await api.persist();
+  } catch {
+    return null;   // تصفّح خاص أو منعٌ من المستخدم: لا شيء ينكسر
+  }
+}
+
+/** حال التخزين اليوم بلا طلبٍ جديد (للعرض في اللوحة). */
+export async function persistedStorage() {
+  const api = storageApi();
+  if (!api?.persisted) return null;
+  try {
+    return await api.persisted();
+  } catch {
+    return null;
+  }
+}
+
 // ————— إدارة —————
 
 export function snapshot() {

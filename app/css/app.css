@@ -381,6 +381,7 @@ button {
 }
 
 .node {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -388,6 +389,25 @@ button {
   width: var(--node-size);
   padding: 0;
 }
+
+/* معلم «إعادة» على العقدة المنجَزة (الحزمة ١١): سهمٌ دائريّ على حافة وجهها — يدلّ
+   أن المنجَز يبقى مفتوحاً للّعب، ولا يزاحم الحرفَ في وسط الدائرة. */
+.node-replay {
+  position: absolute;
+  top: -.15rem;
+  inset-inline-start: -.15rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--paper);
+  color: color-mix(in srgb, var(--accent) 72%, var(--ink));
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+
+.node-replay svg { width: .85rem; height: .85rem; display: block; }
 
 .node-face {
   display: grid;
@@ -1645,6 +1665,35 @@ button {
 .rec-chart { display: block; margin-top: .35rem; }
 .rec-chart svg { width: 100%; max-width: 20rem; height: auto; }
 
+/* ————— لوحة وليّ الأمر: النسخة الاحتياطية والتحكّم في الرحلة (الحزمة ١١) —————
+   شاشةُ بالغٍ خلف بوابة: صفوفٌ من قائمةٍ وزرّ، وتأكيدٌ يظهر في مكانه قبل كل فعل
+   يكتب فوق رحلة الطفل. بمفردات التنسيق القائمة (note · chip · row) لا بلوحٍ جديد. */
+
+.parent-tool { justify-content: flex-start; margin-top: .6rem; align-items: center; }
+
+/* القائمة: هدف لمسٍ ككل أزرار اللوحة، ولا تفيض عن الشاشة الضيقة */
+.pick {
+  max-width: min(22rem, 100%);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* «استعِد من ملف»: الزرّ ظاهرٌ ومدخل الملف داخله — فلا زرٌّ كاذب يدّعي فعلاً لا يفعله */
+.file-label { display: inline-flex; align-items: center; cursor: pointer; }
+.file-pick { width: 0; height: 0; opacity: 0; position: absolute; pointer-events: none; }
+
+.confirm-slot:empty { display: none; }
+.confirm { margin-top: .75rem; text-align: start; }
+.confirm .hint { margin: .35rem 0 0; }
+
+.note--bad {
+  margin-top: .75rem;
+  border: 2px solid var(--err);
+  color: var(--err-text);
+  text-align: start;
+}
+
 /* ————— رسالة عابرة ————— */
 
 .toast {
@@ -1733,3 +1782,62 @@ button {
   }
   .pairs--grid .vchip--pair .vchip-face { font-size: 2.1rem; }
 }
+
+/* ═════ مهمة «أيقونات لا إيموجي» (أمر المالك، ٧ أغسطس ٢٠٢٦) ═════
+   يُضاف في ذيل الملف حصراً تحت هذا العنوان (ترسيمُ التوازي مع الحزمة ١١).
+
+   قاعدتان لا ثالثة:
+     • **رمزُ البيانات** صورةٌ من `app/emoji/` (Twemoji) داخل صندوقه القديم نفسِه —
+       فمقاسُه ولونُ صندوقه وموضعُه كما كانت، ولا يتبدّل إلا مَن يرسمه: ملفُّنا
+       لا خطُّ الجهاز. ومقاسُه `1em` فيتبع `font-size` المكتوب أعلاه لكل موضع،
+       فلا رقمَ يُكرَّر هنا ولا رقمَ يتخلّف عن أخيه إذا تغيّر.
+     • **رمزُ الواجهة** أيقونةٌ خطية تتبع لون نصّها ومقاسَه (`currentColor`/`em`)،
+       كمعالم المحطات وأيقونة الميكروفون قبلها. */
+
+.emoji {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -.14em;
+}
+
+/* الصندوقُ الكبير (صورةُ السؤال وبطاقةُ الكلمة ووجهُ الاحتفال): رسمُ Twemoji يملأ
+   مربّعَه إلى حافّته، وحبرُ الإيموجي في خطّ النظام يترك حوله هواءً. فلولا هذا
+   التعويضُ لكبرت الصورةُ عمّا كانت وأدخلت الشاشةَ في سحبٍ رأسيّ (`--device`). */
+.pic-emoji .emoji,
+.celebrate-face .emoji,
+.continue-face .emoji,
+.node-face .emoji,
+.station-num .emoji { width: .86em; height: .86em; vertical-align: -.08em; }
+
+/* أيقونةُ الواجهة — خطٌّ بلا ملء يتبع لون نصّه (لغةُ المعالم، DESIGN §٦) */
+.ui-icon {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -.16em;
+  flex: none;
+}
+
+.ui-icon svg { width: 100%; height: 100%; display: block; }
+
+/* في الأزرار: الأيقونة أخفُّ قليلاً من النصّ فلا تسرق منه البصر (DESIGN §٥.١) */
+.btn .ui-icon { opacity: .92; }
+
+/* وجهُ العقدة والمحطة حين يكون أيقونةً خطية (لعبةُ الكلمات وسلّمُ الجمل والمكتبة
+   وسهمُ المراجعة): يتبع لونَ المحطة لا لون النصّ، كما كان وجهُها الملوّن. */
+.node-face > .ui-icon,
+.station-num > .ui-icon,
+.continue-face > .ui-icon { width: .88em; height: .88em; color: var(--accent, currentColor); }
+
+/* أذنُ الصورة وقفلُ العقدة شارتان مقيستان بالبكسل من قبلُ — تبقيان على مقاسهما
+   والأيقونةُ حبرُهما (ولونُ القفل لون نصّه لا لون المحطة: نذيرٌ لا وجه). */
+.pic-ear .ui-icon { width: 1.25rem; height: 1.25rem; vertical-align: 0; }
+.node-lock .ui-icon { width: 1em; height: 1em; color: currentColor; vertical-align: 0; }
+
+/* الرسالةُ العابرة: أيقونتُها قبل نصّها بفاصلٍ يسير */
+.toast .ui-icon { margin-inline-end: .35rem; }
+
+/* وثبةُ الفرح في سطر الإتقان وسطرِ الختام: بلون النجمة (وهو لون الاحتفال في اللوح) */
+.hint .ui-icon,
+.note .ui-icon { color: var(--star); }

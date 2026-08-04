@@ -76,7 +76,13 @@ def main():
     ok(queue[1]["doneAt"] == gen.TODAY, "doneAt بتاريخ اليوم")
     ok((gen.OUT_DIR / f"{gen.key_for('مَدّ')}.mp3").exists(), "الملف كُتب باسم مفتاح النص")
     ok(manifest.get(gen.key_for("الشَّمْس")) == "الشَّمْس", "نصوص القائمة دخلت الفهرس")
-    ok(len(manifest) == len(curriculum) + 3, f"الفهرس = المنهج + منجَز القائمة ({len(manifest)})")
+    # العقد الجديد (حكم المدير في يتيم جملة المدّ): الفهرس = **الملفات الموجودة**،
+    # فبحذف ملفٍ يخرج نصُّه ولا يعود، ولا يَعِد الفهرسُ بما ليس على القرص.
+    on_disk = {p.stem for p in gen.OUT_DIR.glob("*.mp3")}
+    ok(set(manifest) == on_disk,
+       f"الفهرس = ما على القرص لا أكثر ({len(manifest)} مدخلاً، {len(on_disk)} ملفاً)")
+    ok(gen.key_for("قَديم") not in manifest,
+       "مدخل done بلا ملف لا يدخل الفهرس (وسجلّه في القائمة باقٍ)")
     shutil.rmtree(tmp)
 
     # ————— ٢. التوقف على الحصة يحفظ ما سبق —————
@@ -231,8 +237,15 @@ def main():
     except gen.QuotaExhausted as e:
         ok(e.seconds == 500, "ونفادها كلها يرفع الاستثناء بأقرب مهلة تجدد")
     verdict = json.loads(gen.INDEPENDENCE_FILE.read_text(encoding="utf-8"))
-    ok(verdict[gen.MODEL_SENTENCE]["verdict"].startswith("المشروع نفسه"),
-       "وتقارُبُ نافذتَي التجدد يُسجَّل «المشروع نفسه»")
+    # درس ٤ أغسطس: تقاربُ نافذتَي التجدد **ليس** دليل وحدة المشروع — المفتاحان
+    # يُستهلكان في الفترة نفسها فتتقارب نافذتاهما ولو كانا منفصلين.
+    ok(verdict[gen.MODEL_SENTENCE]["verdict"] == "كلاهما نفد — غير قاطع",
+       "نفادُ الاثنين يُسجَّل «غير قاطع» لا حكماً بوحدة المشروع")
+    gen.note_independence(gen.MODEL_SENTENCE, "KEY_A", "KEY_B", {})
+    gen.note_independence(gen.MODEL_SENTENCE, "KEY_A", "", {})
+    verdict = json.loads(gen.INDEPENDENCE_FILE.read_text(encoding="utf-8"))
+    ok(verdict[gen.MODEL_SENTENCE]["verdict"] == "مستقلّان",
+       "وإثباتُ الاستقلال لا تنقضه ملاحظةٌ ضعيفة بعده")
     gen.INDEPENDENCE_FILE, gen.gemini_pcm = real_ind, real_pcm
     shutil.rmtree(tmp)
 

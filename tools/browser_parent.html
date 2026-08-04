@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار صلابة التقدّم وتحكّم وليّ الأمر</title></head>
+<body>
+<!--
+  الحزمة ١١ — الدورة الكاملة في متصفّح حقيقي، على التطبيق نفسِه في إطار:
+    ١) ترقية عامل الخدمة (رفعُ نسخة الكاش فعلياً) **لا تمسّ** نجوم الطفل ولا صناديقه.
+    ٢) تصدير النسخة ← محو التخزين كما يمحوه حذف التطبيق ← استعادةٌ مطابقة حرفاً بحرف.
+    ٣) تحكّم وليّ الأمر خلف بوابته: فتحُ الطريق وتصفيرُ محطة — كلٌّ بتأكيدٍ صريح.
+    ٤) الطلب الدائم للتخزين عند البوابة، ومعلمُ «إعادة» على العقد المنجَزة في الخريطة.
+  وطولَ الدورة: اللوحة صامتة (لا صوت في غير موضعه) ولا نطق آليّ ولا خطأ جافاسكربت.
+-->
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script type="module">
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 130000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 5000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(30);
+  }
+}
+async function waitForAsync(fn, label = '', ms = 60000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = await fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(250);
+  }
+}
+
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+const STORE = 'muallim.progress.v1';
+
+const played = [];
+const spoken = [];
+const jsErrors = [];
+let persistAsked = 0;
+let blobs = [];          // ما صُدِّر فعلاً: نصُّ كل ملفٍ طلب التطبيقُ تنزيله
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      played.push(manifest[key] ?? `?${key}`);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { spoken.push(text); this.text = text; } };
+  // طلب التخزين الدائم: نرصد وقوعه ولا ننتظر جواب المتصفّح (بلا واجهة لا نافذة إذن)
+  if (win.navigator.storage) win.navigator.storage.persist = () => { persistAsked++; return Promise.resolve(true); };
+  // التنزيل: نلتقط نصّ الملف بدل أن يكتبه المتصفّح على القرص
+  win.URL.createObjectURL = (blob) => { blobs.push(blob); return 'blob:محجوز'; };
+  win.URL.revokeObjectURL = () => {};
+}
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
+const stored = () => win.localStorage.getItem(STORE);
+const parsed = () => JSON.parse(stored() || '{}');
+
+async function reload() {
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(150);
+}
+
+const dayNumber = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+
+// جبهةُ الطفل المزروع: أتمّ المجموعة الأولى كلها، وله نجمةٌ **خلف** الجبهة (`g2:ن`)
+// لا تحرّكها — فأول ناقصٍ هو درس مدّ الألف الذي يليها. مقصودٌ في الزرع: الحالةُ التي
+// تُستعاد وتُقرأ هنا ليست خطاً مستقيماً ساذجاً.
+const FRONTIER = { id: 'skill:madd-alif', title: 'مَدّ الألِف' };
+
+/** حالةُ طفلٍ في منتصف رحلته: نجومٌ وصناديقُ ليتنر ودقائقُ ومراجعة. */
+function seedState() {
+  const now = dayNumber();
+  const skill = (right, wrong, box, due) => ({ right, wrong, box, due: now + due, seen: now });
+  return {
+    v: 2,
+    stars: { 'g1:ا': 3, 'g1:ب': 3, 'g1:م': 2, 'g1:ل': 3, 'g1:words': 3, 'g2:ن': 2 },
+    skills: {
+      'ب|fatha|quiz': skill(5, 1, 4, 8),
+      'م|kasra|haraka': skill(2, 3, 1, 1),
+      'ل|damma|build': skill(1, 2, 0, 0),
+    },
+    days: { '2020-01-01': 600 },
+    reviews: {},
+    records: [{ node: 'story:s1', title: 'قصة', seconds: 22.5, day: '2020-01-01', at: 1 }],
+    mic: true,
+    seconds: 600,
+    startedAt: 1, updatedAt: 2,
+  };
+}
+
+async function seed(state = seedState()) {
+  win.localStorage.setItem(STORE, JSON.stringify(state));
+  await reload();
+}
+
+async function openPanel() {
+  win.location.hash = '#/';
+  await sleep(150);
+  // بوصفها المسموع لا بوجهها: وجهُ الزرّ رسمٌ قد يتغيّر، والوصفُ عقدٌ مع قارئ الشاشة
+  $('[aria-label="لوحة وليّ الأمر"]').click();
+  await waitFor(() => $('.gate .giant') || $('.audit'), 'شاشة وليّ الأمر');
+  if ($('.audit')) return false;      // البوابة مفتوحة ما دامت الصفحة مفتوحة
+  const [a, b] = $('.giant').textContent.split('×')
+    .map((s) => Number(s.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+  $('input.chip').value = String(a * b);
+  btn('ادخل').click();
+  await waitFor(() => $('.audit'), 'لوحة وليّ الأمر');
+  return true;
+}
+
+/** ملفٌ يختاره وليّ الأمر — من عالَم الإطار نفسِه كما يصل من محدّد الملفات. */
+async function chooseFile(text) {
+  const input = $('.file-pick');
+  const dt = new win.DataTransfer();
+  dt.items.add(new win.File([text], 'muallim-progress.json', { type: 'application/json' }));
+  input.files = dt.files;
+  input.dispatchEvent(new win.Event('change'));
+  await sleep(250);
+}
+
+await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+attach();
+
+try {
+  // ————— ١) ترقية عامل الخدمة لا تمسّ التقدّم —————
+  //
+  // العيب المحروس: ترقيةُ نسخة الكاش تمحو المخزون كلَّه عند التفعيل — فلو مسّ ذلك
+  // تخزين التقدّم (أو أعاد التطبيقُ بناء حالته من مخزونٍ ممحوّ) لضاعت رحلة الطفل
+  // في تحديثٍ لم يطلبه. والفحص هنا **ترقيةٌ حقيقية**: `app/sw.js` نفسُه برقم نسخةٍ
+  // مرفوع (يخدمه خادم الاختبار على `sw.js?bump=1`)، ثم يُقاس التقدّم قبلها وبعدها.
+  await seed();
+  await waitFor(() => $('.station'), 'الخريطة');
+  const starsBefore = $('.pill--stars').textContent.trim();
+  const stateBefore = stored();
+
+  const reg = await waitForAsync(() => win.navigator.serviceWorker?.ready, 'تسجيل عامل الخدمة', 40000);
+  ok(!!reg.active, `عامل الخدمة يعمل على التطبيق (${reg.active?.state})`);
+  const before = (await win.caches.keys()).filter((n) => n.startsWith('muallim-')).sort();
+  ok(before.length === 2, `ومخزونه قائم باسم نسخته (${before.join('، ')})`);
+
+  await win.navigator.serviceWorker.register('sw.js?bump=1', { scope: './' });
+  const after = await waitForAsync(async () => {
+    const keys = (await win.caches.keys()).filter((n) => n.startsWith('muallim-'));
+    return keys.length && keys.every((n) => n.includes('bump')) ? keys.sort() : null;
+  }, 'تفعيل النسخة المرفوعة', 90000);
+  ok(true, `ترقية النسخة تمّت فعلاً: المخزون صار ${after.join('، ')}`);
+  ok(!after.some((n) => before.includes(n)), 'ومخزون النسخة السابقة مُحي عن آخره');
+
+  ok(stored() === stateBefore, 'وتقدّم الطفل لم يتغيّر بايتاً واحداً عبر الترقية');
+  const boxes = parsed().skills;
+  ok(boxes['ب|fatha|quiz'].box === 4 && boxes['م|kasra|haraka'].box === 1,
+    'وصناديق ليتنر بأرقامها (لا تعود المراجعة من الصفر بعد تحديث)');
+
+  await reload();
+  await waitFor(() => $('.station'), 'الخريطة بعد الترقية');
+  ok($('.pill--stars').textContent.trim() === starsBefore,
+    `والخريطة تعرض نجومه كما كانت (${starsBefore})`);
+  const goOn = $$('.continue').find((c) => !c.classList.contains('continue--review'));
+  ok(goOn?.querySelector('b').textContent.trim() === FRONTIER.title,
+    `وجبهته حيث تركها (تابع من هنا: ${goOn?.querySelector('b').textContent.trim()})`);
+
+  // ————— ٢) معلم «إعادة» على المنجَز (بلاغ المالك: لم يكن بيّناً) —————
+  const doneNodes = $$('.node--done');
+  ok(doneNodes.length >= 5 && doneNodes.every((n) => n.querySelector('.node-replay')),
+    `كل عقدةٍ منجَزة عليها معلم «إعادة» (${doneNodes.length} عقدة)`);
+  ok($$('.node--locked .node-replay').length === 0 && $$('.node--open .node-replay').length === 0,
+    'ولا معلم على مقفلةٍ ولا على مفتوحةٍ لم تُلعب بعد');
+  ok(doneNodes[0].getAttribute('aria-label').includes('يمكن إعادته'),
+    `ووصفُها المسموع يقولها صراحةً (${doneNodes[0].getAttribute('aria-label')})`);
+  ok($$('.node-replay svg').length === doneNodes.length,
+    'والمعلم رسمٌ خطيّ لا إيموجي (DESIGN §٦)');
+
+  // ————— ٣) البوابة: طلب التخزين الدائم ثم اللوحة —————
+  const playedBefore = played.length;
+  ok(await openPanel(), 'الدخول إلى اللوحة يمرّ ببوابة وليّ الأمر');
+  ok(persistAsked === 1, `وعبورُها يطلب من المتصفّح تخزيناً دائماً (${persistAsked})`);
+  const storageLine = await waitFor(
+    () => $$('.audit .hint').map((p) => p.textContent)
+      .find((t) => t.includes('تخزين') && !t.includes('جارٍ الفحص')),
+    'سطر حال التخزين', 8000);
+  ok(!!storageLine, `واللوحة تعلن حاله على هذا الجهاز (${storageLine.slice(0, 64)}…)`);
+
+  // ————— ٤) تصدير النسخة —————
+  blobs = [];
+  btn('انسخ تقدّم طفلي').click();
+  await sleep(150);
+  ok(blobs.length === 1, `«انسخ تقدّم طفلي» يُخرج ملفاً واحداً (${blobs.length})`);
+  const backupText = await blobs[0].text();
+  const bundle = JSON.parse(backupText);
+  ok(bundle.kind === 'muallim.progress' && bundle.format === 1,
+    `والملف يعرّف نفسه (${bundle.kind} · شكل ${bundle.format})`);
+  ok(JSON.stringify(bundle.state.stars) === JSON.stringify(parsed().stars)
+    && JSON.stringify(bundle.state.skills) === JSON.stringify(parsed().skills),
+    'وفيه نجومُه وصناديقُه كما هي');
+  ok(bundle.state.records.length === 1 && !backupText.includes('blob')
+    && !backupText.includes('base64'),
+    'ومدّةُ قراءته الجهرية فيه — بلا صوتٍ واحد (صوت الطفل لا يغادر جهازه)');
+
+  // ————— ٥) محوٌ كما يمحو حذفُ التطبيق، ثم استعادة —————
+  win.localStorage.removeItem(STORE);
+  await reload();
+  await waitFor(() => $('.station'), 'الخريطة بعد المحو');
+  ok($('.pill--stars').textContent.includes('★ ٠'),
+    `محو التخزين أعاده إلى الصفر (${$('.pill--stars').textContent.trim()})`);
+  ok($$('.node--done').length === 0, 'ولا عقدة منجَزة على الخريطة');
+
+  await openPanel();
+  ok(persistAsked === 2, `وكلُّ عبورٍ للبوابة يجدّد الطلب (${persistAsked})`);
+  await chooseFile('{ ليس ملف نسخة');
+  ok(!!$('.note--bad'), `ملفٌ ليس نسخةً يُرفَض برسالةٍ ظاهرة (${$('.note--bad')?.textContent.trim()})`);
+  ok(!$('.confirm'), 'ولا يُعرض عليه تأكيدُ استعادةٍ أصلاً');
+
+  await chooseFile(backupText);
+  const confirmBox = await waitFor(() => $('.confirm'), 'تأكيد الاستعادة');
+  ok(confirmBox.textContent.includes('★') && confirmBox.textContent.includes('نجوم')
+    || confirmBox.textContent.includes('★'),
+    `والنسخة الصحيحة تُعرض بملخّصها قبل التأكيد (${confirmBox.querySelector('b').textContent})`);
+  ok(!stored(), 'ولا يقع شيء قبل التأكيد (التخزين ما زال فارغاً)');
+
+  $('.confirm-no').click();
+  await sleep(100);
+  ok(!$('.confirm') && !stored(), 'و«إلغاء» يصرف التأكيد بلا أثر');
+
+  await chooseFile(backupText);
+  await waitFor(() => $('.confirm'), 'تأكيد الاستعادة ثانيةً');
+  $('.confirm-yes').click();
+  await waitFor(() => stored(), 'التقدّم بعد الاستعادة');
+  const restored = parsed();
+  const original = JSON.parse(stateBefore);
+  ok(JSON.stringify(restored.stars) === JSON.stringify(original.stars),
+    'الاستعادة أرجعت النجوم كما كانت حرفاً بحرف');
+  ok(JSON.stringify(restored.skills) === JSON.stringify(original.skills),
+    'وصناديق ليتنر كذلك (المراجعة تكمل من حيث وقفت)');
+  ok(restored.seconds === original.seconds && restored.records.length === 1
+    && restored.days['2020-01-01'] === 600,
+    'ودقائقُ تعلّمه ومددُ قراءاته');
+
+  win.location.hash = '#/';
+  await waitFor(() => $('.station'), 'الخريطة بعد الاستعادة');
+  ok($('.pill--stars').textContent.trim() === starsBefore,
+    `والخريطة تعرضها كما كانت قبل المحو (${starsBefore})`);
+
+  // ————— ٦) فتح الطريق يدوياً (تجاوز القفل للأمام) —————
+  await openPanel();
+  const nodePick = $('select.pick');
+  const sectionPick = $$('select.pick')[1];
+  ok(!!nodePick && !!sectionPick, 'اللوحة فيها قائمتا التحكّم (عقدة ومحطة)');
+  ok(nodePick.value === FRONTIER.id, `وقائمةُ العقد تبدأ من موضع الطفل نفسِه (${nodePick.value})`);
+
+  const starsAtAsk = JSON.stringify(parsed().stars);
+  const target = [...nodePick.options][40];
+  nodePick.value = target.value;
+  btn('افتح الطريق إلى هنا').click();
+  const openConfirm = await waitFor(() => $('.confirm'), 'تأكيد الفتح');
+  ok(openConfirm.textContent.includes('عقد') && !!$('.confirm-yes'),
+    `الفتح لا يقع بنقرة: تأكيدٌ يشرح أثره (${openConfirm.querySelector('.hint').textContent.slice(0, 70)}…)`);
+  await sleep(200);
+  ok(JSON.stringify(parsed().stars) === starsAtAsk, 'ولا شيء يقع في التخزين قبل التأكيد');
+
+  $('.confirm-yes').click();
+  await waitFor(() => parsed().stars[target.value] === 1 || parsed().stars['g2:ر'] === 1,
+    'الفتح بعد التأكيد');
+  const opened = parsed().stars;
+  ok(opened['g2:ر'] === 1, 'ما فُتح يدوياً بنجمةٍ واحدة (تفكّ القفل ولا تدّعي إتقاناً)');
+  ok(opened['g1:ا'] === 3, 'ونجومُ ما كسبه لم تُنقص');
+  ok(JSON.stringify(parsed().skills) === JSON.stringify(original.skills),
+    'وسجلّ مهاراته لم يُخترع له قياسٌ لم يقع');
+
+  win.location.hash = '#/';
+  await waitFor(() => $('.station'), 'الخريطة بعد الفتح');
+  ok($('[data-next]')?.getAttribute('aria-label').startsWith(target.text),
+    `وجبهةُ الطفل صارت حيث فُتح له (${target.text})`);
+
+  // ————— ٧) تصفير محطةٍ لإعادة التدريب —————
+  await openPanel();
+  const picks = $$('select.pick')[1];
+  picks.value = 'g1';
+  btn('صفِّر هذه المحطة').click();
+  const resetConfirm = await waitFor(() => $('.confirm'), 'تأكيد التصفير');
+  ok(resetConfirm.textContent.includes('سجلّ مهاراته'),
+    'التصفير يُعلن قبل وقوعه أنه لا يمسّ سجلّ المهارات');
+  ok(parsed().stars['g1:ا'] === 3, 'ولا شيء يقع قبل التأكيد');
+
+  $('.confirm-yes').click();
+  await waitFor(() => parsed().stars['g1:ا'] === undefined, 'التصفير بعد التأكيد');
+  ok(parsed().stars['g1:ا'] === undefined && parsed().stars['g1:words'] === undefined,
+    'التصفير أعاد عقد المجموعة الأولى إلى الصفر');
+  ok(parsed().stars['g2:ن'] === 2,
+    'ونجومُ ما بعدها محفوظة (تُقفل حتى يتمّها ثم تعود كما كانت)');
+  ok(JSON.stringify(parsed().skills) === JSON.stringify(original.skills),
+    'وسجلّ ليتنر لم يُمسّ — ما قِيس من مهاراته حقٌّ له');
+
+  win.location.hash = '#/';
+  await waitFor(() => $('.station'), 'الخريطة بعد التصفير');
+  ok($$('.node--locked').length > 0 && $$('.node')[0].classList.contains('node--open'),
+    'والخريطة أعادته إلى أول الرحلة (القفل التسلسلي يعيد قفل ما بعدها)');
+
+  // ————— ٨) اللوحة صامتة، ولا نطق آليّ ولا أخطاء —————
+  ok(played.length === playedBefore,
+    `شاشة وليّ الأمر لا تنطق شيئاً في الدورة كلها (${played.length - playedBefore} صوتاً)`);
+  const stray = spoken.filter((t) => !pendingAudio.has(t));
+  ok(stray.length === 0,
+    `ولا نطق آليّ خارج قائمة الانتظار${stray.length ? ' — ' + stray.join('، ') : ''}`);
+  ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, 'استثناء: ' + ((e && e.stack) || e));
+}
+
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

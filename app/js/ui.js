@@ -84,17 +84,23 @@ export function nodeWhere(node) {
   return 'محطة المهارات والقصص';
 }
 
-/** وجه العقدة على الخريطة: الحرف نفسه، أو رمز يدلّ على نوعها. */
+/**
+ * وجه العقدة على الخريطة: الحرف نفسه، أو رمز يدلّ على نوعها.
+ *
+ * ووجها «لعبة الكلمات» و«سلّم الجمل» أيقونتانا الخطيتان لا إيموجي (مهمة «أيقونات
+ * لا إيموجي»): لا بيانَ لهما في المنهج — هما تسميةُ نوعِ محطةٍ من صنع الواجهة،
+ * ولغةُ الواجهة عندنا SVG خطيّ كمعالم المحطات وأيقونة الميكروفون.
+ */
 export function nodeFace(node) {
   if (node.type === 'letter') return node.letter;
-  if (node.type === 'words') return '🧩';
+  if (node.type === 'words') return icon('puzzle');
   if (node.type === 'skill') return node.skill.face;
   if (node.type === 'story') return node.story.emoji;
   if (node.type === 'quran') return node.face;
   if (node.type === 'gate') return node.gate.face;
   if (node.type === 'contrast') return node.contrast.face;
   if (node.type === 'garden') return node.garden.emoji;
-  if (node.type === 'ladder') return '📖';
+  if (node.type === 'ladder') return icon('book');
   if (node.type === 'library') return node.story.emoji;
   return '';
 }
@@ -119,10 +125,11 @@ export function h(tag, props = {}, ...children) {
 }
 
 let toastTimer = 0;
-export function toast(message) {
+/** رسالةٌ عابرة — ومعها أيقونةُ واجهةٍ اختيارية (لا محرفَ إيموجي في نصّها). */
+export function toast(message, iconName) {
   const toastEl = document.getElementById('toast');
   if (!toastEl) return;
-  toastEl.textContent = message;
+  toastEl.replaceChildren(...[iconName && icon(iconName), message].filter(Boolean));
   toastEl.hidden = false;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { toastEl.hidden = true; }, 2200);
@@ -201,6 +208,164 @@ export function micIcon() {
   return el;
 }
 
+// ————— مهمة «أيقونات لا إيموجي» (أمر المالك، ٧ أغسطس ٢٠٢٦) —————
+//
+// **العلّة**: إيموجي خطِّ النظام ليس صورةً واحدة — هو صورةٌ لكل جهاز. فما راجعه
+// المالك والمدير في `docs/REVIEW_ICONS.md` على أبل يراه طفلٌ آخر على أندرويد أو
+// ويندوز رسماً مختلفاً، فينقلب عليه حكمُ «صدق الصورة» (DESIGN §٦)؛ والرموزُ
+// الحديثة (يونيكود ١٤–١٥) تظهر في الأجهزة الأقدم مربّعاً فارغاً، فتصير الإجابةُ
+// المصوَّرة بلا صورةٍ أصلاً. والعلاج قسمان:
+//
+//   • **رموز البيانات** (كلمات المنهج والمعجم ومشاهد القصص ووجوه المحطات):
+//     تُرسم من Twemoji المخزونة في `app/emoji/` — الرمز نفسُه لا يتغيّر، وإنما
+//     صار رسمُه ملفَّ SVG واحداً لكل طفل. ويجلبها `tools/fetch_twemoji.py`.
+//   • **رموز الواجهة** (زرّ السماع، الاحتفال، القفل، الإعادة…): أيقوناتُنا
+//     الخطية أدناه لا Twemoji — لغةُ الواجهة عندنا SVG خطيّ أصلاً (المعالم
+//     والميكروفون)، وليست هذه الرموز من بياناتٍ يراجعها أحد.
+//
+// ولا يبقى في التطبيق محرفُ إيموجي واحد يُسلَّم إلى خطّ النظام — يحرسه
+// `tools/test_emoji.mjs` على الشيفرة و`browser_test.py` على الشاشة نفسِها.
+
+// «رمزٌ مصوَّر» قاعدةُ يونيكود لا ذوق: `Emoji_Presentation=Yes` (رسمُه الملوّن هو
+// الأصل)، أو محرفٌ أُلحق به مُحدِّدُ التصوير `U+FE0F`. وبها تخرج «✦» و«✓» و«★»
+// و«←» — محارفُ نصّية تُرسم بخطّ النصّ نفسِه ولا شأن لها بهذه المهمة. وهذه عينُ
+// القاعدة المكتوبة في `tools/fetch_twemoji.py`، ويقابل `test_emoji.mjs` بينهما
+// رمزاً رمزاً فلا تنحرف إحداهما عن الأخرى.
+const PRESENTATION = '\u{231A}-\u{231B}\u{23E9}-\u{23EC}\u{23F0}\u{23F3}\u{25FD}-\u{25FE}\u{2614}-\u{2615}'
+  + '\u{2648}-\u{2653}\u{267F}\u{2693}\u{26A1}\u{26AA}-\u{26AB}\u{26BD}-\u{26BE}\u{26C4}-'
+  + '\u{26C5}\u{26CE}\u{26D4}\u{26EA}\u{26F2}-\u{26F3}\u{26F5}\u{26FA}\u{26FD}\u{2705}'
+  + '\u{270A}-\u{270B}\u{2728}\u{274C}\u{274E}\u{2753}-\u{2755}\u{2757}\u{2795}-\u{2797}'
+  + '\u{27B0}\u{27BF}\u{2B1B}-\u{2B1C}\u{2B50}\u{2B55}\u{1F004}\u{1F0CF}\u{1F18E}\u{1F191}-'
+  + '\u{1F19A}\u{1F1E6}-\u{1F1FF}\u{1F201}-\u{1F202}\u{1F21A}\u{1F22F}\u{1F232}-\u{1F236}'
+  + '\u{1F238}-\u{1F23A}\u{1F250}-\u{1F251}\u{1F300}-\u{1F320}\u{1F32D}-\u{1F335}\u{1F337}-'
+  + '\u{1F37C}\u{1F37E}-\u{1F393}\u{1F3A0}-\u{1F3CA}\u{1F3CF}-\u{1F3D3}\u{1F3E0}-\u{1F3F0}'
+  + '\u{1F3F4}\u{1F3F8}-\u{1F43E}\u{1F440}\u{1F442}-\u{1F4FC}\u{1F4FF}-\u{1F53D}\u{1F54B}-'
+  + '\u{1F54E}\u{1F550}-\u{1F567}\u{1F57A}\u{1F595}-\u{1F596}\u{1F5A4}\u{1F5FB}-\u{1F64F}'
+  + '\u{1F680}-\u{1F6C5}\u{1F6CC}\u{1F6D0}-\u{1F6D2}\u{1F6D5}-\u{1F6D7}\u{1F6DC}-\u{1F6DF}'
+  + '\u{1F6EB}-\u{1F6EC}\u{1F6F4}-\u{1F6FC}\u{1F7E0}-\u{1F7EB}\u{1F7F0}\u{1F90C}-\u{1F93A}'
+  + '\u{1F93C}-\u{1F945}\u{1F947}-\u{1F9FF}\u{1FA70}-\u{1FA7C}\u{1FA80}-\u{1FA88}\u{1FA90}-'
+  + '\u{1FABD}\u{1FABF}-\u{1FAC5}\u{1FACE}-\u{1FADB}\u{1FAE0}-\u{1FAE8}\u{1FAF0}-\u{1FAF8}';
+const BASE_CHARS = '\u{A9}\u{AE}\u{203C}\u{2049}\u{2122}\u{2139}\u{2194}-\u{21AA}\u{231A}-\u{231B}\u{2328}'
+  + '\u{23CF}-\u{23FA}\u{24C2}\u{25AA}-\u{25FE}\u{2600}-\u{27BF}\u{2934}-\u{2935}\u{2B00}-'
+  + '\u{2BFF}\u{3030}\u{303D}\u{3297}\u{3299}\u{1F000}-\u{1FAFF}';
+const ZWJ = '\u{200D}';
+const VS16 = '\u{FE0F}';
+const EMOJI_RE = new RegExp(
+  `^(?:[${PRESENTATION}]${VS16}?|[${BASE_CHARS}]${VS16})`
+  + `(?:${ZWJ}(?:[${PRESENTATION}]|[${BASE_CHARS}])${VS16}?)*$`, 'u');
+
+/** أهذا النصُّ رمزٌ مصوَّر بتمامه؟ (حرفٌ عربيّ أو «۞» أو «✦»: لا). */
+export const isEmoji = (text) => typeof text === 'string' && EMOJI_RE.test(text);
+
+/**
+ * مسارُ ملف الرمز في `app/emoji/` — نقاطُه بالست عشري موصولةً بشرطة.
+ * وقاعدةُ `U+FE0F` قاعدةُ مجموعة Twemoji نفسِها: يُحذف المُحدِّد إلا في تسلسل ZWJ —
+ * فالميزان (U+2696 U+FE0F) ملفُّه `2696.svg`، والطبيب (U+1F468 U+200D U+2695 U+FE0F)
+ * ملفُّه `1f468-200d-2695-fe0f.svg` بمُحدِّده. (ولا يُكتب في هذا الملف محرفُ إيموجي
+ * واحد ولو في تعليق — النطاقات أعلاه بالهروب لذلك، ويحرسه `tools/test_emoji.mjs`.)
+ */
+export function emojiSrc(glyph) {
+  const text = glyph.includes(ZWJ) ? glyph : glyph.replaceAll(VS16, '');
+  return `emoji/${[...text].map((ch) => ch.codePointAt(0).toString(16)).join('-')}.svg`;
+}
+
+/**
+ * صورةُ الرمز — مربّعةٌ بمقاس سطرها (`1em`) فتحلّ محلّ المحرف في مكانه بلا إزاحة.
+ * و`data-emoji` تُعلن أيَّ رمزٍ ترسم: كان الرمزُ نصّاً يُقرأ من الشاشة فصار صورة،
+ * فلولا الإعلانُ لعميت عنه اختباراتُ المتصفّح التي تتحقّق أنّ المعروض هو المقصود.
+ */
+export const emojiImg = (glyph) => h('img', {
+  class: 'emoji', src: emojiSrc(glyph), alt: '', 'aria-hidden': 'true',
+  draggable: false, 'data-emoji': glyph,
+});
+
+/**
+ * **المُصيِّر الواحد**: وجهٌ في صندوقه — رمزاً مصوَّراً كان أو حرفاً أو أيقونةً خطية.
+ *
+ * الصندوقُ الخارجيّ يبقى كما كان بصنفه وتنسيقه (فحجم الرمز ولونه من CSS كما هما)،
+ * وإنما يتبدّل ما بداخله: `<img>` للمصوَّر، ونصٌّ للحرف العربي («ب»، «ـَا»، «۞»).
+ * فما من موضعٍ في التطبيق يكتب رمزاً في DOM إلا من هنا.
+ */
+export function faceEl(value, className, tag = 'span') {
+  const drawn = !!value?.nodeType || isEmoji(value);      // صورةٌ أو أيقونة، لا حرفاً
+  const inner = value?.nodeType ? value : (drawn ? emojiImg(value) : value);
+  // الصورةُ زينةٌ لا نصّ: تُخفى عن قارئ الشاشة كما كان الرمزُ يُخفى قبلها، أما
+  // الحرفُ العربيّ فيبقى مقروءاً (وجهُ عقدةِ الحرف وحبرُ الاحتفال يُقرآن).
+  return h(tag, { class: className, 'aria-hidden': drawn ? 'true' : null }, inner);
+}
+
+// أيقونات الواجهة — لغةُ المعالم نفسُها: خطٌّ بلا ملء، يتبع لون نصّه (`currentColor`).
+// كلُّها في صندوق 24×24، فيكفي المقاسَ سطرُها.
+const ICONS = {
+  // مكبّر الصوت — زرّ «اسمع» وأذنُ الصورة
+  ear: '<path d="M4 9.5h3.2L12 5.5v13L7.2 14.5H4z"/>'
+    + '<path d="M15.6 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.4a8 8 0 0 1 0 11.2"/>',
+  // سمّاعتان — «أيها سمعت؟»
+  headphones: '<path d="M4 15.5V12a8 8 0 0 1 16 0v3.5"/>'
+    + '<path d="M4 15.5a2.4 2.4 0 0 1 4.8 0v2.6a2.4 2.4 0 0 1-4.8 0z"/>'
+    + '<path d="M15.2 15.5a2.4 2.4 0 0 1 4.8 0v2.6a2.4 2.4 0 0 1-4.8 0z"/>',
+  // وثبةُ فرح — احتفالُ الختام (وهي شقيقةُ النجمة في اللوح لا صورةُ مفرقعات)
+  party: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3"/>'
+    + '<path d="M2.5 12h3M18.5 12h3"/><path d="m5.3 5.3 2.1 2.1M16.6 16.6l2.1 2.1"/>'
+    + '<path d="m18.7 5.3-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+  // قفلٌ مغلق — المحطة التي لم يبلغها بعد
+  lock: '<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/>'
+    + '<path d="M8.2 10.5V7.2a3.8 3.8 0 0 1 7.6 0v3.3"/>',
+  // سهمان يدوران — المراجعة و«تابع من هنا»
+  repeat: '<path d="M4 11V9.6A4.6 4.6 0 0 1 8.6 5H19"/><path d="m16.4 2.4 2.9 2.6-2.9 2.6"/>'
+    + '<path d="M20 13v1.4a4.6 4.6 0 0 1-4.6 4.6H5"/><path d="m7.6 21.6-2.9-2.6 2.9-2.6"/>',
+  // قطعةُ أُحجية — لعبة تركيب الكلمات
+  puzzle: '<path d="M4.5 9.6V4.5h5.1a2.4 2.4 0 0 1 4.8 0h5.1v5.1a2.4 2.4 0 0 0 0 4.8v5.1h-5.1'
+    + 'a2.4 2.4 0 0 0-4.8 0H4.5v-5.1a2.4 2.4 0 0 0 0-4.8z"/>',
+  // كتابٌ مفتوح — سلّم الجمل وشاشة القراءة (شقيقُ معلم المكتبة على الخريطة)
+  book: '<path d="M12 6.5v14"/><path d="M12 6.5C9.4 4.6 6.3 4 3.5 4.4v13.9c2.8-.4 5.9.2 8.5 2.2"/>'
+    + '<path d="M12 6.5c2.6-1.9 5.7-2.5 8.5-2.1v13.9c-2.8-.4-5.9.2-8.5 2.2"/>',
+  // كتبٌ مصفوفة — المكتبة
+  books: '<path d="M4 20V5.5h3.6V20z"/><path d="M8.8 20V7.5h3.6V20z"/>'
+    + '<path d="m14 20 3-13.2 3.5.8L17.6 20z"/><path d="M3 20h18"/>',
+  // أسرة — بوابةُ وليّ الأمر (لا وجهَ طفلٍ يُنقر عليه بالخطأ)
+  family: '<circle cx="7.5" cy="6.8" r="2.8"/><circle cx="16.8" cy="7.6" r="2.4"/>'
+    + '<circle cx="12.2" cy="14.4" r="2"/><path d="M3 15.5a4.5 4.5 0 0 1 8.2-2.6"/>'
+    + '<path d="M13.2 13.2a4 4 0 0 1 7.3 2.3"/><path d="M8.6 21a3.7 3.7 0 0 1 7.2 0"/>',
+  // وجهٌ يبتسم — بشرى العبور واللمسات اللطيفة
+  smile: '<circle cx="12" cy="12" r="8.8"/><path d="M8.2 14.4a4.7 4.7 0 0 0 7.6 0"/>'
+    + '<circle cx="9.2" cy="10" r=".9" fill="currentColor" stroke="none"/>'
+    + '<circle cx="14.8" cy="10" r=".9" fill="currentColor" stroke="none"/>',
+  // لهبٌ — سلسلةُ أيام المراجعة المتتالية
+  flame: '<path d="M12 2.8c.4 3.4 4.6 5.3 4.6 9.6a4.6 4.6 0 0 1-9.2 0c0-1.9.9-3.2 1.9-4.2'
+    + '.1 1.5.9 2.4 1.8 2.4 1.3 0 1.4-2.4-.5-4.4z"/>'
+    + '<path d="M12 20.9a2.6 2.6 0 0 1-2.6-2.6c0-1.5 2.6-3.4 2.6-3.4s2.6 1.9 2.6 3.4'
+    + 'A2.6 2.6 0 0 1 12 20.9z"/>',
+  // هديّةٌ معقودة — فتحُ المجموعة التالية
+  gift: '<rect x="3.5" y="9.4" width="17" height="4" rx="1"/>'
+    + '<path d="M5.2 13.4V20h13.6v-6.6"/><path d="M12 9.4V20"/>'
+    + '<path d="M12 9.4c-3.4 0-5-.7-5-2.3S9.6 4.5 12 9.4z"/>'
+    + '<path d="M12 9.4c3.4 0 5-.7 5-2.3S14.4 4.5 12 9.4z"/>',
+};
+
+/**
+ * أيقونةُ واجهة — رمزٌ من صنع الواجهة لا من بيانات المنهج (DESIGN §٦).
+ * تتبع لون نصّها ومقاسَه، فتقع من الزرّ موقعَ محرفها الذي كانت. وحيث كان الرمز
+ * في **شارةٍ** مقيسةٍ بالبكسل (أذنُ الصورة، قفلُ العقدة) تُوضع داخلها لا مكانَها:
+ * الشارةُ صندوقُها والأيقونةُ حبرُها، فلا يتنازع صنفان على مقاسٍ واحد.
+ */
+export function icon(name) {
+  if (!ICONS[name]) return null;
+  const el = h('span', { class: 'ui-icon', 'aria-hidden': 'true' });
+  el.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+  return el;
+}
+
+/** أسماء أيقونات الواجهة — يقرؤها حارسُ `tools/test_emoji.mjs`. */
+export const ICON_NAMES = Object.keys(ICONS);
+
+/**
+ * سطرُ الإتقان: نصُّه ثم وثبةُ الفرح — بديلُ محرف الاحتفال الذي كان يُختم به النصّ.
+ * (يُمرَّر إلى `h` كما يُمرَّر النصّ، فهي تفرد المصفوفة على أبنائها.)
+ */
+export const cheer = (text) => [text, ' ', icon('party')];
+
 // ————— توسيط الحرف البطل في صندوقه (بلاغ المالك ٦ أغسطس ٢٠٢٦) —————
 
 /**
@@ -244,6 +409,8 @@ export function inkLift(text, family = 'Noto Naskh Arabic') {
  * أولاً، ومقاييسه غير مقاييس النسخ) — فلا يُثبَّت على الشاشة رقمُ خطٍّ ليس المعروض.
  */
 export function giantInk(text) {
+  // رمزٌ مصوَّر: لا خطَّ أساسٍ له ولا حبرَ يُقاس — صورةٌ في موضع الحبر وكفى
+  if (isEmoji(text)) return faceEl(text, 'giant-ink');
   const span = h('span', { class: 'giant-ink' }, text);
   const apply = () => span.style.setProperty('--letter-lift', `${(-inkLift(text)).toFixed(4)}em`);
   apply();

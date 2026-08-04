@@ -8,7 +8,7 @@
 
 import * as progress from './progress.js';
 import * as audio from './audio.js';
-import { h, toast, go, arNum, starsRow, topbar, mascot, shuffle, shake, DEV } from './ui.js';
+import { h, icon, faceEl, toast, go, arNum, starsRow, topbar, mascot, shuffle, shake, DEV } from './ui.js';
 
 const QUIZ_OPTIONS = 3;
 const AFTER_PICK_MS = 750;
@@ -50,7 +50,7 @@ export function readQuizStep(items, { next, fail }, { onPick } = {}) {
   function startRound() {
     const r = rounds[index];
     locked = false;
-    pic.replaceChildren(h('span', { class: 'pic-emoji' }, r.target.emoji));
+    pic.replaceChildren(faceEl(r.target.emoji, 'pic-emoji'));
     counter.textContent = `الكلمة ${arNum(index + 1)} من ${arNum(rounds.length)}`;
     row.replaceChildren(...r.options.map((word) => {
       const btn = h('button', {
@@ -145,12 +145,13 @@ export function steppedScreen({ nodeId, className = '', accent, pill, face, step
 
     body.replaceChildren(h('div', { class: 'celebrate' },
       mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, face),
+      faceEl(face, 'celebrate-face', 'div'),
       h('h2', {}, 'أحسنت!'),
       starsRow(stars, 'big-stars'),
       h('p', { class: 'hint' }, line),
       before > stars && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
-      last && h('p', { class: 'note' }, '🎉 أتممتَ الرحلة كلها — من الحرف الأول إلى سلّم الجمل.'),
+      last && h('p', { class: 'note' }, icon('party'),
+        ' أتممتَ الرحلة كلها — من الحرف الأول إلى سلّم الجمل.'),
       h('div', { class: 'row foot' },
         h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة'),
         h('button', {

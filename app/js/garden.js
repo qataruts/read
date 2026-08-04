@@ -19,7 +19,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard, starsForGame } from './words.js';
 import { steppedScreen, readQuizStep, nextButton } from './screens.js';
-import { h, arNum, arCount, accentForGarden, shake } from './ui.js';
+import { h, icon, faceEl, cheer, arNum, arCount, accentForGarden, shake } from './ui.js';
 
 const BEFORE_SAY_MS = 250;   // سكتة بين آخر مقطع والكلمة كاملة
 const AFTER_WORD_MS = 700;   // مهلة بعد سماع الكلمة قبل الانتقال إلى التي بعدها
@@ -56,7 +56,7 @@ function showStep(bundle, { next }, heard) {
         audio.play(word.say);
       },
     },
-      h('span', { class: 'word-emoji' }, word.emoji),
+      faceEl(word.emoji, 'word-emoji'),
       h('span', { class: 'word-text' }, word.text),
     );
     return btn;
@@ -86,7 +86,7 @@ function buildStep(bundle, { next, fail }) {
   const paintDots = () => dots.replaceChildren(...bundle.words.map((word, i) => h('li', {
     class: `dot${i === state.index ? ' dot--now' : ''}${i < state.index ? ' dot--done' : ''}`,
     'aria-label': word.text,
-  }, word.emoji)));
+  }, faceEl(word.emoji))));
 
   /** ما زلنا في نفس الكلمة وعلى نفس الشاشة؟ (تُوقِف الصوت والمهل المعلّقة) */
   const live = (token) => token === state.token && wrap.isConnected;
@@ -181,8 +181,8 @@ function buildStep(bundle, { next, fail }) {
         'aria-label': `اسمع كلمة ${word.text}`,
         onclick: () => audio.play(word.say),
       },
-        h('span', { class: 'pic-emoji' }, word.emoji),
-        h('span', { class: 'pic-ear' }, '🔊'),
+        faceEl(word.emoji, 'pic-emoji'),
+        h('span', { class: 'pic-ear' }, icon('ear')),
       ),
       h('p', { class: 'hint' }, 'اضغط الصورة لتسمعها، ثم رتّب المقاطع'),
       slots,
@@ -228,7 +228,7 @@ export function renderGarden(bundleId) {
     celebrate: (state) => ({
       stars: starsForGame(state.errors, words.length),
       line: state.errors === 0
-        ? `${arCount(words.length, ['كلمة جديدة', 'كلمتان جديدتان', 'كلمات جديدة', 'كلمة جديدة'])} بلا خطأ! 🎉`
+        ? cheer(`${arCount(words.length, ['كلمة جديدة', 'كلمتان جديدتان', 'كلمات جديدة', 'كلمة جديدة'])} بلا خطأ!`)
         : 'صارت هذه الكلمات في رصيدك — وستلقاها في قراءتك.',
     }),
   });

@@ -184,7 +184,18 @@ def analyze(files: list, serve_dir: Path | None = None, prefix: str = "audio/") 
 
 
 def classify(rows: list, analysis: list) -> list:
-    """يصنّف المشتبه: تكرار فعليّ (نطقتان متقاربتان) أم طول طبيعي."""
+    """يصنّف: تكرارٌ فعليّ أم طول طبيعي — بعدد النطقات المتوقَّع لا بأول مقطعين.
+
+    درسان من ٤ أغسطس ٢٠٢٦:
+      ١) الشظايا (نَفَسٌ أو انفجار ٠٫٠٢–٠٫١ث) ليست نطقات، فتُطرح قبل الحكم —
+         ولولا ذلك لأفلتت «عَةْ» (٠٫٦٨ + شظية + ٠٫٦٨) بحجّة «مقاطع متفاوتة».
+      ٢) النصّ ذو الكلمتين («سُكْ كَرْ») نطقتاه **متوقّعتان**، فالمعيار عدد
+         الكلمات: نطقاتٌ أكثر من كلماته = تكرار، وبقدرها = طبيعي.
+      ٣) والفاصل هو الفيصل: «مَقْعَدْ» تنقطع ٠٫١٨ث عند سكون القاف وهذا نطقٌ سليم،
+         أمّا «عَةْ» ففاصلها ٢٫٨٦ث — صمتٌ لا يقع داخل كلمة، فهي إعادة نطق.
+    """
+    MIN_SEG = 0.18                       # أقصر ما يُعدّ نطقةً لا شظية
+    REPEAT_GAP = 0.5                     # الفاصل الذي يميّز إعادة النطق من وقفةٍ داخلية
     by_file = {a["file"]: a for a in analysis}
     out = []
     for r in rows:
@@ -192,19 +203,19 @@ def classify(rows: list, analysis: list) -> list:
         if not a or a.get("error"):
             continue
         segs = a.get("segs", [])
-        lens = [round(e - s, 2) for s, e in segs]
-        verdict, why = "طول طبيعي", ""
-        if len(segs) >= 2:
-            first, second = lens[0], lens[1]
-            gap = round(segs[1][0] - segs[0][1], 2)
-            ratio = min(first, second) / max(first, second) if max(first, second) else 0
-            if ratio >= 0.55 and min(first, second) >= 0.18:
-                verdict = "تكرار"
-                why = f"نطقتان {first}ث و{second}ث بفاصل {gap}ث"
-            else:
-                why = f"{len(segs)} مقاطع: {lens} (متفاوتة)"
-        else:
-            why = f"نطقة واحدة {lens}"
+        big = [(s, e) for s, e in segs if e - s >= MIN_SEG]
+        lens = [round(e - s, 2) for s, e in big]
+        expected = max(1, len(str(r["text"]).split()))
+        verdict, why = "طول طبيعي", f"{len(lens)} نطقة لـ{expected} كلمة: {lens}"
+        gaps = [round(big[i + 1][0] - big[i][1], 2) for i in range(len(big) - 1)]
+        wide = [g for g in gaps if g >= REPEAT_GAP]
+        if len(big) > expected and wide:
+            verdict = "تكرار"
+            why = (f"{len(big)} نطقات ({lens}) والمتوقَّع {expected} — "
+                   f"وبينها صمتٌ {max(wide)}ث")
+        elif len(big) > expected:
+            why = (f"{len(big)} نطقات لـ{expected} كلمة بفواصل قصيرة {gaps} — "
+                   "وقفةٌ داخلية (سكون أو شدّة) لا إعادة")
         out.append({**r, "segs": segs, "lens": lens, "verdict": verdict, "why": why})
     return out
 
@@ -270,7 +281,24 @@ def main():
     ap.add_argument("--analyze", action="store_true", help="تحليل النطقات في متصفّح حقيقي")
     ap.add_argument("--page", action="store_true", help="صفحة سماع للتصديق")
     ap.add_argument("--all", action="store_true", help="على كل الفهرس لا النواة وحدها")
+    ap.add_argument("--repair", action="store_true",
+                    help="إصلاح ذاتي: يعيد توليد المكرَّر حتى تخرج نطقةٌ واحدة")
+    ap.add_argument("--orphans", action="store_true",
+                    help="اليتيم الدلاليّ: ملفٌ في الفهرس لم تعد بيانات التطبيق تطلبه")
     args = ap.parse_args()
+
+    if args.repair:
+        sys.exit(repair(args.dry_run if hasattr(args, "dry_run") else False))
+
+    if args.orphans:
+        rows = semantic_orphans()
+        print(f"اليتيم الدلاليّ: {len(rows)} ملفاً")
+        for r in rows:
+            print(f"  «{r['text'][:60]}» · {r['key']}.mp3 · {r['bytes'] // 1024}KB "
+                  f"· طلبته {r['requestedBy']}")
+        if not rows:
+            print("  ✓ كل ملف في الفهرس تطلبه بيانات التطبيق.")
+        return 0
 
     data = scan()
     rows = data["rows"]
@@ -306,6 +334,110 @@ def main():
         print(f"\nصفحة التصديق: {out}")
         print(f"افتحها: .venv/bin/python -m http.server 8070 -d {WORK} → http://127.0.0.1:8070/")
     return 0
+
+
+# ————————————————————————— اليتيم الدلاليّ —————————————————————————
+
+def wanted_texts() -> set:
+    """ما تطلبه بيانات التطبيق اليوم (من مستخرِج القائمة نفسه — لا نكرّر منطقه)."""
+    out = subprocess.run(["node", "tools/queue_texts.mjs", "--wanted-json"],
+                         cwd=gen.ROOT, capture_output=True, text=True, check=True).stdout
+    return {row[0] for row in json.loads(out.strip().splitlines()[-1])}
+
+
+def semantic_orphans() -> list:
+    """ملفٌ في الفهرس لم تعد بيانات التطبيق تطلبه — لا يراه `--verify-only`.
+
+    مثاله المكتشَف (٤ أغسطس ٢٠٢٦): جملة المدّ القديمة بقيت ملفاً ومدخلاً `done`
+    بعدما أعادت الجلسةُ ٤ صياغتَها؛ فالمدقّق يعدّها سليمة (لها نصّ في القائمة)
+    والتطبيق لا يشغّلها أبداً — وزنٌ ميت يُشحن إلى جهاز الطفل ويُخزَّن فيه.
+    """
+    man = json.loads((gen.OUT_DIR / "manifest.json").read_text(encoding="utf-8"))
+    curriculum = set(gen.parse_curriculum(gen.CURRICULUM.read_text(encoding="utf-8")))
+    keep = wanted_texts() | curriculum | set(gen.recitation_texts())
+    queue = {e["text"]: e for e in gen.load_queue()}
+    out = []
+    for key, text in man.items():
+        if text in keep:
+            continue
+        p = gen.OUT_DIR / f"{key}.mp3"
+        e = queue.get(text, {})
+        out.append({"text": text, "key": key, "requestedBy": e.get("requestedBy", "منهج"),
+                    "model": e.get("model", ""), "bytes": p.stat().st_size if p.exists() else 0})
+    return out
+
+# ————————————————————————— حلقة الإصلاح الذاتي —————————————————————————
+
+NO_REPEAT = ("انطق هذا النصّ **مرة واحدة فقط** بلا إعادة ولا تكرار، "
+             "بتأنٍّ ووضوح لطفل يتعلم القراءة: ")
+REPAIR_TRIES = 3
+
+
+def repair(dry_run: bool = False) -> int:
+    """يعيد توليد كل ملفٍ ثبت تكرارُه، ويقبل أول محاولة تخرج بنطقةٍ واحدة.
+
+    الأذن للجودة، والمحلّل للعيب: التكرار عيبٌ يُقاس فيُصلَح بلا انتظار سماع.
+    وإن عاندت ثلاثُ محاولات أُبقي الأقلّ نطقاتٍ ورُفع النصّ للمالك.
+    """
+    dupes = [r for r in current_classification() if r["verdict"] == "تكرار"]
+    if not dupes:
+        print("لا ملف مكرَّراً — لا شيء يُصلَح.")
+        return 0
+    print(f"مكرَّر: {len(dupes)} ملفاً" + (" (تجربة جافّة)" if dry_run else ""))
+    if dry_run:
+        for r in dupes:
+            print(f"  ⟶ {r['text'][:30]} ({r['sec']}ث)")
+        return 0
+
+    gen.set_rpm(8)
+    pool = gen.KeyPool(gen.read_keys(), gen.DEFAULT_VOICE)
+    work = WORK / "repair"
+    work.mkdir(parents=True, exist_ok=True)
+    fixed = stubborn = 0
+    for r in dupes:
+        text = r["text"]
+        best = None
+        for attempt in range(1, REPAIR_TRIES + 1):
+            try:
+                pcm, rate, _key = pool.call(text, NO_REPEAT, gen.MODEL_CORE)
+            except Exception as e:  # noqa: BLE001
+                print(f"  ✗ {text}: {str(e)[:60]}", file=sys.stderr)
+                break
+            cand = work / f"{gen.key_for(text)}__{attempt}.mp3"
+            gen.pcm_to_mp3(pcm, rate, cand)
+            row = {"text": text, "cat": r.get("cat", "?"), "file": cand.name,
+                   "sec": round(gen.mp3_duration(cand), 2)}
+            res = classify([row], analyze([cand.name], serve_dir=work, prefix=""))
+            if not res:
+                continue
+            n_utt = len(res[0]["lens"])
+            if best is None or n_utt < best[0]:
+                best = (n_utt, cand, res[0])
+            if res[0]["verdict"] != "تكرار":
+                shutil.copy2(cand, gen.OUT_DIR / f"{gen.key_for(text)}.mp3")
+                gen.mark_done(text, f"{gen.MODEL_CORE}#no-repeat")
+                fixed += 1
+                print(f"  ✓ {text}: صحّت في المحاولة {attempt} ({row['sec']}ث، نطقة واحدة)")
+                break
+        else:
+            stubborn += 1
+            print(f"  ⚠ {text}: عاندت {REPAIR_TRIES} محاولات — أقلّها {best[0]} نطقات، "
+                  f"تُرفع للمالك", file=sys.stderr)
+    if fixed:
+        gen.write_manifest(gen.manifest_map())
+    print(f"\nأُصلح {fixed} · عاند {stubborn}")
+    return stubborn
+
+
+def current_classification() -> list:
+    """تصنيف كل ملفات الفهرس الآن (يقيسه متصفّح حقيقي)."""
+    man = json.loads((gen.OUT_DIR / "manifest.json").read_text(encoding="utf-8"))
+    texts, pending = gen.expected_texts()
+    cats = {**texts, **pending}
+    rows = [{"text": t, "cat": cats.get(t, "?"), "file": f"{k}.mp3",
+             "sec": round(gen.mp3_duration(gen.OUT_DIR / f"{k}.mp3"), 2)}
+            for k, t in man.items() if (gen.OUT_DIR / f"{k}.mp3").exists()]
+    return classify(rows, analyze([r["file"] for r in rows]))
 
 
 if __name__ == "__main__":

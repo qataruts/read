@@ -95,7 +95,8 @@ $(done, '.read-all').click();
 for (let i = 0; i < 60 && $(done, '.read-all')?.dataset.on; i++) await tick();
 $(done, '.foot .next').click();
 await tick();
-const answer = $$(done, '.ask .piccard').find((c) => c.textContent.trim() === short.question.answer.emoji);
+const answer = $$(done, '.ask .piccard').find((c) =>
+  c.querySelector('[data-emoji]')?.dataset.emoji === short.question.answer.emoji);
 answer?.click();
 for (let i = 0; i < 12 && !$(done, '.celebrate'); i++) await tick();
 window.setTimeout = realTimeout;

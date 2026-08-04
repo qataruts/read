@@ -23,7 +23,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { starsForReview, compareSounds } from './review.js';
 import {
-  h, toast, go, arNum, starsRow, topbar, letterTitle,
+  h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar, letterTitle,
   PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, DEV,
 } from './ui.js';
 
@@ -181,7 +181,7 @@ export function renderContrast(contrastId) {
       h('h2', {}, 'أيَّ حرف سمعت؟'),
       counter,
       h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: playTarget }, '🔊 اسمع مرة أخرى')),
+        h('button', { class: 'btn btn--primary', onclick: playTarget }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
     startRound();
@@ -204,11 +204,11 @@ export function renderContrast(contrastId) {
 
     body.replaceChildren(h('div', { class: 'celebrate' },
       mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, contrast.face),
+      faceEl(contrast.face, 'celebrate-face', 'div'),
       h('h2', {}, 'أحسنت!'),
       starsRow(stars, 'big-stars'),
       h('p', { class: 'hint' }, state.errors === 0
-        ? 'ميّزتَ بينها كلها بلا خطأ! 🎉'
+        ? cheer('ميّزتَ بينها كلها بلا خطأ!')
         : 'صار الفرق في أذنك — وستلقاه في المراجعة.'),
       before > stars && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
       h('div', { class: 'row foot' },
@@ -240,7 +240,7 @@ export function renderContrast(contrastId) {
     ),
     h('main', { class: 'screen-card' },
       h('div', { class: 'contrast-head' },
-        h('span', { class: 'contrast-face', 'aria-hidden': 'true' }, contrast.face),
+        faceEl(contrast.face, 'contrast-face'),
         h('div', {},
           h('h2', {}, contrast.title),
           h('p', { class: 'hint' }, contrast.hint),

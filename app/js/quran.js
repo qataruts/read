@@ -24,7 +24,7 @@ import { starsForGame } from './words.js';
 import { starsForStory } from './story.js';
 import { steppedScreen, readQuizStep, nextButton } from './screens.js';
 import {
-  h, toast, go, arNum, arCount, starsRow, topbar,
+  h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar,
   QURAN_ACCENT, shuffle, shake, giantInk, heroStep, DEV,
 } from './ui.js';
 
@@ -59,7 +59,7 @@ const ruleHead = (title, face, rule) => [heroStep([
 ], [
   h('p', { class: 'rule' }, rule),
   h('div', { class: 'row' },
-    h('button', { class: 'btn btn--primary', onclick: () => audio.play(rule) }, '🔊 اسمع القاعدة')),
+    h('button', { class: 'btn btn--primary', onclick: () => audio.play(rule) }, icon('ear'), ' اسمع القاعدة')),
 ])];
 
 /** كلمة إملائية تُنطق بنقرة (لا شيء من المصحف يمرّ من هنا). */
@@ -68,7 +68,7 @@ const spokenWord = (word) => h('button', {
   'aria-label': `اسمع كلمة ${word.read}`,
   onclick: () => audio.play(word.read),
 },
-  h('span', { class: 'word-emoji' }, word.emoji),
+  faceEl(word.emoji, 'word-emoji'),
   h('span', { class: 'word-text' }, word.read),
 );
 
@@ -106,7 +106,7 @@ function renderQuranLetters() {
     celebrate: (state) => ({
       stars: starsForGame(state.errors, words.length),
       line: state.errors === 0
-        ? 'قرأتَ الهمزة والتاء المربوطة بلا خطأ! 🎉'
+        ? cheer('قرأتَ الهمزة والتاء المربوطة بلا خطأ!')
         : 'صارتا في يدك — وستلقاهما في المصحف كثيراً.',
     }),
   });
@@ -135,7 +135,7 @@ function renderQuranWords(level) {
     celebrate: (state) => ({
       stars: starsForGame(state.errors, items.length),
       line: state.errors === 0
-        ? 'قرأتَ كلمات القرآن كلها بلا خطأ! 🎉'
+        ? cheer('قرأتَ كلمات القرآن كلها بلا خطأ!')
         : 'أحسنت — هذه الكلمات ستراها في المصحف كثيراً.',
     }),
   });
@@ -239,7 +239,7 @@ function renderQuranRasm() {
     celebrate: (state) => ({
       stars: starsForGame(state.errors, RASM_ROUNDS),
       line: state.errors === 0
-        ? 'عرفتَ علامات المصحف بلا خطأ! 🎉'
+        ? cheer('عرفتَ علامات المصحف بلا خطأ!')
         : 'صارت مألوفة لعينك — وستراها في كل صفحة.',
     }),
   });
@@ -308,7 +308,7 @@ function renderQuranMuqattaat() {
     celebrate: () => ({
       stars: starsForStory(heard.size, data.items.length),
       line: heard.size >= data.items.length
-        ? 'قرأتَ الحروف المقطَّعة بأسمائها كلها! 🎉'
+        ? cheer('قرأتَ الحروف المقطَّعة بأسمائها كلها!')
         : 'أعِد واقرأ كل مجموعة بأسماء حروفها لتزيد نجومك.',
     }),
   });
@@ -473,7 +473,7 @@ function renderSurahWords(surahId) {
     celebrate: (state) => ({
       stars: starsForGame(state.errors, Math.min(FIND_ROUNDS, words.length)),
       line: state.errors === 0
-        ? `صارت كلمات سورة ${surah.name} في يدك — اقرأها الآن! 🎉`
+        ? cheer(`صارت كلمات سورة ${surah.name} في يدك — اقرأها الآن!`)
         : 'أعِد النظر في الكلمات، ثم اقرأ السورة على مهل.',
     }),
   });

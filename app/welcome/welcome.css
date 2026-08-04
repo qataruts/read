@@ -1,9 +1,68 @@
 /* الصفحة التعريفية — تنسيقها وحدها.
-   اللوح والخطوط والأزرار من `../css/app.css` (مصدر الحقيقة الوحيد للألوان، DESIGN §٢):
-   هذه الصفحة **لا تُعرّف لوناً ولا خطاً**، بل تصفّ ما عرّفه التطبيق — فما يراه المعلّم
-   هنا هو عينُ ما يراه الطفل هناك، ولا لوحان يفترقان بمرور الوقت.
+   اللوح والأزرار وخطوطُ التطبيق من `../css/app.css` (مصدر الحقيقة الوحيد للألوان،
+   DESIGN §٢): هذه الصفحة **لا تُعرّف لوناً ولا تنسخ خطَّ تطبيق**، بل تصفّ ما عرّفه
+   التطبيق — فما يراه المعلّم هنا هو عينُ ما يراه الطفل هناك، ولا لوحان يفترقان.
+
+   **إلا خطَّ متنِها** (مهمة «أيقونات لا إيموجي» — بند الخط الثانوي، ٧ أغسطس ٢٠٢٦):
+   متنُ هذه الصفحة نصٌّ تحريريّ طويل يقرؤه معلّمٌ راشد لا طفلٌ يتهجّى، و«بالو»
+   خطُّ واجهةٍ مدوّرٌ وُضع للأزرار والعناوين — تُتعب كتلتُه العينَ في فقرةٍ من عشرة
+   أسطر. فمتنُها **IBM Plex Sans Arabic** (OFL، مضمّنٌ هنا)، وعناوينُها تبقى «بالو»
+   فلا تفقد الصفحةُ صوتَ التطبيق. **وهذا الخطّ لهذه الصفحة وحدها**: ملفّاته في
+   `welcome/fonts/` لا في `app/fonts/`، فلا تحمله قشرةُ التطبيق إلى جهاز طفلٍ
+   لا يقرؤه، ولا يُمسّ خطُّ التطبيق نفسِه بحرف.
 
    وهي خارج قشرة عامل الخدمة (لا تُخزَّن ولا تُسجّل عاملاً ولا تحمل جافاسكربت أصلاً). */
+
+/* ————— خطّ المتن التحريريّ — مضمّن محلياً (لا شبكة، كخطوط التطبيق) ————— */
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('fonts/IBMPlexSansArabic-arabic-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1,
+    U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74,
+    U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('fonts/IBMPlexSansArabic-latin-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('fonts/IBMPlexSansArabic-arabic-600.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1,
+    U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74,
+    U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('fonts/IBMPlexSansArabic-latin-600.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F, U+FEFF, U+FFFD;
+}
+
+/* المتن للخطّ التحريريّ، والعناوينُ والأزرارُ لخطّ التطبيق كما هي.
+   والاحتياطيّ خطُّ التطبيق نفسُه: لو تعذّر الملفُّ فالصفحة كما كانت لا كما اتّفق. */
+.w-wrap {
+  font-family: 'IBM Plex Sans Arabic', var(--font-ui);
+  line-height: 1.85;
+}
+
+.w-wrap h1, .w-wrap h2, .w-wrap h3, .w-wrap h4,
+.w-wrap .btn, .w-wrap .w-num, .w-wrap .w-stats b, .w-wrap .w-stage {
+  font-family: var(--font-ui);
+  line-height: 1.4;
+}
 
 /* ————— الهيكل العام ————— */
 
@@ -133,7 +192,12 @@
 
 .w-card ol li { margin-bottom: .4rem; }
 
+/* وجهُ البطاقة ورمزُ الجدول: صورةُ Twemoji من `app/emoji/` لا محرفُ خطِّ النظام
+   (مهمة «أيقونات لا إيموجي») — فما يراه المعلّم هنا هو عينُ ما يراه الطفل هناك،
+   على أيّ جهازٍ فتحا به. */
 .w-card .w-face { font-size: 1.9rem; line-height: 1; }
+.w-card .w-face img { width: 1em; height: 1em; display: block; }
+.w-inline-emoji { width: 1.1em; height: 1.1em; vertical-align: -.2em; }
 
 /* الأسس الخمسة: رقمٌ بلونٍ من ألوان مراحل التطبيق (اللون لا يحمل معنى وحده — معه رقمه) */
 .w-basis .w-card { border-inline-start: 6px solid var(--accent, var(--accent-letters)); }
@@ -265,6 +329,16 @@
 .w-why h4 { margin-top: .35rem; }
 
 .w-why p:last-child { margin-bottom: .35rem; }
+
+/* خطوات حفظ التقدّم واستعادته (الحزمة ١١): أرقامٌ مشرقية كبقية الواجهة (DESIGN §٣) */
+.w-why ol {
+  margin: .5rem 0 .75rem;
+  padding-inline-start: 1.35rem;
+  list-style-type: arabic-indic;
+  color: var(--ink-soft);
+}
+
+.w-why ol li { margin-bottom: .4rem; }
 
 /* ————— الخاتمة ————— */
 

@@ -23,7 +23,7 @@ import * as recorder from './recorder.js';
 import * as recordings from './recordings.js';
 import { gateCard } from './parent.js';
 import {
-  h, toast, go, arNum, arCount, starsRow, topbar, shake,
+  h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar, shake,
   STORY_ACCENT, mascot, micIcon, shuffle, DEV,
 } from './ui.js';
 
@@ -120,7 +120,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
         'aria-label': `اسمع عنوان القصة: ${title}`,
         onclick: () => { stopAll(); audio.play(title); },
       },
-        h('span', { class: 'word-emoji' }, emoji),
+        faceEl(emoji, 'word-emoji'),
         h('span', { class: 'story-title-text' }, title),
       ),
     );
@@ -144,13 +144,13 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       });
 
       const el = h('div', { class: 'line' },
-        h('span', { class: 'line-emoji', 'aria-hidden': 'true' }, line.emoji),
+        faceEl(line.emoji, 'line-emoji'),
         h('p', { class: 'line-words' }, words),
         h('button', {
           class: 'btn line-ear',
           'aria-label': `اسمع الجملة كاملة: ${line.text}`,
           onclick: () => readAloud(index, false),
-        }, '🔊'),
+        }, icon('ear')),
       );
       lineEls.push(el);
       sheet.append(el);
@@ -161,7 +161,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
       h('button', {
         class: 'btn btn--wide read-all',
         onclick: (e) => (e.currentTarget.dataset.on ? stopAll() : readAloud(0, true)),
-      }, '🔊 اسمع القصة كاملة'),
+      }, icon('ear'), ' اسمع القصة كاملة'),
     ));
     // و«اقرأ لي» تحته: يسمع القصةَ بصوتنا، ثم يقرؤها بصوته (الحزمة ١٠)
     if (recordRow) sheet.append(recordRow);
@@ -181,7 +181,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
     const btn = body.querySelector('.read-all');
     if (btn) {
       delete btn.dataset.on;
-      btn.textContent = '🔊 اسمع القصة كاملة';
+      btn.replaceChildren(icon('ear'), ' اسمع القصة كاملة');
     }
   }
 
@@ -348,7 +348,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
           await new Promise((r) => setTimeout(r, AFTER_PICK_MS));
           if (live(mine)) celebrate();
         },
-      }, h('span', { class: 'pic-emoji' }, word.emoji));
+      }, faceEl(word.emoji, 'pic-emoji'));
       return btn;
     }));
 
@@ -385,16 +385,17 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, question, sta
 
     body.replaceChildren(h('div', { class: 'celebrate' },
       mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, emoji),
+      faceEl(emoji, 'celebrate-face', 'div'),
       h('h2', {}, 'قرأتَ قصة كاملة!'),
       starsRow(won, 'big-stars'),
       h('p', { class: 'hint' }, won === 3
-        ? 'سمعتَ الجمل كلها وأجبتَ عن السؤال — أحسنت! 🎉'
+        ? cheer('سمعتَ الجمل كلها وأجبتَ عن السؤال — أحسنت!')
         : question
           ? 'أعِد القراءة واسمع كل جملة، وأجب عن السؤال من أول مرة.'
           : 'أعِد القراءة واسمع كل جملة لتزيد نجومك.'),
       before > won && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
-      last && h('p', { class: 'note' }, '🎉 أتممتَ الرحلة كلها — من الحرف الأول إلى المكتبة.'),
+      last && h('p', { class: 'note' }, icon('party'),
+        ' أتممتَ الرحلة كلها — من الحرف الأول إلى المكتبة.'),
       h('div', { class: 'row foot' },
         h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة'),
         h('button', {

@@ -111,6 +111,10 @@ const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
 const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+// الرمزُ صار صورةَ SVG لا محرفاً (مهمة «أيقونات لا إيموجي»)، وهو معلَنٌ في
+// `data-emoji` على `<img>` — فتقرأ الاختباراتُ ما تراه العينُ لا نصّاً غاب.
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji
+  ?? el?.textContent.trim() ?? '';
 const lastHeard = () => heardLog[heardLog.length - 1];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
@@ -140,7 +144,7 @@ async function playReadQuiz(items, { mistakeAt = 1 } = {}) {
   for (let round = 1; round <= shown.length; round++) {
     const mark = heardLog.length;
     await waitFor(() => $$('.vchip--word').length === 3, `خيارات الجولة ${round}`);
-    const emoji = $('.pick-pic').textContent.trim();
+    const emoji = picOf($('.pick-pic'));
     const target = items.find((w) => w.emoji === emoji);
     const faces = texts('.vchip-face');
     if (round === 1) {

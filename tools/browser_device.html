@@ -180,6 +180,30 @@ function show(build) {
 }
 
 /**
+ * حارسُ «أيقونات لا إيموجي» على الشاشة نفسِها (لا على الشيفرة وحدها):
+ * أيُّ محرفِ إيموجي بقي **نصّاً** في الشاشة يرسمه خطُّ الجهاز — فيختلف من جهازٍ
+ * إلى جهاز وقد يغيب أصلاً. والمقيس نصوصُ الشاشة لا سماتُها: `data-emoji` على
+ * الصورة إعلانٌ لما ترسمه لا محرفٌ يُقرأ، فلا يُعَدّ.
+ *
+ * وهذه الصفحة تبني كلَّ شاشات الرحلة واحدةً واحدة، فالفحصُ عليها فحصٌ للتطبيق كلِّه.
+ */
+const EMOJI_IN_TEXT = /[\u{231A}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F000}-\u{1FAFF}]\u{FE0F}?|.\u{FE0F}/gu;
+// محارفُ نصّية متعمَّدة يرسمها خطُّ النصّ نفسُه، لا إيموجي (DESIGN §٦ ومعالمُ الواجهة)
+const TEXT_OK = new Set(['\u06DE', '\u2726', '\u2605', '\u2606', '\u2713', '\u2717',
+  '\u2190', '\u2192', '\u21BB', '\u22EE', '\u25B6', '\u2715']);
+
+function systemEmoji(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const found = new Set();
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    for (const m of node.data.matchAll(EMOJI_IN_TEXT)) {
+      if (!TEXT_OK.has(m[0])) found.add(m[0]);
+    }
+  }
+  return [...found].join('');
+}
+
+/**
  * معايرة توسيط الحرف البطل في صندوقه.
  *
  * الخطّ العربي يُجلس الحرف على خطّ أساسٍ لا في وسط سطره: مع `line-height: 1` يقع خطّ
@@ -240,6 +264,7 @@ if (params.get('metrics')) {
         h: doc.scrollHeight,
         over: Math.max(0, doc.scrollHeight - vh),
         overX: Math.max(0, doc.scrollWidth - vw),
+        emoji: systemEmoji(app),
       });
     } catch (e) {
       out.push({ id, label, orient, vw, vh, error: String(e && e.message || e) });

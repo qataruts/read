@@ -36,11 +36,17 @@ const walk = (dir, prefix = '') => {
 };
 walk('./');
 
-// ملفات الهيكل: كل ما في app/ عدا ما يُخزَن من فهرسه (الأصوات وقصص المكتبة)
-// وعامل الخدمة نفسه. القصةُ الجديدة تدخل المخزون بفهرسها لا بسطرٍ يدويّ في sw.js.
+// ملفات الهيكل: كل ما في app/ عدا ما يُخزَن من فهرسه (الأصوات وقصص المكتبة
+// وأيقونات الرموز) وعامل الخدمة نفسه، **وعدا الصفحة التعريفية**: `welcome/` ليست
+// من التطبيق — صفحةُ عرضٍ للمعلمين خارج القشرة عمداً (لا تُخزَّن ولا تَعُدّ نفسها
+// منه)، ويحرس خروجَها `tools/test_welcome.mjs` بالشقّين: لا في SHELL، ولا يمسّها
+// ردُّ التنقّل. والقصةُ الجديدة — والرمزُ الجديد — يدخلان المخزون بفهرسهما لا
+// بسطرٍ يدويّ في sw.js.
 const wanted = onDisk.filter((p) => !p.startsWith('audio/')
     || p === 'audio/manifest.json' || p === 'audio/versions.json')
   .filter((p) => !p.startsWith('data/stories/') || p === 'data/stories/index.json')
+  .filter((p) => !p.startsWith('emoji/') || p === 'emoji/index.json')
+  .filter((p) => !p.startsWith('welcome/'))
   .filter((p) => p !== 'sw.js');
 
 const forgotten = wanted.filter((p) => !shell.includes(p));
@@ -51,6 +57,10 @@ const phantom = shell.filter((p) => !existsSync(new URL(p, APP)));
 ok(phantom.length === 0,
   `ولا تعِد بملف غير موجود${phantom.length ? ' — ' + phantom.join('، ') : ''}`);
 ok(sw.includes("'./'") && /index\.html/.test(sw), 'وتشمل جذر التطبيق وصفحته');
+
+const inShell = shell.filter((p) => p.startsWith('welcome/'));
+ok(inShell.length === 0,
+  `ولا تشمل الصفحة التعريفية (خارج القشرة عمداً)${inShell.length ? ' — دخلت: ' + inShell.join('، ') : ''}`);
 
 // كل وحدة جافاسكربت مستوردة فعلاً من شجرة main.js (لا ملف ميت في القائمة)
 const modules = onDisk.filter((p) => p.startsWith('js/'));
@@ -91,6 +101,14 @@ ok(sw.includes('precacheStories') && sw.includes('data/stories/index.json'),
   'وقصص المكتبة مخزونة من فهرسها لا من قائمة يدوية '
   + `(${JSON.parse(read('data/stories/index.json')).stories.length} قصة — فتُقرأ دون إنترنت)`);
 ok(shell.includes('data/stories/index.json'), 'وفهرسُ المكتبة نفسه من ملفات الهيكل');
+// أيقونات الرموز (مهمة «أيقونات لا إيموجي»): صارت الصورةُ ملفاً بعد أن كانت محرفاً
+// يرسمه خطُّ الجهاز — وهي في «اقرأ واختر» و«أكمل الجملة» السؤالُ نفسُه لا زينتُه،
+// فلولا خزنُها لظهر الطفلُ دون إنترنت أمام سؤالٍ بلا صورة.
+const emojiIndex = JSON.parse(read('emoji/index.json'));
+ok(sw.includes('precacheEmoji') && sw.includes('emoji/index.json'),
+  'وأيقونات الرموز مخزونة من فهرسها لا من قائمة يدوية '
+  + `(${Object.keys(emojiIndex.files).length} أيقونة — فتُرى دون إنترنت)`);
+ok(shell.includes('emoji/index.json'), 'وفهرسُ الأيقونات نفسه من ملفات الهيكل');
 ok(/request\.method !== 'GET'/.test(sw), 'ولا يعترض إلا طلبات GET');
 ok(sw.includes('self.location.origin'), 'ولا يمسّ أي مصدر خارجي');
 ok(/caches\.delete/.test(sw) && /VERSION/.test(sw),

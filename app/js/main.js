@@ -18,7 +18,7 @@ import { renderGarden } from './garden.js';
 import { renderLadder } from './ladder.js';
 import { renderParent, skillsText } from './parent.js';
 import {
-  h, toast, go, arNum, arCount, starsRow, topbar, letterTitle, nodeTitle, nodeFace, nodeWhere,
+  h, icon, faceEl, toast, go, arNum, arCount, starsRow, topbar, letterTitle, nodeTitle, nodeFace, nodeWhere,
   ACCENTS, PAUSE_ACCENT, STORY_ACCENT, QURAN_ACCENT, SENTENCE_ACCENT,
   accentFor, accentForGarden, landmark, DEV,
 } from './ui.js';
@@ -50,12 +50,12 @@ function renderMap() {
     topbar(
       h('h1', {}, 'المُعلِّم'),
       h('span', { class: 'spacer' }),
-      DEV && h('button', { class: 'btn btn--ghost', onclick: () => go('#/audio') }, '🔊 فحص الأصوات'),
+      DEV && h('button', { class: 'btn btn--ghost', onclick: () => go('#/audio') }, icon('ear'), ' فحص الأصوات'),
       h('button', {
         class: 'btn btn--ghost',
         'aria-label': 'لوحة وليّ الأمر',
         onclick: () => go('#/parent'),
-      }, '👪'),
+      }, icon('family')),
       h('span', { class: 'pill pill--stars' }, `★ ${arNum(earned)} / ${arNum(progress.maxTotalStars())}`),
     ),
   );
@@ -72,14 +72,15 @@ function renderMap() {
       css: { '--accent': accentOf(next, group) },
       onclick: () => openNode(next),
     },
-      h('span', { class: 'continue-face' }, nodeFace(next)),
+      faceEl(nodeFace(next), 'continue-face'),
       h('span', { class: 'continue-text' },
         h('b', {}, nodeTitle(next)),
         h('small', {}, `تابع من هنا · ${nodeWhere(next)}`)),
     ));
   } else {
     main.append(h('p', { class: 'note' },
-      '🎉 أتممتَ الرحلة كلها — من الحرف الأول إلى المصحف والحديقة وسلّم الجمل والمكتبة!'));
+      icon('party'),
+      ' أتممتَ الرحلة كلها — من الحرف الأول إلى المصحف والحديقة وسلّم الجمل والمكتبة!'));
   }
 
   // الدرب المتعرج: انعطافة خيط بين كل محطتين، يمنةً مرة ويسرةً مرة (DESIGN §٦)
@@ -142,7 +143,7 @@ function reviewCard() {
     class: `continue continue--review${done ? ' continue--done' : ''}`,
     onclick: () => go('#/review'),
   },
-    h('span', { class: 'continue-face' }, done ? '✓' : '🔁'),
+    faceEl(done ? '✓' : icon('repeat'), 'continue-face'),
     h('span', { class: 'continue-text' },
       h('b', {}, 'مراجعة اليوم'),
       h('small', {}, line)),
@@ -165,7 +166,7 @@ function stationEl(section, index, next, folded) {
     badge: arNum(index + 1),
     title: group.title,
     sub: group.letters.join(' '),
-    meta: unlocked ? [h('b', {}, `★ ${arNum(stats.earned)}`), ` / ${arNum(stats.max)}`] : '🔒 مقفلة',
+    meta: unlocked ? [h('b', {}, `★ ${arNum(stats.earned)}`), ` / ${arNum(stats.max)}`] : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
   });
@@ -192,7 +193,7 @@ function interludeEl(section, next, folded) {
     sub: section.nodes.map(nodeTitle).join(' · '),
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
-      : '🔒 مقفلة',
+      : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
   });
@@ -219,7 +220,7 @@ function quranEl(section, next, folded) {
     sub: 'كلمات ورسم المصحف وسور قصار',
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
-      : '🔒 مقفلة',
+      : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
   });
@@ -245,7 +246,7 @@ function gateEl(section, next, folded) {
     badge: section.gate.face,
     title: section.gate.title,
     sub: open ? 'اجتزتَها — الطريق مفتوح' : section.gate.hint,
-    meta: unlocked ? (open ? '✓ مجتازة' : 'عشرة تمارين') : '🔒 مقفلة',
+    meta: unlocked ? (open ? '✓ مجتازة' : 'عشرة تمارين') : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
   });
@@ -275,7 +276,7 @@ function contrastEl(section, next, folded) {
     sub: pairs,
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(progress.getStars(node.id))}`), ` / ${arNum(progress.MAX_STARS)}`]
-      : '🔒 مقفلة',
+      : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
   });
@@ -306,7 +307,7 @@ function gardenEl(section, next, folded) {
       : `${arCount(garden.words.length, ['كلمة', 'كلمتان', 'كلمات', 'كلمة'])} جديدة`,
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
-      : '🔒 مقفل',
+      : [icon('lock'), ' مقفل'],
     nodes: section.nodes,
     next,
   });
@@ -330,13 +331,13 @@ function ladderEl(section, next, folded) {
     accent: SENTENCE_ACCENT,
     mark: 'ladder',
     label: `سلّم جمل ${garden.title}${unlocked ? '' : ' — مقفل'}`,
-    badge: '📖',
+    badge: icon('book'),
     title: `جمل ${garden.title}`,
     sub: `${arCount(sentences, ['جملة', 'جملتان', 'جمل', 'جملة'])} في `
       + `${arCount(section.nodes.length, ['درجة', 'درجتين', 'درجات', 'درجة'])}`,
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
-      : '🔒 مقفل',
+      : [icon('lock'), ' مقفل'],
     nodes: section.nodes,
     next,
   });
@@ -360,13 +361,13 @@ function libraryEl(section, next, folded) {
     accent: STORY_ACCENT,
     mark: 'book',
     label: `مكتبة ${garden.title}${unlocked ? '' : ' — مقفلة'}`,
-    badge: '📚',
+    badge: icon('books'),
     title: `مكتبة ${garden.title}`,
     sub: `${arCount(section.nodes.length, ['قصة', 'قصتان', 'قصص', 'قصة'])} `
       + `· مستوى ${levels.map(arNum).join('–')}`,
     meta: unlocked
       ? [h('b', {}, `★ ${arNum(earned)}`), ` / ${arNum(section.nodes.length * progress.MAX_STARS)}`]
-      : '🔒 مقفلة',
+      : [icon('lock'), ' مقفلة'],
     nodes: section.nodes,
     next,
   });
@@ -412,7 +413,7 @@ function trackEl({ id, folded, className, accent, mark, label, badge, title, sub
   function paint() {
     station.classList.toggle('station--folded', !open);
     const inner = [
-      h('span', { class: 'station-num' }, badge),
+      faceEl(badge, 'station-num'),
       h('div', {},
         h('h2', {}, title),
         h('p', { class: 'station-letters' }, sub),
@@ -440,6 +441,23 @@ function trackEl({ id, folded, className, accent, mark, label, badge, title, sub
   return station;
 }
 
+/**
+ * معلم «إعادة» على العقدة المنجَزة (الحزمة ١١ — بلاغ المالك: لم يكن بيّناً أن المنجَز
+ * يبقى مفتوحاً للإعادة). سهمٌ دائريّ خفيف على حافة العقدة، لا إيموجي (DESIGN §٦)،
+ * ولا يزاحم وجهها: زخرفةٌ صامتة تدلّ، والنقرة نفسها هي الفعل كما كانت.
+ * ويتكرّر بعدد العقد المنجَزة في كل رسمة، فيُحلَّل مرة ويُستنسخ (كما خيط الدرب).
+ */
+let replayTemplate = null;
+function replayMark() {
+  if (!replayTemplate) {
+    replayTemplate = h('span', { class: 'node-replay', 'aria-hidden': 'true' });
+    replayTemplate.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.5 3.5v5h-5"/></svg>`;
+  }
+  return replayTemplate.cloneNode(true);
+}
+
 function nodeButton(node, next) {
   const stars = progress.getStars(node.id);
   const open = progress.isNodeUnlockedById(node.id);
@@ -450,22 +468,21 @@ function nodeButton(node, next) {
   const btn = h('button', {
     class: `node node--${node.type} node--${state}${isNext ? ' node--next' : ''}`,
     css: node.type === 'story' || node.type === 'library' ? { '--accent': STORY_ACCENT } : {},
-    'aria-label': `${label} — ${open ? (stars ? `${arNum(stars)} نجوم` : 'مفتوح') : 'مقفل'}`,
+    'aria-label': `${label} — ${open ? (stars ? `${arNum(stars)} نجوم · يمكن إعادته` : 'مفتوح') : 'مقفل'}`,
     onclick: () => {
       if (!open) {
         btn.classList.remove('shake');
         void btn.offsetWidth;          // إعادة تشغيل الحركة
         btn.classList.add('shake');
-        toast('أكمِل ما قبله أولاً 😊');
+        toast('أكمِل ما قبله أولاً', 'smile');
         return;
       }
       openNode(node);
     },
   },
-    h('span', { class: 'node-face' }, open
-      ? nodeFace(node)
-      : h('span', { class: 'node-lock' }, '🔒')),
+    faceEl(open ? nodeFace(node) : h('span', { class: 'node-lock' }, icon('lock')), 'node-face'),
     starsRow(stars),
+    state === 'done' && replayMark(),
   );
 
   if (isNext) btn.dataset.next = '1';
@@ -532,7 +549,7 @@ async function render() {
   const guard = (id) => {
     if (!progress.findNode(id)) return true;          // عقدة لا وجود لها: الشاشة تردّه للخريطة
     if (progress.isNodeUnlockedById(id)) return true;
-    toast('أكمِل ما قبله أولاً 😊');
+    toast('أكمِل ما قبله أولاً', 'smile');
     location.replace('#/');
     return false;
   };
@@ -572,7 +589,7 @@ async function render() {
   } else if (name === 'review') {
     screen = renderReview();
     if (!screen) {                       // لا حصيلة للمراجعة بعدُ
-      toast('أتمِم درساً أولاً، ثم تأتي المراجعة 😊');
+      toast('أتمِم درساً أولاً، ثم تأتي المراجعة', 'smile');
       location.replace('#/');
       return;
     }

@@ -16,7 +16,7 @@
 import { gateById } from './curriculum.js';
 import * as progress from './progress.js';
 import { buildSession, renderSession, starsForReview, studiedPairs } from './review.js';
-import { h, go, arNum, starsRow, mascot, PAUSE_ACCENT } from './ui.js';
+import { h, icon, faceEl, go, arNum, starsRow, mascot, PAUSE_ACCENT } from './ui.js';
 
 export const GATE_SIZE = 10;      // عشرة تمارين: أطول من مراجعة اليوم ودون إرهاق
 export const PASS_RATE = 0.8;     // العبور بإصابة ≥٨٠٪ من المحاولات
@@ -50,7 +50,7 @@ export function renderGate(gateId) {
     accent: PAUSE_ACCENT,
     leaveAsk: 'تريد الخروج قبل إتمام البوابة؟',
     header: h('div', { class: 'gate-head' },
-      h('span', { class: 'gate-face', 'aria-hidden': 'true' }, gate.face),
+      faceEl(gate.face, 'gate-face'),
       h('div', {},
         h('h2', {}, gate.title),
         h('p', { class: 'hint' }, gate.hint),
@@ -70,7 +70,7 @@ export function renderGate(gateId) {
       return open
         ? h('div', { class: 'celebrate' },
           mascot('mascot mascot--cheer'),
-          h('div', { class: 'celebrate-face' }, gate.face),
+          faceEl(gate.face, 'celebrate-face', 'div'),
           h('h2', {}, 'فُتِحَتِ البَوَّابَة!'),
           starsRow(starsForReview(errors, items.length), 'big-stars'),
           score,
@@ -79,7 +79,7 @@ export function renderGate(gateId) {
         )
         : h('div', { class: 'celebrate celebrate--again' },
           mascot('mascot mascot--hello'),
-          h('div', { class: 'celebrate-face' }, '🙂'),
+          h('div', { class: 'celebrate-face' }, icon('smile')),
           h('h2', {}, 'لَيْسَ بَعْدُ'),
           h('p', { class: 'rule' }, 'قَوِّ حُرُوفَكْ أَوَّلاً'),
           score,

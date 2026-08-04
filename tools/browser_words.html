@@ -78,6 +78,10 @@ attach();
 const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+// الرمزُ صار صورةَ SVG لا محرفاً (مهمة «أيقونات لا إيموجي»)، وهو معلَنٌ في
+// `data-emoji` على `<img>` — فتقرأ الاختباراتُ ما تراه العينُ لا نصّاً غاب.
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji
+  ?? el?.textContent.trim() ?? '';
 const bare = (s) => s.replace(/[ً-ْٰـ\s]/g, '');
 const lastPlayed = () => played[played.length - 1];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
@@ -129,7 +133,7 @@ try {
   ok($$('.dot--now').length === 1 && $$('.dot')[0].classList.contains('dot--now'), 'الكلمة الأولى هي الحالية');
 
   const w1 = g1.words[0];                                   // بابا: مقطعان متكرّران
-  ok(texts('.pic-emoji')[0] === w1.emoji, `الصورة معروضة (${texts('.pic-emoji')[0]})`);
+  ok(picOf($('.pic-emoji')) === w1.emoji, `الصورة معروضة (${picOf($('.pic-emoji'))})`);
   ok($$('.slot').length === w1.tiles.length, `خانات بعدد المقاطع (${$$('.slot').length})`);
   ok($$('.tile').length === w1.tiles.length + 1,
     `بلاطات = مقاطع الكلمة + مشتّت (${$$('.tile').length})`);

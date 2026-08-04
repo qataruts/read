@@ -303,7 +303,7 @@ try {
 
   // ————— ٤) لوحة وليّ الأمر خلف بوابة حسابية —————
   const playedBefore = played.length;
-  btn('👪').click();
+  $('[aria-label="لوحة وليّ الأمر"]').click();
   await waitFor(() => $('.giant'), 'بوابة وليّ الأمر');
   ok(!$('.audit'), 'اللوحة لا تظهر قبل حلّ العملية');
   const readQ = () => {

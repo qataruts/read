@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>لقطات صلابة التقدّم وتحكّم وليّ الأمر</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; align-items: start; }
+    .cell { background: rgba(255,255,255,.35); border-radius: 24px; padding: .5rem; }
+    .cell > h4 { margin: .2rem 0 .4rem; text-align: center; color: #b8720a; }
+    .app { max-width: none; padding: 0; }
+  </style>
+</head>
+<body>
+<div id="toast" class="toast" hidden></div>
+<div class="grid" id="grid"></div>
+
+<!-- تقدّم مزروع قبل تحميل الوحدات: طفلٌ في منتصف رحلته (نجومٌ وصناديقُ وقراءةٌ مسجَّلة) -->
+<script>
+  const now = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+  const skill = (right, wrong, box, due) => ({ right, wrong, box, due: now + due, seen: now });
+  localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: { 'g1:ا': 3, 'g1:ب': 3, 'g1:م': 2, 'g1:ل': 3, 'g1:words': 3, 'skill:madd-alif': 2 },
+    skills: {
+      'ب|fatha|quiz': skill(5, 1, 4, 8),
+      'م|kasra|haraka': skill(2, 3, 1, 1),
+      'ل|damma|build': skill(1, 2, 0, 0),
+    },
+    days: { '2020-01-01': 600 },
+    reviews: {},
+    records: [{ node: 'story:s1', title: 'قصة الباب', seconds: 24.5, day: '2020-01-01', at: Date.now() }],
+    mic: true,
+    seconds: 1800,
+    startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+</script>
+
+<script type="module">
+import { renderParent } from './js/parent.js';
+
+// لا صوت في اللوحة أصلاً، والتنزيل لا يُكتب على القرص في اللقطة
+window.URL.createObjectURL = () => 'blob:لقطة';
+
+const grid = document.getElementById('grid');
+const $$ = (root, sel) => [...root.querySelectorAll(sel)];
+
+function cell(title, node) {
+  const box = document.createElement('div');
+  box.className = 'cell';
+  box.innerHTML = `<h4>${title}</h4>`;
+  const app = document.createElement('div');
+  app.className = 'app';
+  app.append(node);
+  box.append(app);
+  grid.append(box);
+  return app;
+}
+
+/** لوحةٌ مفتوحة: تُعبَر بوابتُها الحسابية كما يعبرها وليّ الأمر. */
+function panel(title) {
+  const host = cell(title, renderParent(() => {}));
+  const gate = host.querySelector('.giant');
+  if (gate) {
+    const [a, b] = gate.textContent.split('×')
+      .map((s) => Number(s.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+    host.querySelector('input.chip').value = String(a * b);
+    $$(host, '.btn').find((x) => x.textContent.includes('ادخل')).click();
+    host.replaceChildren(renderParent(() => {}));
+  }
+  return host;
+}
+
+// ١) القسمان الجديدان كما يراهما وليّ الأمر
+const first = panel('١ — اللوحة: النسخة الاحتياطية والتحكّم في الرحلة');
+first.querySelector('.audit h3').scrollIntoView?.();
+
+// ٢) تأكيد الفتح اليدويّ (لا يقع فعلٌ بنقرة واحدة)
+const second = panel('٢ — تأكيد فتح الطريق');
+const nodePick = second.querySelector('select.pick');
+nodePick.value = [...nodePick.options][40].value;
+$$(second, '.btn').find((b) => b.textContent.includes('افتح الطريق')).click();
+
+// ٣) تأكيد تصفير المحطة (وما لا يمسّه التصفير معلَنٌ فيه)
+const third = panel('٣ — تأكيد تصفير محطة');
+$$(third, 'select.pick')[1].value = 'g1';
+$$(third, '.btn').find((b) => b.textContent.includes('صفِّر')).click();
+</script>
+</body>
+</html>

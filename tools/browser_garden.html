@@ -94,6 +94,10 @@ const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
 const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+// الرمزُ صار صورةَ SVG لا محرفاً (مهمة «أيقونات لا إيموجي»)، وهو معلَنٌ في
+// `data-emoji` على `<img>` — فتقرأ الاختباراتُ ما تراه العينُ لا نصّاً غاب.
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji
+  ?? el?.textContent.trim() ?? '';
 const lastHeard = () => heardLog[heardLog.length - 1];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
@@ -122,7 +126,7 @@ async function playBundle(bundle, { quizMistake = -1, verbose = false } = {}) {
   if (verbose) {
     ok(texts('.word-text').join('|') === bundle.words.map((w) => w.text).join('|'),
       `شاهد واسمع: كلمات الباقة كما في المعجم (${texts('.word-text').join('، ')})`);
-    ok(texts('.word-emoji').join('') === bundle.words.map((w) => w.emoji).join(''),
+    ok($$('.word-emoji').map(picOf).join('') === bundle.words.map((w) => w.emoji).join(''),
       'ولكل كلمة صورتها');
   }
   for (const el of $$('.example-word')) { el.click(); await sleep(40); }
@@ -142,7 +146,7 @@ async function playBundle(bundle, { quizMistake = -1, verbose = false } = {}) {
   for (let round = 1; round <= shown.length; round++) {
     const mark = heardLog.length;
     await waitFor(() => $$('.vchip--word').length === 3, `خيارات الجولة ${round}`);
-    const emoji = $('.pick-pic').textContent.trim();
+    const emoji = picOf($('.pick-pic'));
     const target = bundle.words.find((w) => w.emoji === emoji);
     const faces = texts('.vchip-face');
     if (verbose && round === 1) {

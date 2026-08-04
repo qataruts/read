@@ -9,7 +9,7 @@ import { GROUPS, bareLetters, syllableSkill } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import {
-  h, toast, go, arNum, starsRow, topbar, wordText,
+  h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar, wordText,
   accentFor, mascot, shuffle, shake, DEV,
 } from './ui.js';
 
@@ -93,7 +93,7 @@ export function renderWordsGame(groupId) {
     dots.replaceChildren(...words.map((word, i) => h('li', {
       class: `dot${!state.done && i === state.index ? ' dot--now' : ''}${state.done || i < state.index ? ' dot--done' : ''}`,
       'aria-label': word.say,
-    }, word.emoji)));
+    }, faceEl(word.emoji))));
   }
 
   function paint() {
@@ -199,8 +199,8 @@ export function renderWordsGame(groupId) {
         'aria-label': `اسمع كلمة ${word.say}`,
         onclick: () => audio.play(word.say),
       },
-        h('span', { class: 'pic-emoji' }, word.emoji),
-        h('span', { class: 'pic-ear' }, '🔊'),
+        faceEl(word.emoji, 'pic-emoji'),
+        h('span', { class: 'pic-ear' }, icon('ear')),
       ),
       h('p', { class: 'hint' }, 'اضغط الصورة لتسمعها، ثم رتّب المقاطع'),
       slots,
@@ -225,18 +225,18 @@ export function renderWordsGame(groupId) {
     const nextGroup = GROUPS[GROUPS.indexOf(group) + 1];
     const opened = nextGroup && progress.isGroupUnlocked(nextGroup.id);
 
-    const line = state.errors === 0 ? 'بنيتَ الكلمات كلها بلا خطأ! 🎉'
+    const line = state.errors === 0 ? cheer('بنيتَ الكلمات كلها بلا خطأ!')
       : stars === 2 ? 'أحسنت — كلمات المجموعة كلها صارت في يدك.'
         : 'أتممتَ اللعبة، وبالإعادة تزيد نجومك.';
 
     body.replaceChildren(h('div', { class: 'celebrate' },
       mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, '🧩'),
+      h('div', { class: 'celebrate-face' }, icon('puzzle')),
       h('h2', {}, 'أحسنت!'),
       starsRow(stars, 'big-stars'),
       h('p', { class: 'hint' }, line),
       before > stars && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
-      opened && h('p', { class: 'note' }, `🎁 فُتحت ${nextGroup.title}!`),
+      opened && h('p', { class: 'note' }, icon('gift'), ` فُتحت ${nextGroup.title}!`),
       h('div', { class: 'row foot' },
         h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة'),
         h('button', {

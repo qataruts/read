@@ -23,7 +23,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import { buildBoard, starsForGame } from './words.js';
 import {
-  h, toast, go, arNum, arCount, starsRow, topbar,
+  h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar,
   SENTENCE_ACCENT, mascot, shuffle, shake, DEV,
 } from './ui.js';
 
@@ -129,7 +129,7 @@ export function renderLadder(rungId) {
           btn.classList.add('good');
           sayAndGo(sentence);
         },
-      }, h('span', { class: 'pic-emoji' }, word.emoji));
+      }, faceEl(word.emoji, 'pic-emoji'));
       return btn;
     }));
 
@@ -192,8 +192,8 @@ export function renderLadder(rungId) {
         'aria-label': `اسمع كلمة ${sentence.target.word}`,
         onclick: () => audio.play(sentence.target.say),
       },
-        h('span', { class: 'pic-emoji' }, sentence.target.emoji),
-        h('span', { class: 'pic-ear' }, '🔊'),
+        faceEl(sentence.target.emoji, 'pic-emoji'),
+        h('span', { class: 'pic-ear' }, icon('ear')),
       ),
       h('p', { class: 'hint' }, 'اقرأ الكلمات، ثم رتّبها جملةً'),
       slots,
@@ -235,7 +235,7 @@ export function renderLadder(rungId) {
           sayAndGo(sentence);
         },
       },
-        !bare && h('span', { class: 'vchip-pic' }, word.emoji),
+        !bare && faceEl(word.emoji, 'vchip-pic'),
         h('span', { class: 'vchip-face' }, face),
       );
       return btn;
@@ -276,14 +276,15 @@ export function renderLadder(rungId) {
 
     body.replaceChildren(h('div', { class: 'celebrate' },
       mascot('mascot mascot--cheer'),
-      h('div', { class: 'celebrate-face' }, '📖'),
+      h('div', { class: 'celebrate-face' }, icon('book')),
       h('h2', {}, 'أحسنت!'),
       starsRow(stars, 'big-stars'),
       h('p', { class: 'hint' }, state.errors === 0
-        ? `قرأتَ ${arCount(sentences.length, ['جملة', 'جملتين', 'جمل', 'جملة'])} بلا خطأ! 🎉`
+        ? cheer(`قرأتَ ${arCount(sentences.length, ['جملة', 'جملتين', 'جمل', 'جملة'])} بلا خطأ!`)
         : 'كل جملة قرأتها تقرّبك من القصة.'),
       before > stars && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
-      last && h('p', { class: 'note' }, '🎉 أتممتَ الرحلة كلها — من الحرف الأول إلى سلّم الجمل.'),
+      last && h('p', { class: 'note' }, icon('party'),
+        ' أتممتَ الرحلة كلها — من الحرف الأول إلى سلّم الجمل.'),
       h('div', { class: 'row foot' },
         h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة'),
         h('button', {

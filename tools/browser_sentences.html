@@ -95,6 +95,10 @@ const stored = () => JSON.parse(localStorage.getItem('muallim.progress.v1'));
 const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
+// الرمزُ صار صورةَ SVG لا محرفاً (مهمة «أيقونات لا إيموجي»)، وهو معلَنٌ في
+// `data-emoji` على `<img>` — فتقرأ الاختباراتُ ما تراه العينُ لا نصّاً غاب.
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji
+  ?? el?.textContent.trim() ?? '';
 const lastHeard = () => heardLog[heardLog.length - 1];
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
 // الخريطة كسولة (إصلاح بطء الخريطة): محطاتٌ بعيدة عن جبهة الطفل تُرسم بطاقاتِ عناوين
@@ -125,12 +129,12 @@ async function playRead(sentence, { mistake = false, verbose = false } = {}) {
     ok(texts('.sentence-word').join(' ') === sentence.text,
       `اقرأ ونفّذ: الجملة معروضة كما في المعجم («${texts('.sentence-word').join(' ')}»)`);
     ok(heardLog.length === mark, 'ولا يُسمَع شيء قبل الاختيار — الحكم على القراءة لا على السمع');
-    ok($$('.piccard .pic-emoji').some((el) => el.textContent.trim() === sentence.target.emoji),
+    ok($$('.piccard .pic-emoji').some((el) => picOf(el) === sentence.target.emoji),
       'وصورة الجملة بين الصور الثلاث');
     checkTargets('اقرأ ونفّذ');
   }
   const cards = $$('.piccard');
-  const faces = texts('.piccard');
+  const faces = cards.map(picOf);
   if (mistake) {
     const wrong = cards[faces.findIndex((f) => f !== sentence.target.emoji)];
     wrong.click();
@@ -139,7 +143,7 @@ async function playRead(sentence, { mistake = false, verbose = false } = {}) {
     ok($$('.piccard').length === 3, 'والجولة نفسها باقية');
     await sleep(250);
   }
-  cards[texts('.piccard').indexOf(sentence.target.emoji)].click();
+  cards[faces.indexOf(sentence.target.emoji)].click();
   if (verbose) {
     await waitFor(() => heardLog.includes(sentence.text), 'سماع الجملة كاملة');
     ok(true, `والصواب يُسمعه الجملة كاملةً («${sentence.text}»)`);

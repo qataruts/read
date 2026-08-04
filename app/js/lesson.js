@@ -10,7 +10,7 @@ import {
 import * as progress from './progress.js';
 import * as audio from './audio.js';
 import {
-  h, toast, go, arNum, starsRow, topbar, letterTitle, wordText,
+  h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar, letterTitle, wordText,
   accentFor, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
 } from './ui.js';
 
@@ -133,12 +133,12 @@ export function renderLesson(groupId, letter) {
           class: 'btn',
           'aria-label': `اسمع اسم الحرف: ${name}`,
           onclick: () => audio.play(name),
-        }, `🔊 اسمه: ${name}`),
+        }, icon('ear'), ` اسمه: ${name}`),
         h('button', {
           class: 'btn btn--primary',
           'aria-label': `اسمع صوت الحرف: ${letter + FATHA}`,
           onclick: () => audio.play(letter + FATHA),
-        }, `🔊 صوته: ${letter + FATHA}`),
+        }, icon('ear'), ` صوته: ${letter + FATHA}`),
       ),
       h('h3', { class: 'sub' }, 'أشكاله في الكلمة'),
       h('div', { class: 'forms' },
@@ -153,7 +153,7 @@ export function renderLesson(groupId, letter) {
           'aria-label': `اسمع كلمة ${example.say}`,
           onclick: () => audio.play(example.say),
         },
-          h('span', { class: 'word-emoji' }, example.emoji),
+          faceEl(example.emoji, 'word-emoji'),
           h('span', { class: 'word-text' },
             clusters(wordText(example)).map((piece) => (piece[0] === letter
               ? h('span', { class: 'lit' }, piece)
@@ -220,10 +220,10 @@ export function renderLesson(groupId, letter) {
       foot.replaceChildren(h('button', {
         class: 'btn',
         onclick: () => audio.play(target.text),
-      }, '🔊 أعِد السماع'));
+      }, icon('ear'), ' أعِد السماع'));
     }
 
-    foot.append(h('button', { class: 'btn btn--primary btn--wide', onclick: ask }, '🎧 أيها سمعت؟'));
+    foot.append(h('button', { class: 'btn btn--primary btn--wide', onclick: ask }, icon('headphones'), ' أيها سمعت؟'));
 
     return h('div', {},
       h('h2', {}, `${letterTitle(letter)} مع الحركات`),
@@ -376,7 +376,7 @@ export function renderLesson(groupId, letter) {
       prompt,
       counter,
       h('div', { class: 'row foot' },
-        h('button', { class: 'btn btn--primary', onclick: playTarget }, '🔊 اسمع مرة أخرى')),
+        h('button', { class: 'btn btn--primary', onclick: playTarget }, icon('ear'), ' اسمع مرة أخرى')),
       row,
     );
     startRound();
@@ -395,7 +395,7 @@ export function renderLesson(groupId, letter) {
     state.done = true;
     paintSteps();
 
-    const line = state.errors === 0 ? 'بلا خطأ واحد! 🎉'
+    const line = state.errors === 0 ? cheer('بلا خطأ واحد!')
       : state.errors === 1 ? 'خطأ واحد فقط — ممتاز!'
         : 'أتممتَ الدرس، وبالتكرار تزيد نجومك.';
 

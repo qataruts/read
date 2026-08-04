@@ -197,3 +197,9 @@ if (process.argv.includes('--prune')) {
       + (kept.length ? ` — واستُبقي ${kept.length} صُرِّف أثناء العمل` : ''));
   }
 }
+
+// إضافة أداتيّة (جلسة الصوت): إخراج «المطلوب» JSON ليكشف المدقّق اليتيمَ الدلاليّ —
+// ملفاً في الفهرس لم تعد بياناتُ التطبيق تطلبه (تغيّرت صياغةُ جملةٍ مثلاً).
+if (process.argv.includes('--wanted-json')) {
+  console.log(JSON.stringify([...wanted].map(([t, c]) => [t, c])));
+}
