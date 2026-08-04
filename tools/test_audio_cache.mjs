@@ -158,38 +158,48 @@ const caches = {
   async delete(name) { return this.store.delete(name); },
 };
 
-const listeners = {};
-const selfObj = {
-  addEventListener: (type, fn) => { listeners[type] = fn; },
-  registration: { scope: SCOPE },
-  location: { origin: 'https://muallim.test' },
-  skipWaiting: async () => {},
-  clients: { claim: async () => {} },
-};
+/** تركيبُ نسخةٍ من `app/sw.js` في بيئتها المزيَّفة — تُعيد أذرعَ قيادتها.
+ *  والنسخُ تتشارك `caches` و`fetch` أنفسَها، فترقيةُ نسخةٍ فوق أخرى تقع كما تقع
+ *  على جهاز الطفل: عاملٌ جديد يجد مخزون سابقه على حاله. */
+function loadSw(source) {
+  const listeners = {};
+  const selfObj = {
+    addEventListener: (type, fn) => { listeners[type] = fn; },
+    registration: { scope: SCOPE },
+    location: { origin: 'https://muallim.test' },
+    skipWaiting: async () => {},
+    clients: { claim: async () => {} },
+  };
+  vm.runInContext(source,
+    vm.createContext({ self: selfObj, caches, fetch: fakeFetch, URL, Request, Response, console }));
+  return {
+    fire: async (type) => {
+      let waited;
+      listeners[type]({ waitUntil: (p) => { waited = p; } });
+      await waited;
+    },
+    request: async (path) => {
+      let answer;
+      listeners.fetch({
+        request: new Request(new URL(path, SCOPE)),
+        respondWith: (p) => { answer = p; },
+      });
+      return answer ? answer : null;
+    },
+  };
+}
 
 const swSource = read('app/sw.js');
-vm.runInContext(swSource,
-  vm.createContext({ self: selfObj, caches, fetch: fakeFetch, URL, Request, Response, console }));
+const { fire, request } = loadSw(swSource);
 
-// اسم المخزون من `sw.js` نفسِه لا مكتوباً هنا: كل جلسة تمسّ ملفات الهيكل ترفع
-// VERSION (قاعدة sw.js)، فلو ثبّتناه هنا لاحمرّ هذا الفحص في وجه كل إصلاح.
-const SW_VERSION = swSource.match(/const VERSION = '([^']+)'/)[1];
+// اسم مخزن الصوت من `sw.js` نفسِه لا مكتوباً هنا. و**بلا رقم نسخة**: حزمة «خفّة
+// التخزين» فصلته عن `VERSION` كي لا يعيد كلُّ تحديثٍ تنزيلَ الصوت كلِّه — ويُقرأ من
+// المصدر فلا يكذب هذا الملف إن تغيّر الاسم غداً.
+const AUDIO_CACHE = swSource.match(/const AUDIO_CACHE = '([^']+)'/)[1];
 
-const fire = async (type) => {
-  let waited;
-  listeners[type]({ waitUntil: (p) => { waited = p; } });
-  await waited;
-};
-const request = async (path) => {
-  let answer;
-  listeners.fetch({
-    request: new Request(new URL(path, SCOPE)),
-    respondWith: (p) => { answer = p; },
-  });
-  return answer ? answer : null;
-};
-const audioCache = async () => caches.open(`muallim-audio-${SW_VERSION}`);
+const audioCache = async () => caches.open(AUDIO_CACHE);
 const cachedUrls = async () => [...(await audioCache()).entries.keys()].sort();
+const mp3Hits = () => net.filter((u) => /\.mp3/.test(u));
 
 // ——— التركيب الأول: تُخزَن الأصوات بروابطها الموسومة ———
 await fire('install');
@@ -203,7 +213,8 @@ ok(first.includes(`${SCOPE}audio/${KEY_R}.mp3?v=3333cccc`), 'وتلاوةُ ال
 // الحزمة ١٢: تلاوةُ الكلمة المفردة ملفُّها موسوم `wbw-` — لولا خزنُها لصمتت المحطة دون إنترنت
 ok(first.includes(`${SCOPE}audio/wbw-${KEY_W}.mp3?v=4444dddd`),
   'وتلاوةُ الكلمة المفردة كذلك باسمها الموسوم (فتعمل محطة كلمات السورة دون إنترنت)');
-const shellCache = await caches.open(`muallim-shell-${SW_VERSION}`);
+const shellCache = await caches.open(
+  `muallim-shell-${swSource.match(/const VERSION = '([^']+)'/)[1]}`);
 ok([...shellCache.entries.keys()].some((u) => u.endsWith('audio/versions.json')),
   'وبيان البصمات نفسه مخزون في الهيكل (فيُقرأ دون إنترنت)');
 
@@ -252,12 +263,65 @@ ok(swept.length === 4 && !swept.some((u) => !u.includes('?v=')),
 ok((await (await audioCache()).match(new Request(`${SCOPE}audio/${KEY_A}.mp3?v=9999aaaa`))) !== undefined,
   'ويُبقي المتوقَّع اليوم');
 
-// ——— ترقية النسخة تمحو مخزون النسخة السابقة (مسكّن الأجهزة المخلوطة) ———
-caches.store.set('muallim-audio-v7', new FakeCache());
-(await caches.open('muallim-audio-v7')).entries.set(`${SCOPE}audio/${KEY_A}.mp3`, 'قديم مخلوط');
-await fire('activate');
-ok(!(await caches.keys()).includes('muallim-audio-v7'),
-  'وترقية النسخة تمحو مخزون السابقة كله — فيُطهَّر ما خُلط فعلاً على الأجهزة');
+// ——————— ٤. ترقيةُ نسخةٍ حقيقية لا تعيد تنزيل الصوت (حزمة «خفّة التخزين») ———————
+//
+// **العيب المحروس**: كان اسم مخزن الصوت `muallim-audio-${VERSION}`، ورقمُ النسخة يتغيّر
+// مع كل حزمة — فيولد مخزنٌ فارغ ويُحذف السابق عند التفعيل، فيعيد جهازُ الطفلة جلب
+// آلاف الملفات (٤١ ميغابايت) في **كل** تحديث. وهو هدرٌ محض: بصماتُ المحتوى تحكم
+// الطزاجة سلفاً. والفحصُ هنا ترقيةٌ حقيقية: `app/sw.js` نفسُه برقم نسخةٍ مرفوع يُركَّب
+// فوق المخزون القائم، ويُقاس ما جُلب من الشبكة — والمطلوب صفر.
+
+console.log('\n٤. ترقيةُ النسخة لا تعيد جلب صوتٍ لم تتغيّر بصمتُه');
+
+const bumped = swSource.replace(/(const VERSION = '[^']*)'/, "$1-bump'");
+const next = loadSw(bumped);
+net = [];
+await next.fire('install');
+ok(mp3Hits().length === 0,
+  `التركيبُ الجديد لم يجلب ملفاً صوتياً واحداً (${mp3Hits().length} طلباً)`);
+await next.fire('activate');
+ok((await caches.keys()).filter((n) => n.startsWith('muallim-audio')).length === 1
+  && (await caches.keys()).includes(AUDIO_CACHE),
+  `ومخزن الصوت واحدٌ باسمه الثابت عبر النسخ (${AUDIO_CACHE})`);
+ok((await cachedUrls()).length === 4, `والأصوات الأربعة في مواضعها (${(await cachedUrls()).length})`);
+ok(!(await caches.keys()).some((n) => n.startsWith('muallim-shell') && !n.includes('bump')),
+  'وقشرةُ النسخة السابقة وحدَها مُحيت (ملفاتُها تتبدّل تحت أسمائها فتحتاج الوسم)');
+
+// ——— الجهاز العابر من الاسم الموسوم: يتبنّى صوته مرّةً ولا ينزّله ———
+// (مرحلةُ عمرٍ واحدة لكل جهاز: يوم يبلغه هذا الإصلاح. ولولاها لدفع ثمنَ الإصلاح نفسِه
+//  تنزيلاً كاملاً أخيراً.) ويُدسّ فيه أثرٌ مخلوط بلا وسم: يُتبنّى ثم يكنسه الكنسُ نفسُه.
+const legacy = new FakeCache();
+for (const [url, body] of (await audioCache()).entries) legacy.entries.set(url, body);
+legacy.entries.set(`${SCOPE}audio/${KEY_A}.mp3`, 'قديم مخلوط');
+caches.store.set('muallim-audio-v18', legacy);
+caches.store.delete(AUDIO_CACHE);
+
+net = [];
+await next.fire('install');
+ok(mp3Hits().length === 0,
+  `العابرُ من مخزنٍ موسومٍ بنسخة يتبنّى صوته بلا تنزيل (${mp3Hits().length} طلباً)`);
+const adopted = await cachedUrls();
+ok(adopted.length === 4 && adopted.every((u) => u.includes('?v=')),
+  `والمخزونُ أربعةٌ موسومة لا خمسة (${adopted.length}) — فما خُلط يكنسه الكنسُ نفسُه`);
+await next.fire('activate');
+ok(!(await caches.keys()).includes('muallim-audio-v18'),
+  'ثم يُمحى المخزون الموسوم القديم عن آخره (لا نسختان على الجهاز)');
+
+// ——— الإخفاق يُعدّ ولا يُبتلَع: وإن وقع فلا كنسَ (صيانةً للقديم الصالح) ———
+// حصةُ التخزين تضيق على الأجهزة الأقدم فيفشل الخزن — وكنسُ «ما بَطَل» عندئذٍ يمحو
+// صالحاً قائماً ولا يضع مكانه شيئاً، فيصمت الصوت خارج الشبكة.
+disk.delete(`audio/${KEY_B}.mp3`);                       // ملفٌ يُخفق جلبه
+(await audioCache()).entries.delete(`${SCOPE}audio/${KEY_B}.mp3?v=2222bbbb`);
+(await audioCache()).entries.set(`${SCOPE}audio/${KEY_A}.mp3?v=0000old0`, 'وسمٌ بطل');
+await next.fire('install');
+const afterFail = await cachedUrls();
+ok(afterFail.includes(`${SCOPE}audio/${KEY_A}.mp3?v=0000old0`),
+  'إخفاقُ ملفٍ يمنع الكنس — لا يُمحى مخزونٌ قائم في جولةٍ ناقصة');
+setSite({ aBody: 'صوت ألف — الجديد (Sulafat)', aTag: '9999aaaa' });   // عاد الملف
+await next.fire('install');
+ok(!(await cachedUrls()).includes(`${SCOPE}audio/${KEY_A}.mp3?v=0000old0`)
+  && (await cachedUrls()).length === 4,
+  'وأولُ جولةٍ تامّة تكنسه (الكنس مؤجَّلٌ لا مُلغى)');
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات كسر كاش الصوت ناجحة');
 process.exit(fails ? 1 : 0);

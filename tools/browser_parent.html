@@ -94,6 +94,13 @@ async function reload() {
 }
 
 const dayNumber = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+// مفتاحُ يوم اليوم بصيغة `progress.dayKey` — ساعةُ الاستعمال لا تكتب في سواه،
+// فبه يُفرَز ما من حقّ الساعة أن تحرّكه ممّا يجب أن يبقى ساكناً حرفاً بحرف.
+const TODAY = (() => {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+})();
 
 // جبهةُ الطفل المزروع: أتمّ المجموعة الأولى كلها، وله نجمةٌ **خلف** الجبهة (`g2:ن`)
 // لا تحرّكها — فأول ناقصٍ هو درس مدّ الألف الذي يليها. مقصودٌ في الزرع: الحالةُ التي
@@ -113,6 +120,9 @@ function seedState() {
       'ل|damma|build': skill(1, 2, 0, 0),
     },
     days: { '2020-01-01': 600 },
+    // تاريخُ خفوت كلمتين (حزمة الخفوت): حالةٌ تامّة لا ناقصة — فلو نقص حقلٌ لملأه أولُ
+    // حفظٍ بفراغه، فيبدو تطبيعُ الحالة تغيّراً في التقدّم ويكذب فحصُ الترقية على نفسه.
+    reads: { 'بابا': { n: 3, day: '2020-01-01' }, 'شمس': { n: 1, day: '2020-01-01' } },
     reviews: {},
     records: [{ node: 'story:s1', title: 'قصة', seconds: 22.5, day: '2020-01-01', at: 1 }],
     mic: true,
@@ -169,17 +179,59 @@ try {
   const reg = await waitForAsync(() => win.navigator.serviceWorker?.ready, 'تسجيل عامل الخدمة', 40000);
   ok(!!reg.active, `عامل الخدمة يعمل على التطبيق (${reg.active?.state})`);
   const before = (await win.caches.keys()).filter((n) => n.startsWith('muallim-')).sort();
-  ok(before.length === 2, `ومخزونه قائم باسم نسخته (${before.join('، ')})`);
+  const shellBefore = before.filter((n) => n.startsWith('muallim-shell'));
+  const audioBefore = before.filter((n) => n.startsWith('muallim-audio'));
+  ok(shellBefore.length === 1 && audioBefore.length === 1,
+    `ومخزونه قائم: قشرةٌ موسومةٌ بنسختها وصوتٌ باسمٍ ثابت (${before.join('، ')})`);
+
+  // حزمة «خفّة التخزين»: كان اسم مخزن الصوت يحمل النسخة، فكلُّ تحديثٍ يمحوه ويعيد
+  // تنزيل آلاف الملفات على آيباد الطفلة. والشاهدُ **عند الخادم** لا في الصفحة: جلبُ
+  // عامل الخدمة لا يمرّ بالنافذة فلا يراه جافاسكربت، وعدّادُ الخادم لا يخفيه شيء.
+  const audioHits = async () => (await (await fetch('/__audio_hits.json')).json()).mp3;
+  const hitsBefore = await audioHits();
 
   await win.navigator.serviceWorker.register('sw.js?bump=1', { scope: './' });
   const after = await waitForAsync(async () => {
     const keys = (await win.caches.keys()).filter((n) => n.startsWith('muallim-'));
-    return keys.length && keys.every((n) => n.includes('bump')) ? keys.sort() : null;
+    const shell = keys.filter((n) => n.startsWith('muallim-shell'));
+    return shell.length === 1 && shell[0].includes('bump') ? keys.sort() : null;
   }, 'تفعيل النسخة المرفوعة', 90000);
   ok(true, `ترقية النسخة تمّت فعلاً: المخزون صار ${after.join('، ')}`);
-  ok(!after.some((n) => before.includes(n)), 'ومخزون النسخة السابقة مُحي عن آخره');
+  ok(!after.includes(shellBefore[0]), 'وقشرةُ النسخة السابقة مُحيت عن آخرها');
+  ok(after.includes(audioBefore[0]) && after.filter((n) => n.startsWith('muallim-audio')).length === 1,
+    `ومخزنُ الصوت عبَر الترقية باسمه الثابت (${audioBefore[0]})`);
+  const refetched = (await audioHits()) - hitsBefore;
+  ok(refetched === 0,
+    `والترقيةُ لم تُعد جلب ملفٍّ صوتيٍّ واحد لم تتغيّر بصمتُه (${refetched} طلباً)`);
 
-  ok(stored() === stateBefore, 'وتقدّم الطفل لم يتغيّر بايتاً واحداً عبر الترقية');
+  // ساعةُ الاستعمال (`main.js`) تكتب في التقدّم كل عشر ثوانٍ ما دام الطفل حاضراً،
+  // والترقيةُ تستغرق أضعافها — فمساواةُ الحالة بايتاً ببايت كانت تطالب ساعةً من حقّها
+  // أن تدور بالوقوف، فتحمرّ بحقّ الساعة لا بعيبٍ في الترقية. **والعلاج تقسيةٌ لا
+  // تخفيف**: كلُّ ما ليس ساعةً يتطابق حرفاً بحرف، وما هو ساعةٌ يُثبَت أنه لم يتحرّك إلا
+  // بحساب الساعة نفسِه — فلو مسّت الترقيةُ بايتاً في غير ذلك لسقط الفحص كما كان.
+  // (وترتيبُ المفاتيح لا يُحتسب فرقاً: أولُ حفظٍ يعيد كتابة الحالة بترتيب `blank()`،
+  //  وهو ترتيبُ حروفٍ في ملفّ لا بايتٌ من تقدّم الطفل.)
+  const CLOCK = ['seconds', 'days', 'updatedAt'];
+  const canon = (state) => Object.entries(state)
+    .filter(([key]) => !CLOCK.includes(key))
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([key, value]) => `${key}=${JSON.stringify(value)}`);
+  const frozen = (state) => canon(state).join('\n');
+  const dayTotal = (state) => Object.values(state.days || {}).reduce((sum, n) => sum + n, 0);
+  const wasState = JSON.parse(stateBefore);
+  const nowState = parsed();
+  const moved = canon(nowState).filter((line) => !canon(wasState).includes(line))
+    .map((line) => line.split('=')[0]);
+  ok(frozen(nowState) === frozen(wasState),
+    'وتقدّم الطفل لم يتغيّر بايتاً واحداً عبر الترقية (ما خلا ساعةَ استعماله)'
+    + `${moved.length ? ' — تحرّك: ' + moved.join('، ') : ''}`);
+  const grew = nowState.seconds - wasState.seconds;
+  // اليومُ وحده يقبل الزيادة (وهو الذي تكتب فيه الساعة)، وكلُّ يومٍ مضى ثابتٌ لا يُمَسّ
+  const pastKept = Object.entries(wasState.days)
+    .every(([day, n]) => (day === TODAY ? nowState.days[day] >= n : nowState.days[day] === n));
+  ok(grew >= 0 && grew === dayTotal(nowState) - dayTotal(wasState) && pastKept
+    && nowState.updatedAt >= wasState.updatedAt,
+    `وساعتُه لم تتحرّك إلا بحسابها هي (+${grew} ثانية، ولا يومٌ مضى نقص ولا زاد)`);
   const boxes = parsed().skills;
   ok(boxes['ب|fatha|quiz'].box === 4 && boxes['م|kasra|haraka'].box === 1,
     'وصناديق ليتنر بأرقامها (لا تعود المراجعة من الصفر بعد تحديث)');
@@ -212,6 +264,22 @@ try {
       .find((t) => t.includes('تخزين') && !t.includes('جارٍ الفحص')),
     'سطر حال التخزين', 8000);
   ok(!!storageLine, `واللوحة تعلن حاله على هذا الجهاز (${storageLine.slice(0, 64)}…)`);
+
+  // «الأصوات المخزونة: س من ص» (حزمة «خفّة التخزين»): إخفاقُ الخزن كان يُبتلَع صامتاً،
+  // فتنقص ملفات ويصمت الصوت خارج الشبكة بلا خبر. والعددان **مقيسان من المخزن نفسِه
+  // ومن بياني الصوت** لا مكتوبَين هنا — فلو كذب السطر لأمسكه هذا الفحص.
+  const cachedLine = await waitFor(
+    () => $$('.audit .hint').map((p) => p.textContent).find((t) => t.includes('الأصوات المخزونة')),
+    'سطر الأصوات المخزونة', 15000);
+  const recitations = await (await fetch('data/recitations.json')).json();
+  const totalAudio = Object.keys(manifest).length
+    + Object.keys(recitations.ayat || {}).length + Object.keys(recitations.words || {}).length;
+  const audioCacheName = (await win.caches.keys()).find((n) => n.startsWith('muallim-audio'));
+  const inCache = (await (await win.caches.open(audioCacheName)).keys()).length;
+  const shown = cachedLine.replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .match(/\d+/g).map(Number);
+  ok(shown[0] === Math.min(inCache, totalAudio) && shown[1] === totalAudio,
+    `وتعلن كم صوتاً على الجهاز من كم (${cachedLine.slice(0, 40)}…)`);
 
   // ————— ٤) تصدير النسخة —————
   blobs = [];
@@ -264,9 +332,17 @@ try {
     'الاستعادة أرجعت النجوم كما كانت حرفاً بحرف');
   ok(JSON.stringify(restored.skills) === JSON.stringify(original.skills),
     'وصناديق ليتنر كذلك (المراجعة تكمل من حيث وقفت)');
-  ok(restored.seconds === original.seconds && restored.records.length === 1
-    && restored.days['2020-01-01'] === 600,
-    'ودقائقُ تعلّمه ومددُ قراءاته');
+  // النسخةُ لا الحالةُ الأولى هي المرجع: بين زرعِ الحالة وحفظِ النسخة دارت ساعةُ
+  // الاستعمال دورةً أو دورتين، فمساواةُ المستعاد بالمزروع تحمرّ بحقّ الساعة. **والتقسية
+  // أن يُقاس المستعادُ بالنسخة كلِّها**: كلُّ حقلٍ في الملف يعود بحرفه (لا الحقول الثلاثة
+  // التي كان يعدّها هذا السطر)، ومجموعُ أيامه يساوي مجموعَه الكليّ — فلا ثانيةَ ضاعت.
+  const saved = JSON.parse(backupText).state;
+  ok(frozen(restored) === frozen(saved) && restored.records.length === saved.records.length,
+    'والنسخةُ عادت بحقولها كلِّها حرفاً بحرف (نجومٌ وصناديقُ ومددُ قراءات وتاريخُ خفوت)');
+  ok(restored.seconds >= saved.seconds && restored.seconds === dayTotal(restored)
+    && restored.days['2020-01-01'] === saved.days['2020-01-01']
+    && saved.days['2020-01-01'] === original.days['2020-01-01'],
+    `ودقائقُ تعلّمه بأيامها (${restored.seconds} ثانية = مجموع أيامه، ويومٌ مضى بـ${restored.days['2020-01-01']})`);
 
   win.location.hash = '#/';
   await waitFor(() => $('.station'), 'الخريطة بعد الاستعادة');

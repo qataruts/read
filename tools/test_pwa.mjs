@@ -111,8 +111,37 @@ ok(sw.includes('precacheEmoji') && sw.includes('emoji/index.json'),
 ok(shell.includes('emoji/index.json'), 'وفهرسُ الأيقونات نفسه من ملفات الهيكل');
 ok(/request\.method !== 'GET'/.test(sw), 'ولا يعترض إلا طلبات GET');
 ok(sw.includes('self.location.origin'), 'ولا يمسّ أي مصدر خارجي');
-ok(/caches\.delete/.test(sw) && /VERSION/.test(sw),
-  'ورفع النسخة يمحو المخزون القديم (لا يعلَق طفل على نسخة قديمة)');
+ok(/caches\.delete/.test(sw) && /SHELL_CACHE = `muallim-shell-\$\{VERSION\}`/.test(sw),
+  'ورفع النسخة يمحو مخزون **القشرة** القديم (لا يعلَق طفل على نسخة قديمة)');
+
+// ————— خفّة التخزين: مخزنُ الصوت يعبر النسخ، والجلبُ مدفَّعٌ معدودُ الإخفاق —————
+//
+// العيب المُغلَق هنا: مخزنُ الصوت كان موسوماً بالنسخة، فكلُّ تحديثٍ يولّد مخزناً فارغاً
+// ويمحو السابق ⇒ إعادةُ تنزيل الصوت كلِّه على جهاز الطفلة في كل حزمة. والسلوكُ نفسُه
+// مُثبَتٌ على `sw.js` الحيّ في `tools/test_audio_cache.mjs` (ترقيةٌ حقيقية بصفر جلب)
+// وعلى Chrome في `browser_test.py --parent`؛ وهذه الثلاثةُ تحرس شكلَه في المصدر.
+
+const audioFiles = Object.keys(audioManifest).length
+  + Object.keys(recitations.ayat || {}).length + Object.keys(recitations.words || {}).length;
+const audioCacheName = (sw.match(/const AUDIO_CACHE = ([^;]+);/) || [])[1] || '';
+ok(!audioCacheName.includes('VERSION') && /^'[^'$]+'$/.test(audioCacheName.trim()),
+  `اسمُ مخزن الصوت ثابتٌ لا يحمل النسخة (${audioCacheName.trim() || 'غائب'})`
+  + ` — فلا يعيد التحديثُ تنزيل ${audioFiles} ملفاً صوتياً`);
+
+const precache = sw.slice(sw.indexOf('async function precacheAudio'))
+  .split('\n}\n')[0];
+const batch = Number((sw.match(/const AUDIO_BATCH = (\d+);/) || [])[1]);
+ok(batch >= 12 && batch <= 16 && /for \(.*AUDIO_BATCH\)/.test(precache) && /\.slice\(/.test(precache),
+  `والتخزين المسبق مُدفَّعٌ متتابع (${batch || 'بلا حدّ'} في الدفعة، لا ${audioFiles} طلباً دفعةً واحدة)`);
+ok(/\.keys\(\)/.test(precache) && /filter\(\(url\) => !have\.has\(url\)\)/.test(precache),
+  'ولا يُطلَب من الشبكة إلا الناقص (`cache.add` يجلب دائماً وإن كان مخزوناً)');
+ok(!/catch\(\(\) => \{\}\)/.test(precache) && /failed \+=/.test(precache)
+  && /if \(failed\) return;/.test(precache),
+  'والإخفاقاتُ معدودةٌ لا مبتلعة، وإن وقع إخفاقٌ فلا كنسَ (صيانةً للقديم الصالح)');
+const panel = read('js/parent.js');
+ok(read('js/progress.js').includes('export async function audioStored')
+  && panel.includes('progress.audioStored()') && panel.includes('الأصوات المخزونة'),
+  'وعددُ المخزون معروضٌ في لوحة وليّ الأمر (فلا يفاجئه صمتٌ لا يعرف سببه)');
 
 // ————— ٣. بيان التطبيق —————
 

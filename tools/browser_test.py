@@ -116,12 +116,28 @@ def pending_texts() -> list:
 
 
 def make_server(port: int, results: list):
+    # عدّادُ طلبات الصوت **عند الخادم** (حزمة «خفّة التخزين»): الشاهدُ الوحيد على أن
+    # ترقيةَ نسخةٍ لا تعيد تنزيل الصوت — فجلبُ عامل الخدمة لا يمرّ بالصفحة فلا تراه،
+    # وأثرُه هنا لا يُخفيه شيء. تقرؤه صفحةُ الاختبار على `/__audio_hits.json`.
+    hits = {"mp3": 0}
+
     class Handler(http.server.SimpleHTTPRequestHandler):
         def __init__(self, *a, **kw):
             super().__init__(*a, directory=str(APP), **kw)
 
         def do_GET(self):
             path, _, query = self.path.partition("?")
+            if path.startswith("/audio/") and path.endswith(".mp3"):
+                hits["mp3"] += 1
+            if path == "/__audio_hits.json":
+                body = json.dumps(hits).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
             # ترقيةُ نسخةِ عامل الخدمة في بيئة الاختبار (الحزمة ١١): `app/sw.js` **نفسُه**
             # برقم نسخةٍ مرفوع — فتقع الترقية كما تقع على جهاز الطفل (تركيبٌ ثم تفعيلٌ
             # يمحو مخزون السابقة)، ويُقاس عندها بقاءُ التقدّم. لا نسخةَ ثانية من الملف.

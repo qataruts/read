@@ -412,6 +412,18 @@ function summaryText(sum) {
 function backupSection(rerender) {
   const slot = h('div', { class: 'confirm-slot' });
   const storage = h('p', { class: 'hint' }, 'التخزين على هذا الجهاز: جارٍ الفحص…');
+  // سطرُ الأصوات المخزونة (حزمة «خفّة التخزين»): كان إخفاقُ الخزن يُبتلَع صامتاً —
+  // ومنه تجاوزُ حصة التخزين على الأجهزة الأقدم — فتنقص ملفاتٌ ولا يعلم أحد، ثم يصمت
+  // الصوت في الطائرة أو في السيارة. فالعدد معروضٌ لوليّ الأمر: يرى النقص قبل أن يفاجئه.
+  const cached = h('p', { class: 'hint' });
+  progress.audioStored().then((count) => {
+    if (!count || !cached.isConnected) return;
+    cached.textContent = count.stored >= count.total
+      ? `الأصوات المخزونة: ${arNum(count.total)} من ${arNum(count.total)}`
+        + ' — كلُّها على الجهاز، فيعمل التطبيق بلا إنترنت.'
+      : `الأصوات المخزونة: ${arNum(count.stored)} من ${arNum(count.total)}`
+        + ' — تكتمل من تلقائها حين يُفتح التطبيق متصلاً، وما نقص منها يُجلَب عند سماعه.';
+  });
 
   progress.persistedStorage().then((persisted) => {
     if (!storage.isConnected) return;
@@ -479,6 +491,7 @@ function backupSection(rerender) {
     ),
     slot,
     storage,
+    cached,
     h('p', { class: 'note' },
       'في النسخة: النجوم وصناديق المراجعة ودقائق التعلّم ومدد قراءاته الجهرية'
       + ' وتاريخ خفوت كلماته. وليس فيها تسجيلات صوته — تلك لا تغادر جهازه أبداً.'),

@@ -1033,6 +1033,47 @@ export async function persistedStorage() {
   }
 }
 
+/**
+ * كم صوتاً على هذا الجهاز من كم (حزمة «خفّة التخزين»): `{stored, total}` أو `null`.
+ *
+ * موضعُها هنا لأنها أختُ `persistedStorage` لا أختُ `audio.js`: كلتاهما **قياسُ حال
+ * التخزين على الجهاز** يُعرض لوليّ الأمر في سطرٍ واحد، ولا تشغّل صوتاً ولا تعرف مفتاحاً.
+ *
+ * **والقياس من المخزن نفسِه لا من تقريرٍ يكتبه عاملُ الخدمة**: خبرٌ عن نفسه قد يكذب
+ * (يُكتب قبل أن يُخفق التخزين، أو يبقى بعد إخلاء المتصفّح للمخزون) — أما عدُّ مفاتيح
+ * المخزن فهو الحاصلُ الآن. واسمُ المخزن يُلتمس بسابقته لا بحرفه، فلا ينكسر السطر إن
+ * تغيّر اسمٌ في `sw.js` — والسابقة عقدٌ واحد بين الملفين.
+ *
+ * **وبيانا الصوت يُقرآن من المخزون لا من الشبكة** (`caches.match` لا `fetch`): عهدُ
+ * «صفر طلبٍ شبكيّ في دورة التسجيل» (الحزمة ١٠) عهدٌ مطلق لا يُستثنى منه سطرُ عرضٍ —
+ * وهذه اللوحةُ نفسُها تعرض تسجيلات الطفل. وهو أصحُّ أيضاً: العددُ يُقرأ دون إنترنت.
+ * فإن لم يُخزَّن البيانان بعدُ (أولُ فتحةٍ قبل تمام التركيب) يسقط السطر ولا يكذب.
+ */
+export async function audioStored() {
+  if (typeof caches === 'undefined') return null;
+  try {
+    const name = (await caches.keys()).find((n) => n.startsWith('muallim-audio'));
+    if (!name) return null;
+    const stored = new URL('../', import.meta.url);
+    const read = async (path) => {
+      const hit = await caches.match(new URL(path, stored));
+      return hit ? hit.json() : null;
+    };
+    const [manifest, recitations] = await Promise.all([
+      read('audio/manifest.json'), read('data/recitations.json'),
+    ]);
+    if (!manifest) return null;
+    const total = Object.keys(manifest).length
+      + Object.keys(recitations?.ayat || {}).length
+      + Object.keys(recitations?.words || {}).length;
+    if (!total) return null;
+    const have = (await (await caches.open(name)).keys()).length;
+    return { stored: Math.min(have, total), total };
+  } catch {
+    return null;      // متصفّح بلا Cache API أو تصفّح خاص: السطر يسقط ولا ينكسر شيء
+  }
+}
+
 // ————— إدارة —————
 
 export function snapshot() {

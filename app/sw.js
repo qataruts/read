@@ -23,13 +23,22 @@
 // (`data/recitations.json`) — منفصلان عمداً (نصّ المصحف ممنوع من فهرس المولَّد)،
 // ويُخزَن كلاهما فتعمل التلاوة دون إنترنت كبقية الأصوات.
 //
-// عند تغيير أي ملف من ملفات الهيكل: ارفع VERSION فيُمحى المخزون القديم كله.
+// عند تغيير أي ملف من ملفات الهيكل: ارفع VERSION فيُمحى مخزون **القشرة** القديم.
 // ويحرس اختبار `tools/test_pwa.mjs` أن قائمة SHELL لا تنسى ملفاً موجوداً في app/،
 // و`tools/test_audio_cache.mjs` يشغّل هذا الملف نفسَه على كاشٍ وشبكةٍ مزيَّفين.
+//
+// **ولماذا اسمُ مخزن الصوت بلا نسخة؟** (حزمة «خفّة التخزين»، ١١ أغسطس ٢٠٢٦) كان
+// `muallim-audio-${VERSION}`، فكلُّ حزمةٍ ترفع النسخة كانت تولّد مخزناً فارغاً وتمحو
+// السابق ⇒ يعيد جهازُ الطفلة تنزيل الصوت كلِّه (٤١ ميغابايت اليوم، وأكثر غداً) في
+// كل تحديث. **وهو هدرٌ محض**: طزاجةُ الصوت تحكمها بصمةُ محتواه في الرابط (`?v=`) لا
+// اسمُ المخزن، والكنسُ في آخر `precacheAudio` يحذف ما بَطَل بالفعل. فصار الاسم ثابتاً
+// يعبر النسخ، وبقيت القشرة موسومةً كما هي (ملفاتُها تتغيّر تحت أسمائها فتحتاج الوسم).
+// ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
+// كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v18';  // v18: القرآني الموسّع (ثماني سور + خطوة الترديد بكتلة record.js)
+const VERSION = 'v19';  // v19: خفّة التخزين (مخزن صوتٍ ثابت، ودفعاتٌ معدودة الإخفاق)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
-const AUDIO_CACHE = `muallim-audio-${VERSION}`;
+const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
 
 const SHELL = [
@@ -124,26 +133,82 @@ function audioUrl(stem, tags) {
   return tags[stem] ? `${href}?v=${tags[stem]}` : href;
 }
 
+/** حجم الدفعة: ٢٦٢٨ طلباً متوازياً في `install` قطيعٌ يخنق الشبكة على جهازٍ منزليّ
+ *  ويزاحم أصواتَ الطفل نفسِه وهو يلعب. ستَّ عشرةَ في النفَس تكفي الإنتاجية ولا تخنق. */
+const AUDIO_BATCH = 16;
+
+/** ترتيب الأولوية بلا أن يعرف عاملُ الخدمة أين بلغ الطفل (تقدّمُه في تخزين الصفحة،
+ *  ولا طريق من هنا إليه ولا يُراد): **ما سمعه الطفل مخزونٌ سلفاً** (يخزنه `cacheFirst`)
+ *  فيسقط من قائمة الجلب أصلاً؛ والباقي يُرتَّب بأثر المنهج نفسِه في النصّ: المنهج يصعد
+ *  من اسم الحرف إلى الحرف بحركته إلى المقطع إلى الكلمة إلى الجملة، **وطولُ النصّ هو
+ *  أثرُ ذلك الصعود** — فالأقصر أوّلُ ما يحتاجه، والأطول أبعدُه. وتلاوةُ القارئ آخِراً:
+ *  المرحلة القرآنية آخرُ الرحلة لكل طفل. فإن انقطع التخزين كان الناقصُ أبعدَ ما يحتاج. */
+function audioOrder(generated, recitations) {
+  const entries = Object.entries(generated || {})
+    .map(([stem, text]) => ({ stem, far: [...String(text)].length }));
+  // أسماءُ الملفات لا المفاتيح: تلاوةُ الكلمة المفردة تُخزَن باسمها الموسوم `wbw-`
+  for (const stem of Object.keys(recitations?.ayat || {})) entries.push({ stem, far: Infinity });
+  for (const key of Object.keys(recitations?.words || {})) {
+    entries.push({ stem: `wbw-${key}`, far: Infinity });
+  }
+  entries.sort((a, b) => (a.far - b.far) || (a.stem < b.stem ? -1 : 1));
+  return entries.map((e) => e.stem);
+}
+
+/** تبنّي مخزون الصوت الموسوم بنسخةٍ سابقة (`muallim-audio-v18` وما قبله) — مرّةً
+ *  واحدة في عمر كل جهاز: يوم يعبر إلى الاسم الثابت. لولاه لدفع جهازُ الطفلة ثمنَ
+ *  الإصلاح نفسِه تنزيلاً كاملاً أخيراً. ولا يخلط قديماً بجديد: ما يُتبنّى يمرّ على
+ *  كنس `precacheAudio` بعده مباشرةً فيسقط كلُّ ما ليس في المتوقَّع اليوم. */
+async function adoptLegacyAudio(cache) {
+  const legacy = (await caches.keys())
+    .filter((name) => name.startsWith('muallim-audio-') && name !== AUDIO_CACHE);
+  for (const name of legacy) {
+    const old = await caches.open(name);
+    for (const request of await old.keys()) {
+      const response = await old.match(request);
+      if (response) await cache.put(request, response);
+    }
+  }
+}
+
 /** خزن الأصوات كلها من بياناتها — بعدها لا يحتاج التطبيق شبكةً البتّة.
  *  البيانان: فهرس المولَّد، وبيان التلاوة بصوت القارئ (كلاهما «مفتاح ← نصّ»)،
  *  ومع كلٍّ بصماتُ محتواه فيُخزَن بالرابط الذي يطلبه التطبيق نفسِه.
  *  ثم **تُكنَس الأوسمة الغابرة**: كل مخزونٍ ليس في المتوقَّع اليوم (وسمٌ أقدم
  *  لملفٍ استُبدل، أو رابطٌ بلا وسم خُزن قبل قراءة البصمات) يُحذف — فلا يبقى في
- *  الجهاز أثرٌ للصوت القديم يُسمَع من طريقٍ آخر. */
+ *  الجهاز أثرٌ للصوت القديم يُسمَع من طريقٍ آخر.
+ *
+ *  **ولا يُجلَب إلا الناقص**: `cache.add` يجلب من الشبكة دائماً وإن كان الملف مخزوناً،
+ *  فبه كانت الترقيةُ تعيد تنزيل الصوت كلِّه ولو ثبت اسمُ المخزن. والمخزونُ يُقارَن
+ *  بالرابط الموسوم نفسِه، فملفٌ تبدّلت بصمتُه يُجلَب وحدَه.
+ *
+ *  **والإخفاق يُعدّ ولا يُبتلَع**: `catch(() => {})` كان يُخفي تجاوزَ حصة التخزين
+ *  (سقفُ سفاري على الأجهزة الأقدم ضيّق) فتفشل ملفات ويصمت الصوت خارج الشبكة بلا
+ *  خبر. فإن أخفق شيءٌ **لا نكنس**: القديمُ الصالح خيرٌ من فراغٍ في أذن الطفل، وسطرُ
+ *  «الأصوات المخزونة: س من ص» في لوحة وليّ الأمر يقيس الحاصل من المخزن نفسِه. */
 async function precacheAudio() {
   const cache = await caches.open(AUDIO_CACHE);
   const [generated, versions, recitations] = await Promise.all([
     json('audio/manifest.json'), json('audio/versions.json'), json('data/recitations.json'),
   ]);
   const tags = { ...(versions || {}), ...(recitations?.v || {}) };
-  // أسماءُ الملفات لا المفاتيح: تلاوةُ الكلمة المفردة تُخزَن باسمها الموسوم `wbw-`
-  const stems = [...Object.keys(generated || {}), ...Object.keys(recitations?.ayat || {}),
-    ...Object.keys(recitations?.words || {}).map((key) => `wbw-${key}`)];
-  const urls = stems.map((stem) => audioUrl(stem, tags));
-  // واحداً واحداً: ملفٌ ناقص لا يُسقِط الخزن كله (بخلاف cache.addAll)
-  await Promise.all(urls.map((url) => cache.add(url).catch(() => {})));
+  await adoptLegacyAudio(cache);
+
+  const urls = audioOrder(generated, recitations).map((stem) => audioUrl(stem, tags));
+  const have = new Set((await cache.keys()).map((request) => request.url));
+  const missing = urls.filter((url) => !have.has(url));
+
+  let failed = 0;
+  for (let i = 0; i < missing.length; i += AUDIO_BATCH) {
+    // واحداً واحداً داخل الدفعة: ملفٌ ناقص لا يُسقِط الدفعة كلها (بخلاف cache.addAll)
+    const batch = await Promise.all(missing.slice(i, i + AUDIO_BATCH)
+      .map((url) => cache.add(url).then(() => true, () => false)));
+    failed += batch.filter((done) => !done).length;
+  }
+  if (failed) console.warn(`[sw] تعذّر خزن ${failed} ملفاً صوتياً من ${missing.length}`);
 
   if (!generated) return;            // بيانٌ لم يصل: لا نكنس على غير علم
+  if (failed) return;                // إخفاقٌ وقع: لا نكنس (صيانةً للقديم الصالح)
   const wanted = new Set(urls);
   const stale = (await cache.keys()).filter((request) => !wanted.has(request.url));
   await Promise.all(stale.map((request) => cache.delete(request)));
