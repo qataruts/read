@@ -87,8 +87,17 @@ function renderQuranLetters() {
     steps: [
       {
         title: 'الحرفان',
+        // **لكل علامةٍ قاعدتُها على بطاقتها** (أذنُ المالك): كانت قاعدةً واحدة تجمع
+        // الحرفين وتقتبس رموزَهما بين قوسين — فنطقها المولّد رموزاً مخمَّنة، وطالت
+        // سبع عشرة ثانية. فصارتا قاعدتين قصيرتين، كلٌّ عند علامتها بزرّ سماعها.
+        // **والصورُ تبقى معروضة**: تُقرأ بالعين ولا تُنطق، فلا يخمّنها مولّد.
         build: ({ next }) => h('div', {},
-          ...ruleHead(data.title, data.face, data.rule),
+          heroStep([
+            h('h2', {}, data.title),
+            // زخرفةٌ صامتة لا زرّ: لا قاعدةَ منطوقة في رأس الدرس — قاعدةُ كلِّ
+            // علامةٍ على بطاقتها أدناه (أذنُ المالك)
+            h('span', { class: 'giant', 'aria-hidden': 'true' }, giantInk(data.face)),
+          ], []),
           ...data.signs.map((sign) => h('section', { class: 'sign-card' },
             h('div', { class: 'sign-head' },
               h('span', { class: 'sign-face' }, sign.sign),
@@ -98,6 +107,13 @@ function renderQuranLetters() {
                   h('span', { class: 'sign-shape' }, sh))),
               ),
             ),
+            h('p', { class: 'rule' }, sign.rule),
+            h('div', { class: 'row' },
+              h('button', {
+                class: 'btn btn--primary',
+                'aria-label': `اسمع: ${sign.rule}`,
+                onclick: () => audio.play(sign.rule),
+              }, icon('ear'), ' اسمع القاعدة')),
             h('div', { class: 'row wordrow' }, sign.words.map(spokenWord)),
           )),
           nextButton(next),

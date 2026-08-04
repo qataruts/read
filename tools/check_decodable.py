@@ -362,6 +362,10 @@ def parse_quran(src: str) -> dict:
         signs.append({
             "sign": one(r"sign:\s*'([^']*)'", chunk, ""),
             "name": one(r"name:\s*'([^']*)'", chunk, ""),
+            # قاعدةُ كل علامةٍ على بطاقتها (أذنُ المالك، ١١ أغسطس ٢٠٢٦): شُقّت قاعدةُ
+            # الدرس الواحدة قاعدتين قصيرتين بلا رمزٍ مقتبس — فتُقرأ من هنا كي تدخل
+            # جردَ المنطوق (وإلا لسقطت من فحص «لكل منطوقٍ صوت» صامتةً).
+            "rule": one(r"rule:\s*'([^']*)'", chunk, ""),
             "shapes": re.findall(r"'([^']*)'", bracket_region(chunk, "shapes:")),
             "words": worded(chunk),
         })
@@ -478,6 +482,7 @@ def check_quran(quran, taught, letters, source):
     """
     errors, warnings = [], []
     spoken, mushaf, station = [], [], []
+    spoken += [s["rule"] for s in quran["letters"]["signs"] if s["rule"]]
 
     # ١. الحرفان الجديدان يوسّعان الحروف المدروسة في هذه المرحلة وحدها
     new_signs = [s["sign"] for s in quran["letters"]["signs"]]

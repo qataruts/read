@@ -1428,6 +1428,70 @@ def check_tatweel(data: dict, quiet: bool = False) -> int:
     return 0
 
 
+QUOTED = re.compile(r"«([^»]{1,3})»")
+
+
+def spoken_inventory(data: dict) -> list:
+    """كلُّ نصٍّ يدخل قائمة الصوت — بمصادره الثلاثة (منهجٌ ومعجمٌ ومكتبة).
+
+    ولا يدخلها **ما يُعرَض ولا يُنطَق**: صورُ الحروف (`shapes`) وأمثلةُ الرسم
+    العثمانية ووجوهُ العقد (`face`) — تُقرأ بالعين، فلا حكمَ للأذن عليها.
+    """
+    src = CURRICULUM.read_text(encoding="utf-8")
+    _letters, groups, parts = parse_curriculum(src)
+    quran = parse_quran(parts.get("QURAN", ""))
+    out = [(s["rule"], "درس علامة") for s in parse_skills(parts.get("SKILLS", "")) if s["rule"]]
+    out += [(s["rule"], "درس الحرفين") for s in quran["letters"]["signs"] if s["rule"]]
+    out += [(s["rule"], "درس الرسم") for s in quran["rasm"]["signs"] if s["rule"]]
+    out += [(say, "الحروف المقطَّعة") for m in quran["muqattaat"]["items"] for _ch, say in m["parts"]]
+    for entry in data.get("words") or []:
+        out.append((entry.get("sentence"), f"معجم/{entry.get('word')}"))
+    out += [(t, "المعجم المساند") for t in data.get(SUPPORT_FIELD) or []]
+    out += [(t, "سلّم الجمل") for t in all_sentences(data)]
+    if STORY_INDEX.exists():
+        _index, stories = load_stories()
+        for story in stories:
+            if story.get("missing"):
+                continue
+            out.append((story.get("title"), f"قصة «{story.get('id')}»"))
+            out += [(p.get("text"), f"قصة «{story.get('id')}»") for p in story.get("pages") or []]
+            out.append(((story.get("question") or {}).get("text"), f"قصة «{story.get('id')}»"))
+    return [(t, where) for t, where in out if t]
+
+
+def check_spoken_symbols(data: dict, quiet: bool = False) -> int:
+    """**لا يُقتبَس رمزٌ مفرد في نصٍّ يُنطَق** — أذنُ المالك (١١ أغسطس ٢٠٢٦).
+
+    **العلّة**: قاعدةُ درس الهمزة كانت تقتبس الرموز بين قوسين («الهمزة تُكتب وحدها
+    ‹ء› أو على ألف ‹أ›…»). وهي على الورق واضحةٌ لا غبار عليها — وفي الأذن كارثة:
+    **الرمزُ المفرد لا اسمَ منطوقاً له، فيخمّنه المولّد** فنطق «ء» «ها».
+
+    وهذا الحارسُ أخو `check_tatweel`، وصنفُهما واحد: **ما يصحّ على الورق ولا يصحّ
+    في الأذن**. فالأوّلُ يمنع رسماً ينهار حين يُنزَع شكلُه، وهذا يمنع نصّاً ينهار
+    حين يُنطَق. والعلاجُ في الحالين واحد: تُسمّى العلامةُ بلسانها لا تُقتبَس برسمها
+    («على ألف» لا «على ‹أ›»)، وتبقى صورتُها **معروضةً على الشاشة** تُقرأ بالعين.
+
+    و**يُستثنى ما يُعرَض ولا يُنطَق** بناءً لا استثناءً: هذا الفحص لا يقرأ إلا جردَ
+    المنطوق (`spoken_inventory`) — فصورُ الحروف وأمثلةُ الرسم ووجوهُ العقد خارجه.
+    """
+    errors = []
+    for text, where in spoken_inventory(data):
+        for quoted in QUOTED.findall(text):
+            bare_q = quoted.replace(TATWEEL, "")
+            if len(bare_q) == 1 and not bare_q.isspace():
+                errors.append(f"[{where}] «{text}» يقتبس الرمز «{quoted}» — "
+                              "الرمزُ المفرد لا اسمَ منطوقاً له فيخمّنه المولّد؛ "
+                              "سَمِّه بلسانه وأبقِ صورتَه على الشاشة")
+    for line in errors:
+        print(f"  ✗ {line}")
+    if errors:
+        print(f"\n✗ {len(errors)} نصّاً منطوقاً يقتبس رمزاً مفرداً (أذنُ المالك)")
+        return 1
+    if not quiet:
+        print("✓ ولا نصَّ منطوقٍ يقتبس رمزاً مفرداً: ما يُنطَق يُسمّى، وما يُرسَم يُعرَض.")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description="فحص معجم «حديقة الكلمات»")
     ap.add_argument("-q", "--quiet", action="store_true", help="إخفاء التنبيهات")
@@ -1448,7 +1512,8 @@ def main():
         sys.exit(fill_support(data))
     status = check(data, letters, quiet=args.quiet)
     status |= check_stories(data, letters, quiet=args.quiet)
-    sys.exit(status | check_tatweel(data, quiet=args.quiet))
+    status |= check_tatweel(data, quiet=args.quiet)
+    sys.exit(status | check_spoken_symbols(data, quiet=args.quiet))
 
 
 if __name__ == "__main__":

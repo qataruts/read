@@ -207,10 +207,18 @@ try {
   ok(texts('.sign-shape').join('') === QURAN.letters.signs.flatMap((s) => s.shapes).join(''),
     `وصور الهمزة معروضة (${texts('.sign-shape').join(' ')})`);
 
-  const beforeRule = heardLog.length;
-  btn('اسمع القاعدة').click();
-  await waitFor(() => heardLog.length > beforeRule, 'صوت القاعدة');
-  ok(lastHeard() === QURAN.letters.rule, 'زر القاعدة يُسمعها');
+  // **لكل علامةٍ قاعدتُها وزرُّ سماعها** (أذنُ المالك): شُقّت قاعدةُ الدرس الواحدة
+  // قاعدتين قصيرتين بلا رمزٍ مقتبس — فالرمزُ المفرد لا اسمَ منطوقاً له فيخمّنه المولّد.
+  const ruleBtns = $$('.btn').filter((b) => b.textContent.includes('اسمع القاعدة'));
+  ok(ruleBtns.length === QURAN.letters.signs.length,
+    `لكل علامةٍ زرُّ قاعدتها (${ruleBtns.length} زرّاً لعلامتين)`);
+  for (const [i, sign] of QURAN.letters.signs.entries()) {
+    const beforeRule = heardLog.length;
+    ruleBtns[i].click();
+    await waitFor(() => heardLog.length > beforeRule, `صوت قاعدة ${sign.name}`);
+    ok(lastHeard() === sign.rule, `زرُّ قاعدة ${sign.name} يُسمعها وحدَها`);
+    ok(!/«/.test(sign.rule), `وقاعدتُها بلا رمزٍ مقتبس (${sign.rule})`);
+  }
 
   // كلمةٌ لكل صورةٍ من صور الحرفين — والصورُ صارت خمساً للهمزة (حزمة «القرآني الموسّع»)
   const words = $$('.example-word');
