@@ -12737,5 +12737,13 @@
     "priority": 100,
     "status": "pending",
     "doneAt": null
+  },
+  {
+    "text": "الْكَأْسُ لَامِعَةْ",
+    "category": "sentence",
+    "requestedBy": "manager-extreview",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
   }
 ]
