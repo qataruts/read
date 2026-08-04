@@ -89,6 +89,16 @@ const END_MARKS = new Set([FATHA, KASRA, DAMMA, SUKUN, ...TANWEEN]);
 /** نزع علامة الآخر (سكون الوقف أو حركة أو تنوين) — وما عداها يبقى. */
 const stripEnd = (base) => (END_MARKS.has(base.slice(-1)) ? base.slice(0, -1) : base);
 
+// حرفُ المدّ وحركتُه المجانسة — بهما وحدَهما يكون الآخِرُ عليلاً فلا تظهر حركةُ إعرابه
+// («الْبَطَاطَا» و«الرَّاعِي»). ونظيرُهما `MADD_BEFORE`/`ill_ended` في `make_sentences.py`.
+const MADD_BEFORE = { 'ا': 'َ', 'و': 'ُ', 'ي': 'ِ' };
+const illEnded = (body) => {
+  if (body.length < 2 || !MADD_BEFORE[body.slice(-1)]) return false;
+  const before = body.slice(0, -1).replace(new RegExp(`${SHADDA}+$`), '');  // «بُنِّي»
+  return Boolean(before) && before.slice(-1) === MADD_BEFORE[body.slice(-1)];
+};
+const attach = (body, mark) => (illEnded(body) ? body : body + mark);
+
 /**
  * «الـ» + الكلمة + علامة الآخر، بالإدغام الشمسي كما تُكتب في المصادر:
  * قمريّ بلامٍ ساكنة («الْغُرْفَةُ»)، وشمسيّ بلامٍ بلا حركة وشدّةٍ بعد حركة أوّله
@@ -96,8 +106,8 @@ const stripEnd = (base) => (END_MARKS.has(base.slice(-1)) ? base.slice(0, -1) : 
  */
 function definite(base, mark) {
   const body = stripEnd(base);
-  if (SUN.has(body[0])) return `ال${body[0]}${body[1]}${SHADDA}${body.slice(2)}${mark}`;
-  return `ال${SUKUN}${body}${mark}`;
+  if (SUN.has(body[0])) return attach(`ال${body[0]}${body[1]}${SHADDA}${body.slice(2)}`, mark);
+  return attach(`ال${SUKUN}${body}`, mark);
 }
 
 /** المضاف إلى ياء المتكلم: «أُذُنْ» ← «أُذُنِي»، والتاء المربوطة تُبسَط («جَدَّةْ» ← «جَدَّتِي»). */
@@ -110,7 +120,7 @@ function possessed(base) {
 const DRESSES = {
   none: (base) => base,                             // آخرُ الجملة موقوفاً كما في المعجم
   def: definite,                                    // «الـ» وعلامة الموضع
-  bare: (base, mark) => stripEnd(base) + mark,      // نكرةٌ بعلامة الموضع (المضاف)
+  bare: (base, mark) => attach(stripEnd(base), mark),   // نكرةٌ بعلامة الموضع (المضاف)
   poss: possessed,                                  // مضافٌ إلى ياء المتكلم
 };
 
@@ -121,9 +131,14 @@ const DRESSES = {
  * يُستنبَط ثوبُها (كلَّ جملةٍ في الملف لا جملَ «أكمل» وحدها)، ويسقط بها الاختبار.
  */
 export function dressOf(base, token) {
-  const mark = END_MARKS.has(token.slice(-1)) ? token.slice(-1) : '';
-  for (const kind of Object.keys(DRESSES)) {
-    if (DRESSES[kind](base, mark) === token) return { kind, mark };
+  const end = END_MARKS.has(token.slice(-1)) ? token.slice(-1) : '';
+  // المنتهي بمدٍّ رمزُه بلا علامةِ آخر، فتُجرَّب عليه حركاتُ الإعراب أوّلاً (الضمّةُ
+  // أولاها) وإلا لبِس المشتّتُ ثوباً بلا حركة — نظيرُه `dress_of` في المولّد.
+  const marks = end ? [end] : (illEnded(stripEnd(base)) ? ['ُ', 'ِ', 'َ', ''] : ['']);
+  for (const mark of marks) {
+    for (const kind of Object.keys(DRESSES)) {
+      if (DRESSES[kind](base, mark) === token) return { kind, mark };
+    }
   }
   return null;
 }

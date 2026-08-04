@@ -493,6 +493,19 @@ def check(data: dict, letters: dict, known: set = None, quiet: bool = False) -> 
             deferred.append((word, entry["theme"], theme_id(themes, place)))
         ladder_items.append((word, sentence, place, label))
 
+    # ٢د-٢. **نفس الرسم، اختلافُ الحركات** (حكم المدير، ١٠ أغسطس ٢٠٢٦): يُجرَد الرسمُ
+    # من حركاته ويُعرَض ما تشابه **للعين البشرية تنبيهاً لا رفضاً آلياً** — فـ«عِلْم»
+    # و«عَلَم» كلمتان مشروعتان يفرّقهما المعنى، بينما «مِعْصَمْ»/«مِعْصَمُ» تكرارٌ
+    # مهرَّب بحركة. الآلةُ لا تفرّق بينهما، والعينُ تفرّق — فيُرفع إليها.
+    by_skeleton = {}
+    for entry in words:
+        by_skeleton.setdefault(bare(entry.get("word", "")), []).append(entry.get("word"))
+    same = {k: v for k, v in by_skeleton.items() if len(v) > 1}
+    if same:
+        warnings.append(f"{len(same)} رسماً تشترك فيه أكثرُ من كلمة (للعين لا للرفض): "
+                        + "؛ ".join(f"«{'» و«'.join(v)}»" for v in list(same.values())[:6])
+                        + ("…" if len(same) > 6 else ""))
+
     # ٢و. الجمل المتدرجة (الحزمة ٩أ): ٣–٥ كلمات تُؤلَّف بمولّد مقيَّد
     # (`tools/make_sentences.py`) لا بيد — والفاحص يحكم عليها بقواعد الجمل نفسها،
     # ويزيد: هدفٌ من المعجم حاضرٌ في الجملة (هو صورتُها وفراغُ «أكمل الجملة»).

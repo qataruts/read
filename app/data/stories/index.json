@@ -1,35 +1,34 @@
 {
-  "version": 1,
-  "note": "مكتبة «مصنع القصص» (الحزمة ٩) — تُؤلَّف بـtools/make_stories.py ويفحصها tools/check_lexicon.py، ولا تُحرَّر بيد.",
-  "support": [
-    "سَامِي",
-    "حَسَنْ",
-    "زَيْدْ",
-    "مَنْ",
-    "مَاذَا",
-    "أَيْنَ",
-    "مَعَ",
-    "يَبْحَثْ",
-    "يَجِدْ",
-    "يَسْقُطْ",
-    "يَشْكُرْ",
-    "تَقْفِزْ",
-    "سَعِيدْ",
-    "سَعِيدَةْ",
-    "حَزِينْ",
-    "يَحْمِلْ",
-    "يَقِفْ"
-  ],
-  "stories": [
-    "miftah-sami",
-    "jaddat-hasan",
-    "dirs-zayd",
-    "shorbat-ummi",
-    "arnab-alhadiqa",
-    "zahrat-alhaql",
-    "daftar-zayd",
-    "quffaz-hasan",
-    "hafilat-almadrasa",
-    "kurat-zayd"
-  ]
+ "version": 1,
+ "note": "مكتبة «مصنع القصص» (الحزمة ٩) — تُؤلَّف بـtools/make_stories.py ويفحصها tools/check_lexicon.py، ولا تُحرَّر بيد.",
+ "support": [
+  "سَامِي",
+  "حَسَنْ",
+  "زَيْدْ",
+  "مَنْ",
+  "مَاذَا",
+  "أَيْنَ",
+  "مَعَ",
+  "يَبْحَثْ",
+  "يَجِدْ",
+  "يَسْقُطْ",
+  "يَشْكُرْ",
+  "سَعِيدْ",
+  "سَعِيدَةْ",
+  "حَزِينْ",
+  "يَحْمِلْ",
+  "يَقِفْ"
+ ],
+ "stories": [
+  "miftah-sami",
+  "jaddat-hasan",
+  "dirs-zayd",
+  "shorbat-ummi",
+  "arnab-alhadiqa",
+  "zahrat-alhaql",
+  "daftar-zayd",
+  "quffaz-hasan",
+  "hafilat-almadrasa",
+  "kurat-zayd"
+ ]
 }

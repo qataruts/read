@@ -12745,5 +12745,8357 @@
     "priority": 100,
     "status": "pending",
     "doneAt": null
+  },
+  {
+    "text": "صُنْبُورْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قُفْلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُنَبِّهْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِشْطْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِنْدِيلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُثَلَّجْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَرَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَنْجَرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شَفْرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَجَّادَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "إِبْرِيقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِصْعَدْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَخْزَنْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دَرَجْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِزْهَرِيَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رِيْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِسْمَارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِلْكْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عُدَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَقْفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِغْرَفَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دَلْوْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وْ",
+    "category": "letter_haraka",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِذْيَاعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِنْشَارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَلَّاجَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَغْسَلَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَرُوسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَاحِرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اِبْتِسَامَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَحَّارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ضَابِطْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ضَا",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَارِسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطَلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَالَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَدَّادْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَمَلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَلَّاقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَوْأَمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَوْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَمَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَبَّاكْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زَبُونْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَرِيضْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَمَاعَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَاكِبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَيَّاطْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَاعِي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عِي",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَامِلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَجْمُوعَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَيَّارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُمَرِّضَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ضَةْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَدَاقَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دِمَاغْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَاحَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَدْرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جِلْدْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جُوعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَبْضْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَاجِبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطْنْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِعْدَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَطَشْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شَفَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَدْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ظَهْرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَنْجَرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَعَبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ظُفْرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَبِينْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رُكْبَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بِنْصِرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سُرُورْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَبْضَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَقَبَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِرْفَقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَفَسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَافِيَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطَاطَا",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فُلْفُلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَنْدَوِيشْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وِي",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِشْطَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَلَاوَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "أَنَانَاسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زَيْتُونَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فَطِيرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زَبِيبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَطْبُوخْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ذُرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَدَسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَسْكَوِيتْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَبَقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِشْمِشْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فُطْرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "أَرُزّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَخْبُوزْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَشْرُوبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شَرَابْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَاذِنْجَانْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَعْكَرُونَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "لَبَنْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَأْكَلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَحِينْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حِي",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَقْرَبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فَهْدْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "أَخْطَبُوطْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عُقَابْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "لَامَا",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَوْرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَوْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَامُوسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَرَطَانْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطْرِيقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَمْلَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دُبّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَحْلِيَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رُبْيَانْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خُفَّاشْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَغْلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خِنْزِيرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ضِفْدَعَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِرْشْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قُنْدُسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ضَبُعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حِمَارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَلَزُونْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زُو",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَرْتِيتْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَنْغَرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَعَامَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شُرُوقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَادِي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رِيشَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَرِيفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَصَاةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَاةْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غُرُوبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَطْرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عُشّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَوْسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَوْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَخْرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بُرْكَانْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَا",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غَيْمَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غَيْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زَرْعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بِرْكَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَةْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَوْكَبَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَوْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَادِيَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بُسْتَانْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَقِيعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَبْعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَيْفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَلّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غُصْنْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَبِيعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَيْلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَقْسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كَاتِبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اِمْتِحَانْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَدْوَلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دِرَاسَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كِتَابَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَكْتُوبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِلَفّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَقْمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عِلْمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَفّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُدَرِّسَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَرَقَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَمْعْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَعْلُومَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَبُّورَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَالِمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رِسَالَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَرْحْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَعْلِيمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَبْشُورَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَقَالْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُغَلَّفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَدْرِيسْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِرَاءَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ءَةْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَتْمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَوْبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عِمَامَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِكْيَاجْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رِبَاطْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جِلْدَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَبَاءَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَرْحَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غَسِيلْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِي",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صُدْرِيَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حِزَامْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سُتْرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زِرّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِكْوَاةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَاةْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَسِيجْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عِقْدْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خُفّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِلَادَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كُمّْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَرِيرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِشْبَكْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِلْسِلَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِشْجَبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِعْصَمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قُطْنْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عِطْرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَاطِرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِرْكَبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَصِيفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَقْبَرَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَوَّابَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَوْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شَاحِنَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَرَبَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَصْرِفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُتَنَزَّهْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَخْفَرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "إِسْعَافْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِرْوَحِيَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حِيْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فُنْدُقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَرَّارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُسْتَوْصَفْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِطْفَأَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "أَةْ",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِيكْرُوبَاصْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَتْجَرْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَاحَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَلْجَأْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَرْكَبَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَافِعَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَشْرَبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سُورْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِنَارَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "لَاعِبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَسَّامْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بُرْتُقَالِي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَايْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَفَّارَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَهْمْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَسْمَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَنَفْسَجِي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جِي",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِيثَارَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَا",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "لَوْحَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَرَقِيَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِلْصَقْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَمَادِي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بِيَانُو",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نُو",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَلْوِينْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِضْرَبْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَرْدِي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَغْمَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بِطَاقَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِزْمَارْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زَحْلُوقَةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بُنِّي",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نِي",
+    "category": "syllable",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُوسِيقَا",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِيدَالِيَّةْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "لُغْزْ",
+    "category": "word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصُّنْبُورُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقُفْلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُنَبِّهُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْطُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُثَلَّجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَرَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّنْجَرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّفْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِبْرِيقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِصْعَدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْزَنُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِسْمَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السِّلْكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعُدَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّلْوُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِذْيَاعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِنْشَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصُّنْبُورُ نَظِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقُفْلُ صُلْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُنَبِّهُ صَاخِبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَاخِبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْطُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِنْدِيلُ نَظِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُثَلَّجُ لَذِيذْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَرَّةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّنْجَرَةُ سَاخِنَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّفْرَةُ خَطِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّجَّادَةُ نَاعِمَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّجَّادَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِبْرِيقُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِصْعَدُ سَرِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْزَنُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّرَجُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّرَجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِزْهَرِيَّةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِسْمَارُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السِّلْكُ رَفِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَفِيعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعُدَّةُ ثَقِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّقْفُ مُرْتَفِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِغْرَفَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِغْرَفَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّلْوُ ثَقِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِذْيَاعُ صَاخِبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِنْشَارُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّلَّاجَةُ بَارِدَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّلَّاجَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَارِدَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَغْسَلَةُ نَظِيفَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّلْوُ تَحْتَ الصُّنْبُورِ فِي الْمَطْبَخْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَطْبَخُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَرِيرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَافِذَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَقْعَدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَاعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِصْبَاحُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَحْنُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "كُوبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِلْعَقَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِكِّينُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَمَّامُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَابُونُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَلَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِكْنَسَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تِلْفَازُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "هَاتِفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَدِيقَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جِدَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِرْوَحَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خِزَانَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِظَلَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِدْرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صُنْبُورُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قُفْلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُنَبِّهُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِشْطُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُثَلَّجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَرَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَنْجَرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شَفْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "إِبْرِيقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِصْعَدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَخْزَنُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِسْمَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِلْكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عُدَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دَلْوُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِذْيَاعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِنْشَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرُوسُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّاحِرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْاِبْتِسَامَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَارِسُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَطَلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَّاقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّوْأَمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَرِيضُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَمَاعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَامِلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَجْمُوعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَرُوسِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَاحِرِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اِبْتِسَامَتِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَارِسِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطَلِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَلَّاقِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَوْأَمِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَرِيضِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَمَاعَتِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَامِلِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَجْمُوعَتِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرُوسُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّاحِرُ مُخِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُخِيفْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْاِبْتِسَامَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَحَّارُ صَبُورْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضَّابِطُ صَبُورْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَارِسُ صَبُورْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَطَلُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَاهِرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَالَةُ طَيِّبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَدَّادُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَمَلُ صَعْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَمَلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَعْبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَّاقُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّوْأَمُ يَلْعَبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَمَّةُ طَيِّبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّبَّاكُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّبَّاكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّبُونُ يَشْتَرِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَرِيضُ يَنَامْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَمَاعَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاكِبُ يَرْكَبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَيَّاطُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاعِي يَمْشِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاعِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَامِلُ يَعْمَلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَعْمَلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَجْمُوعَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّيَّارُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُمَرِّضَةُ طَيِّبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُمَرِّضَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَيِّبَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّدَاقَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دِمَاغِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَاحَتِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَبْضِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شَفَتِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ظُفْرِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَبْضَتِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدِّمَاغُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاحَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّبْضُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّفَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الظُّفْرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَبْضَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "دِمَاغِي سَرِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاحَةُ نَاعِمَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَدْرِي عَرِيضْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جِلْدِي نَاعِمْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجُوعُ صَعْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجُوعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّبْضُ سَرِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَاجِبِي رَفِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطْنِي كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَطْنِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِعْدَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَطَشُ صَعْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّفَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَدِي نَاعِمْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَدِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ظَهْرِي عَرِيضْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَنْجَرَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّعَبُ صَعْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّعَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ظُفْرِي قَصِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَبِينِي وَاسِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرُّكْبَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بِنْصِرِي صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بِنْصِرِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّرُورُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَبْضَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّقَبَةُ طَوِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّقَبَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَوِيلَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِرْفَقِي صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَفَسِي طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَافِيَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَافِيَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدِّمَاغْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاحَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّبْضْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّفَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الظُّفْرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَبْضَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَيْنْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَسْمَعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأُذُنَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَنْفَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الذِّرَاعَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّجْلَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَدَمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّعْرَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَسْنَانَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللِّسَانَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَلْبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَظْمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّوْتَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدَّمْعَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرَقَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضِّرْسَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصِّحَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحُقْنَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّوْمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضَّحِكَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْيَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدِّمَاغَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّاحَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّبْضَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّفَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الظُّفْرَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَبْضَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَطَاطَا",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُلْفُلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّنْدَوِيشُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِشْطَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَاوَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَنَانَاسُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّيْتُونَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَطِيرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّبِيبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَطْبُوخُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الذُّرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَدَسُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَسْكَوِيتُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّبَقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُطْرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَرُزُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْبُوزُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرُوبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَاذِنْجَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَعْكَرُونَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّبَنُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَأْكَلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حَامِضْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُرَّةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَفْرَاءْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَطَاطَا لَذِيذَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّنْدَوِيشُ لَذِيذْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِشْطَةُ حُلْوَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَاوَةُ حُلْوَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَنَانَاسُ حَامِضْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّيْتُونَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَطِيرَةُ سَاخِنَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّبِيبُ حُلْوْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "حُلْوْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَطْبُوخُ سَاخِنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الذُّرَةُ مُفِيدَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَدَسُ مُفِيدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُفِيدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَسْكَوِيتُ حُلْوْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّبَقُ نَظِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْمِشُ حُلْوْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْمِشُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُطْرُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْبُوزُ سَاخِنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرُوبُ بَارِدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّرَابُ حُلْوْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَاذِنْجَانُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَعْكَرُونَةُ لَذِيذَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَأْكَلُ لَذِيذْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُلْفُلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّنْدَوِيشْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِشْطَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَاوَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَنَانَاسْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّيْتُونَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَطِيرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّبِيبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَطْبُوخْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الذُّرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَدَسْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَسْكَوِيتْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّبَقْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُطْرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَرُزّْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْبُوزْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرُوبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَاذِنْجَانْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَعْكَرُونَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّبَنْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَأْكَلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُلْفُلَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّنْدَوِيشَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِشْطَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَاوَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَنَانَاسَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّيْتُونَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَطِيرَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّبِيبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَطْبُوخَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الذُّرَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَدَسَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَسْكَوِيتَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّبَقَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُطْرَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَرُزَّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْبُوزَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرُوبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَاذِنْجَانَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَعْكَرُونَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّبَنَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَأْكَلَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَنَامْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَقْرَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَهْدُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَخْطَبُوطُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعُقَابُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّامَا",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّوْرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَامُوسُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّرَطَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَطْرِيقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّمْلَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدُّبُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّحْلِيَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرُّبْيَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخُفَّاشُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخِنْزِيرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضِّفْدَعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِرْشُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقُنْدُسُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحِمَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَزُونُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَرْتِيتُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَنْغَرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَقْفِزْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَلْعَبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَسْبَحْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَصِيحْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَقْرَبُ خَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفَهْدُ يَجْرِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَخْطَبُوطُ غَرِيبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعُقَابُ يَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّامَا طَوِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّوْرُ قَوِيّْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَامُوسُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّرَطَانُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَطْرِيقُ يَمْشِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّمْلَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدُّبُّ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّحْلِيَّةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرُّبْيَانُ لَذِيذْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخُفَّاشُ يَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَغْلُ قَصِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَغْلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَصِيرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخِنْزِيرُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضِّفْدَعَةُ تَقْفِزْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِرْشُ خَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقُنْدُسُ يَسْبَحْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الضَّبُعُ مُخِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحِمَارُ صَبُورْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَلَزُونُ يَمْشِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَرْتِيتُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَنْغَرُ يَقْفِزْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّعَامَةُ تَجْرِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّعَامَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَجْرِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرْدَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشُّرُوقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَادِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّيشَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَرِيفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغُرُوبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَطْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعُشُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُرْكَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغَيْمَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّرْعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَادِيَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُسْتَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّقِيعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّلُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغُصْنُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّبِيعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صُلْبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّلَّالُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَوِيَّةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشُّرُوقُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَادِي وَاسِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّيشَةُ خَفِيفَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَرِيفُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَصَاةُ صُلْبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَصَاةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صُلْبَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغُرُوبُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَطْرَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعُشُّ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَوْسُ مُلَوَّنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّخْرَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّخْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُرْكَانُ خَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغَيْمَةُ خَفِيفَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّرْعُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبِرْكَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَوْكَبَةُ بَعِيدَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَادِيَةُ وَاسِعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَاسِعَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُسْتَانُ وَاسِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّقِيعُ بَارِدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّبْعُ بَارِدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّيْفُ سَاخِنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّلُّ مُرْتَفِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مُرْتَفِعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغُصْنُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّبِيعُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّيْلُ خَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّيْلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّقْسُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَاتِبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْاِمْتِحَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَدْوَلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَكْتُوبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلَفُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّقْمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُدَرِّسَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَمْعُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَالِمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّسَالَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقَالُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُغَلَّفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَدِيدْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَقِيلَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَمِعْتُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِبْرَاةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقْلَمَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَاتِبُ يَكْتُبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "يَكْتُبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْاِمْتِحَانُ صَعْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَدْوَلُ وَاضِحْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الدِّرَاسَةُ مُفِيدَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكِتَابَةُ وَاضِحَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكِتَابَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وَاضِحَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَكْتُوبُ وَاضِحْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلَفُّ ثَقِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّقْمُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِلْمُ غَالِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّفُّ نَظِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُدَرِّسَةُ تَشْرَحْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقَةُ رَفِيعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَفِيعَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَمْعُ سَهْلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَعْلُومَةُ جَدِيدَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّبُّورَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّبُّورَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَالِمُ مَاهِرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّسَالَةُ قَصِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحُ سَهْلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّعْلِيمُ مُفِيدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّعْلِيمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّبْشُورَةُ قَصِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقَالُ قَصِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُغَلَّفُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّدْرِيسُ مُفِيدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِرَاءَةُ مُمْتِعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَتْمُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخَتْمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّوْحْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَاتِبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْاِمْتِحَانْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَدْوَلْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَكْتُوبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلَفّْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّقْمْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُدَرِّسَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَمْعْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَالِمْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّسَالَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقَالْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُغَلَّفْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكَاتِبِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْاِمْتِحَانِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَدْوَلِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَكْتُوبِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلَفِّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّقْمِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُدَرِّسَةِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقَةِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَمْعِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَالِمِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّسَالَةِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقَالِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُغَلَّفِ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّوْبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِمَامَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِكْيَاجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَبَاءَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغَسِيلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّتْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزِّرُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِكْوَاةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخُفُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِلَادَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السِّلْسِلَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْجَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سَوْدَاءْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّوْبُ جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِمَامَةُ بَيْضَاءْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِكْيَاجُ مُلَوَّنْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرِّبَاطُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجِلْدَةُ صُلْبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَبَاءَةُ وَاسِعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغَسِيلُ نَظِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصُّدْرِيَّةُ خَفِيفَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصُّدْرِيَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَفِيفَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحِزَامُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحِزَامُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّتْرَةُ ثَقِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزِّرُّ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِكْوَاةُ سَاخِنَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّسِيجُ نَاعِمْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِقْدُ غَالِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخُفُّ خَفِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِلَادَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْكُمُّ قَصِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَرِيرُ نَاعِمْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْبَكُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْبَكُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السِّلْسِلَةُ طَوِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْجَبُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِعْصَمِي صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِعْصَمِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقُطْنُ نَاعِمْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِطْرُ غَالِي",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِبْرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَمِيصْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُسْتَانَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الثَّوْبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِمَامَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِكْيَاجَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَبَاءَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّرْحَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْغَسِيلَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّتْرَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزِّرَّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِكْوَاةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْخُفَّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِلَادَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السِّلْسِلَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِشْجَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَمِيصُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "بَنْطَالُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "فُسْتَانُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِعْطَفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قُبَّعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "وِشَاحُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قُفَّازُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَوْرَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "جَزْمَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَظَّارَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَاتَمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صَنْدَلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "رَبْطَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَاجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خَيْطُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "إِبْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صُوفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "شُورْتُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "صُنْدُوقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "نَعْلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَاقِيَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِوَارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "ثَوْبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عِمَامَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِكْيَاجُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "عَبَاءَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "طَرْحَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "غَسِيلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سُتْرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "زِرُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِكْوَاةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "خُفُّ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قِلَادَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "سِلْسِلَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مِشْجَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَاطِرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْكَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّصِيفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقْبَرَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّاحِنَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرَبَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَصْرِفُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُتَنَزَّهُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِسْعَافُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْوَحِيَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُنْدُقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِطْفَأَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيكْرُوبَاصُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَتْجَرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَرْكَبَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّافِعَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَرِيبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "قَرِيبَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَاطِرَةُ طَوِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْكَبُ سَرِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّصِيفُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقْبَرَةُ قَرِيبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَوَّابَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّاحِنَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرَبَةُ كَبِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَصْرِفُ قَرِيبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُتَنَزَّهُ وَاسِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْفَرُ قَرِيبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِسْعَافُ سَرِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْوَحِيَّةُ تَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُنْدُقُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَرَّارُ ثَقِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجَرَّارُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُسْتَوْصَفُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِطْفَأَةُ حَمْرَاءْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيكْرُوبَاصُ كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَتْجَرُ مَفْتُوحْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "مَفْتُوحْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّاحَةُ وَاسِعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَلْجَأُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَرْكَبَةُ ثَقِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّافِعَةُ مُرْتَفِعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرَبُ قَرِيبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّورُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّورُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِنَارَةُ مُرْتَفِعَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّهْرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَاطِرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْكَبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّصِيفْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقْبَرَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّاحِنَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرَبَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَصْرِفْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُتَنَزَّهْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِسْعَافْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْوَحِيَّةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُنْدُقْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِطْفَأَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيكْرُوبَاصْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَتْجَرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَرْكَبَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّافِعَةْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرَبْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّيَّارَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْحَافِلَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّيَّارَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّفِينَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَارِبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّارِعَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْجِسْرَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السُّوقَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعِيَادَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَسْجِدَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَلْعَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَحَطَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَتْحَفَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَصْنَعَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَزْرَعَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُرْجَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِشَارَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَخْبَزَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّيْدَلِيَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَكْتَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَطْعَمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقَاطِرَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْكَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّصِيفَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَقْبَرَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الشَّاحِنَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْعَرَبَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَصْرِفَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُتَنَزَّهَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْإِسْعَافَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِرْوَحِيَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُنْدُقَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِطْفَأَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيكْرُوبَاصَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَتْجَرَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَرْكَبَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّافِعَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمَشْرَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّاعِبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّسَّامُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُرْتُقَالِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّايُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّهْمُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّسْمَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَنَفْسَجِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِيثَارَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقِيَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلْصَقُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّمَادِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبِيَانُو",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِضْرَبُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرْدِي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّغْمَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبِطَاقَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّحْلُوقَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُنِّي",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُوسِيقَا",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيدَالِيَّةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْفُلْفُلُ أَخْضَرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْأَرُزُّ أَبْيَضْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّبَنُ أَبْيَضْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الطَّحِينُ أَبْيَضْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَحْرُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّيْلُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّاعِبُ يَلْعَبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّسَّامُ يَرْسُمْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُرْتُقَالِي جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّايُ طَوِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الصَّفَّارَةُ صَاخِبَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّهْمُ سَرِيعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّسْمَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبَنَفْسَجِي جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِيثَارَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّوْحَةُ مُلَوَّنَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّوْحَةُ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقِيَّةُ تَطِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "تَطِيرْ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلْصَقُ صَغِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّمَادِي غَامِقْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبِيَانُو كَبِيرْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "التَّلْوِينُ مُمْتِعْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِضْرَبُ خَفِيفْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرْدِي جَمِيلْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّغْمَةُ جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبِطَاقَةُ صَغِيرَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِزْمَارُ صَاخِبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّحْلُوقَةُ طَوِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبُنِّي غَامِقْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمُوسِيقَا جَمِيلَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيدَالِيَّةُ غَالِيَةْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللُّغْزُ صَعْبْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللُّغْزُ فِي الْكِتَابِ فَوْقَ الْمَقْعَدْ",
+    "category": "sentence",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "اللَّاعِبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّسَّامَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّايَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "السَّهْمَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الرَّسْمَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْقِيثَارَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْوَرَقِيَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِلْصَقَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِضْرَبَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "النَّغْمَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْبِطَاقَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الزَّحْلُوقَةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
+  },
+  {
+    "text": "الْمِيدَالِيَّةَ",
+    "category": "story_word",
+    "requestedBy": "session-7",
+    "priority": 100,
+    "status": "pending",
+    "doneAt": null
   }
 ]
