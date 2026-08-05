@@ -81,9 +81,14 @@ ok(!doc.querySelector('link[rel="manifest"]'), 'ولا تصل بيان التط�
 
 // **يُقرأ قبل الاستعجال**: السطرُ التالي يبدّل السمة نفسَها، فلو قُرئت بعده لقرأ
 // الفحصُ ما كتبه هو لا ما كتبته الصفحة.
-ok([...doc.images].every((im) => im.getAttribute('loading') === 'lazy'
+// **ويُستثنى صدرُ الصفحة** (١٣ أغسطس ٢٠٢٦): تأجيلُ أول ما تراه العين يؤخّر أهمَّ
+// صورةٍ في الصفحة — فصورُ الصدر تُجلَب فوراً وما بعدها يُؤجَّل، وهو نظيرُ الاستثناء
+// المكتوب في `tools/test_welcome.mjs` سواءً بسواء.
+const above = [doc.querySelector('.w-top'), doc.querySelector('.w-hero')].filter(Boolean);
+const eager = (im) => above.some((box) => box.contains(im));
+ok([...doc.images].every((im) => (im.getAttribute('loading') === 'lazy' || eager(im))
   && im.hasAttribute('width') && im.hasAttribute('height')),
-  'ولكل صورةٍ أبعادُها المصرَّحة و`loading="lazy"` (شرطُ المدير)');
+  'ولكل صورةٍ أبعادُها المصرَّحة، و`loading="lazy"` لما بعد الصدر (شرطُ المدير)');
 
 // اللقطات `loading="lazy"` فلا تُطلب وهي خارج لوح الاختبار — تُستعجَل هنا، ثم
 // يُنتظر الخطُّ والصورة معاً قبل قراءة سجلّ الشبكة (وإلا قُرئ ناقصاً).

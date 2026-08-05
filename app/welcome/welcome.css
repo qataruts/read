@@ -877,10 +877,12 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
 
+/* **وارتفاعُه ٦٤ بكسل لا ينقص** (DESIGN §٤ — هدفُ اللمس): خُفِض في تهذيب الأزرار
+   إلى ٥٢ فأمسكه الحارسُ على الشاشة نفسِها. فالتهذيبُ في الحافّة والظلّ لا في الهدف. */
 .w-start {
-  min-height: 3.25rem;
-  padding: .7rem 2rem;
-  font-size: 1.1rem;
+  min-height: 4rem;
+  padding: .8rem 2.2rem;
+  font-size: 1.15rem;
   box-shadow: 0 2px 6px rgb(0 0 0 / 10%);
 }
 
