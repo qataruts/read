@@ -405,6 +405,7 @@ ok([...recited.keys()].every((key) => !(key in manifest)),
 //   ب) وآيتُها **مسجَّلةٌ عندنا** وملفُّها على القرص (فلا مقطعٌ في هواء).
 //   ج) وحدودُه صالحةٌ موجبة (بدايةٌ قبل نهاية) — فلا نقرةٌ تُسمِع صمتاً.
 const spans = recitations.spans || {};
+const recitationSrcEarly = readFileSync(new URL('../app/js/recitation.js', import.meta.url), 'utf8');
 const surahWordTexts = [...new Set(QURAN.surahs.flatMap((s) => surahWords(s).map((w) => w.text)))];
 const voiceless = surahWordTexts.filter((t) => !spans[keyFor(t)] && !(recitations.words || {})[keyFor(t)]);
 ok(voiceless.length === 0,
@@ -416,6 +417,17 @@ ok(spanOrphans.length === 0,
   + `${spanOrphans.length ? ' — يتيم: ' + spanOrphans.length : ''}`);
 ok(Object.values(spans).every((v) => Number.isFinite(v.s) && Number.isFinite(v.e) && v.e > v.s),
   'وحدودُه أرقامٌ صالحةٌ والبدايةُ قبل النهاية');
+// **والنقرةُ تُسمِع الآيةَ لا الكلمةَ مقتطعة** (أمر المالك بعد أن سمع القصّ): الشاشةُ
+// تُشغّل نصَّ الآية وتُمرّر مفتاح الكلمة للإبراز — فلو عاد أحدٌ إلى تشغيل نصّ الكلمة
+// عاد البترُ الذي شكا منه. والمقاطعُ تبقى **للإبراز** لا للقطع.
+const swSrc = readFileSync(new URL('../app/js/quran.js', import.meta.url), 'utf8');
+const swAt = swSrc.indexOf('function renderSurahWords');
+const swBlock = swSrc.slice(swAt, swSrc.indexOf('جِدْها في الآية', swAt));
+ok(/recitation\.play\(ayahText, \{/.test(swBlock) && /word: word\.text/.test(swBlock),
+  'ونقرةُ الكلمة تُشغّل **آيتَها** وتُمرّر الكلمةَ للإبراز (لا تقطعُها من التلاوة)');
+ok(/timeupdate/.test(recitationSrcEarly) && /spanOf|follow\(/.test(recitationSrcEarly),
+  'والإبرازُ يتبع موضعَ التلاوة لا مؤقّتاً أعمى');
+
 ok(!!recitations.spansSource && /CC BY/i.test(recitations.spansSource),
   `ومصدرُ التوقيت مُسمّىً برخصته في البيان (${recitations.spansSource || 'غائب'})`);
 // **وصفرُ ملفِّ صوتٍ جديد**: هذا هو مكسبُ الحلّ كلُّه — لو عاد أحدٌ إلى ملفاتٍ مفردة

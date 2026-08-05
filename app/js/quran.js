@@ -376,11 +376,13 @@ function renderSurahWords(surahId) {
   // نسبةُ التلاوة إلى صاحبها — **قارئُ الكلمة وحده** لا قارئُ الآية: هما مصدران
   // مختلفان قد يختلف قارئاهما، ونسبةُ تلاوةٍ إلى غير صاحبها كذبٌ على الطفل ووليّه.
   // فما لم يُجلب بيانُ الكلمات بعدُ يبقى السطر عاماً بلا اسم (والكلماتُ صامتة).
-  const credit = h('p', { class: 'note' }, 'اضغط الكلمة لتسمعها بصوت قارئ متقن.');
+  // **والنسبةُ تصدُق ما يُسمَع**: النقرةُ تُسمِع آيةَ الكلمة لا الكلمةَ مقتطعة، فيقول
+  // السطرُ ذلك بلفظه — ولا يَعِد الطفلَ بما لا يسمعه.
+  const credit = h('p', { class: 'note' }, 'اضغط الكلمة لتسمع آيتها بصوت قارئ متقن.');
   recitation.ready().then(() => {
-    const name = recitation.wordReciter();
-    if (name) credit.textContent = `الكلمات بصوت ${name}. اضغط الكلمة لتسمعها.`;
-    recitation.prefetch(words.map((w) => w.text));
+    const name = recitation.reciter();
+    if (name) credit.textContent = `اضغط الكلمة لتسمع آيتها بصوت ${name}، وتُضاء وهو يقرؤها.`;
+    recitation.prefetch(surah.ayat);      // الآياتُ هي ما يُشغَّل، فهي ما يُجلَب مسبقاً
   });
 
   return stepped({
@@ -409,7 +411,18 @@ function renderSurahWords(surahId) {
                 btn.classList.add('good');
                 heard.add(at);
                 paintFoot();
-                recitation.play(word.text);
+                // **تُسمَع الآيةُ كاملةً والكلمةُ تُضاء في وقتها** (أمر المالك، ١٣ أغسطس
+                // ٢٠٢٦، بعد أن سمع القصَّ فوجده غيرَ مريح): قصُّ الكلمة من تلاوةٍ
+                // موصولة يبترها لا محالة — والفجوةُ بين كلمتين في بيان التوقيت حدٌّ
+                // حسابيّ لا صمتٌ في الصوت. فالنقرةُ تُسمِع آيتَها بصوتٍ طبيعيّ تامّ،
+                // وتُبرِز الكلمةَ حين يبلغها القارئ — وهو صنيعُ معلّم القرآن نفسِه.
+                // **وتَكرارُ الآية لا يضرّ** (حكم المالك): الطفلُ يألفها بالسماع.
+                const ayahText = surah.ayat[word.ayah - 1];
+                recitation.play(ayahText, {
+                  word: word.text,
+                  on: () => btn.classList.add('sw-now'),
+                  off: () => btn.classList.remove('sw-now'),
+                });
               },
             }, h('span', { class: 'vchip-face mushaf' }, word.text));
             return btn;

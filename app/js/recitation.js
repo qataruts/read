@@ -128,7 +128,7 @@ export function stop() {
  * تلاوة نصٍّ واحد من ملفه. **لا احتياط بالنطق الآلي**: غياب الملف صمتٌ وfalse.
  * @returns {Promise<boolean>} صحيح إن سُمعت التلاوة إلى آخرها.
  */
-export async function play(text) {
+export async function play(text, mark) {
   stop();
   const mine = session;
   await ready();
@@ -140,7 +140,43 @@ export async function play(text) {
 
   el.src = urlFor(text);
   el.preload = 'auto';
+  if (mark?.word) follow(el, spans?.[keyFor(mark.word)], mark);
   return waitFor(el, mine);
+}
+
+/** موضعُ كلمةٍ داخل تلاوة آيتها (أو `null`) — تستهلكه الشاشةُ لتُبرزها في وقتها. */
+export const spanOf = (text) => (spans?.[keyFor(text)] || null);
+
+/** **إبرازُ الكلمة في وقتها من تلاوة آيتها** (أمر المالك، ١٣ أغسطس ٢٠٢٦):
+ *
+ *  جُرِّب قصُّ الكلمة من الآية فسُمع مبتوراً — والعلّةُ بنيويّة: الحصريُّ يصل الكلمات
+ *  وصلاً، والفجوةُ بين كل كلمتين في بيان التوقيت **عشرُ ملّي ثانية بالضبط دائماً**،
+ *  أي أنّها حدٌّ حسابيّ لا صمتٌ في الصوت. فالقطعُ يقع في وسط النَّفَس مهما ضُبط.
+ *
+ *  فصارت النقرةُ تُسمِع **الآيةَ كاملةً** — صوتاً طبيعياً بلا قطع — **وتُبرِز الكلمةَ
+ *  حين يبلغها القارئ**. وهو ما يفعله معلّمُ القرآن: يقرأ الآية ويشير إلى الكلمة.
+ *  وتَكرارُ الآية بتكرار النقر لا يضرّ (حكم المالك): الطفلُ يألفها بالسماع.
+ *
+ *  والإبرازُ بـ`timeupdate` مقصود: دقّتُه ربعُ ثانية في سفاري وهي تكفي للعين، ولا
+ *  يُقطَع بها صوتٌ — بخلاف القصّ الذي كان يحتاج دقّةَ المؤقّت. */
+function follow(el, span, mark) {
+  if (!span) return;
+  let on = false;
+  const tick = () => {
+    const now = el.currentTime * 1000;
+    const inside = now >= span.s && now <= span.e;
+    if (inside === on) return;
+    on = inside;
+    (on ? mark.on : mark.off)?.();
+  };
+  const end = () => {
+    el.removeEventListener('timeupdate', tick);
+    if (on) { on = false; mark.off?.(); }
+  };
+  el.addEventListener('timeupdate', tick);
+  el.addEventListener('ended', end, { once: true });
+  el.addEventListener('error', end, { once: true });
+  pending.push(end);                 // إيقافُ التلاوة يُطفئ الإبراز أيضاً
 }
 
 /** تشغيل مقطعٍ من داخل ملفّ آية: من `s` إلى `e` بالملّي ثانية.

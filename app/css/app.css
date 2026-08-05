@@ -2080,3 +2080,11 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
 }
 
 .map-about:hover { text-decoration: underline; }
+
+/* **بطاقةُ الكلمة تُضاء وهي تُتلى** (أمر المالك، ١٣ أغسطس ٢٠٢٦): نقرةُ الكلمة تُسمِع
+   آيتَها كاملةً، فتُبرَز البطاقةُ حين يبلغها القارئ — عينُ نمط الكاريوكي في القصص
+   (`.line--now`)، فالعينُ تتبع الأذنَ في الشاشتين بلغةٍ واحدة. */
+.vchip--mushaf.sw-now {
+  background: color-mix(in srgb, var(--accent) 14%, var(--mix));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 45%, var(--mix));
+}
