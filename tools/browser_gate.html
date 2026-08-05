@@ -115,8 +115,13 @@ async function goto(hash) {
 }
 
 /** الهدف المسموع في تمرين اختيار: صوتٌ **جديد** (بعد `mark`) يكون أحد الخيارات المعروضة. */
-const heardTarget = (faces, mark) => waitFor(
-  () => (played.length > mark && faces.includes(lastPlayed()) ? lastPlayed() : null),
+// **أوّلُ جديدٍ يطابق الخيارات، لا آخرُ ما سُمع** (إصلاح اضطرابٍ سابق، ١٣ أغسطس
+// ٢٠٢٦): كان يشترط أن يكون الهدفُ **آخرَ** مسموع، فصوتٌ عارضٌ يقع بعده — إعادةُ
+// رسمٍ أو نقرةٌ تالية — يُسقِط الشرطَ إلى الأبد فيُخفق الفحصُ متقطّعاً (مرّتان من
+// ستّ على شيفرةٍ لم تُمَسّ). والقيدُ المقصود محفوظ: لا يُقبل إلا صوتٌ **بعد العلامة**،
+// فلا يصحّ صوتٌ قديم صادف وجهاً معروضاً.
+const heardTarget = (getFaces, mark) => waitFor(
+  () => played.slice(mark).find((t) => getFaces().includes(t)) ?? null,
   'صوت الهدف', 6000);
 
 /**
@@ -149,11 +154,14 @@ async function answerOne(wrongs = 0, mark = 0) {
   }
 
   const big = $$('.vchip--big').length > 0;              // تمييز حرف أو حركة
+  // **الوجوهُ تُقرأ في كل نبضة لا مرّةً واحدة**: التمرين قد يُعاد رسمُه بعد أول قراءة،
+  // فتبقى في اليد وجوهٌ لم تعد على الشاشة ولا يطابقها صوتُ الهدف أبداً — وهو الاضطراب
+  // المتقطّع الذي أخفق ثلاثاً من ثمانٍ. والعلامةُ تُلتقط في runGate قبل ظهور التمرين،
+  // فلا يُقبل صوتٌ قديم صادف وجهاً معروضاً هدفاً.
+  const heard = await heardTarget(
+    () => $$('.vchip').map((c) => c.querySelector('.vchip-face').textContent), mark);
   const chips = $$('.vchip');
   const faces = chips.map((c) => c.querySelector('.vchip-face').textContent);
-  // العلامة تُلتقط في runGate قبل ظهور التمرين — فلا يُقبل صوتٌ قديم صادف وجهاً
-  // معروضاً هدفاً (سباق «حكم البوابة» المتقطع الذي أمسكه المدير).
-  const heard = await heardTarget(faces, mark);
   for (let i = 0; i < wrongs; i++) {
     chips[faces.findIndex((f) => f !== heard)].click();
     await sleep(120);
@@ -167,10 +175,13 @@ async function answerOne(wrongs = 0, mark = 0) {
 /** يسوق جلسة بوابة كاملة: `wrongsPlan` أخطاءٌ متعمَّدة لكل تمرين بترتيبه. */
 let nextMark = 0;                  // علامة «ما بعدها نداءُ التمرين التالي» — تضبطها answerOne
 
-async function runGate(wrongsPlan = []) {
+async function runGate(wrongsPlan = [], enterMark = null) {
   const kinds = [];
   const count = $$('.dot').length;
-  nextMark = Math.max(0, played.length - 1);   // الأول: نداؤه سبق النداء فيُقبل آخرُ مسموع
+  // **علامةُ الدخول تُلتقط عند النقر على البوابة لا هنا**: نداءُ التمرين الأول يقع
+  // بين النقرة وبلوغِ هذا السطر، فلو قُيّد بـ«آخر مسموع» سقط متى تلاه صوتٌ آخر —
+  // وهو الاضطرابُ المتقطّع. وبعلامة الدخول يُقبل كلُّ ما سُمع **داخل الجلسة** لا قبلها.
+  nextMark = enterMark ?? Math.max(0, played.length - 1);
   for (let i = 0; i < count; i++) {
     if ($('.celebrate')) break;                          // انتهت الجلسة قبل أوانها
     kinds.push(await answerOne(wrongsPlan[i] || 0, nextMark));
@@ -184,10 +195,18 @@ try {
   const today = dayNumber();
   const weak = (letter, haraka, kind, wrong) =>
     [`${letter}|${haraka}|${kind}`, { right: 0, wrong, box: 0, due: today, seen: today }];
+  // **اثنتا عشرة مهارةً ضعيفة لعشرة تمارين** (إصلاح اضطرابٍ متقطّع، ١٣ أغسطس ٢٠٢٦):
+  // كانت ستّاً، فتُملأ البقيةُ بأضعف ما وجد — وفيه `mark-compare` وهو **صامتٌ بنصّ
+  // التصميم** (قراءةٌ بالعين لا بالأذن، `review.js` §المهارات). فكان الفحصُ ينتظر له
+  // صوتاً لا يأتي فيُخفق واحدةً من ثمانٍ. والمقيسُ هنا آلةُ البوابة — عتبتُها وإعادتُها
+  // ونجومُها — لا أنواعُ تمارينها، وتنويعُ الأنواع محروسٌ في `--marks` و`--review`.
   const SKILLS_SEED = Object.fromEntries([
     weak('ك', 'fatha', 'quiz', 4), weak('ق', 'kasra', 'quiz', 3),
     weak('ط', 'damma', 'haraka', 3), weak('ص', 'fatha', 'quiz', 2),
     weak('ض', 'fatha', 'haraka', 2), weak('ظ', 'kasra', 'quiz', 1),
+    weak('ب', 'fatha', 'quiz', 4), weak('ت', 'kasra', 'haraka', 4),
+    weak('ن', 'damma', 'quiz', 3), weak('م', 'fatha', 'haraka', 3),
+    weak('ل', 'kasra', 'quiz', 2), weak('ر', 'damma', 'haraka', 2),
   ]);
 
   await seed(idsBefore('gate:quran'), { skills: SKILLS_SEED });
@@ -211,13 +230,14 @@ try {
   // ————— ٢) الإخفاق: «ليس بعدُ» بلا نجمة ولا عبور —————
   await goto('#/');
   await waitFor(() => $('.station'), 'الخريطة');
+  const enterMark = played.length;      // قبل الدخول: ما بعده أصواتُ الجلسة وحدَها
   $('.station--gate .node').click();
   await waitFor(() => $('.dots'), 'شاشة البوابة');
   ok($$('.dot').length === 10, `جلسة البوابة عشرة تمارين (${$$('.dot').length})`);
   ok($('.gate-head').textContent.includes('بوابة المصحف'), 'وترويستها تُعلن أين يقف الطفل');
   ok(texts('.pill').includes('بوابة'), 'وشارتها «بوابة» لا «مراجعة اليوم»');
 
-  const firstKinds = await runGate([6, 3, 2]);           // أخطاء متعمَّدة ⇒ دون العتبة
+  const firstKinds = await runGate([6, 3, 2], enterMark);           // أخطاء متعمَّدة ⇒ دون العتبة
   ok($('.celebrate--again'), 'دون ٨٠٪ لا تُفتح البوابة');
   ok($('.celebrate h2').textContent.includes('لَيْسَ بَعْدُ'),
     `والرسالة «${$('.celebrate h2').textContent}» — لا لفظ رسوب`);
@@ -229,6 +249,7 @@ try {
   ok(/٪/.test(report), `والنتيجة معروضة بنسبتها (${report})`);
 
   // ————— ٣) الإعادة تُولّد جلسة جديدة (لا نمط يُحفظ) —————
+  const retryMark = played.length;      // كسابقتها: علامةُ الدخول قبل النقر
   btn('أعِد المحاولة').click();
   await waitFor(() => $('.dots') && !$('.celebrate'), 'جلسة الإعادة');
   ok($$('.dot').length === 10 && $$('.dot--now').length === 1
@@ -237,7 +258,7 @@ try {
   ok($$('.dot--done').length === 0, 'ولا أثر لتمارين المحاولة السابقة');
 
   // ————— ٤) العبور: بلا خطأ ⇒ نجوم وفتحُ ما بعدها —————
-  const kinds = await runGate();
+  const kinds = await runGate([], retryMark);
   ok(!$('.celebrate--again') && $('.celebrate h2').textContent.includes('فُتِحَتِ'),
     `العبور يُحتفى به (${$('.celebrate h2').textContent})`);
   ok($$('.big-stars .on').length === 3, `بلا خطأ ⇒ ثلاث نجوم (${$$('.big-stars .on').length})`);

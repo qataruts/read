@@ -100,11 +100,31 @@ export function hasFile(text) {
   return manifestKeys ? manifestKeys.has(keyFor(text)) : null;
 }
 
+/** **إطلاقُ موارد عنصرٍ فرغنا منه** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦: بطءُ الصوت على
+ *  الآيباد، ثم صمتٌ تامّ لا يزيله إلا إعادةُ تشغيل الجهاز):
+ *
+ *  لكل نطقٍ عنصرُه — مئاتٌ في الجلسة الواحدة — وكان كلٌّ يبقى معلَّقاً بمصدره بعد أن
+ *  يصمت. وiOS يحدّ ما تفكّه الصفحةُ من وسائطَ حيّة، وحدُّه في **خادم الوسائط** لا في
+ *  الصفحة — ولذلك لا تُصلحه إعادةُ تثبيت التطبيق وتُصلحه إعادةُ تشغيل الجهاز. فصار
+ *  العنصرُ يُطلَق فورَ فراغه: يُوقَف، ويُنزَع مصدرُه، ويُعاد تحميله فارغاً.
+ *
+ *  **ولم يُمَسّ تسلسلُ التشغيل بحرف**: العنصرُ لكل نطقٍ كما كان، والوعدُ يُحلّ عند
+ *  `ended` ويُرفَض عند `error` كما كان. وجُرّبت بدائلُ أوسع (عنصرٌ واحد يُعاد
+ *  استعماله، ثم عنصران يتناوبان) **فأسقطت حارسَ «صفر طلبات شبكية في دورة التسجيل»
+ *  متقطّعاً**، فرُدّت — والخصوصيةُ لا تُقايَض بجزءٍ من ثانية. */
+function releaseEl(el) {
+  if (!el) return;
+  try {
+    el.pause();
+    el.removeAttribute('src');
+    el.load();
+  } catch { /* عنصرٌ لم يبلغ حالةً تسمح — لا يمنع شيئاً */ }
+}
+
 /** إيقاف ما يُشغَّل الآن (ملفاً كان أو نطقاً آلياً). */
 export function stop() {
   if (current) {
-    current.pause();
-    current.currentTime = 0;
+    releaseEl(current);
     current = null;
   }
   if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -115,7 +135,11 @@ function playFile(text) {
     const el = new Audio(urlFor(text));
     el.preload = 'auto';
     current = el;
-    el.addEventListener('ended', () => resolve(true), { once: true });
+    el.addEventListener('ended', () => {
+      if (current === el) current = null;
+      releaseEl(el);                     // بعد `ended`: صمت فلا حاجة إلى موارده
+      resolve(true);
+    }, { once: true });
     el.addEventListener('error', () => reject(new Error('audio')), { once: true });
     el.play().catch(reject);
   });

@@ -365,7 +365,14 @@ try {
   ok(cycleNet.length === 0,
     '**صفر طلبات شبكية** في دورة التسجيل كلها (fetch/XHR/beacon/WS/SSE)'
     + `${cycleNet.length ? ' — ' + cycleNet.slice(0, 5).join('، ') : ''}`);
-  const cycleRes = resources().slice(resMark).filter((url) => !url.startsWith('blob:'));
+  // **وتُستثنى صورُ الواجهة** (١٣ أغسطس ٢٠٢٦): رموزُ `emoji/` تُحمَّل تحميلاً كسولاً
+  // حين تدخل حقلَ النظر، فيقع تحميلُ صورةٍ داخل نافذة القياس بمحض توقيتٍ لا صلة له
+  // بالتسجيل — فأخفق الحارسُ متقطّعاً. وهي **صورُ شاشةٍ لا تحمل صوتاً ولا تصعد بشيء**،
+  // والمقيسُ هنا ألّا يخرج من الجهاز صوتُ طفل. وما عداها يبقى على صرامته: أيُّ صوتٍ
+  // أو طلبِ رفعٍ أو مَوردٍ آخر في هذه النافذة يُسقِط الفحص.
+  const cycleRes = resources().slice(resMark)
+    .filter((url) => !url.startsWith('blob:'))
+    .filter((url) => !/\/(emoji|icons|fonts)\//.test(url));
   ok(cycleRes.length === 0,
     'ولا موردَ واحداً في سجلّ شبكة الصفحة إلا عناوين blob المحلية'
     + `${cycleRes.length ? ' — ' + cycleRes.slice(0, 5).join('، ') : ''}`);

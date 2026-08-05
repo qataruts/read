@@ -136,10 +136,22 @@ try {
     `ومحطات المهارات والقصص بينها (${$$('.station--pause').length})`);
   ok($$('.station--gate').length === 2,
     `وبوابتا الإتقان قبل المفصلين (${$$('.station--gate').length} — الحزمة ١٤)`);
-  ok($$('.station--quran').length === 1, 'والمرحلة القرآنية بعدها (الجلسة ٦)');
+  // **محطاتُ القرآنية محسوبةٌ لا مكتوبة** (حزمة «مفاصل المرحلة القرآنية»): كانت
+  // عقدةً واحدة تحت عنوانٍ واحد فشُقّت محطاتٍ مسمّاة — تهيئةٌ ورسمٌ وسورٌ قصار،
+  // وعددُ الأخيرة من عدد السور. فسورةٌ تُضاف تفتح محطتَها بلا سطرٍ يُعدَّل هنا.
+  const { QURAN } = await import('/js/curriculum.js');
+  const { SURAHS_PER_STATION } = await import('/js/progress.js');
+  const quranStations = 2 + Math.ceil(QURAN.surahs.length / SURAHS_PER_STATION);
+  ok($$('.station--quran').length === quranStations,
+    `والمرحلة القرآنية بعدها في ${quranStations} محطاتٍ مسمّاة (${$$('.station--quran').length})`);
   ok($$('.station--garden').length >= 8, `وبساتين الموضوعات بعدها (${$$('.station--garden').length} بستاناً — الحزمة ٧)`);
-  ok($$('.station--library').length === $$('.station--ladder').length,
-    `ومكتبةُ قصصٍ بعد كل سلّم (${$$('.station--library').length} مكتبة — الحزمة ٩)`);
+  // **ورفُّ القراءة الطويلة ليس مكتبةَ بستان**: يحمل الصنفين في الشكل (`station--library
+  // station--shelf`) وموضعُه ذيلُ الرحلة لا خاتمةُ سلّم — فيُعَدّ وحدَه (حزمة «رفّ المكتبة»).
+  const libraries = $$('.station--library:not(.station--shelf)').length;
+  ok(libraries === $$('.station--ladder').length,
+    `ومكتبةُ قصصٍ بعد كل سلّم (${libraries} مكتبة — الحزمة ٩)`);
+  ok($$('.station--shelf').length === 1,
+    `ورفُّ القراءة الطويلة واحدٌ في ذيل الرحلة (${$$('.station--shelf').length})`);
   ok($$('.station--ladder').length === $$('.station--garden').length,
     `وسلّم جملٍ بعد كل بستان خاتمةً (${$$('.station--ladder').length} سلّماً — الحزمة ٨)`);
 
