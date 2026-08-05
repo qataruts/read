@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>قياس السرعة — اِقْرَأْ</title>
+    <!--
+      **صفحةُ قياسٍ لا صفحةُ عرض** (بلاغ المالك: «الطفل نفسه يرى أنّ البرنامج فيه بطء
+      حيث يقارنه بباقي برامج الآيباد»، ١٣ أغسطس ٢٠٢٦).
+
+      المبدأ: **لا يُصلَح ما لم يُقَس** — وقد كلّفنا التخمينُ اليومَ جولاتٍ ضائعة. فهذه
+      تُفتَح على الجهاز البطيء نفسِه فتقول بالأرقام **أين** يذهب الوقت: الإقلاع، وبناءُ
+      كل شاشة، وأولُ صوتٍ بعد النقرة، وكتابةُ التقدّم، وثِقَلُ الشجرة المرسومة.
+
+      وثلاثةُ قيودٍ فيها مقصودة:
+        ١) **لا تمسّ تقدّمَ الطفلة**: تُصوَّر الذاكرةُ المحلّية قبل القياس وتُعاد بعده
+           حرفاً بحرف — فلا نجمةَ تُكتب ولا محطةَ تُفتح بسبب قياس.
+        ٢) **لا تنقر جواباً**: تتنقّل وتُسمِع فحسب، فلا تُسجَّل مهارةٌ ولا يُفسَد ليتنر.
+        ٣) **موضعُها `welcome/`**: عاملُ الخدمة يستثني هذا المسار من الاعتراض، فلا
+           يبتلعها ردُّ التنقّل ولا تُخزَّن نسخةٌ قديمة منها على جهازٍ بطيء.
+    -->
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem;
+        font: 16px/1.6 -apple-system, system-ui, sans-serif;
+        background: #faf4e8;
+        color: #3a3128;
+      }
+      h1 { font-size: 1.2rem; margin: 0 0 .2rem; }
+      p.sub { margin: 0 0 1rem; color: #6b5d4c; font-size: .9rem; }
+      button {
+        display: block;
+        width: 100%;
+        min-height: 4rem;
+        font: 700 1.2rem/1.4 inherit;
+        color: #3a3128;
+        background: #e0a83c;
+        border: 0;
+        border-radius: 12px;
+      }
+      button[disabled] { opacity: .5; }
+      table { width: 100%; border-collapse: collapse; margin-top: 1.25rem; font-size: .95rem; }
+      th, td { text-align: start; padding: .5rem .4rem; border-bottom: 1px solid #e6dcc9; }
+      th { color: #6b5d4c; font-weight: 600; }
+      td.ms { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .ok { color: #1f7a4d; }
+      .mid { color: #b8860b; }
+      .bad { color: #b3261e; }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #fffaf2;
+        border: 1px solid #e6dcc9;
+        border-radius: 10px;
+        padding: .7rem;
+        font-size: .78rem;
+        margin-top: 1rem;
+      }
+      iframe { width: 390px; height: 700px; border: 0; position: absolute; left: -9999px; top: 0; }
+      #note { margin-top: .75rem; font-size: .9rem; color: #6b5d4c; }
+    </style>
+  </head>
+  <body>
+    <h1>قياس السرعة</h1>
+    <p class="sub">اضغط الزرّ ودع الصفحة تعمل (نحو دقيقة)، ثم أرسل الصورة.</p>
+
+    <button id="go">ابدأ القياس</button>
+    <p id="note">لا يُغيَّر تقدّم الطفل: تُصوَّر بياناتُه وتُعاد كما كانت.</p>
+
+    <table id="out" hidden>
+      <thead>
+        <tr><th>ما قيس</th><th>الزمن</th><th>ملاحظة</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <pre id="env" hidden></pre>
+
+    <script>
+      var $ = function (s) { return document.querySelector(s); };
+      var rows = $('#out').querySelector('tbody');
+      var plays = [];          // [{ at, key }] لحظاتُ نداء التشغيل داخل التطبيق
+
+      function ms(n) { return Math.round(n) + ' م.ث'; }
+
+      /** حكمٌ بالعين على الرقم: أخضر مقبول، أصفر محسوس، أحمر بطيء. */
+      function grade(v, good, bad) {
+        return v <= good ? 'ok' : (v <= bad ? 'mid' : 'bad');
+      }
+
+      function row(label, value, cls, note) {
+        var tr = document.createElement('tr');
+        var a = document.createElement('td'); a.textContent = label;
+        var b = document.createElement('td'); b.className = 'ms ' + (cls || ''); b.textContent = value;
+        var c = document.createElement('td'); c.textContent = note || '';
+        tr.append(a, b, c); rows.append(tr); $('#out').hidden = false;
+      }
+
+      function sleep(msec) { return new Promise(function (r) { setTimeout(r, msec); }); }
+
+      /** انتظارٌ حتى يصدق شرط — بمهلة، ويعود بالزمن المستغرق (أو -1 إن لم يصدق). */
+      async function waitFor(test, limit) {
+        var t0 = performance.now();
+        for (;;) {
+          try { if (test()) return performance.now() - t0; } catch (e) { /* الإطار يُبنى بعد */ }
+          if (performance.now() - t0 > (limit || 8000)) return -1;
+          await sleep(16);
+        }
+      }
+
+      // ————— صيانةُ تقدّم الطفل: صورةٌ قبل، وإعادةٌ بعد —————
+      function snapshot() {
+        var keep = {};
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          keep[k] = localStorage.getItem(k);
+        }
+        return keep;
+      }
+
+      /** **لا يُمسَح المخزن ثم يُعاد**: بينهما لحظةٌ لو انقطع فيها القياس — إغلاقُ لسان
+       *  أو نفادُ ذاكرة — ضاع تقدّمُ الطفل كلُّه. فيُحذف ما استُحدث وحدَه، ويُعاد ما
+       *  تبدّل وحدَه، ولا يُمسّ ما لم يتغيّر. */
+      function restore(keep) {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+          var k = localStorage.key(i);
+          if (!Object.prototype.hasOwnProperty.call(keep, k)) localStorage.removeItem(k);
+        }
+        for (var key in keep) if (Object.prototype.hasOwnProperty.call(keep, key)) {
+          if (localStorage.getItem(key) !== keep[key]) localStorage.setItem(key, keep[key]);
+        }
+      }
+
+      async function run() {
+        $('#go').disabled = true;
+        $('#go').textContent = 'يقيس…';
+        var keep = snapshot();
+
+        var frame = document.createElement('iframe');
+        document.body.append(frame);
+
+        // ١) الإقلاع: من طلب الصفحة إلى ظهور أول محطة على الخريطة
+        var t0 = performance.now();
+        frame.src = '../index.html';
+        await new Promise(function (r) { frame.addEventListener('load', r, { once: true }); });
+        var loadMs = performance.now() - t0;
+        var win = frame.contentWindow;
+        var doc = frame.contentDocument;
+
+        // مراقبةُ نداء التشغيل: نلتقط اللحظة التي يطلب فيها التطبيقُ صوتاً
+        var NativeAudio = win.Audio;
+        win.Audio = function (src) {
+          var el = new NativeAudio(src);
+          var play = el.play.bind(el);
+          el.play = function () { plays.push({ at: performance.now(), src: el.src }); return play(); };
+          return el;
+        };
+
+        var mapMs = await waitFor(function () { return doc.querySelector('.station'); }, 15000);
+        row('إقلاع التطبيق حتى الخريطة', ms(loadMs + Math.max(0, mapMs)),
+          grade(loadMs + mapMs, 1200, 2500), 'من طلب الصفحة إلى أول محطة');
+
+        var stations = doc.querySelectorAll('.station').length;
+        var nodes = doc.querySelectorAll('*').length;
+        row('ثِقَلُ الخريطة', nodes + ' عنصراً', grade(nodes, 1500, 4000), stations + ' محطة');
+
+        // ٢) بناءُ الشاشات: «تابع من هنا» ثم العودة، ثم لوحةُ الوالد إن فُتحت
+        var cont = doc.querySelector('.continue');
+        if (cont) {
+          var t1 = performance.now();
+          cont.click();
+          var screenMs = await waitFor(function () {
+            return doc.querySelector('.lesson, .quran, .garden, .ladder, .story, .library, .gate, .wgame');
+          }, 12000);
+          var built = performance.now() - t1;
+          row('فتحُ «تابع من هنا»', screenMs < 0 ? 'لم تظهر' : ms(built),
+            screenMs < 0 ? 'bad' : grade(built, 400, 1000), 'نقرة ← شاشةٌ مرسومة');
+          row('ثِقَلُ تلك الشاشة', doc.querySelectorAll('*').length + ' عنصراً',
+            grade(doc.querySelectorAll('*').length, 1200, 3000), '');
+
+          // ٣) أولُ صوتٍ بعد النقرة: أوّلُ زرِّ سماعٍ في الشاشة
+          var ear = [].slice.call(doc.querySelectorAll('button'))
+            .filter(function (b) { return /اسمع|صوت|اسمعه/.test(b.textContent || ''); })[0];
+          if (ear) {
+            plays.length = 0;
+            var t2 = performance.now();
+            ear.click();
+            var got = await waitFor(function () { return plays.length > 0; }, 6000);
+            row('أولُ صوتٍ بعد النقرة', got < 0 ? 'لم يُطلَب' : ms(plays[0].at - t2),
+              got < 0 ? 'bad' : grade(plays[0].at - t2, 150, 500), 'من النقرة إلى طلب التشغيل');
+          } else {
+            row('أولُ صوتٍ بعد النقرة', 'لا زرَّ سماع', '', 'الشاشة بلا زرّ صوت');
+          }
+
+          var t3 = performance.now();
+          win.location.hash = '#/';
+          var backMs = await waitFor(function () { return doc.querySelector('.station'); }, 12000);
+          row('العودة إلى الخريطة', backMs < 0 ? 'لم تعد' : ms(performance.now() - t3),
+            backMs < 0 ? 'bad' : grade(performance.now() - t3, 400, 1000), 'إعادةُ رسم الخريطة كاملة');
+        } else {
+          row('فتحُ شاشة', 'لا زرّ «تابع»', '', 'خريطةٌ بلا هدفٍ تالٍ');
+        }
+
+        // ٤) كتابةُ التقدّم: هل تُثقِل الكتابةُ المتزامنة كلَّ تفاعل؟
+        var probe = JSON.stringify({ pad: new Array(2000).join('x') });
+        var t4 = performance.now();
+        for (var i = 0; i < 100; i++) {
+          win.localStorage.setItem('__perf', probe);
+          win.localStorage.getItem('__perf');
+        }
+        var each = (performance.now() - t4) / 100;
+        win.localStorage.removeItem('__perf');
+        row('كتابةُ التقدّم (لكل مرّة)', each.toFixed(2) + ' م.ث',
+          grade(each, 1, 4), '١٠٠ دورة كتابة/قراءة');
+
+        // ٥) المخزون: هل الصوتُ كلُّه على الجهاز فعلاً؟
+        try {
+          var names = await win.caches.keys();
+          var audio = names.filter(function (n) { return n.indexOf('muallim-audio') === 0; })[0];
+          if (audio) {
+            var stored = (await (await win.caches.open(audio)).keys()).length;
+            row('الأصوات المخزونة', stored + ' ملفاً',
+              stored >= 2900 ? 'ok' : (stored > 0 ? 'mid' : 'bad'),
+              stored >= 2900 ? 'المخزون تامّ — يعمل دون إنترنت' : 'ناقص: يحتاج اتصالاً ليكتمل');
+          } else {
+            row('الأصوات المخزونة', 'لا مخزن', 'bad', 'لم يُثبَّت عاملُ الخدمة بعد');
+          }
+        } catch (e) { row('الأصوات المخزونة', 'تعذّر', '', String(e)); }
+
+        restore(keep);
+        frame.remove();
+
+        var nav = performance.getEntriesByType('navigation')[0] || {};
+        $('#env').hidden = false;
+        $('#env').textContent =
+          'الجهاز: ' + navigator.userAgent
+          + '\nأنوية المعالج: ' + (navigator.hardwareConcurrency || 'غير معلوم')
+          + ' · الذاكرة: ' + (navigator.deviceMemory || 'غير معلومة')
+          + '\nالشاشة: ' + screen.width + '×' + screen.height
+          + ' · نسبة البكسل: ' + (window.devicePixelRatio || 1)
+          + '\nمتّصل: ' + navigator.onLine
+          + ' · نوع الشبكة: ' + ((navigator.connection || {}).effectiveType || 'غير معلوم')
+          + '\nزمن جلب هذه الصفحة: ' + Math.round(nav.responseEnd || 0) + ' م.ث';
+
+        $('#go').textContent = 'أُعيد القياس';
+        $('#go').disabled = false;
+        $('#note').textContent = 'انتهى — وتقدّمُ الطفل أُعيد كما كان.';
+
+        // في وضع `#auto` وحدَه: تُرسَل الأرقام إلى عدّة القياس المحلّية (`tools/perf_check.py`)
+        // فتُقرأ نصّاً بدل تصويرها. ولا يقع هذا حين يفتحها إنسانٌ بيده.
+        if (location.hash === '#auto') {
+          var text = [].map.call(rows.querySelectorAll('tr'), function (tr) {
+            return [].map.call(tr.children, function (td) { return td.textContent; }).join(' | ');
+          }).join('\n');
+          try {
+            await fetch('/__perf', { method: 'POST', body: text + '\n\n' + $('#env').textContent });
+          } catch (e) { /* لا عدّة تستمع — لا يضرّ */ }
+        }
+      }
+
+      function start() {
+        run().catch(function (e) {
+          row('توقّف القياس', 'خطأ', 'bad', String(e && e.message ? e.message : e));
+          $('#go').disabled = false;
+        });
+      }
+
+      $('#go').addEventListener('click', start);
+      // `#auto` يبدأ بلا نقرة — به يُجرَّب القياسُ نفسُه في متصفّحٍ بلا يد.
+      if (location.hash === '#auto') start();
+    </script>
+  </body>
+</html>
