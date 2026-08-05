@@ -237,6 +237,25 @@
     </div>
 
     <div class="w-stations">
+      <article class="w-station" style="--accent: var(--accent-quran)">
+        <div class="w-station-head">
+          <img loading="lazy" width="32" height="32" src="../emoji/1f441.svg" alt="">
+          <div><span class="w-kicker">لمن يقيّم التطبيق</span><h3>‏‎?preview=1‎ — عايِن كل شيء ولا تترك أثراً</h3></div>
+        </div>
+        <dl class="w-what">
+          <div><dt>ما يتعلّمه الطفل</dt><dd>لا شيء — <b>هذا الوضع ليس له</b>. الطفلُ
+            يمشي محطةً محطة، والقفلُ التسلسليّ من أسس المنهج: لا يُعرَض عليه ما لم
+            يبلغه. وهذا الوضعُ لك أنت لتراه كلَّه في جلسةٍ واحدة.</dd></div>
+          <div><dt>كيف يعمل</dt><dd>أضِف <code>?preview=1</code> إلى عنوان التطبيق ثم
+            أعِد التحميل. تُفتَح المحطاتُ كلُّها للتصفّح، ويظهر في أعلى الشاشة شريطٌ
+            يقول <b>«وضع المعاينة»</b> — فلا يلتبس عليك ما تراه بتجربة الطفل.</dd></div>
+          <div><dt>دورُك أنت</dt><dd>جُل في المحطات كما تشاء: افتح درساً، وبستاناً،
+            وقصةً، وسورة. <b>ولا يُحفَظ شيءٌ على الجهاز</b> — لا نجمةٌ تُزرع ولا تقدّمٌ
+            يُمحى؛ تُغلق الصفحةَ فيعود الجهازُ كما كان. وهو يختلف عن <code>?dev=1</code>
+            أدناه: ذاك <b>يكتب</b> في التقدّم فعلاً، وهذا لا يمسّه.</dd></div>
+        </dl>
+      </article>
+
       <article class="w-station" style="--accent: var(--accent-stories)">
         <div class="w-station-head">
           <img loading="lazy" width="32" height="32" src="../emoji/1f50d.svg" alt="">
@@ -322,6 +341,68 @@
       <b>قبل التثبيت:</b> اضغط «ابدأ الآن» أولاً لتكون داخل التطبيق — هذه الصفحة
       التعريفية ليست منه، ولا يُثبَّت التطبيق منها.
     </p>
+
+    <!--
+      **رسمٌ لا لقطة** (اقتراح المالك، ١٣ أغسطس ٢٠٢٦: «صورة توضيحية تُظهر مراحل تثبيت
+      التطبيق بالصور للآيباد»): لا نصنع لقطاتٍ لسفاري — تلك واجهةُ آبل تتبدّل بكل نسخة،
+      ولقطةٌ نرسمها نحن لواجهةٍ ليست لنا **تُوهم أنّها حقيقية**. فالرسمُ مخطَّطٌ ظاهرُ
+      الرمزية: يدلّ على الزرّ وموضعه ولا يدّعي أنّه صورةُ شاشة. وهو SVG في الصفحة
+      نفسِها — لا ملفَّ يُجلب، ولا لونَ خارج لوح `app.css`.
+    -->
+    <figure class="w-steps">
+      <svg viewBox="0 0 720 200" role="img" width="720" height="200"
+           aria-labelledby="inst-t inst-d">
+        <title id="inst-t">ثلاث خطوات لتثبيت التطبيق على الآيباد</title>
+        <desc id="inst-d">زرّ المشاركة في شريط سفاري، ثم «إضافة إلى الشاشة الرئيسية»،
+          ثم أيقونة اِقْرَأْ بين تطبيقات الجهاز.</desc>
+
+        <!-- ١) الجهاز وزرّ المشاركة -->
+        <rect x="14" y="18" width="190" height="150" rx="14"
+              fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+        <rect x="26" y="30" width="166" height="26" rx="8" fill="var(--paper-deep)"/>
+        <rect x="150" y="34" width="34" height="18" rx="6"
+              fill="var(--accent-garden)" opacity=".22"/>
+        <path d="M167 38v12M162 43l5-5 5 5M159 47v5h16v-5"
+              fill="none" stroke="var(--accent-garden)" stroke-width="2.4"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="40" y="72" width="138" height="8" rx="4" fill="var(--line)"/>
+        <rect x="40" y="92" width="104" height="8" rx="4" fill="var(--line)"/>
+        <rect x="40" y="112" width="120" height="8" rx="4" fill="var(--line)"/>
+        <text x="109" y="190" text-anchor="middle" font-size="15"
+              fill="var(--ink-soft)">١ · زرّ المشاركة</text>
+
+        <!-- ٢) القائمة وفيها «إضافة إلى الشاشة الرئيسية» -->
+        <rect x="265" y="18" width="190" height="150" rx="14"
+              fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+        <rect x="279" y="34" width="162" height="22" rx="7" fill="var(--paper-deep)"/>
+        <rect x="279" y="64" width="162" height="22" rx="7" fill="var(--paper-deep)"/>
+        <rect x="279" y="94" width="162" height="30" rx="8"
+              fill="var(--accent-garden)" opacity=".22"/>
+        <rect x="289" y="103" width="16" height="16" rx="4"
+              fill="none" stroke="var(--accent-garden)" stroke-width="2.2"/>
+        <path d="M297 107v8M293 111h8" stroke="var(--accent-garden)"
+              stroke-width="2.2" stroke-linecap="round"/>
+        <rect x="315" y="106" width="112" height="9" rx="4" fill="var(--accent-garden)"/>
+        <text x="360" y="190" text-anchor="middle" font-size="15"
+              fill="var(--ink-soft)">٢ · إضافة إلى الشاشة الرئيسية</text>
+
+        <!-- ٣) الأيقونة على شاشة الجهاز -->
+        <rect x="516" y="18" width="190" height="150" rx="14"
+              fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+        <rect x="540" y="44" width="46" height="46" rx="12" fill="var(--line)"/>
+        <rect x="602" y="44" width="46" height="46" rx="12" fill="var(--line)"/>
+        <rect x="540" y="104" width="46" height="46" rx="12"
+              fill="var(--accent-letters)"/>
+        <text x="563" y="135" text-anchor="middle" font-size="20"
+              fill="var(--paper)" font-weight="700">ا</text>
+        <rect x="602" y="104" width="46" height="46" rx="12" fill="var(--line)"/>
+        <text x="611" y="190" text-anchor="middle" font-size="15"
+              fill="var(--ink-soft)">٣ · افتحه من أيقونته</text>
+      </svg>
+      <figcaption class="w-under">
+        رسمٌ توضيحيّ لمواضع الأزرار — لا لقطةُ شاشةٍ لسفاري (واجهةُ الجهاز تتبدّل بنسخه).
+      </figcaption>
+    </figure>
 
     <div class="w-cards">
       <article class="w-card">

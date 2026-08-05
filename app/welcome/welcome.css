@@ -897,3 +897,8 @@
 }
 
 .w-contact a { color: inherit; }
+
+/* رسمُ خطوات التثبيت: مخطَّطٌ لا لقطة — يتمدّد بعرض الصفحة ولا يفيض عنها. */
+.w-steps { margin: 0 0 1.5rem; }
+.w-steps svg { display: block; width: 100%; height: auto; }
+.w-steps figcaption { margin-top: .5rem; }

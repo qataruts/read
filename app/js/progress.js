@@ -146,13 +146,27 @@ function migrateJourney() {
   if (changed) save();
 }
 
+/* **وضعُ المعاينة** (أمر المالك، ١٣ أغسطس ٢٠٢٦: «هل ينبغي أن نفتح كل شيء لمن
+   يقيّم التطبيق؟»): المعلّمُ الذي يفحص يحتاج أن يرى المحطات كلَّها، والطفلُ يحتاج
+   ألّا يقفز إلى ما لم يبلغه — **والقفلُ التسلسليّ جوهرُ المنهج لا قيدٌ عليه**.
+
+   فبـ`?preview=1`: تُفتَح الرحلةُ كلُّها للتصفّح، **ولا يُكتب حرفٌ في تقدّم أحد** —
+   `save()` يصير بلا أثرٍ على القرص (ويبقى إخطارُ الشاشات ليُرسَم ما يجري في الجلسة).
+   فيدور المقيّمُ في كل شاشة ثم يُغلق، ويعود الجهازُ كما كان بلا محوٍ ولا زرعِ نجوم.
+
+   **وهو غيرُ `?dev=1`**: ذاك يملأ التقدّمَ فعلاً (أدواتُ تطوير)، وهذا لا يمسّه. */
+export const PREVIEW = typeof location !== 'undefined'
+  && new URLSearchParams(location.search).get('preview') === '1';
+
 function save() {
   frontierCache = null;   // النجوم وحدها تحرّك الجبهة، وكل تغيّر فيها يمرّ من هنا
   state.updatedAt = Date.now();
-  try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(state));
-  } catch {
-    console.warn('[progress] تعذّر الحفظ في localStorage');
+  if (!PREVIEW) {                       // معاينةٌ: تُرسَم الجلسةُ ولا يُمَسّ القرص
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    } catch {
+      console.warn('[progress] تعذّر الحفظ في localStorage');
+    }
   }
   for (const fn of listeners) fn(state);
 }
@@ -563,7 +577,12 @@ export function unlockFrontier() {
 /** العقدة مفتوحة = كل ما سبقها في الرحلة مُنجَز (أي: موضعها ≤ الجبهة). */
 export function isNodeUnlockedById(id) {
   const index = indexOf(id);
-  return index >= 0 && index <= unlockFrontier();
+  if (index < 0) return false;
+  // **المعاينةُ تفتح القفلَ ولا تدّعي إتماماً**: جُرِّب دفعُ الجبهة إلى آخر الرحلة
+  // فقالت الخريطةُ للمقيّم «أتممتَ الرحلة كلها» — وهو خبرٌ كاذب. فالجبهةُ تبقى
+  // على حقيقتها (ومنها «تابع من هنا» ونسبةُ الإنجاز)، والقفلُ وحدَه يُرفَع.
+  if (PREVIEW) return true;
+  return index <= unlockFrontier();
 }
 
 /** المجموعة مكتملة = كل حروفها ولعبة كلماتها أُنجزت. */
