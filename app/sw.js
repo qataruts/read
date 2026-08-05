@@ -237,7 +237,8 @@ async function audioComplete() {
    مكبوحةً بدقيقة، ولا تجلب إلا الناقص. */
 let syncing = false;
 let healed = false;             // مرّةً في عمر العامل (وكلُّ بعثٍ فرصةٌ جديدة)
-const HEAL_AFTER = 30000;       // نصفُ دقيقة تمضي للطفل قبل أي تنزيلٍ خلفيّ
+const HEAL_AFTER = 10000;       // عشرُ ثوانٍ: تكفي لتمضي الفتحةُ للطفل، ولا تطول
+                                // حتى يُنهي iOS العاملَ قبل أن يبدأ الشفاء أصلاً
 
 async function syncAudio() {
   if (syncing) return;
