@@ -58,6 +58,11 @@ const { GARDENS } = await import(new URL('lexicon.js', JS));
 const { RUNGS, SENTENCES } = await import(new URL('sentences.js', JS));
 const { LIBRARY } = await import(new URL('library.js', JS));
 const emojiIndex = JSON.parse(read('emoji/index.json', APP));
+// **بنكُ الصوت يُحسب من بيانه لا يُقدَّر**: بصمةٌ لكل ملفٍّ مولَّد في `versions.json`،
+// وآيةٌ لكل ملفِّ تلاوةٍ في `recitations.json` — فدفعةٌ جديدة تُسقِط الفحصَ يومَ
+// تُصرَّف، وذاك الحارسُ يعمل لا عيبٌ فيه (حكم المدير حين أُجّل الرقم).
+const audioVersions = JSON.parse(read('audio/versions.json', APP));
+const recitations = JSON.parse(read('data/recitations.json', APP));
 
 const SITE = 'https://read.mishkat.qa/';          // الاستثناءُ المعلَن الوحيد
 
@@ -230,6 +235,7 @@ const expected = {
   roots: ROOTS.length,
   rootMembers: ROOTS.reduce((s, r) => s + r.members.length, 0),
   icons: Object.keys(emojiIndex.files).length,
+  audio: Object.keys(audioVersions).length + Object.keys(recitations.ayat).length,
   // المراحلُ الخمس الكبرى في الخطّ الزمنيّ — محسوبةٌ من الرحلة نفسِها
   stageFound: nodesOf((s) => ['group', 'interlude', 'contrast'].includes(s.kind)),
   stageQuran: nodesOf((s) => s.kind === 'quran') + nodesOf(gateOf('quran')),
