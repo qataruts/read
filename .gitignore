@@ -12,3 +12,9 @@ tools/gcloud-oauth.json
 tools/gcloud-token.json
 !app/welcome/shots/
 !app/welcome/shots/**
+
+# مخبأُ المصادر المُنزَّلة (لا يدخل المستودع): بيانُ توقيت الكلمات من `quran-align`
+# — ٥٫٥ م.ب يُنزَّل مرّةً ويُتحقَّق من بصمته، ومنه تُبنى `spans` في بيان التلاوة.
+# **يُحفظ محلياً ولا يُرفع**: البصمةُ المعلَنة في `tools/fetch_word_timings.py` تكفي
+# لإثبات أنّ أيَّ نسخةٍ تُجلب لاحقاً هي عينُ التي بُنيت منها الأرقام.
+tools/.cache/
