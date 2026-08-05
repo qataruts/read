@@ -94,7 +94,12 @@ function paintMs(times = 6) {
 }
 
 const mapNodes = () => doc.querySelectorAll('.map *').length;
-const unfoldAll = () => { for (const b of $$('.station-head--fold')) b.click(); };
+// **المطويّةَ وحدَها** (١٣ أغسطس ٢٠٢٦): صار رأسُ المحطة زرّاً في الحالين — يفتح
+// ويغلق (بلاغ المالك: لم يكن للدُّرج غلق). فنقرُ الكلِّ كان يطوي المفتوح ويفتح
+// المطويّ، والمقصودُ فردُ الجميع لا قلبُ حالها.
+const unfoldAll = () => {
+  for (const b of $$('.station--folded .station-head--fold')) b.click();
+};
 
 try {
   // ————— حالة الطفل المتقدّم: ٩٠٪ من الرحلة —————

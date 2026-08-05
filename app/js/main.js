@@ -535,20 +535,32 @@ function trackEl({ id, folded, className, accent, mark, label, badge, title, sub
       h('div', { class: 'station-meta' }, meta),
     ];
 
+    /* **الدُّرج يُفتَح ويُغلَق** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦: «يخيَّل إليّ أنّني أستطيع
+       أن أعيد المحطة مضمومة، لكن لا يوجد شيءٌ كهذا»): كان الطيُّ في اتجاهٍ واحد —
+       رأسُ المطويّة زرٌّ يفتح، ورأسُ المفتوحة `div` لا يفعل شيئاً. فمَن فتح محطةً
+       بقيت مفتوحةً ولا سبيل إلى ضمّها، والخريطةُ تطول بلا داعٍ.
+       فصار الرأسُ **زرّاً في الحالين**: علامتُه `▾` مطويّةً و`▴` مفتوحة، و`aria-expanded`
+       يقول حالَه لقارئ الشاشة — فيُعرَف الدُّرجُ بالنظر وباللمس. */
+    const head = h('button', {
+      class: 'station-head station-head--fold',
+      'aria-expanded': open ? 'true' : 'false',
+      'aria-label': `${label} · انقر ${open ? 'لضمّ عقدها' : 'لعرض عقدها'}`,
+      onclick: () => {
+        open = !open;
+        if (open) unfolded.add(id); else unfolded.delete(id);
+        paint();
+      },
+    }, inner, h('span', { class: 'fold-sign', 'aria-hidden': 'true' }, open ? '▴' : '▾'));
+
     if (!open) {
-      station.replaceChildren(h('button', {
-        class: 'station-head station-head--fold',
-        'aria-expanded': 'false',
-        'aria-label': `${label} · انقر لعرض عقدها`,
-        onclick: () => { unfolded.add(id); open = true; paint(); },
-      }, inner, h('span', { class: 'fold-sign', 'aria-hidden': 'true' }, '▾')));
+      station.replaceChildren(head);
       return;
     }
 
     // `body` جسدٌ بديلٌ للمسار (رفُّ المكتبة يعرض أغلفةً لا نقاطاً) — والباقي كما هو
     const track = body || h('ol', { class: 'track' });
     if (!body) for (const node of nodes) track.append(h('li', {}, nodeButton(node, next)));
-    station.replaceChildren(h('div', { class: 'station-head' }, inner), track);
+    station.replaceChildren(head, track);
     if (mark) station.append(landmark(mark));
   }
 
