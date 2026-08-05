@@ -98,6 +98,12 @@
 
 /* ————— الهيكل العام ————— */
 
+/* **الانحناءُ أهدأ في الورقة منه في التطبيق** (حكم المالك، ١٣ أغسطس ٢٠٢٦):
+   `--radius` في `app.css` مدوَّرٌ لأنّ أزرارَ الطفل تُلمَس بإصبع؛ وصفحةُ المرجع
+   تُقرأ بالعين، والزوايا الشديدةُ التدوير فيها تُشبه لعبةً لا وثيقة. فيُضيَّق
+   في نطاق هذه الصفحة وحدَها — **ولا يُمَسّ لوحُ التطبيق ولا شعاعُه**. */
+.w-wrap, .w-top { --radius: 10px; }
+
 .w-wrap {
   max-width: 64rem;
   margin: 0 auto;
@@ -138,23 +144,64 @@
 
 .w-hero {
   text-align: center;
-  padding: 3rem 0 1rem;
+  padding: 2.5rem 0 1rem;
+}
+
+/* شقّان على الواسع، عمودٌ على الضيّق — والنصُّ يُحاذى إلى اليمين حين يصير عموداً
+   جانبياً، فالتوسيطُ لا يصلح لعمودٍ ضيّق. */
+@media (min-width: 62rem) {
+  .w-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: center;
+    gap: 2.5rem;
+    text-align: start;
+    padding: 3rem 0 1.5rem;
+  }
+
+  .w-hero .w-lockup { justify-content: flex-start; }
+  .w-hero .w-tagline,
+  .w-hero .w-lede { margin-inline: 0; }
+}
+
+.w-hero-shot { margin: 2rem 0 0; }
+
+.w-hero-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+@media (min-width: 62rem) {
+  .w-hero-shot { margin: 0; }
+}
+
+/* **الأيقونةُ والاسمُ سطرٌ واحد لا سطران** (حكم المالك بالنظر، ١٣ أغسطس ٢٠٢٦):
+   كانا مركومَين فبدَوا علامتين لا علامة، وأكلا صدرَ الصفحة فراغاً. فصارا وحدةً
+   أفقية: أيقونةٌ أصغرُ ثم الاسم، تفصلهما مسافةٌ واحدة. */
+.w-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .85rem;
+  margin-bottom: .75rem;
 }
 
 .w-hero img {
-  /* سطرٌ خاصٌّ بها: العلامةُ تحتها `inline-block` (صندوقُ `.brand`)، فلولا هذا
-     لاصطفّت الأيقونةُ والكلمةُ في سطرٍ واحد — علامتان جنباً إلى جنب. */
   display: block;
-  width: 88px;
-  height: 88px;
-  margin: 0 auto;
-  border-radius: 24px;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
   box-shadow: var(--shadow);
 }
 
 .w-hero h1 {
-  font-size: clamp(2.25rem, 7vw, 3.25rem);
-  margin: .75rem 0 .25rem;
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  margin: 0;
+  line-height: 1.35;
   letter-spacing: .5px;
 }
 
@@ -165,7 +212,13 @@
   color: var(--ink-soft);
 }
 
-.w-hero .w-lede { max-width: 44rem; margin: 1.25rem auto; }
+/* الفقرةُ الطويلة تُحاذى إلى اليمين لا تُوسَّط: التوسيطُ يصلح سطراً لا فقرةً —
+   حافّةٌ متعرّجةٌ من الجهتين تُبطئ العينَ في كل سطر. وعرضُ السطر مضبوط. */
+.w-hero .w-lede {
+  max-width: 40rem;
+  margin: 1.1rem auto 1.5rem;
+  text-align: start;
+}
 
 /* الفعل الرئيس: أكبر ما في الصفحة وأوضحه (DESIGN §٥.١، وهدف اللمس ≥ ٦٤ بكسل) */
 .w-start {
@@ -436,28 +489,41 @@
 .w-top .brand-word { letter-spacing: normal; }
 .w-top a.w-top-brand { text-decoration: none; display: inline-flex; align-items: center; }
 
+/* **روابطُ الشريط روابطُ لا أزرار** (حكم المالك، ١٣ أغسطس ٢٠٢٦): كانت حبّاتٍ
+   مستديرةً تزاحم زرَّ البدء فتساوى الثانويُّ بالرئيس. فصارت نصّاً هادئاً، وعلامةُ
+   الصفحة الحالية خطٌّ تحتها بلون المرحلة — والزرُّ الممتلئ واحدٌ في الشريط. */
 .w-topnav {
   display: flex;
   flex-wrap: wrap;
-  gap: .2rem .4rem;
+  align-items: center;
+  gap: .1rem 1.15rem;
   margin-inline-start: auto;
 }
 
 .w-topnav a, .w-topnav span {
   display: inline-block;
-  padding: .3rem .7rem;
-  border-radius: 999px;
+  padding: .45rem 0;
   font-size: .95rem;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  transition: color .12s ease, border-color .12s ease;
 }
 
-.w-topnav a:hover { background: var(--paper-deep); }
+.w-topnav a:hover { color: var(--ink); border-bottom-color: var(--line); }
 
 .w-topnav a[aria-current="page"] {
-  background: var(--card);
-  border: 1px solid var(--line);
+  color: var(--ink);
   font-weight: 600;
+  border-bottom-color: var(--accent-letters);
+}
+
+/* زرُّ البدء يبقى زرّاً — ومسافةٌ تفصله عن الروابط فلا يُقرأ خامسَها */
+.w-topnav a.btn {
+  margin-inline-start: .5rem;
+  padding: .45rem 1.1rem;
+  border-bottom: 0;
+  color: inherit;
 }
 
 /* صفحةٌ لم تُبنَ بعد: تُرى في البنية ولا تَعِد بنقرة (المرحلة الثانية) */
