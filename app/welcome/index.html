@@ -1,14 +1,24 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="اِقْرَأْ — يعلّم طفلك قراءة العربية، من الحرف الأول إلى القرآن. على أساس القاعدة النورانية: ترتيب الحروف بالتواتر، ومفكوكية ١٠٠٪ مفروضة آلياً، ومسار واحد ينتهي بالتهيئة لتلاوة المصحف. صفحة تعريفية للمعلمين والمدارس.">
-  <meta name="theme-color" content="#FAF4E8">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2A241C">
-  <title>اِقْرَأْ — تعليم القراءة العربية لطفل السادسة</title>
-  <link rel="icon" href="../icons/icon-192.png">
-  <!--
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="اِقْرَأْ — يعلّم طفلك قراءة العربية، من الحرف الأول إلى القرآن. على أساس القاعدة النورانية: ترتيب الحروف بالتواتر، ومفكوكية ١٠٠٪ مفروضة آلياً، ومسار واحد ينتهي بالتهيئة لتلاوة المصحف. صفحة تعريفية للمعلمين والمدارس."
+    />
+    <meta name="theme-color" content="#FAF4E8" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#2A241C"
+    />
+    <title>اِقْرَأْ — تعليم القراءة العربية للأطفال</title>
+    <link rel="icon" href="../icons/icon-192.png" />
+    <!--
     الرئيسة — **بوّابةٌ في ثلاثين ثانية، لا مرجعٌ يطول**: ما هو، لمن، ما يميّزه،
     لقطاتٌ حيّة، أرقامٌ كبرى، وثلاثةُ أبوابٍ إلى الصفحات العميقة. وما كان فيها من
     تفصيلٍ (الأسسُ ومسوّغاتُها ودليلُ المعلم والتثبيت) **أُعيد تأليفُه** في
@@ -20,242 +30,401 @@
     (`WELCOME` في `sw.js`) · صفرُ مرجعٍ شبكيّ يُجلَب · لوحُ `app.css` نفسُه ·
     رموزُ `app/emoji/` · لقطاتٌ من الشاشات بمولّدها · أرقامٌ يحسبها الحارس.
   -->
-  <link rel="stylesheet" href="../css/app.css">
-  <link rel="stylesheet" href="welcome.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../css/app.css" />
+    <link rel="stylesheet" href="welcome.css" />
+  </head>
+  <body>
+    <header class="w-top">
+      <div class="w-top-in">
+        <a class="w-top-brand" href="./"
+          ><span class="brand"
+            ><span class="brand-word">اِقْرَأْ</span></span
+          ></a
+        >
+        <nav class="w-topnav" aria-label="صفحات المرجع">
+          <a href="./" aria-current="page">الرئيسة</a>
+          <a href="curriculum.html">المنهج</a>
+          <a href="method.html">الأسس</a>
+          <a href="guide.html">الدليل العملي</a>
+          <a class="btn btn--primary" href="../">ابدأ الآن ←</a>
+        </nav>
+      </div>
+    </header>
 
-<header class="w-top">
-  <div class="w-top-in">
-    <a class="w-top-brand" href="./"><span class="brand"><span class="brand-word">اِقْرَأْ</span></span></a>
-    <nav class="w-topnav" aria-label="صفحات المرجع">
-      <a href="./" aria-current="page">الرئيسة</a>
-      <a href="curriculum.html">المنهج</a>
-      <a href="method.html">الأسس</a>
-      <a href="guide.html">الدليل العملي</a>
-      <a class="btn btn--primary" href="../">ابدأ الآن ←</a>
-    </nav>
-  </div>
-</header>
+    <div class="w-wrap">
+      <div class="w-print-head">
+        <img
+          loading="lazy"
+          src="../icons/icon-192.png"
+          alt=""
+          width="44"
+          height="44"
+        />
+        <span class="w-print-brand brand"
+          ><span class="brand-word">اِقْرَأْ</span></span
+        >
+        <span class="w-print-title">تعليم القراءة العربية للأطفال </span>
+        <a class="w-print-url" href="https://read.mishkat.qa/"
+          >read.mishkat.qa</a
+        >
+      </div>
 
-<div class="w-wrap">
-
-  <div class="w-print-head">
-    <img loading="lazy" src="../icons/icon-192.png" alt="" width="44" height="44">
-    <span class="w-print-brand brand"><span class="brand-word">اِقْرَأْ</span></span>
-    <span class="w-print-title">تعليم القراءة العربية لطفل السادسة</span>
-    <a class="w-print-url" href="https://read.mishkat.qa/">read.mishkat.qa</a>
-  </div>
-
-  <header class="w-hero">
-    <img loading="lazy" src="../icons/icon-192.png" alt="أيقونة تطبيق «اِقْرَأْ»" width="88" height="88">
-    <!-- العلامة: الكلمةُ مشكولةً بخطّها (`.brand` في app.css — لا نسخةَ تنسيقٍ هنا).
+      <header class="w-hero">
+        <img
+          loading="lazy"
+          src="../icons/icon-192.png"
+          alt="أيقونة تطبيق «اِقْرَأْ»"
+          width="88"
+          height="88"
+        />
+        <!-- العلامة: الكلمةُ مشكولةً بخطّها (`.brand` في app.css — لا نسخةَ تنسيقٍ هنا).
          ونوري لا يظهر معها هنا: أيقونتُه فوقها بثلاثة أسطر، فلا يُكرَّر في شبرٍ واحد. -->
-    <h1 class="brand"><span class="brand-word">اِقْرَأْ</span></h1>
-    <p class="w-tagline">يتعلّم الطفل قراءة العربية حرفاً حرفاً — حتى يقرأ المصحف بنفسه.</p>
-
-    <p class="w-lede">
-      تطبيق ويب مجاني لتعليم القراءة العربية لطفل الخامسة إلى السابعة، على أساس
-      <b>القاعدة النورانية</b> مطوَّعةً بترتيبٍ تواتريّ ومفرداتٍ من عالم الطفل.
-      مسارٌ واحد متّصل يبدأ من أربعة حروف وينتهي بقراءة الفاتحة وقصار السور —
-      ولا يُعرض فيه على الطفل حرفٌ أو علامة لم تُدرَّس بعد.
-    </p>
-
-    <a class="btn btn--primary w-start" href="../">ابدأ الآن ←</a>
-    <p class="w-under">يفتح في المتصفّح مباشرة — بلا تنزيل، وبلا حساب، وبلا إعلانات.</p>
-  </header>
-
-  <!-- ————— ما الذي يميّزه ————— -->
-
-  <section class="w-section" id="why" style="--accent: var(--accent-letters)">
-    <h2>أربعةُ فروقٍ تُرى في أول جلسة</h2>
-    <p class="w-lede">
-      وكلُّها قابلةٌ للتحقّق لا دعوى: يفرضها فاحصٌ آليّ على المحتوى قبل أن يصل إلى
-      الطفل، ويحمرُّ إن خولف.
-    </p>
-    <div class="w-cards w-cards--four">
-      <article class="w-card" style="--accent: var(--accent-letters)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f6a6.svg" alt="" width="30" height="30"></div>
-        <h3>مفكوكيةٌ ١٠٠٪ مفروضةٌ آلياً</h3>
-        <p>
-          لا كلمةَ ولا جملةَ ولا قصةَ فيها حرفٌ أو علامةٌ لم تُدرَّس بعد — حتى الجملُ
-          المولَّدة وكلماتُ السورة المشقوقة من نصّها تمرّ بالفاحص.
+        <h1 class="brand"><span class="brand-word">اِقْرَأْ</span></h1>
+        <p class="w-tagline">
+          يتعلّم الطفل قراءة العربية حرفاً حرفاً — حتى يقرأ المصحف بنفسه.
         </p>
-      </article>
-      <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f3b5.svg" alt="" width="30" height="30"></div>
-        <h3>بنكُ صوتٍ محقَّقٌ بأذنٍ بشرية</h3>
-        <p>
-          <b data-stat="audio">٢٩٧٦</b> ملفَّ صوتٍ مُنتَجٌ مسبقاً <b>ومسموعٌ بأذنٍ
-          بشرية</b>، ومعه دفترُ نسبٍ يقول من أين جاء كلُّ ملف — لا نطقَ آليّاً لحظياً.
-          ومنها <b data-stat="ayat">٦٨</b> آيةً <b>لا تُنطق آلياً أبداً</b>: تلاوتُها
-          بصوت الشيخ محمود خليل الحصري (المرتَّل).
+
+        <p class="w-lede">
+          تطبيق ويب مجاني لتعليم القراءة العربية لطفل الخامسة إلى السابعة، على
+          أساس
+          <b>القاعدة النورانية</b> مطوَّعةً بترتيبٍ تواتريّ ومفرداتٍ من عالم
+          الطفل. مسارٌ واحد متّصل يبدأ من أربعة حروف وينتهي بقراءة الفاتحة وقصار
+          السور — ولا يُعرض فيه على الطفل حرفٌ أو علامة لم تُدرَّس بعد.
         </p>
-      </article>
-      <article class="w-card" style="--accent: var(--accent-skills)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f512.svg" alt="" width="30" height="30"></div>
-        <h3>خصوصيةٌ مطلقة</h3>
-        <p>
-          لا حساب، ولا تسجيل دخول، ولا إعلانات، ولا تتبُّع. وتسجيلُ صوت الطفل في
-          «اقرأ لي» <b>لا يغادر جهازه أبداً</b>: يُخزَن محلّياً ويُسمَع منه ويُحذف منه.
+
+        <a class="btn btn--primary w-start" href="../">ابدأ الآن ←</a>
+        <p class="w-under">
+          يفتح في المتصفّح مباشرة — بلا تنزيل، وبلا حساب، وبلا إعلانات.
         </p>
-      </article>
-      <article class="w-card" style="--accent: var(--accent-garden)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f4f1.svg" alt="" width="30" height="30"></div>
-        <h3>يعمل دون إنترنت</h3>
-        <p>
-          يُثبَّت على الشاشة الرئيسة كتطبيقٍ مستقلّ، ويخزّن الأصوات والقصص والتلاوة من
-          أول فتحةٍ متّصلة — فيعمل بعدها في السيارة وفي صفٍّ بلا شبكة.
+      </header>
+
+      <!-- ————— ما الذي يميّزه ————— -->
+
+      <section
+        class="w-section"
+        id="why"
+        style="--accent: var(--accent-letters)"
+      >
+        <h2>أربعةُ فروقٍ تُرى في أول جلسة</h2>
+        <p class="w-lede">
+          وكلُّها قابلةٌ للتحقّق لا دعوى: يفرضها فاحصٌ آليّ على المحتوى قبل أن
+          يصل إلى الطفل، ويحمرُّ إن خولف.
         </p>
-      </article>
+        <div class="w-cards w-cards--four">
+          <article class="w-card" style="--accent: var(--accent-letters)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f6a6.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3>مفكوكيةٌ ١٠٠٪ مفروضةٌ آلياً</h3>
+            <p>
+              لا كلمةَ ولا جملةَ ولا قصةَ فيها حرفٌ أو علامةٌ لم تُدرَّس بعد —
+              حتى الجملُ المولَّدة وكلماتُ السورة المشقوقة من نصّها تمرّ
+              بالفاحص.
+            </p>
+          </article>
+          <article class="w-card" style="--accent: var(--accent-quran)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f3b5.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3>بنكُ صوتٍ محقَّقٌ بأذنٍ بشرية</h3>
+            <p>
+              <b data-stat="audio">٢٩٧٦</b> ملفَّ صوتٍ مُنتَجٌ مسبقاً
+              <b>ومسموعٌ بأذنٍ بشرية</b>، ومعه دفترُ نسبٍ يقول من أين جاء كلُّ
+              ملف — لا نطقَ آليّاً لحظياً. ومنها <b data-stat="ayat">٦٨</b> آيةً
+              <b>لا تُنطق آلياً أبداً</b>: تلاوتُها بصوت الشيخ محمود خليل الحصري
+              (المرتَّل).
+            </p>
+          </article>
+          <article class="w-card" style="--accent: var(--accent-skills)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f512.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3>خصوصيةٌ مطلقة</h3>
+            <p>
+              لا حساب، ولا تسجيل دخول، ولا إعلانات، ولا تتبُّع. وتسجيلُ صوت
+              الطفل في «اقرأ لي» <b>لا يغادر جهازه أبداً</b>: يُخزَن محلّياً
+              ويُسمَع منه ويُحذف منه.
+            </p>
+          </article>
+          <article class="w-card" style="--accent: var(--accent-garden)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f4f1.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3>يعمل دون إنترنت</h3>
+            <p>
+              يُثبَّت على الشاشة الرئيسة كتطبيقٍ مستقلّ، ويخزّن الأصوات والقصص
+              والتلاوة من أول فتحةٍ متّصلة — فيعمل بعدها في السيارة وفي صفٍّ بلا
+              شبكة.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ————— لمن هو ————— -->
+
+      <section
+        class="w-section"
+        id="who"
+        style="--accent: var(--accent-stories)"
+      >
+        <h2>ما «اِقْرَأْ»، ولمن؟</h2>
+        <p class="w-lede">
+          لعبةُ قراءةٍ في ظاهرها، ومنهجٌ صوتيّ تركيبيّ منظَّم في باطنها. الطفل
+          يلعب ثلاث إلى خمس دقائق في الدرس الواحد، والتطبيق يقيس كل خطأ ويعيده
+          عليه في موعده.
+        </p>
+        <div class="w-cards">
+          <article class="w-card">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                width="32"
+                height="32"
+                src="../emoji/1f9d2.svg"
+                alt="طفل"
+              />
+            </div>
+            <h3>للطفل (٥–٧ سنوات)</h3>
+            <p>
+              لا يحتاج أن يقرأ ليستعمله: الصورة والصوت والموضع تدلّه، والأزرار
+              كبيرة تناسب إصبعه، ولا مؤقّت ولا عدّ تنازليّ ولا شاشة «خطأ» —
+              الخطأ يُسمعه ما اختاره ويمضي.
+            </p>
+          </article>
+          <article class="w-card">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                width="32"
+                height="32"
+                src="../emoji/1f46a.svg"
+                alt="أسرة"
+              />
+            </div>
+            <h3>لوليّ الأمر</h3>
+            <p>
+              لوحةٌ خلف بوابةٍ بسيطة تريه أين يتعثّر طفله بالضبط (حرفاً بحركةٍ
+              بنوع تمرين)، وكم دقيقة تعلَّم في كل يوم من الأسبوع، وما الحروف
+              التي ثبتت فعلاً.
+            </p>
+          </article>
+          <article class="w-card">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                width="32"
+                height="32"
+                src="../emoji/1f3eb.svg"
+                alt="مدرسة"
+              />
+            </div>
+            <h3>للمعلم والمدرسة</h3>
+            <p>
+              تسلسلٌ معلَن يمكن تدقيقه بنداً بنداً، ومفكوكيةٌ مفروضة بفاحصٍ آليّ
+              لا بذوق مؤلّف، وثلاثُ صفحاتٍ في هذا المرجع تبيّن كل محطةٍ ومسوّغَ
+              كل قرار.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ————— أرقام ولقطات ————— -->
+
+      <section
+        class="w-section"
+        id="journey"
+        style="--accent: var(--accent-quran)"
+      >
+        <h2>رحلةٌ واحدة من «ا» إلى قصار السور</h2>
+        <p class="w-lede">
+          دربٌ واحد متّصل، والتالي مقفلٌ حتى يُتمّ الذي قبله. واللقطات أدناه
+          <b>من التطبيق نفسه</b> لا رسومَ عرضٍ — تُلتقط آلياً من شاشاته.
+        </p>
+
+        <ul class="w-figs">
+          <li><b data-stat="nodes">٢٩١</b><span>محطة في الرحلة</span></li>
+          <li><b data-stat="stars">٨٧٣</b><span>نجمة تُكتسب</span></li>
+          <li><b data-stat="letters">٢٨</b><span>حرفاً بأشكاله</span></li>
+          <li><b data-stat="words">٥٣٦</b><span>كلمةً مصوَّرة</span></li>
+          <li><b data-stat="sentences">٦٦٢</b><span>جملةً متدرّجة</span></li>
+          <li><b data-stat="stories">٢٣</b><span>قصةً مفكوكة</span></li>
+          <li><b data-stat="surahs">١٢</b><span>سورةً بتلاوة قارئ</span></li>
+          <li><b data-stat="roots">١٣</b><span>شجرةَ جذرٍ صرفيّ</span></li>
+        </ul>
+
+        <div class="w-shots">
+          <figure>
+            <img
+              src="shots/map.png"
+              width="820"
+              height="1180"
+              loading="lazy"
+              alt="خريطة الرحلة: محطات متتابعة بنجومها، وزرّ «تابع من هنا» في أعلاها."
+            />
+            <figcaption>
+              <b>درب الرحلة</b>
+              محطةٌ بعد محطة، والتالي مقفلٌ حتى يُتمّ الذي قبله — فلا يضيع الطفل
+              في قائمة.
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="shots/lesson.png"
+              width="820"
+              height="1097"
+              loading="lazy"
+              alt="درس حرف الباء: الحرف كبيراً، واسمه وصوته، وأشكاله الأربعة في الكلمة."
+            />
+            <figcaption>
+              <b>درس الحرف</b>
+              اسمع وشاهد، ثم الحركات، ثم تتبَّع بإصبعك، ثم ميِّز بأذنك — أربع
+              خطوات في ثلاث دقائق.
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="shots/story.png"
+              width="820"
+              height="1041"
+              loading="lazy"
+              alt="قصة «بيت سامي»: خمس جمل مشكولة، ولكل جملة زرّ سماع."
+            />
+            <figcaption>
+              <b>قصة مفكوكة</b>
+              أول قصةٍ بعد أربع مجموعات — كل حرفٍ فيها درسه، وله أن يسجّل صوته
+              وهو يقرؤها.
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="shots/quran.png"
+              width="820"
+              height="1180"
+              loading="lazy"
+              alt="سورة الفاتحة بالرسم العثماني، ولكل آيةٍ زرّ استماعٍ بصوت القارئ."
+            />
+            <figcaption>
+              <b>المرحلة القرآنية</b>
+              بالرسم العثماني وخطّ المصحف، ولا سورةَ قبل محطةِ كلماتها —
+              والتلاوة بصوت قارئ.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ————— ثلاثة أبواب ————— -->
+
+      <section
+        class="w-section"
+        id="more"
+        style="--accent: var(--accent-skills)"
+      >
+        <h2>وللمعلّم ووليّ الأمر: ثلاثةُ أبواب</h2>
+        <p class="w-lede">
+          هذه الصفحة بوّابة. وما وراءها مرجعٌ يُدقَّق: كلُّ محطةٍ بميكانيكيتها،
+          وكلُّ قرارٍ بمسوّغه، وكلُّ أداةٍ بطريقة استعمالها.
+        </p>
+        <div class="w-cards">
+          <article class="w-card" style="--accent: var(--accent-letters)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f5fa.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3><a href="curriculum.html">المنهج — الرحلة محطةً محطة</a></h3>
+            <p>
+              <b data-stat="nodes">٢٩١</b> محطة في خمس مراحل: ماذا يتعلّم الطفل
+              في كلٍّ، وكيف يعمل تمرينها، وما دورُك أنت. وتُطبَع ورقةً تُسلَّم
+              لمدرسة.
+            </p>
+          </article>
+          <article class="w-card" style="--accent: var(--accent-quran)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f9e0.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3><a href="method.html">الأسس — لماذا هذا الترتيب</a></h3>
+            <p>
+              الصوتيات التركيبية المنظَّمة، والنورانية وتطويعها، والتواتر،
+              والازدواجية، والوعي الصرفيّ، وحجمُ القراءة —
+              <b>ومسوّغاتُنا المعلَنة وحدودُ النطاق</b>.
+            </p>
+          </article>
+          <article class="w-card" style="--accent: var(--accent-garden)">
+            <div class="w-face">
+              <img
+                loading="lazy"
+                src="../emoji/1f393.svg"
+                alt=""
+                width="30"
+                height="30"
+              />
+            </div>
+            <h3><a href="guide.html">الدليل العملي — في البيت وفي الصفّ</a></h3>
+            <p>
+              كيف تكون الجلسة، وكيف تُقرأ لوحةُ القياس، و<b
+                >كيف تجرّب التطبيق من أوله</b
+              >، والتثبيتُ وحفظُ التقدّم واستعادتُه.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <div class="w-end">
+        <h2 style="margin-top: 0">ابدأ من الحرف الأول</h2>
+        <p class="w-lede" style="margin-inline: auto">
+          لا تنزيل ولا حساب — تفتح الصفحة فيبدأ الطفل من «ا».
+        </p>
+        <a class="btn btn--primary w-start" href="../">ابدأ الآن ←</a>
+      </div>
+
+      <footer class="w-foot">
+        <p>
+          «اِقْرَأْ» تطبيق ويب مفتوح البنية، بلا إطارات عملٍ ولا أدوات بناء.
+          مرجعاه المنهجيان: <b>القاعدة النورانية</b> (نور محمد حقاني) و<b
+            >الدروس الهجائية</b
+          >
+          (أوقاف قطر). ونصّ المصحف بالرسم العثماني بخطّ مجمّع الملك فهد،
+          والتلاوة بصوت الشيخ محمود خليل الحصري (المرتَّل).
+        </p>
+        <p>
+          وهذه الصفحة تعريفٌ بالتطبيق — ولا تجمع عنك شيئاً ولا تضع في جهازك
+          شيئاً.
+        </p>
+      </footer>
     </div>
-  </section>
-
-  <!-- ————— لمن هو ————— -->
-
-  <section class="w-section" id="who" style="--accent: var(--accent-stories)">
-    <h2>ما «اِقْرَأْ»، ولمن؟</h2>
-    <p class="w-lede">
-      لعبةُ قراءةٍ في ظاهرها، ومنهجٌ صوتيّ تركيبيّ منظَّم في باطنها. الطفل يلعب ثلاث
-      إلى خمس دقائق في الدرس الواحد، والتطبيق يقيس كل خطأ ويعيده عليه في موعده.
-    </p>
-    <div class="w-cards">
-      <article class="w-card">
-        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f9d2.svg" alt="طفل"></div>
-        <h3>للطفل (٥–٧ سنوات)</h3>
-        <p>
-          لا يحتاج أن يقرأ ليستعمله: الصورة والصوت والموضع تدلّه، والأزرار كبيرة تناسب
-          إصبعه، ولا مؤقّت ولا عدّ تنازليّ ولا شاشة «خطأ» — الخطأ يُسمعه ما اختاره
-          ويمضي.
-        </p>
-      </article>
-      <article class="w-card">
-        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f46a.svg" alt="أسرة"></div>
-        <h3>لوليّ الأمر</h3>
-        <p>
-          لوحةٌ خلف بوابةٍ بسيطة تريه أين يتعثّر طفله بالضبط (حرفاً بحركةٍ بنوع تمرين)،
-          وكم دقيقة تعلَّم في كل يوم من الأسبوع، وما الحروف التي ثبتت فعلاً.
-        </p>
-      </article>
-      <article class="w-card">
-        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f3eb.svg" alt="مدرسة"></div>
-        <h3>للمعلم والمدرسة</h3>
-        <p>
-          تسلسلٌ معلَن يمكن تدقيقه بنداً بنداً، ومفكوكيةٌ مفروضة بفاحصٍ آليّ لا بذوق
-          مؤلّف، وثلاثُ صفحاتٍ في هذا المرجع تبيّن كل محطةٍ ومسوّغَ كل قرار.
-        </p>
-      </article>
-    </div>
-  </section>
-
-  <!-- ————— أرقام ولقطات ————— -->
-
-  <section class="w-section" id="journey" style="--accent: var(--accent-quran)">
-    <h2>رحلةٌ واحدة من «ا» إلى قصار السور</h2>
-    <p class="w-lede">
-      دربٌ واحد متّصل، والتالي مقفلٌ حتى يُتمّ الذي قبله. واللقطات أدناه
-      <b>من التطبيق نفسه</b> لا رسومَ عرضٍ — تُلتقط آلياً من شاشاته.
-    </p>
-
-    <ul class="w-figs">
-      <li><b data-stat="nodes">٢٩١</b><span>محطة في الرحلة</span></li>
-      <li><b data-stat="stars">٨٧٣</b><span>نجمة تُكتسب</span></li>
-      <li><b data-stat="letters">٢٨</b><span>حرفاً بأشكاله</span></li>
-      <li><b data-stat="words">٥٣٦</b><span>كلمةً مصوَّرة</span></li>
-      <li><b data-stat="sentences">٦٦٢</b><span>جملةً متدرّجة</span></li>
-      <li><b data-stat="stories">٢٣</b><span>قصةً مفكوكة</span></li>
-      <li><b data-stat="surahs">١٢</b><span>سورةً بتلاوة قارئ</span></li>
-      <li><b data-stat="roots">١٣</b><span>شجرةَ جذرٍ صرفيّ</span></li>
-    </ul>
-
-    <div class="w-shots">
-      <figure>
-        <img src="shots/map.png" width="820" height="1180" loading="lazy"
-             alt="خريطة الرحلة: محطات متتابعة بنجومها، وزرّ «تابع من هنا» في أعلاها.">
-        <figcaption><b>درب الرحلة</b>
-          محطةٌ بعد محطة، والتالي مقفلٌ حتى يُتمّ الذي قبله — فلا يضيع الطفل في قائمة.
-        </figcaption>
-      </figure>
-      <figure>
-        <img src="shots/lesson.png" width="820" height="1097" loading="lazy"
-             alt="درس حرف الباء: الحرف كبيراً، واسمه وصوته، وأشكاله الأربعة في الكلمة.">
-        <figcaption><b>درس الحرف</b>
-          اسمع وشاهد، ثم الحركات، ثم تتبَّع بإصبعك، ثم ميِّز بأذنك — أربع خطوات في
-          ثلاث دقائق.
-        </figcaption>
-      </figure>
-      <figure>
-        <img src="shots/story.png" width="820" height="1041" loading="lazy"
-             alt="قصة «بيت سامي»: خمس جمل مشكولة، ولكل جملة زرّ سماع.">
-        <figcaption><b>قصة مفكوكة</b>
-          أول قصةٍ بعد أربع مجموعات — كل حرفٍ فيها درسه، وله أن يسجّل صوته وهو يقرؤها.
-        </figcaption>
-      </figure>
-      <figure>
-        <img src="shots/quran.png" width="820" height="1180" loading="lazy"
-             alt="سورة الفاتحة بالرسم العثماني، ولكل آيةٍ زرّ استماعٍ بصوت القارئ.">
-        <figcaption><b>المرحلة القرآنية</b>
-          بالرسم العثماني وخطّ المصحف، ولا سورةَ قبل محطةِ كلماتها — والتلاوة بصوت
-          قارئ.
-        </figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- ————— ثلاثة أبواب ————— -->
-
-  <section class="w-section" id="more" style="--accent: var(--accent-skills)">
-    <h2>وللمعلّم ووليّ الأمر: ثلاثةُ أبواب</h2>
-    <p class="w-lede">
-      هذه الصفحة بوّابة. وما وراءها مرجعٌ يُدقَّق: كلُّ محطةٍ بميكانيكيتها، وكلُّ
-      قرارٍ بمسوّغه، وكلُّ أداةٍ بطريقة استعمالها.
-    </p>
-    <div class="w-cards">
-      <article class="w-card" style="--accent: var(--accent-letters)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f5fa.svg" alt="" width="30" height="30"></div>
-        <h3><a href="curriculum.html">المنهج — الرحلة محطةً محطة</a></h3>
-        <p>
-          <b data-stat="nodes">٢٩١</b> محطة في خمس مراحل: ماذا يتعلّم الطفل في كلٍّ،
-          وكيف يعمل تمرينها، وما دورُك أنت. وتُطبَع ورقةً تُسلَّم لمدرسة.
-        </p>
-      </article>
-      <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f9e0.svg" alt="" width="30" height="30"></div>
-        <h3><a href="method.html">الأسس — لماذا هذا الترتيب</a></h3>
-        <p>
-          الصوتيات التركيبية المنظَّمة، والنورانية وتطويعها، والتواتر، والازدواجية،
-          والوعي الصرفيّ، وحجمُ القراءة — <b>ومسوّغاتُنا المعلَنة وحدودُ النطاق</b>.
-        </p>
-      </article>
-      <article class="w-card" style="--accent: var(--accent-garden)">
-        <div class="w-face"><img loading="lazy" src="../emoji/1f393.svg" alt="" width="30" height="30"></div>
-        <h3><a href="guide.html">الدليل العملي — في البيت وفي الصفّ</a></h3>
-        <p>
-          كيف تكون الجلسة، وكيف تُقرأ لوحةُ القياس، و<b>كيف تجرّب التطبيق من أوله</b>،
-          والتثبيتُ وحفظُ التقدّم واستعادتُه.
-        </p>
-      </article>
-    </div>
-  </section>
-
-  <div class="w-end">
-    <h2 style="margin-top:0">ابدأ من الحرف الأول</h2>
-    <p class="w-lede" style="margin-inline:auto">
-      لا تنزيل ولا حساب — تفتح الصفحة فيبدأ الطفل من «ا».
-    </p>
-    <a class="btn btn--primary w-start" href="../">ابدأ الآن ←</a>
-  </div>
-
-  <footer class="w-foot">
-    <p>
-      «اِقْرَأْ» تطبيق ويب مفتوح البنية، بلا إطارات عملٍ ولا أدوات بناء.
-      مرجعاه المنهجيان: <b>القاعدة النورانية</b> (نور محمد حقاني) و<b>الدروس الهجائية</b>
-      (أوقاف قطر). ونصّ المصحف بالرسم العثماني بخطّ مجمّع الملك فهد،
-      والتلاوة بصوت الشيخ محمود خليل الحصري (المرتَّل).
-    </p>
-    <p>وهذه الصفحة تعريفٌ بالتطبيق — ولا تجمع عنك شيئاً ولا تضع في جهازك شيئاً.</p>
-  </footer>
-
-</div>
-</body>
+  </body>
 </html>
