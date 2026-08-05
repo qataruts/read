@@ -214,19 +214,48 @@
         row('كتابةُ التقدّم (لكل مرّة)', each.toFixed(2) + ' م.ث',
           grade(each, 1, 4), '١٠٠ دورة كتابة/قراءة');
 
-        // ٥) المخزون: هل الصوتُ كلُّه على الجهاز فعلاً؟
+        // ٥) المخزون: هل الصوتُ كلُّه على الجهاز فعلاً؟ **والمتوقَّعُ يُحسب من بيانه**
+        //    لا يُكتب رقماً هنا — فدفعةُ صوتٍ جديدة لا تُكذّب هذا القياس.
+        var expected = 0;
+        try {
+          var vers = await (await fetch('../audio/versions.json')).json();
+          var recs = await (await fetch('../data/recitations.json')).json();
+          expected = Object.keys(vers).length
+            + Object.keys(recs.ayat || {}).length + Object.keys(recs.words || {}).length;
+        } catch (e) { /* بلا بيان: يبقى المتوقَّع صفراً فلا نحكم */ }
+
         try {
           var names = await win.caches.keys();
           var audio = names.filter(function (n) { return n.indexOf('muallim-audio') === 0; })[0];
           if (audio) {
             var stored = (await (await win.caches.open(audio)).keys()).length;
-            row('الأصوات المخزونة', stored + ' ملفاً',
-              stored >= 2900 ? 'ok' : (stored > 0 ? 'mid' : 'bad'),
-              stored >= 2900 ? 'المخزون تامّ — يعمل دون إنترنت' : 'ناقص: يحتاج اتصالاً ليكتمل');
+            var full = expected && stored >= expected;
+            row('الأصوات المخزونة', stored + (expected ? ' من ' + expected : '') + ' ملفاً',
+              full ? 'ok' : (stored > 0 ? 'mid' : 'bad'),
+              full ? 'تامّ — يعمل دون إنترنت'
+                   : 'ناقصٌ ' + (expected - stored) + ' ملفاً — كلٌّ منها يُجلَب عند سماعه');
           } else {
             row('الأصوات المخزونة', 'لا مخزن', 'bad', 'لم يُثبَّت عاملُ الخدمة بعد');
           }
+
+          // **أيُّ نسخةٍ من عامل الخدمة على الجهاز فعلاً؟** اسمُ مخزن القشرة يحملها،
+          // فبه نعرف: أوصل الإصلاحُ إلى الجهاز أم ما زال على نسخةٍ قديمة لا شفاء فيها؟
+          var shell = names.filter(function (n) { return n.indexOf('muallim-shell') === 0; })[0];
+          row('نسخةُ عامل الخدمة', shell ? shell.replace('muallim-shell-', '') : 'لا قشرة',
+            shell ? '' : 'bad', shell ? 'المثبَّتة على هذا الجهاز' : 'لم يُثبَّت بعد');
         } catch (e) { row('الأصوات المخزونة', 'تعذّر', '', String(e)); }
+
+        // ٦) **حصةُ التخزين**: هل امتلأت فيفشل الخزن صامتاً؟ — وهو الاحتمال الذي لا
+        //    يُفرَّق بينه وبين «لم يصل الإصلاح» إلا بهذا الرقم.
+        try {
+          var est = await navigator.storage.estimate();
+          var used = Math.round((est.usage || 0) / 1048576);
+          var cap = Math.round((est.quota || 0) / 1048576);
+          var pct = cap ? Math.round(used * 100 / cap) : 0;
+          row('حصةُ التخزين', used + ' / ' + cap + ' م.ب',
+            pct < 70 ? 'ok' : (pct < 90 ? 'mid' : 'bad'),
+            pct >= 90 ? 'ممتلئة — الخزنُ يفشل صامتاً' : 'المستعمَل ' + pct + '٪ من المتاح');
+        } catch (e) { row('حصةُ التخزين', 'غير متاحة', '', String(e)); }
 
         restore(keep);
         frame.remove();
