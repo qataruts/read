@@ -388,6 +388,33 @@ ok([...recited.keys()].every((key) => existsSync(new URL(`../app/audio/${key}.mp
 ok([...recited.keys()].every((key) => !(key in manifest)),
   'وليست في فهرس الأصوات المولّدة — بيانان منفصلان عمداً');
 
+// ————— ٥ج. صوتُ كلمة السورة: مقطعٌ من آيتها لا ملفٌّ ثانٍ —————
+//
+// **العيبُ المُغلَق هنا** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦): محطةُ «كلمات السورة» عملت
+// صامتةً — ينقر الطفلُ الكلمةَ فلا يسمع شيئاً. والحلُّ أنّ الكلمة في آيتها أصلاً،
+// فلكلٍّ `spans[مفتاحها] = { a: مفتاح آيتها، s، e }`. والمحروسُ ثلاثة:
+//   أ) **لا كلمةَ تُعرَض بلا صوت** — وهي العلّة نفسُها لا تعود.
+//   ب) وآيتُها **مسجَّلةٌ عندنا** وملفُّها على القرص (فلا مقطعٌ في هواء).
+//   ج) وحدودُه صالحةٌ موجبة (بدايةٌ قبل نهاية) — فلا نقرةٌ تُسمِع صمتاً.
+const spans = recitations.spans || {};
+const surahWordTexts = [...new Set(QURAN.surahs.flatMap((s) => surahWords(s).map((w) => w.text)))];
+const voiceless = surahWordTexts.filter((t) => !spans[keyFor(t)] && !(recitations.words || {})[keyFor(t)]);
+ok(voiceless.length === 0,
+  `وكلُّ كلمةٍ تعرضها «كلمات السورة» لها صوت (${surahWordTexts.length} كلمة)`
+  + `${voiceless.length ? ' — صامتٌ: ' + voiceless.length : ''}`);
+const spanOrphans = Object.entries(spans).filter(([, v]) => !recited.has(v.a));
+ok(spanOrphans.length === 0,
+  `ومقطعُ كلٍّ داخل آيةٍ مسجَّلةٍ عندنا (${Object.keys(spans).length} مقطعاً)`
+  + `${spanOrphans.length ? ' — يتيم: ' + spanOrphans.length : ''}`);
+ok(Object.values(spans).every((v) => Number.isFinite(v.s) && Number.isFinite(v.e) && v.e > v.s),
+  'وحدودُه أرقامٌ صالحةٌ والبدايةُ قبل النهاية');
+ok(!!recitations.spansSource && /CC BY/i.test(recitations.spansSource),
+  `ومصدرُ التوقيت مُسمّىً برخصته في البيان (${recitations.spansSource || 'غائب'})`);
+// **وصفرُ ملفِّ صوتٍ جديد**: هذا هو مكسبُ الحلّ كلُّه — لو عاد أحدٌ إلى ملفاتٍ مفردة
+// لتضاعف التنزيل بلا داعٍ، والآيةُ عنده سلفاً.
+ok(!Object.keys(spans).some((key) => existsSync(new URL(`../app/audio/wbw-${key}.mp3`, import.meta.url))),
+  'ولا ملفَّ صوتٍ مفرداً للكلمة — تُشغَّل من ملفّ آيتها المخزون سلفاً');
+
 // وحدة التلاوة نفسها: لا تعرف النطق الآلي أصلاً (لا يسدّ مسدَّ القارئ شيء)
 const recitationSrc = readFileSync(new URL('../app/js/recitation.js', import.meta.url), 'utf8');
 ok(!/speechSynthesis|SpeechSynthesisUtterance/.test(recitationSrc),
