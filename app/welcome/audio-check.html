@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>فحص الصوت — اِقْرَأْ</title>
+    <!--
+      **صفحةُ تشخيصٍ لا صفحةُ عرض** (عيبُ «توقّف الصوت على الآيباد»، ١٣ أغسطس ٢٠٢٦):
+      تُفتَح على الجهاز المعطوب فتقول **لماذا** صمت الصوت بالضبط، بلا وصلِ حاسوبٍ
+      ولا قارئِ سجلّات. وموضعُها في `welcome/` عمداً: عاملُ الخدمة يستثني هذا المسار
+      من الاعتراض كلِّه، فلا يبتلعها ردُّ التنقّل ولا تُخزَّن نسخةٌ قديمة منها.
+
+      وثلاثُ محاولاتٍ في لمسةٍ واحدة تفصل الاحتمالات فصلاً:
+        ١) تشغيلٌ **داخل اللمسة** بلا انتظارٍ ألبتّة.
+        ٢) تشغيلٌ بعد انتظارِ وعدٍ محلول (فجوةُ مهمّةٍ صغرى).
+        ٣) تشغيلٌ بعد **جلبٍ حقيقيّ من الشبكة** — وهو ما يفعله التطبيق اليوم.
+      فإن نجحت ١ وفشلت ٣ فالعلّةُ **سياسةُ اللمسة في سفاري** لا الملفّ ولا الشبكة.
+    -->
+    <style>
+      body {
+        margin: 0;
+        padding: 1.25rem;
+        font: 17px/1.7 -apple-system, system-ui, sans-serif;
+        background: #faf4e8;
+        color: #3a3128;
+      }
+      h1 { font-size: 1.25rem; margin: 0 0 .25rem; }
+      p.sub { margin: 0 0 1.25rem; color: #6b5d4c; font-size: .95rem; }
+      button {
+        display: block;
+        width: 100%;
+        min-height: 4.5rem;
+        font: 700 1.35rem/1.4 inherit;
+        color: #3a3128;
+        background: #e0a83c;
+        border: 0;
+        border-radius: 12px;
+        cursor: pointer;
+      }
+      ol { padding-inline-start: 1.25rem; }
+      li { margin: .85rem 0; }
+      .r { font-weight: 700; }
+      .ok { color: #1f7a4d; }
+      .no { color: #b3261e; }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-all;
+        background: #fffaf2;
+        border: 1px solid #e6dcc9;
+        border-radius: 10px;
+        padding: .75rem;
+        font-size: .8rem;
+        margin-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>فحص الصوت</h1>
+    <p class="sub">اضغط الزرّ مرّةً واحدة، ثم أرسل الصورة.</p>
+
+    <button id="go">اضغط هنا لبدء الفحص</button>
+
+    <ol id="out">
+      <li>١) تشغيل داخل اللمسة مباشرة: <span class="r" id="t1">—</span></li>
+      <li>٢) تشغيل بعد انتظار قصير: <span class="r" id="t2">—</span></li>
+      <li>٣) تشغيل بعد جلب من الشبكة (كما يفعل التطبيق): <span class="r" id="t3">—</span></li>
+      <li>٤) تنزيل ملف الصوت: <span class="r" id="t4">—</span></li>
+      <li>٥) أصوات النطق الآلي المتاحة: <span class="r" id="t5">—</span></li>
+    </ol>
+
+    <pre id="env"></pre>
+
+    <script>
+      // ملفٌّ موجودٌ دائماً (بلا وسم نسخة، فلا يتعلّق الفحصُ ببصمةٍ قد تتبدّل)
+      var URL_MP3 = '../audio/76538b56f0eb.mp3';
+      var MANIFEST = '../audio/manifest.json';
+
+      function show(id, okText, err) {
+        var el = document.getElementById(id);
+        el.textContent = err ? ('فشل — ' + err) : okText;
+        el.className = 'r ' + (err ? 'no' : 'ok');
+      }
+
+      function tryPlay(id) {
+        var el = new Audio(URL_MP3);
+        el.volume = 0.9;
+        var p = el.play();
+        if (!p || !p.then) { show(id, 'شُغِّل (بلا وعد)'); return; }
+        return p.then(
+          function () { show(id, 'نجح ✓'); setTimeout(function () { el.pause(); }, 900); },
+          function (e) { show(id, null, (e && e.name ? e.name : 'خطأ') + (e && e.message ? ': ' + e.message : '')); }
+        );
+      }
+
+      document.getElementById('go').addEventListener('click', function () {
+        // ١) داخل اللمسة تماماً — لا انتظار قبله
+        tryPlay('t1');
+
+        // ٢) بعد فجوة صغرى
+        Promise.resolve().then(function () { return tryPlay('t2'); });
+
+        // ٣) بعد جلبٍ حقيقيّ من الشبكة — وهو ما يفعله التطبيق قبل كل تشغيل
+        fetch(MANIFEST, { cache: 'no-store' })
+          .then(function (r) { return r.json(); })
+          .then(function () { return tryPlay('t3'); })
+          .catch(function (e) { show('t3', null, 'تعذّر جلب الفهرس: ' + e); });
+
+        // ٤) هل يصل الملفّ أصلاً؟
+        fetch(URL_MP3, { cache: 'no-store' })
+          .then(function (r) { return r.blob(); })
+          .then(function (b) { show('t4', 'وصل ✓ (' + b.size + ' بايت، ' + b.type + ')'); })
+          .catch(function (e) { show('t4', null, String(e)); });
+
+        // ٥) احتياط النطق الآلي
+        try {
+          var v = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+          var ar = v.filter(function (x) { return /^ar/i.test(x.lang); });
+          show('t5', v.length + ' صوتاً، منها ' + ar.length + ' عربي');
+        } catch (e) { show('t5', null, String(e)); }
+
+        document.getElementById('env').textContent =
+          'المتصفّح: ' + navigator.userAgent
+          + '\nمثبَّت كتطبيق: ' + (window.navigator.standalone === true ? 'نعم' : 'لا')
+          + '\nعامل خدمة مسجَّل: ' + (navigator.serviceWorker && navigator.serviceWorker.controller ? 'نعم' : 'لا')
+          + '\nمتّصل: ' + navigator.onLine;
+      });
+    </script>
+  </body>
+</html>
