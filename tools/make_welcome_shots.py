@@ -50,6 +50,14 @@ SHOTS = [
     ("story", "قصة مفكوكة"),
     ("quran", "المرحلة القرآنية"),
     ("parent", "لوحة وليّ الأمر"),
+    # المرحلة الثانية من «المرجع التعريفي» (إذنُ المدير): لقطةٌ بجوار كل نوع محطة
+    ("gate", "بوابة الإتقان"),
+    ("contrast", "ميّز بين"),
+    ("garden", "باقة البستان"),
+    ("ladder", "سلّم الجمل"),
+    ("roots", "شجرة الجذر"),
+    ("shelf", "قصة الرفّ"),
+    ("fade", "خفوت التشكيل"),
 ]
 
 
@@ -151,9 +159,14 @@ def generate(args) -> int:
 
 
 def check() -> int:
-    """لا لقطةَ ناقصة ولا معطوبة ولا بمقاسٍ غريب — ولا لقطةَ يتيمة لا تذكرها الصفحة."""
+    """لا لقطةَ ناقصة ولا معطوبة ولا بمقاسٍ غريب — ولا لقطةَ يتيمة لا تعرضها صفحة.
+
+    و**المقروءُ صفحاتُ `welcome/` كلُّها** لا الرئيسةَ وحدَها (المرجع صار موقعاً من
+    أربع صفحات): لقطةٌ تعرضها صفحةُ المنهج مذكورةٌ، ولقطةٌ لا تعرضها صفحةٌ يتيمة.
+    """
     fails = 0
-    html = (APP / "welcome" / "index.html").read_text(encoding="utf-8")
+    pages = sorted((APP / "welcome").glob("*.html"))
+    html = "\n".join(p.read_text(encoding="utf-8") for p in pages)
     for screen, title in SHOTS:
         path = OUT / f"{screen}.png"
         size = png_size(path) if path.exists() else None
@@ -167,7 +180,7 @@ def check() -> int:
             fails += 1
             continue
         if f"shots/{screen}.png" not in html:
-            print(f"  ✗ {screen}.png: لا تعرضها الصفحة التعريفية")
+            print(f"  ✗ {screen}.png: لا تعرضها صفحةٌ من صفحات المرجع")
             fails += 1
             continue
         print(f"  ✓ {screen}.png ({w}×{h}) — {title}")

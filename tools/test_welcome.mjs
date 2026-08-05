@@ -1,17 +1,25 @@
-// اختبار الصفحة التعريفية (`app/welcome/` — جلسة الصفحة التعريفية):
+// اختبار «المرجع التعريفيّ» (`app/welcome/` — أربعُ صفحاتٍ بقشرةٍ واحدة):
 //   node tools/test_welcome.mjs
 //
-// المحروس هنا خمسة، وكلها شروطُ قبولٍ لا زينة:
+// المحروس هنا تسعة، وكلها شروطُ قبولٍ لا زينة:
 //   ١) **خارج التطبيق**: لا في قائمة SHELL، ولا يجيب عنها عاملُ الخدمة، ولا تسجّل
 //      عاملاً، ولا تصل بيان التطبيق (manifest) — فلا تدخل PWA المثبَّتة بحال.
-//   ٢) **لا مرجع شبكيّ خارجي البتّة**: كل ما تطلبه ملفٌّ في هذا المستودع، وكلّ ملفٍّ
-//      تطلبه موجودٌ فعلاً (رابطٌ مكسور في صفحة عرضٍ للمدارس أسوأ من لا صفحة).
-//   ٣) **زرّ البدء ينقل إلى التطبيق** (`../`) وهو الفعل الرئيس (DESIGN §٥.١).
-//   ٤) **اللوح ليس منسوخاً**: الصفحة لا تكتب لوناً بقيمته، بل تستعمل متغيّرات
-//      `app.css` — فلا لوحان يفترقان (DESIGN §٢).
-//   ٥) **أرقامها صادقة**: كل رقمٍ تعده على المعلّم (المحطات، النجوم، الحروف،
-//      الكلمات، الجمل، القصص، السور) يُحسب من بيانات المنهج نفسِها ويُقارَن.
-//      ومعها: أقسامُ التكليف الخمسة، ومسوّغاتُ دليل المعلم الأربعة، ولقطاتُه.
+//   ٢) **لا مَورد شبكيّ خارجيّ البتّة**: كلُّ ما تجلبه الصفحةُ عند فتحها ملفٌّ في هذا
+//      المستودع وموجودٌ فعلاً. **والاستثناءُ المعلَن واحد**: عنوانُ موقعنا في ترويسة
+//      المطبوع — وهو `<a>` يُفتَح إن نُقر ولا يُجلَب (أمر المالك).
+//   ٣) **قشرةٌ واحدة**: شريطُ التنقّل نفسُه في الصفحات الأربع، وصفحتُه الحالية معلَّمة.
+//   ٤) **اللوح ليس منسوخاً**: لا لونَ بقيمته في التنسيق — بل متغيّرات `app.css`.
+//   ٥) **أرقامُها صادقة**: كلُّ رقمٍ موسومٍ `data-stat` في أيّ صفحة يُحسب من بيانات
+//      المنهج ويُقارَن — فتوسعةُ المنهج تُسقِط الفحصَ قبل أن تُسقِط صدقَ الصفحة.
+//   ٦) **لا محطةَ تُترك**: لكل نوع محطةٍ في `journey()` بطاقتُه في صفحة المنهج بنمطها
+//      الواحد وعددِ عقدها — ونوعٌ جديد يُسقِط الفحص يومَ يُضاف (نظيرُ `test_measure`).
+//   ٧) **حارسُ التغطية** (حكم المدير، المرحلة الثانية): الرئيسةُ أُعيد تأليفُها ووُزّع
+//      تفصيلُها على «الأسس» و«الدليل» — **فلا تسقط حقيقةٌ كانت معروضة**: تُجرد هنا
+//      واحدةً واحدة ويُثبَت وجودُ كلٍّ في موضعها الجديد.
+//   ٨) **لا وعدَ بما ليس في التطبيق**: كلُّ اسمِ زرٍّ تَعِد به الصفحةُ يُقابَل بنصّه في
+//      `app/js/parent.js` و`app/js/main.js` — فلو غُيّر اسمٌ هناك احمرّ هنا.
+//   ٩) **النصُّ منقولٌ لا مُعادُ الصياغة**: قواعدُ الدروس ومعاني الجذور وأسماءُ المحطات
+//      تُقرأ من البيانات وقتَ الفحص، ولا حرفَ من نصّ المصحف يُكتب في صفحةِ عرض.
 
 import { readFileSync, existsSync } from 'node:fs';
 
@@ -23,11 +31,18 @@ const read = (path, base = WELCOME) => readFileSync(new URL(path, base), 'utf8')
 let fails = 0;
 const ok = (cond, msg) => { if (!cond) { fails++; console.log('  ✗', msg); } else console.log('  ✓', msg); };
 
-const html = read('index.html');
+const PAGE_NAMES = ['index.html', 'curriculum.html', 'method.html', 'guide.html'];
+const PAGES = Object.fromEntries(PAGE_NAMES.map((name) => [name, read(name)]));
+const html = PAGES['index.html'];
+const cur = PAGES['curriculum.html'];
+const method = PAGES['method.html'];
+const guide = PAGES['guide.html'];
 const css = read('welcome.css');
 const sw = read('sw.js', APP);
+const parentJs = read('js/parent.js', APP);
+const mainJs = read('js/main.js', APP);
 
-// بيانات المنهج — منها تُحسب أرقام الصفحة (لا تُصدَّق كما كُتبت)
+// بيانات المنهج — منها تُحسب أرقام الصفحات (لا تُصدَّق كما كُتبت)
 const store = new Map();
 globalThis.localStorage = {
   getItem: (k) => (store.has(k) ? store.get(k) : null),
@@ -36,16 +51,25 @@ globalThis.localStorage = {
 };
 const JS = new URL('js/', APP);
 const progress = await import(new URL('progress.js', JS));
-const { GROUPS, LETTERS, STORIES, QURAN } = await import(new URL('curriculum.js', JS));
+const {
+  GROUPS, LETTERS, STORIES, QURAN, SKILLS, CONTRASTS, GATES, ROOTS, surahWords,
+} = await import(new URL('curriculum.js', JS));
 const { GARDENS } = await import(new URL('lexicon.js', JS));
-const { RUNGS } = await import(new URL('sentences.js', JS));
+const { RUNGS, SENTENCES } = await import(new URL('sentences.js', JS));
 const { LIBRARY } = await import(new URL('library.js', JS));
+const emojiIndex = JSON.parse(read('emoji/index.json', APP));
+
+const SITE = 'https://read.mishkat.qa/';          // الاستثناءُ المعلَن الوحيد
 
 // ————— ١. خارج التطبيق وخارج قشرة عامل الخدمة —————
 
-ok(!/<link[^>]*rel=["']manifest["']/.test(html), 'الصفحة لا تصل بيان التطبيق (لا تُثبَّت مكانه)');
-ok(!/serviceWorker/.test(html), 'ولا تسجّل عامل خدمة');
-ok(!/<script/i.test(html), 'ولا تحمل سطر جافاسكربت واحداً (لا شيء يعمل فيها أصلاً)');
+console.log('\n١. خارج التطبيق');
+
+for (const [name, text] of Object.entries(PAGES)) {
+  ok(!/<link[^>]*rel=["']manifest["']/.test(text) && !/serviceWorker/.test(text)
+    && !/<script/i.test(text),
+    `${name}: لا بيانَ تطبيقٍ ولا عاملَ خدمة ولا سطرَ جافاسكربت واحداً`);
+}
 ok(/const WELCOME = new URL\('welcome\/'/.test(sw), 'وعامل الخدمة يعرف مسارها مشتقّاً من نطاقه');
 // ردُّ التنقّل يجيب index.html عن كل تنقّلٍ في النطاق — فلولا الاستثناء **قبله**
 // لفُتح التطبيقُ مكان الصفحة على كل جهازٍ ثبّته، فلا تُرى الصفحة أبداً.
@@ -54,56 +78,125 @@ ok(bypass > 0, 'ويستثنيها من الاعتراض فلا تُخزَّن �
 ok(bypass > 0 && bypass < sw.indexOf("request.mode === 'navigate'"),
   'والاستثناء قبل ردّ التنقّل (وإلا ابتلعها فتح التطبيق مكانها)');
 
-// ————— ٢. لا مرجع شبكيّ خارجي، ولا رابط مكسور —————
+// **وبابُ التعريف في التطبيق** (أمر المالك، ١٢ أغسطس ٢٠٢٦): من فتح التطبيق وأراد
+// أن يعرف ما هو يجد رابطَ المرجع في ذيل الخريطة — انتقالُ صفحةٍ لا تنقّلُ تطبيق.
+ok(/class: 'map-about', href: 'welcome\/'/.test(mainJs),
+  'وللتطبيق بابٌ إليها في ذيل خريطته (لا في صدرها فيزاحم درسَ الطفل)');
+ok(/\.map-about\s*{/.test(read('css/app.css', APP)), 'وله تنسيقُه الهادئ في لوح التطبيق');
 
-const external = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map((m) => m[1])
-  .filter((v) => /^(https?:)?\/\//.test(v) || v.startsWith('data:'));
-ok(external.length === 0,
-  `لا مرجع شبكيّ خارجي في الصفحة${external.length ? ' — ' + external.join('، ') : ''}`);
-ok(!/@import|url\(\s*["']?https?:/.test(css), 'ولا في تنسيقها');
+// ————— ٢. لا مَورد شبكيّ خارجيّ، ولا رابط مكسور —————
 
-const links = [...html.matchAll(/(?:href|src)="([^"#][^"]*)"/g)].map((m) => m[1])
-  .filter((v) => !v.startsWith('#'));
-const missing = links.filter((v) => !existsSync(new URL(v, WELCOME)));
-ok(missing.length === 0,
-  `وكل ملفٍّ تطلبه موجود (${links.length} مرجعاً)${missing.length ? ' — مفقود: ' + missing.join('، ') : ''}`);
+console.log('\n٢. المَوارد والروابط');
 
-const anchors = [...html.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
-const ids = new Set([...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]));
-const dangling = anchors.filter((a) => !ids.has(a));
-ok(dangling.length === 0,
-  `وكل رابطٍ داخليّ يجد قسمه${dangling.length ? ' — معلَّق: ' + dangling.join('، ') : ''}`);
+for (const [name, text] of Object.entries(PAGES)) {
+  // **المحروسُ مرجعُ المَورد لا رابطُ التصفّح**: `src` و`<link>` تُجلَب عند الفتح
+  // فلا يجوز فيها خارجيّ البتّة؛ و`<a href>` لا يُجلَب — يُفتَح إن نُقر.
+  const fetched = [...text.matchAll(/(?:src|<link[^>]*href)="([^"]+)"/g)].map((m) => m[1])
+    .filter((v) => /^(?:https?:)?\/\//.test(v) || v.startsWith('data:'));
+  ok(fetched.length === 0,
+    `${name}: صفرُ مَوردٍ خارجيّ يُجلَب${fetched.length ? ' — ' + fetched.join('، ') : ''}`);
 
-// ————— ٣. زرّ البدء —————
-//
-// **وشريطُ التنقّل مستثنىً بعلّته** (حزمة «المرجع التعريفي»): فيه دعوةٌ صغيرة إلى
-// التطبيق بحجم الشريط لا بحجم الفعل الرئيس — والمحروسُ هنا الفعلُ الرئيس في متن
-// الصفحة. فيُقصّ الشريطُ قبل الجرد، ويُفحَص وحدَه في §٧.
-const body = html.replace(/<header class="w-top">[\s\S]*?<\/header>/, '');
-const starts = [...body.matchAll(/<a[^>]*href="\.\.\/"[^>]*>([^<]*)<\/a>/g)];
-ok(starts.length >= 1, `زرّ «ابدأ الآن» ينقل إلى التطبيق (../) — ${starts.length} موضعاً`);
-ok(starts.every((m) => /btn--primary/.test(m[0]) && /w-start/.test(m[0])),
-  'وهو الفعل الرئيس بلون النجمة وبهدف لمسٍ ≥ ٦٤ بكسل');
+  const outward = [...text.matchAll(/<a[^>]*href="(https?:[^"]+)"/g)].map((m) => m[1]);
+  ok(outward.every((v) => v === SITE) && outward.length <= 1,
+    `${name}: ولا رابطَ خارجيّ إلا عنوانَ موقعنا في ترويسة المطبوع`);
+
+  const links = [...text.matchAll(/(?:href|src)="([^"#][^"]*)"/g)].map((m) => m[1])
+    .filter((v) => !/^(?:https?:)?\/\//.test(v));
+  const missing = links.filter((v) => !existsSync(new URL(v, WELCOME)));
+  ok(missing.length === 0,
+    `${name}: وكلُّ ملفٍّ تطلبه موجود (${links.length} مرجعاً)`
+    + (missing.length ? ' — مفقود: ' + missing.join('، ') : ''));
+
+  const ids = new Set([...text.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]));
+  const dangling = [...text.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]).filter((a) => !ids.has(a));
+  ok(dangling.length === 0,
+    `${name}: وكلُّ رابطِ قفزٍ يجد قسمه`
+    + (dangling.length ? ' — معلَّق: ' + dangling.join('، ') : ''));
+
+  // **الصورةُ لا تُزحزح السطرَ ولا تُجلَب قبل أوانها** (شرطُ المدير في المرحلة
+  // الثانية): صفحةٌ بثلاث عشرة لقطة تُحمَّل من الشبكة على جهاز معلّم.
+  const imgs = [...text.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
+  const loose = imgs.filter((t) => !/alt="/.test(t) || !/width="\d+"/.test(t)
+    || !/height="\d+"/.test(t) || !/loading="lazy"/.test(t));
+  ok(loose.length === 0,
+    `${name}: ولكل صورةٍ (${imgs.length}) وصفُها وأبعادُها و\`loading="lazy"\``
+    + (loose.length ? ` — شذّت ${loose.length}` : ''));
+}
+ok(!/@import|url\(\s*["']?https?:/.test(css), 'والتنسيقُ لا يجلب من شبكة');
+
+// ————— ٣. القشرة الواحدة وزرّ البدء —————
+
+console.log('\n٣. القشرة الواحدة');
+
+const TOP = /<header class="w-top">[\s\S]*?<\/header>/;
+for (const [name, text] of Object.entries(PAGES)) {
+  const bar = text.match(TOP)?.[0] || '';
+  const tabs = ['./', 'curriculum.html', 'method.html', 'guide.html'];
+  ok(tabs.every((href) => bar.includes(`href="${href}"`)),
+    `${name}: شريطُ التنقّل الواحد بصفحاته الأربع`);
+  ok((bar.match(/aria-current="page"/g) || []).length === 1,
+    `${name}: وصفحتُها الحالية معلَّمةٌ لقارئ الشاشة (واحدةٌ لا اثنتان)`);
+  ok(bar.includes('class="brand-word"'), `${name}: والعلامةُ في الشريط بصندوقها من app.css`);
+  ok(/<a class="btn btn--primary" href="\.\.\/">/.test(bar), `${name}: وفيه دعوةٌ إلى التطبيق`);
+  ok(text.includes('class="w-print-head"') && text.includes(SITE),
+    `${name}: ولها ترويسةُ مطبوعٍ فيها عنوانُ الموقع`);
+}
+
+// الفعلُ الرئيس في متن الصفحة — والشريطُ مستثنىً بعلّته (دعوةٌ بحجم الشريط)
+for (const [name, text] of Object.entries(PAGES)) {
+  const body = text.replace(TOP, '');
+  const starts = [...body.matchAll(/<a[^>]*href="\.\.\/"[^>]*>([^<]*)<\/a>/g)];
+  if (!starts.length) continue;
+  ok(starts.every((m) => /btn--primary/.test(m[0]) && /w-start/.test(m[0])),
+    `${name}: وزرُّ «ابدأ الآن» في المتن هو الفعل الرئيس (${starts.length} موضعاً)`);
+}
 ok(/\.w-start\s*{[^}]*min-height:\s*4rem/.test(css), 'وارتفاعه في التنسيق ٤rem (٦٤ بكسل)');
 
-// ————— ٤. اللوح من التطبيق لا منسوخاً —————
+// ————— ٤. اللوح من التطبيق لا منسوخاً، والخطوط محلّية —————
+
+console.log('\n٤. اللوح والخطوط والطباعة');
 
 const hexes = [...css.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => m[0])
   .filter((c) => c !== '#fff' && c !== '#ffffff');
 ok(hexes.length === 0,
-  `تنسيق الصفحة لا يكتب لوناً بقيمته${hexes.length ? ' — ' + [...new Set(hexes)].join('، ') : ''}`);
-ok(/href="\.\.\/css\/app\.css"/.test(html), 'بل يرث لوح التطبيق وخطوطه من app.css');
+  `تنسيق المرجع لا يكتب لوناً بقيمته${hexes.length ? ' — ' + [...new Set(hexes)].join('، ') : ''}`);
+ok(PAGE_NAMES.every((n) => /href="\.\.\/css\/app\.css"/.test(PAGES[n])),
+  'بل ترث الصفحاتُ الأربع لوح التطبيق وخطوطه من app.css');
 ok(/var\(--paper\)|var\(--card\)/.test(css) && /var\(--ink/.test(css),
-  'ويستعمل متغيّراته (ورق وبطاقة وحبر)');
+  'وتستعمل متغيّراته (ورق وبطاقة وحبر)');
+ok(/@font-face\s*{[^}]*'Cairo'[^}]*fonts\/Cairo-arabic\.woff2/s.test(css)
+  && existsSync(new URL('fonts/Cairo-arabic.woff2', WELCOME))
+  && existsSync(new URL('fonts/Cairo-latin.woff2', WELCOME)),
+  'وخطُّ العناوين Cairo مضمَّنٌ محلياً في welcome/fonts/ (حكم المدير)');
+ok(!read('css/app.css', APP).includes('Cairo'), 'والتطبيق لم يُمَسّ خطاً (لا Cairo في app.css)');
+const bareCss = css.replace(/\/\*[\s\S]*?\*\//g, '');   // بلا تعليقات: المنتقي لا شرحُه
+ok(!/--font-brand|Marhey/.test(bareCss),
+  'وعلامةُ «اِقْرَأْ» تبقى لخطّها وحدها (لا يطلبه هذا التنسيق)');
 
-// ————— ٥. الأرقام والأقسام —————
+const print = css.slice(css.indexOf('@media print'));
+for (const [rule, why] of [
+  ['.w-top', 'شريطُ التنقّل يسقط من المطبوع'],
+  ['break-inside: avoid', 'ولا تُقصّ بطاقةٌ بين ورقتين'],
+  ['.w-print-head', 'وترويسةُ المطبوع تظهر على الورق وحدَه'],
+]) ok(print.includes(rule), `الطباعة: ${why}`);
+const head = cur.slice(cur.indexOf('class="w-print-head"'),
+  cur.indexOf('</div>', cur.indexOf('class="w-print-head"')));
+ok(/icons\/icon-192\.png/.test(head) && /class="brand-word"/.test(head) && head.includes(SITE),
+  'وفيها أيقونةُ التطبيق وعلامتُه وعنوانُ الموقع (أمر المالك — من وقعت الورقةُ في يده بلغ صاحبَها)');
+
+// ————— ٥. الأرقام — كلُّها محسوبة —————
+
+console.log('\n٥. الأرقام');
 
 const AR = '٠١٢٣٤٥٦٧٨٩';
 const num = (s) => Number([...s].map((d) => (AR.indexOf(d) < 0 ? d : AR.indexOf(d))).join(''));
-const stat = (name) => {
-  const m = html.match(new RegExp(`data-stat="${name}"[^>]*>([٠-٩]+)<`));
-  return m ? num(m[1]) : null;
-};
+
+const shelf = LIBRARY.filter((s) => s.shelf);
+const gardenTales = LIBRARY.filter((s) => s.garden);
+const pageWords = (s) => s.pages.reduce((t, p) => t + p.words.length, 0);
+const sections = progress.journey();
+const nodesOf = (pick) => sections.filter(pick).reduce((t, s) => t + s.nodes.length, 0);
+const gateOf = (id) => (s) => s.kind === 'gate' && s.gate.id === id;
 
 const expected = {
   nodes: progress.allNodes().length,
@@ -114,189 +207,6 @@ const expected = {
   sentences: RUNGS.reduce((s, r) => s + r.sentences.length, 0),
   stories: STORIES.length + LIBRARY.length,
   surahs: QURAN.surahs.length,
-};
-for (const [name, value] of Object.entries(expected)) {
-  ok(stat(name) === value, `الرقم «${name}» في الصفحة = ${value} (المحسوب من المنهج)`);
-}
-
-for (const [id, title] of [
-  ['who', 'ما «اِقْرَأْ» ولمن'],
-  ['basis', 'الأسس الخمسة'],
-  ['journey', 'رحلة التعلم بلقطات حقيقية'],
-  ['install', 'تثبيت التطبيق على الجهاز'],
-  ['guide', 'دليل المعلم'],
-]) {
-  ok(ids.has(id) && anchors.includes(id), `قسم «${title}» موجودٌ وله رابطه المباشر`);
-}
-
-ok((html.match(/class="w-num"/g) || []).length === 5, 'والأسس المعروضة خمسة');
-
-// مسوّغات الدليل الأربعة (تكليف الجلسة، ومادّتها في docs/PEDAGOGY_AUDIT.md)
-const guide = html.slice(html.indexOf('id="guide"'));
-const guideWhys = guide.split('<div class="w-why"').slice(1);
-ok(guideWhys.length === 4, `مسوّغات دليل المعلم أربعة (وجدت ${guideWhys.length})`);
-for (const [key, label] of [
-  ['التنوين', 'ترتيب المهارات مقابل النورانية'],
-  ['القمرية', 'القمرية قبل درس اللام'],
-  ['البساتين', 'البساتين بعد المرحلة القرآنية'],
-  ['عسر القراءة', 'حدود النطاق'],
-]) {
-  ok(guideWhys.some((w) => w.includes(key)), `ومنها مسوّغ «${label}»`);
-}
-
-ok(/جهازٌ لكل طفل/.test(html) && /خلف البوابة/.test(html) && /في هذا الجهاز وحده/.test(html),
-  'وباب استعماله مع مجموعة يذكر: جهازاً لكل طفل، واللوحة خلف البوابة، والتقدّم محليّاً');
-
-// خطوات التثبيت الثلاث (بأمر المالك في هذه الجلسة): آيباد وأندرويد وحاسوب
-for (const key of ['سفاري', 'كروم', 'إيدج']) {
-  ok(html.includes(key), `ودليل التثبيت يذكر «${key}»`);
-}
-ok(/هذه الصفحة\s+التعريفية ليست منه/.test(html.replace(/\s+/g, ' ')),
-  'وينبّه أن التثبيت من التطبيق لا من هذه الصفحة (لا بيان لها فلا تُثبَّت)');
-
-// ————— ٦. حفظ التقدّم واستعادته (الحزمة ١١) —————
-//
-// أمرُ المالك: تُشرَح النسخة الاحتياطية في قسم التثبيت **بعد** أن يُنجزها التطبيق.
-// فالمحروس هنا شقّان: أن الشرح موجود بخطواته، و**أن التطبيق يفي به حرفياً** —
-// أسماءُ الأزرار التي تَعِد بها الصفحة تُقابَل بأسمائها في `app/js/parent.js` نفسِه،
-// فلا تَعِد الصفحةُ المعلّمَ بزرٍّ لا وجود له (وهي عينُ علّة تأجيل هذه الفقرة).
-
-const install = html.slice(html.indexOf('id="install"'), html.indexOf('id="guide"'));
-const parentJs = read('js/parent.js', APP);
-
-for (const label of ['انسخ تقدّم طفلي', 'استعِد من ملف']) {
-  ok(install.includes(label), `قسم التثبيت يشرح زرّ «${label}»`);
-  ok(parentJs.includes(label), `وهو موجودٌ بنصّه في لوحة وليّ الأمر (لا وعدَ بما ليس في التطبيق)`);
-}
-ok(/لوحة وليّ الأمر/.test(install), 'ويدلّ على موضعه: لوحة وليّ الأمر خلف بوابتها');
-ok((install.match(/<ol>/g) || []).length >= 4,
-  'والاستعادة مشروحة خطواتٍ مرقّمة كخطوات التثبيت');
-ok(/محو بيانات المتصفّح/.test(install) && /نسخةٌ تحفظها أنت/.test(install),
-  'والتنبيه القائم صار يدلّ على علاجه (لا تحذيرٌ بلا مخرج)');
-ok(/ليس فيه صوتُ الطفل/.test(install) && /لا تغادر\s+جهازه/.test(install.replace(/\s+/g, ' ')),
-  'ويصرّح بأن النسخة بلا صوت الطفل (قاعدة الخصوصية لا تُنقض بملفٍّ يُنسَخ)');
-ok(parentJs.includes('backupText') && /askPersistence|persistedStorage/.test(parentJs),
-  'والتطبيق يصدّر النسخة ويطلب تخزيناً دائماً فعلاً');
-
-const shots = [...html.matchAll(/src="(shots\/[^"]+)"/g)].map((m) => m[1]);
-ok(shots.length === 6 && new Set(shots).size === 6, `ومعرضُ الرحلة ست لقطاتٍ (${shots.length})`);
-ok(shots.every((s) => existsSync(new URL(s, WELCOME))), 'وكلها ملفات موجودة');
-ok([...html.matchAll(/<img[^>]*>/g)].every((m) => /alt="/.test(m[0])), 'ولكل صورةٍ وصفُها البديل');
-
-// ————— ٧. «المرجع التعريفي» — القشرة الواحدة وصفحةُ المنهج (١٢ أغسطس ٢٠٢٦) —————
-//
-// أمرُ المالك: «كل أقسام والمراحل الرئيسية للتعليم… البيانات واضحة ومكتملة بطريقة
-// عرض احترافية». والمحروسُ هنا ثلاثةٌ لا يُدرَك أحدُها بالنظر:
-//   (أ) **قشرةٌ واحدة**: شريطُ التنقّل نفسُه في كل صفحة، وما لم يُبنَ يُعلَن ولا يُربَط.
-//   (ب) **لا محطةَ تُترك**: لكل **نوع محطةٍ** في `journey()` بطاقتُه بوسم `data-covers`،
-//       وعددُها في البطاقة هو عددُها في الرحلة — فنوعٌ جديد يُضاف غداً يُسقِط الفحص.
-//   (ج) **الأرقام والنصوص محسوبةٌ ومنقولة**: كلُّ رقمٍ من البيانات، وقواعدُ الدروس
-//       ومعاني الجذور وعيّناتُ القراءة **منقولةٌ حرفاً** من مصدرها لا مُعادةُ الصياغة.
-
-console.log('\n٧. المرجع التعريفي — القشرة وصفحة المنهج');
-
-const cur = read('curriculum.html');
-const { SKILLS, CONTRASTS, GATES, ROOTS, surahWords } = await import(new URL('curriculum.js', JS));
-const { SENTENCES } = await import(new URL('sentences.js', JS));
-const emojiIndex = JSON.parse(read('emoji/index.json', APP));
-
-// (أ) القشرة الواحدة
-const TOP = /<header class="w-top">[\s\S]*?<\/header>/;
-const PAGES = { 'index.html': html, 'curriculum.html': cur };
-for (const [name, text] of Object.entries(PAGES)) {
-  const bar = text.match(TOP)?.[0] || '';
-  ok(bar.includes('href="./"') && bar.includes('href="curriculum.html"'),
-    `${name}: شريطُ التنقّل الواحد فيه الرئيسةُ والمنهج`);
-  ok(/<span>الأسس<\/span>/.test(bar) && /<span>الدليل العملي<\/span>/.test(bar),
-    `${name}: والصفحتان اللتان لم تُبنيا مُعلَنتان بلا رابطٍ مكسور`);
-  ok((bar.match(/aria-current="page"/g) || []).length === 1,
-    `${name}: وصفحتُها الحالية معلَّمةٌ لقارئ الشاشة`);
-  ok(bar.includes('class="brand-word"'), `${name}: والعلامةُ في الشريط بصندوقها من app.css`);
-}
-
-// (ب) صفحةُ المنهج تخضع لقوانين `welcome/` كلِّها كأختها
-ok(!/<script/i.test(cur), 'صفحة المنهج: صفر جافاسكربت');
-ok(!/<link[^>]*rel=["']manifest["']/.test(cur) && !/serviceWorker/.test(cur),
-  'ولا تصل بيان التطبيق ولا تسجّل عاملاً');
-const curExternal = [...cur.matchAll(/(?:href|src)="([^"]+)"/g)].map((m) => m[1])
-  .filter((v) => /^(?:https?:)?\/\//.test(v) || v.startsWith('data:'));
-ok(curExternal.length === 0,
-  `ولا مرجعَ شبكيّاً خارجياً${curExternal.length ? ' — ' + curExternal.join('، ') : ''}`);
-const curLinks = [...cur.matchAll(/(?:href|src)="([^"#][^"]*)"/g)].map((m) => m[1]);
-const curMissing = curLinks.filter((v) => !existsSync(new URL(v, WELCOME)));
-ok(curMissing.length === 0,
-  `وكل ملفٍّ تطلبه موجود (${curLinks.length} مرجعاً)${curMissing.length ? ' — مفقود: ' + curMissing.join('، ') : ''}`);
-const curIds = new Set([...cur.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]));
-const curDangling = [...cur.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]).filter((a) => !curIds.has(a));
-ok(curDangling.length === 0,
-  `وكل رابطِ قفزٍ يجد قسمه${curDangling.length ? ' — معلَّق: ' + curDangling.join('، ') : ''}`);
-ok([...cur.matchAll(/<img[^>]*>/g)].every((m) => /alt="/.test(m[0])), 'ولكل صورةٍ وصفُها البديل');
-
-// رموزُها صورُ `app/emoji/` نفسِها لا محارفُ خطّ نظام (مهمة «أيقونات لا إيموجي»)
-const curFaces = [...cur.matchAll(/\.\.\/emoji\/([0-9a-f-]+)\.svg/g)].map((m) => m[1]);
-ok(curFaces.length > 0 && curFaces.every((k) => k in emojiIndex.files),
-  `ورموزُها من فهرس الأيقونات (${new Set(curFaces).size} رمزاً)`);
-
-// خطّ العناوين: عربيُّ الأصل، محلّيّ، ولا يُمَسّ خطُّ التطبيق ولا خطُّ العلامة
-ok(/@font-face\s*{[^}]*'Cairo'[^}]*fonts\/Cairo-arabic\.woff2/s.test(css),
-  'خطّ العناوين Cairo مضمَّنٌ محلياً في welcome.css (لا شبكة)');
-ok(existsSync(new URL('fonts/Cairo-arabic.woff2', WELCOME))
-  && existsSync(new URL('fonts/Cairo-latin.woff2', WELCOME)), 'وملفّاه في welcome/fonts/');
-ok(!read('css/app.css', APP).includes('Cairo'), 'والتطبيق لم يُمَسّ خطاً (لا Cairo في app.css)');
-const bareCss = css.replace(/\/\*[\s\S]*?\*\//g, '');   // بلا تعليقات: المطلوب المنتقي لا شرحُه
-ok(!/--font-brand|Marhey/.test(bareCss),
-  'وعلامةُ «اِقْرَأْ» تبقى لخطّها وحدها (لا يطلبه هذا التنسيق)');
-
-// (ج) الطباعة النظيفة: صفحةُ المنهج تخرج ملفاً يُسلَّم لمدرسة
-const print = css.slice(css.indexOf('@media print'));
-for (const [rule, why] of [
-  ['.w-top', 'شريطُ التنقّل يسقط من المطبوع'],
-  ['break-inside: avoid', 'ولا تُقصّ بطاقةٌ بين ورقتين'],
-  ['.w-print-head', 'وترويسةُ المطبوع تظهر على الورق وحدَه'],
-]) ok(print.includes(rule), `الطباعة: ${why}`);
-ok(cur.includes('class="w-print-head"'), 'وصفحةُ المنهج تحمل ترويسةَ مطبوعها');
-
-// ————— «لا محطةَ تُترك»: بطاقةٌ لكل نوع محطة، بنمطها الواحد —————
-
-const covers = [...cur.matchAll(/data-covers="([^"]+)" data-count="([٠-٩]+)"/g)];
-const nodeTypes = {};
-for (const node of progress.allNodes()) nodeTypes[node.type] = (nodeTypes[node.type] || 0) + 1;
-const covered = new Set(covers.map((m) => m[1]));
-const missingTypes = Object.keys(nodeTypes).filter((t) => !covered.has(t));
-const strayTypes = [...covered].filter((t) => !(t in nodeTypes));
-ok(missingTypes.length === 0 && strayTypes.length === 0,
-  `لكل نوع محطةٍ بطاقتُه (${covered.size} نوعاً)`
-  + (missingTypes.length ? ` — بلا بطاقة: ${missingTypes.join('، ')}` : '')
-  + (strayTypes.length ? ` — بطاقةٌ بلا محطة: ${strayTypes.join('، ')}` : ''));
-for (const [, type, count] of covers) {
-  ok(num(count) === nodeTypes[type], `وعددُ «${type}» في بطاقته = ${nodeTypes[type]}`);
-}
-
-// النمطُ الواحد لا يتبدّل: ثلاثةُ حقولٍ بترتيبها في كل بطاقة
-const cards = cur.split('<article class="w-station"').slice(1);
-const PATTERN = ['ماذا يتعلّم الطفل', 'كيف يعمل التمرين', 'دورُك أنت'];
-const offPattern = cards.filter((card) => {
-  const dts = [...card.slice(0, card.indexOf('</article>')).matchAll(/<dt>([^<]+)<\/dt>/g)].map((m) => m[1]);
-  return dts.length !== 3 || dts.some((d, i) => !d.startsWith(PATTERN[i].slice(0, 6)));
-});
-ok(offPattern.length === 0,
-  `ونمطُ البطاقة واحدٌ في ${cards.length} بطاقة: ${PATTERN.join(' · ')}`
-  + (offPattern.length ? ` — شذّت ${offPattern.length}` : ''));
-
-// ————— أرقامُ صفحة المنهج — كلُّها محسوبة —————
-
-const stats = (name, text = cur) =>
-  [...text.matchAll(new RegExp(`data-stat="${name}"[^>]*>([٠-٩]+)<`, 'g'))].map((m) => num(m[1]));
-
-const shelf = LIBRARY.filter((s) => s.shelf);
-const gardenTales = LIBRARY.filter((s) => s.garden);
-const pageWords = (s) => s.pages.reduce((t, p) => t + p.words.length, 0);
-const sections = progress.journey();
-const nodesOf = (pick) => sections.filter(pick).reduce((t, s) => t + s.nodes.length, 0);
-const gateOf = (id) => (s) => s.kind === 'gate' && s.gate.id === id;
-
-const curExpected = {
-  ...expected,
   groups: GROUPS.length,
   groupWords: GROUPS.reduce((s, g) => s + g.words.length, 0),
   skills: SKILLS.length,
@@ -328,29 +238,164 @@ const curExpected = {
   stageShelf: nodesOf((s) => s.kind === 'shelf'),
 };
 
-const declared = new Set([...cur.matchAll(/data-stat="([^"]+)"/g)].map((m) => m[1]));
-for (const name of [...declared].sort()) {
-  const found = stats(name);
-  const want = curExpected[name];
-  ok(want !== undefined && found.length > 0 && found.every((v) => v === want),
-    `الرقم «${name}» = ${want ?? '؟'} في ${found.length} موضعاً (المحسوب من المنهج)`);
+let statCount = 0;
+for (const [name, text] of Object.entries(PAGES)) {
+  const declared = [...new Set([...text.matchAll(/data-stat="([^"]+)"/g)].map((m) => m[1]))].sort();
+  for (const key of declared) {
+    const found = [...text.matchAll(new RegExp(`data-stat="${key}"[^>]*>([٠-٩]+)<`, 'g'))]
+      .map((m) => num(m[1]));
+    statCount += found.length;
+    ok(expected[key] !== undefined && found.length > 0 && found.every((v) => v === expected[key]),
+      `${name}: «${key}» = ${expected[key] ?? '؟'} في ${found.length} موضعاً`);
+  }
 }
-ok(curExpected.stageFound + curExpected.stageQuran + curExpected.stageGarden
-  + curExpected.stageLibrary + curExpected.stageShelf === progress.allNodes().length,
+ok(statCount > 40, `ومجموعُ المواضع المحسوبة ${statCount} في الصفحات الأربع`);
+ok(expected.stageFound + expected.stageQuran + expected.stageGarden
+  + expected.stageLibrary + expected.stageShelf === progress.allNodes().length,
   'ومجموعُ المراحل الخمس هو الرحلةُ كلُّها — لا محطةَ خارج مرحلة');
 
-// ————— النصوصُ منقولةٌ من مصدرها لا مُعادةُ الصياغة —————
+// ————— ٦. «لا محطةَ تُترك» — بطاقةٌ لكل نوع محطة بنمطها الواحد —————
+
+console.log('\n٦. تغطية المحطات');
+
+const covers = [...cur.matchAll(/data-covers="([^"]+)" data-count="([٠-٩]+)"/g)];
+const nodeTypes = {};
+for (const node of progress.allNodes()) nodeTypes[node.type] = (nodeTypes[node.type] || 0) + 1;
+const covered = new Set(covers.map((m) => m[1]));
+const missingTypes = Object.keys(nodeTypes).filter((t) => !covered.has(t));
+const strayTypes = [...covered].filter((t) => !(t in nodeTypes));
+ok(missingTypes.length === 0 && strayTypes.length === 0,
+  `لكل نوع محطةٍ بطاقتُه (${covered.size} نوعاً)`
+  + (missingTypes.length ? ` — بلا بطاقة: ${missingTypes.join('، ')}` : '')
+  + (strayTypes.length ? ` — بطاقةٌ بلا محطة: ${strayTypes.join('، ')}` : ''));
+for (const [, type, count] of covers) {
+  ok(num(count) === nodeTypes[type], `وعددُ «${type}» في بطاقته = ${nodeTypes[type]}`);
+}
+
+// النمطُ الواحد لا يتبدّل: ثلاثةُ حقولٍ بترتيبها في كل بطاقةٍ في المرجع كلِّه
+const PATTERN = ['ماذا ي', 'كيف يعمل', 'دورُك أنت'];
+let cardCount = 0;
+const offPattern = [];
+for (const [name, text] of Object.entries(PAGES)) {
+  for (const card of text.split('<article class="w-station"').slice(1)) {
+    cardCount++;
+    const dts = [...card.slice(0, card.indexOf('</article>')).matchAll(/<dt>([^<]+)<\/dt>/g)]
+      .map((m) => m[1]);
+    if (dts.length !== 3) offPattern.push(`${name}: ${dts.length} حقول`);
+  }
+}
+ok(offPattern.length === 0,
+  `ونمطُ البطاقة ثلاثةُ حقولٍ في ${cardCount} بطاقة`
+  + (offPattern.length ? ' — شذّت: ' + offPattern.join('، ') : ''));
+const curCards = cur.split('<article class="w-station"').slice(1);
+ok(curCards.every((card) => {
+  const dts = [...card.slice(0, card.indexOf('</article>')).matchAll(/<dt>([^<]+)<\/dt>/g)]
+    .map((m) => m[1]);
+  return PATTERN.every((label, i) => (dts[i] || '').startsWith(label));
+}), 'وترتيبُه في صفحة المنهج واحد: ماذا يتعلّم الطفل · كيف يعمل التمرين · دورُك أنت');
+
+// اللقطاتُ من الشاشات نفسِها بمولّدها — ولكل بطاقةِ محطةٍ لقطتُها
+const SHOTS = ['map', 'lesson', 'words', 'story', 'quran', 'parent',
+  'gate', 'contrast', 'garden', 'ladder', 'roots', 'shelf', 'fade'];
+const shown = new Set(Object.values(PAGES)
+  .flatMap((t) => [...t.matchAll(/src="shots\/([a-z]+)\.png"/g)].map((m) => m[1])));
+ok(SHOTS.every((s) => shown.has(s) && existsSync(new URL(`shots/${s}.png`, WELCOME)))
+  && [...shown].every((s) => SHOTS.includes(s)),
+  `و${SHOTS.length} لقطةً كلُّها معروضةٌ وموجودة (لا يتيمةَ ولا مفقودة)`);
+ok([...cur.matchAll(/<div class="w-pair">/g)].length >= 12,
+  'ولكل بطاقةِ محطةٍ في صفحة المنهج لقطتُها بجوارها');
+
+// رموزُ الصفحات صورُ `app/emoji/` نفسِها لا محارفُ خطّ نظام
+const faces = Object.values(PAGES)
+  .flatMap((t) => [...t.matchAll(/\.\.\/emoji\/([0-9a-f-]+)\.svg/g)].map((m) => m[1]));
+ok(faces.length > 0 && faces.every((k) => k in emojiIndex.files),
+  `ورموزُها كلُّها من فهرس الأيقونات (${new Set(faces).size} رمزاً)`);
+
+// ————— ٧. حارسُ التغطية: لا تسقط حقيقةٌ في إعادة التأليف —————
+//
+// حكمُ المدير: «أعِد التأليف ولا تنقل — وشرطُه حارسُ تغطية: لا تسقط في إعادة
+// التأليف حقيقةٌ كانت معروضة». فهذا جردُ ما كانت الرئيسةُ تعرضه قبل الشقّ، ولكلٍّ
+// **موضعُه الجديد** — والمحروسُ وجودُ الحقيقة لا حرفيّةُ صياغتها.
+
+console.log('\n٧. تغطية ما كان في الرئيسة');
+
+const WHERE = { 'index.html': html, 'curriculum.html': cur, 'method.html': method, 'guide.html': guide };
+const INVENTORY = [
+  // الأسسُ الخمسة التي كانت في الرئيسة — أُعيد تأليفُها بين «الرئيسة» و«الأسس»
+  ['نورانية مطوَّعة', 'method.html', ['النورانية', 'مطوَّعةً']],
+  ['ترتيب الحروف بالتواتر', 'method.html', ['التواتر', 'الأبجديّ']],
+  ['مفكوكية ١٠٠٪ مفروضة آلياً', 'index.html', ['مفكوكيةٌ ١٠٠٪ مفروضةٌ آلياً']],
+  ['صوتٌ مخزون وقارئٌ للمصحف', 'index.html', ['الحصري', 'لا نطقَ آليّاً']],
+  ['خصوصية مطلقة', 'index.html', ['خصوصيةٌ مطلقة', 'لا يغادر جهازه']],
+  // مسوّغاتُ دليل المعلم الأربعة وحدودُ النطاق
+  ['مسوّغ: ترتيب المهارات مقابل النورانية', 'method.html', ['التنوين', 'السكون']],
+  ['مسوّغ: القمرية قبل درس اللام', 'method.html', ['القمرية', 'الشمسية']],
+  ['مسوّغ: البساتين بعد المرحلة القرآنية', 'method.html', ['تأسيسٌ ← تتويجٌ ← توسُّع']],
+  ['حدّ: لا يشخّص عسر القراءة', 'method.html', ['عسر القراءة']],
+  ['حدّ: قراءةٌ لا كتابة', 'method.html', ['مسارَ القلم']],
+  ['حدّ: الازدواجية تخفيفٌ لا إلغاء', 'method.html', ['لا إلغاءٌ له']],
+  ['حدّ: جمهورُه ٥–٧ سنوات', 'method.html', ['دون الخامسة']],
+  // بابُ الصفّ
+  ['في الصفّ: جهازٌ لكل طفل', 'guide.html', ['جهازٌ لكل طفل']],
+  ['في الصفّ: اللوحة خلف البوابة', 'guide.html', ['خلف البوابة']],
+  ['في الصفّ: التقدّم محليّ', 'guide.html', ['في هذا الجهاز وحده']],
+  ['في الصفّ: ثلاثٌ إلى خمس دقائق', 'guide.html', ['ثلاثٌ إلى خمس دقائق']],
+  ['في الصفّ: البوّابتان نقطتا التوقّف', 'guide.html', ['البوّابتان']],
+  // التثبيت والنسخة الاحتياطية
+  ['التثبيت: سفاري', 'guide.html', ['سفاري']],
+  ['التثبيت: كروم', 'guide.html', ['كروم']],
+  ['التثبيت: إيدج', 'guide.html', ['إيدج']],
+  ['التثبيت: من التطبيق لا من الصفحة', 'guide.html', ['التعريفية ليست منه']],
+  ['التنبيه: محو بيانات المتصفّح وعلاجه', 'guide.html', ['محو بيانات المتصفّح', 'نسخةٌ تحفظها أنت']],
+  ['النسخة: بلا صوت الطفل', 'guide.html', ['ليس فيه صوتُ الطفل']],
+  // ما زاد بعد الشقّ (تكليفُ المرحلة الثانية)
+  ['الدليل: ‏?dev=1‏ وأدواته', 'guide.html', ['?dev=1']],
+  ['الدليل: القفز والتصفير من اللوحة', 'guide.html', ['تحكّم في الرحلة']],
+  ['الدليل: لوحة وليّ الأمر وكيف تُقرأ', 'guide.html', ['نحو القراءة الحرة', 'عائلات الجذور']],
+];
+for (const [label, page, needles] of INVENTORY) {
+  const text = WHERE[page].replace(/\s+/g, ' ');
+  const gone = needles.filter((n) => !text.includes(n.replace(/\s+/g, ' ')));
+  ok(gone.length === 0, `«${label}» ← ${page}${gone.length ? ' — سقط: ' + gone.join('، ') : ''}`);
+}
+
+// ————— ٨. لا وعدَ بما ليس في التطبيق —————
+
+console.log('\n٨. الوعود مقابلَ التطبيق');
+
+for (const [label, src, where] of [
+  ['انسخ تقدّم طفلي', parentJs, 'parent.js'],
+  ['استعِد من ملف', parentJs, 'parent.js'],
+  ['نسخة احتياطية من تقدّمه', parentJs, 'parent.js'],
+  ['تحكّم في الرحلة', parentJs, 'parent.js'],
+  ['افتح الطريق إلى هنا', parentJs, 'parent.js'],
+  ['صفِّر هذه المحطة', parentJs, 'parent.js'],
+  ['نحو القراءة الحرة', parentJs, 'parent.js'],
+  ['عائلات الجذور', parentJs, 'parent.js'],
+  ['أدوات التجربة (?dev=1)', mainJs, 'main.js'],
+  ['أنجِز الكل بنجمة', mainJs, 'main.js'],
+  ['أنجِز الكل بثلاث', mainJs, 'main.js'],
+  ['محو التقدّم', mainJs, 'main.js'],
+]) {
+  ok(guide.includes(label) && src.includes(label),
+    `«${label}» موعودٌ في الدليل وموجودٌ بنصّه في ${where}`);
+}
+ok(parentJs.includes('backupText') && /askPersistence|persistedStorage/.test(parentJs),
+  'والتطبيق يصدّر النسخة ويطلب تخزيناً دائماً فعلاً');
+
+// ————— ٩. النصوصُ منقولةٌ من مصدرها لا مُعادةُ الصياغة —————
+
+console.log('\n٩. النقل الحرفيّ من البيانات');
 
 const has = (needle) => cur.includes(needle);
 const tatweel = (s) => s.replace(/ـ/g, '');
 ok(GROUPS.every((g) => tatweel(cur).includes(g.letters.join(' '))),
   'وحروفُ كل مجموعةٍ مكتوبةٌ كما في البيانات');
-ok(SKILLS.every((s) => has(s.title) && has(s.rule)),
-  'وقاعدةُ كل درسِ علامةٍ منقولةٌ بحرفها');
+ok(SKILLS.every((s) => has(s.title) && has(s.rule)), 'وقاعدةُ كل درسِ علامةٍ منقولةٌ بحرفها');
 ok(CONTRASTS.every((c) => c.pairs.every((p) => tatweel(cur).includes(p.letters.join('/')))),
   'وأزواجُ «ميّز بين» السبعةُ كلُّها معروضة');
 ok(GATES.every((g) => has(g.title)), 'والبوّابتان باسميهما');
-ok(QURAN.surahs.every((s) => has(s.name)), `وسورُ المرحلة الاثنتا عشرة بأسمائها`);
+ok(QURAN.surahs.every((s) => has(s.name)), 'وسورُ المرحلة الاثنتا عشرة بأسمائها');
 ok(progress.quranSections().every((s) => has(s.title)),
   'ومحطاتُ المرحلة القرآنية بأسمائها المحسوبة من البيانات');
 ok(GARDENS.every((g) => has(g.title)), 'والبساتين العشرة بأسمائها');
@@ -360,7 +405,8 @@ ok(ROOTS.every((r) => r.members.every((m) => has(m))), 'وأعضاؤها الس�
 ok(LIBRARY.every((s) => has(s.title)), 'وقصصُ المكتبة والرفّ بعناوينها');
 
 // عيّناتُ القراءة: بخطّ التطبيق، **ومن بياناته** — لا جملةً مؤلَّفةً لصفحة عرض
-const samples = [...cur.matchAll(/<span class="w-sample">([^<]+)<\/span>/g)].map((m) => m[1].trim());
+const samples = Object.values(PAGES)
+  .flatMap((t) => [...t.matchAll(/<span class="w-sample">([^<]+)<\/span>/g)].map((m) => m[1].trim()));
 const sentenceTexts = new Set(SENTENCES.map((s) => s.text));
 const storyLines = new Set(STORIES.flatMap((s) => s.sentences.map((x) => x.words.join(' '))));
 ok(samples.length >= 3 && samples.every((t) => sentenceTexts.has(t) || storyLines.has(t)),
@@ -368,10 +414,10 @@ ok(samples.length >= 3 && samples.every((t) => sentenceTexts.has(t) || storyLine
 ok(/\.w-sample\s*{[^}]*font-family:\s*var\(--font-letter\)/s.test(css),
   'وهي بخطّ التطبيق نفسِه — «ما يراه الوليّ هو ما ستراه الطفلة»');
 
-// **ولا نصَّ مصحفٍ في صفحة عرض**: نصُّه لا يُكتب بأيدينا، فما يُرى منه لقطةُ تطبيق
+// **ولا نصَّ مصحفٍ في صفحةِ عرض**: نصُّه لا يُكتب بأيدينا، فما يُرى منه لقطةُ تطبيق
 const ayat = QURAN.surahs.flatMap((s) => s.ayat);
-ok(!/ٱ/.test(cur) && !ayat.some((a) => cur.includes(a)),
-  'ولا حرفَ من نصّ المصحف مكتوبٌ في الصفحة (صورتُه من التطبيق لا نسخُه)');
+ok(PAGE_NAMES.every((n) => !/ٱ/.test(PAGES[n]) && !ayat.some((a) => PAGES[n].includes(a))),
+  'ولا حرفَ من نصّ المصحف مكتوبٌ في صفحاتها (صورتُه من التطبيق لا نسخُه)');
 
-console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات الصفحة التعريفية ناجحة');
+console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «المرجع التعريفي» ناجحة');
 process.exit(fails ? 1 : 0);

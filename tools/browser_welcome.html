@@ -60,21 +60,30 @@ frame.contentWindow.addEventListener('error', (e) => jsErrors.push(String(e.mess
 // ————— ١) الصفحة تُعرض كاملةً وبلا جافاسكربت —————
 
 ok(/اِقْرَأْ/.test(doc.title), `عنوان الصفحة: ${doc.title}`);
+// **الرئيسةُ صارت بوّابةً لا مرجعاً** (المرحلة الثانية): أقسامُها أربعة، وتفصيلُها
+// في الصفحات الثلاث — وشريطُ التنقّل الواحد يقود إليها.
 for (const [id, label] of [
+  ['why', 'ما الذي يميّزه'],
   ['who', 'ما «اِقْرَأْ» ولمن'],
-  ['basis', 'الأسس الخمسة'],
   ['journey', 'رحلة التعلم'],
-  ['install', 'تثبيت التطبيق'],
-  ['guide', 'دليل المعلم'],
+  ['more', 'ثلاثة أبواب'],
 ]) {
   ok(!!doc.getElementById(id), `قسم «${label}» معروض`);
 }
-ok(doc.querySelectorAll('.w-basis .w-card').length === 5, 'والأسس خمس بطاقات');
-ok(doc.querySelectorAll('.w-guide .w-why').length === 4, 'ومسوّغات الدليل أربعة');
-ok(doc.querySelectorAll('.w-table tbody tr').length >= 19,
-  `وخريطةُ التسلسل كاملة (${doc.querySelectorAll('.w-table tbody tr').length} محطة في الجدول)`);
+ok(doc.querySelectorAll('#why .w-card').length === 4, 'وفروقُه المميِّزة أربع بطاقات');
+const tabs = [...doc.querySelectorAll('.w-topnav a')].map((a) => a.getAttribute('href'));
+ok(['./', 'curriculum.html', 'method.html', 'guide.html'].every((h) => tabs.includes(h)),
+  `وشريطُ التنقّل الواحد بصفحاته الأربع (${tabs.join('، ')})`);
+ok(doc.querySelectorAll('.w-topnav [aria-current="page"]').length === 1,
+  'وصفحتُها الحالية معلَّمةٌ فيه');
 ok(doc.scripts.length === 0, 'ولا سطر جافاسكربت في الصفحة (لا شيء فيها ينكسر)');
 ok(!doc.querySelector('link[rel="manifest"]'), 'ولا تصل بيان التطبيق (لا تُثبَّت مكانه)');
+
+// **يُقرأ قبل الاستعجال**: السطرُ التالي يبدّل السمة نفسَها، فلو قُرئت بعده لقرأ
+// الفحصُ ما كتبه هو لا ما كتبته الصفحة.
+ok([...doc.images].every((im) => im.getAttribute('loading') === 'lazy'
+  && im.hasAttribute('width') && im.hasAttribute('height')),
+  'ولكل صورةٍ أبعادُها المصرَّحة و`loading="lazy"` (شرطُ المدير)');
 
 // اللقطات `loading="lazy"` فلا تُطلب وهي خارج لوح الاختبار — تُستعجَل هنا، ثم
 // يُنتظر الخطُّ والصورة معاً قبل قراءة سجلّ الشبكة (وإلا قُرئ ناقصاً).
@@ -87,8 +96,41 @@ const broken = imgs.filter((im) => !im.complete || !im.naturalWidth);
 ok(imgs.length >= 7 && broken.length === 0,
   `وكل صورةٍ محمَّلة (${imgs.length} صورة${broken.length ? '، مكسورة: ' + broken.length : ''})`);
 const shots = imgs.filter((im) => im.src.includes('/welcome/shots/'));
-ok(shots.length === 6 && shots.every((im) => im.naturalWidth === 820),
-  `ولقطات الرحلة الستّ من التطبيق نفسه بمقاس الجهاز (${shots.length})`);
+ok(shots.length >= 4 && shots.every((im) => im.naturalWidth === 820),
+  `ولقطاتُ الرحلة من التطبيق نفسه بمقاس الجهاز (${shots.length})`);
+
+// ————— ١ب) الصفحاتُ الثلاث الأخرى — تُفتَح وتُقرأ كما يقرؤها معلّم —————
+//
+// المرجعُ موقعٌ لا صفحة، فلا يكفي أن تصحّ الرئيسة: كلُّ صفحةٍ تُفتَح فعلاً، وفيها
+// شريطُها وقسمُها المميِّز وصفرُ جافاسكربت ولا تمريرَ أفقيّ.
+for (const [page, marker, label] of [
+  ['curriculum.html', '.w-station[data-covers]', 'المنهج — بطاقاتُ المحطات'],
+  ['method.html', '#limits', 'الأسس — حدودُ النطاق'],
+  ['guide.html', '#try', 'الدليل — جرّبه من أوله'],
+]) {
+  await load(frame, `welcome/${page}`);
+  await waitFor(() => frame.contentDocument?.querySelector('.w-top'), `فتح ${page}`, 8000);
+  const d = frame.contentDocument;
+  ok(!!d.querySelector(marker), `${label}: الصفحةُ تُفتَح وقسمُها المميِّز فيها`);
+  ok(d.scripts.length === 0 && !d.querySelector('link[rel="manifest"]'),
+    `${label}: بلا جافاسكربت وبلا بيان تطبيق`);
+  ok(d.querySelectorAll('.w-topnav a').length >= 4, `${label}: وشريطُ التنقّل فيها`);
+  ok(d.documentElement.scrollWidth <= d.documentElement.clientWidth + 1,
+    `${label}: ولا تمريرَ أفقيّ`);
+}
+// صفحةُ المنهج: لكل نوع محطةٍ بطاقتُه — يُعدّ على الشاشة لا في النصّ
+await load(frame, 'welcome/curriculum.html');
+await waitFor(() => frame.contentDocument?.querySelector('.w-station'), 'إعادة فتح المنهج', 8000);
+const covers = [...frame.contentDocument.querySelectorAll('.w-station[data-covers]')];
+ok(covers.length === 13, `وبطاقاتُ المحطات ثلاث عشرة على الشاشة (${covers.length})`);
+ok(covers.every((c) => c.querySelectorAll('.w-what dt').length === 3),
+  'ولكلٍّ ثلاثةُ حقولٍ بنمطها الواحد');
+
+await load(frame, 'welcome/');
+await waitFor(() => frame.contentDocument?.querySelector('.w-hero'), 'العودة إلى الرئيسة', 8000);
+doc = frame.contentDocument;
+for (const im of doc.images) im.loading = 'eager';
+await waitFor(() => [...doc.images].every((im) => im.complete), 'تحميل صور الرئيسة', 20000);
 
 // ————— ٢) لا طلب شبكيّ خارجيّ —————
 
@@ -154,7 +196,7 @@ await waitFor(() => frame.contentDocument?.querySelector('.w-hero'), 'إعادة
 doc = frame.contentDocument;
 ok(!!doc.querySelector('.w-hero') && !doc.getElementById('app'),
   'والفتحةُ بعده تعطي الصفحةَ التعريفية لا التطبيق (ردُّ التنقّل لا يبتلعها)');
-ok(!!doc.getElementById('guide'), 'وبكامل أقسامها');
+ok(!!doc.getElementById('more'), 'وبكامل أقسامها');
 
 // ب) ولا يدخل منها شيءٌ في المخزون — لا صفحةً ولا تنسيقاً ولا لقطة
 const cachedWelcome = [];

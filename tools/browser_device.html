@@ -193,7 +193,8 @@ const TEXT_OK = new Set(['\u06DE', '\u2726', '\u2605', '\u2606', '\u2713', '\u27
   '\u2190', '\u2192', '\u21BB', '\u22EE', '\u25B6', '\u2715']);
 
 function systemEmoji(root) {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const doc = root.ownerDocument || document;      // يعمل عبر إطارٍ كما يعمل في الصفحة
+  const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const found = new Set();
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     for (const m of node.data.matchAll(EMOJI_IN_TEXT)) {
@@ -271,6 +272,49 @@ if (params.get('metrics')) {
     }
   }
   app.replaceChildren();
+
+  /**
+   * **صفحاتُ «المرجع التعريفيّ» في عدّة الجهاز** (حكم المدير، المرحلة الثانية):
+   * جمهورُها معلّمون على أجهزةٍ شتّى، فيُقاس فائضُها على المقاسات الخمسة نفسِها.
+   *
+   * و**المقيسُ الأفقيُّ وحدَه**: هذه صفحاتُ مستندٍ تُقرأ بالسحب الرأسيّ بطبعها —
+   * فطولُها ليس عيباً، وإنما العيبُ أن تفيض عرضاً فتُسحَب الصفحةُ يميناً وشمالاً
+   * (DESIGN §٤). وتُقاس في إطارٍ بمقاس المنظور: الصفحةُ ليست وحدةَ تطبيقٍ تُبنى
+   * باستيراد، بل مستندٌ يُفتَح.
+   */
+  const PAGES = [
+    ['welcome-index', 'المرجع — الرئيسة', 'welcome/'],
+    ['welcome-curriculum', 'المرجع — المنهج', 'welcome/curriculum.html'],
+    ['welcome-method', 'المرجع — الأسس', 'welcome/method.html'],
+    ['welcome-guide', 'المرجع — الدليل العملي', 'welcome/guide.html'],
+  ];
+  const frame = document.createElement('iframe');
+  frame.style.cssText = `width:${vw}px;height:${vh}px;border:0;display:block`;
+  document.body.append(frame);
+  for (const [id, label, src] of PAGES) {
+    try {
+      await new Promise((done, fail) => {
+        frame.addEventListener('load', done, { once: true });
+        setTimeout(() => fail(new Error('لم تُفتح الصفحة')), 15000);
+        frame.src = src;
+      });
+      const d = frame.contentDocument;
+      await d.fonts.ready;
+      for (const im of d.images) im.loading = 'eager';
+      await new Promise((r) => setTimeout(r, 200));
+      out.push({
+        id, label, orient, vw, vh,
+        h: d.documentElement.scrollHeight,
+        over: 0,                       // مستندٌ يُسحَب رأسياً بطبعه — لا يُقاس طولُه
+        overX: Math.max(0, d.documentElement.scrollWidth - d.documentElement.clientWidth),
+        emoji: systemEmoji(d.body),
+      });
+    } catch (e) {
+      out.push({ id, label, orient, vw, vh, error: String(e && e.message || e) });
+    }
+  }
+  frame.remove();
+
   fetch('/result', { method: 'POST', body: JSON.stringify(out) });
 }
 </script>

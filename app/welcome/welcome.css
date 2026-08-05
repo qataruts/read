@@ -203,6 +203,15 @@
   gap: 1rem;
 }
 
+/* **وصفُّ الأربع شبكةُ ٢×٢ لا ٣+١** (درسُ شبكة الأغلفة ٣×٣): `auto-fit` يعطي ثلاثاً
+   في السطر فتبقى الرابعةُ يتيمةً تبدو حادثَ التفافٍ لا تصميماً — وضيقُ أربعةِ أعمدة
+   يُرهق السطر العربيّ. فالأربعُ تستوي شبكةً، والثلاثُ تبقى صفّاً. */
+.w-cards--four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+@media (max-width: 44rem) {
+  .w-cards--four { grid-template-columns: 1fr; }
+}
+
 .w-card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -678,6 +687,21 @@
   .w-pair { grid-template-columns: 1fr; }
 }
 
+/* لقطةٌ قائمةٌ بنفسها في متن الشرح (لا بجوار بطاقة): محدودةُ العرض فلا تبتلع السطر */
+.w-figure { margin: 1.25rem 0; max-width: 26rem; }
+
+.w-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: var(--paper);
+}
+
+.w-figure figcaption { margin-top: .45rem; font-size: .85rem; color: var(--ink-soft); line-height: 1.6; }
+
 /* ═════ لمساتُ الجداول والنصّ في صفحة المنهج ═════ */
 
 .w-sec-note {
@@ -723,7 +747,7 @@
 
   /* اللقطاتُ تبقى في المطبوع — ورقةُ المدرسة تُرى كما يُرى التطبيق — لكن بمقاسٍ
      يليق بالورق: عمودُها ينهار إلى عرض الصفحة في الطباعة، فتُحَدّ بسبعة سنتيمترات. */
-  .w-pair figure { max-width: 7.5cm; margin-top: .6rem; }
+  .w-pair figure, .w-figure { max-width: 7.5cm; margin-top: .6rem; }
 
   body { background: #fff; }
 
@@ -749,8 +773,24 @@
 
   .w-time { grid-template-columns: repeat(5, 1fr); }
 
-  /* ترويسةُ المطبوع: تُرى على الورق وحدَه — فيعرف قارئُ الورقة مصدرها */
-  .w-print-head { display: block !important; }
+  /* ترويسةُ المطبوع: تُرى على الورق وحدَه — فيعرف قارئُ الورقة مصدرَها ويبلغه */
+  .w-print-head {
+    display: flex !important;
+    align-items: center;
+    gap: .6rem;
+    padding-bottom: .5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid var(--line);
+    break-after: avoid;
+  }
+
+  .w-print-head img { width: 44px; height: 44px; border-radius: 12px; }
+
+  .w-print-brand { font-size: 1.5rem; }
+
+  .w-print-title { color: var(--ink-soft); font-size: .95rem; }
+
+  .w-print-url { margin-inline-start: auto; font-size: .9rem; color: var(--ink-soft); }
 }
 
 .w-print-head { display: none; }

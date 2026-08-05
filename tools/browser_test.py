@@ -322,7 +322,12 @@ def device_main(args):
             if fail:
                 bad.append((label, r["id"], f"فائض رأسي {over}px" if over else f"فائض أفقي {over_x}px"))
             mark = "✗" if fail else ("·" if over else "✓")
-            note = f"الطول {r['h']}px" + (f" — فائض رأسي {over}px" if over else " — يسع الشاشة")
+            # صفحاتُ المرجع مستنداتٌ تُسحَب رأسياً بطبعها — فطولُها ليس عيباً،
+            # والمقيسُ فيها الأفقيُّ وحدَه (حكم المدير: `--device` يمتدّ إلى welcome/).
+            if r["id"].startswith("welcome-"):
+                note = f"الطول {r['h']}px — مستندٌ يُسحَب رأسياً، والمقيسُ الأفقيّ"
+            else:
+                note = f"الطول {r['h']}px" + (f" — فائض رأسي {over}px" if over else " — يسع الشاشة")
             print(f"  {mark} {r['label']}: {note}"
                   + (f" — فائض أفقي {over_x}px" if over_x else ""))
 

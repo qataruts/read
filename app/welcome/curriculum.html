@@ -31,8 +31,8 @@
     <nav class="w-topnav" aria-label="صفحات المرجع">
       <a href="./">الرئيسة</a>
       <a href="curriculum.html" aria-current="page">المنهج</a>
-      <span>الأسس</span>
-      <span>الدليل العملي</span>
+      <a href="method.html">الأسس</a>
+      <a href="guide.html">الدليل العملي</a>
       <a class="btn btn--primary" href="../">ابدأ الآن ←</a>
     </nav>
   </div>
@@ -40,9 +40,16 @@
 
 <div class="w-wrap">
 
-  <p class="w-print-head">
-    منهج «اِقْرَأْ» — مرجعُ المعلم ووليّ الأمر · read.mishkat.qa
-  </p>
+  <!-- ترويسةُ المطبوع (أمر المالك، ١٢ أغسطس ٢٠٢٦): علامةُ التطبيق وعنوانُه على رأس
+       الورقة — فمن وقعت في يده ورقةٌ مصوَّرة عرف صاحبَها وبلغ الموقعَ بنقرةٍ أو بكتابة.
+       ولا تُرى على الشاشة (الشريطُ فوقها يغني)، ورابطُها **الوحيدُ الخارجيّ** في
+       الموقع كلِّه: عنوانُنا نحن، ولا طلبَ شبكةٍ فيه — يُفتَح إن نُقر ولا يُجلَب. -->
+  <div class="w-print-head">
+    <img loading="lazy" src="../icons/icon-192.png" alt="" width="44" height="44">
+    <span class="w-print-brand brand"><span class="brand-word">اِقْرَأْ</span></span>
+    <span class="w-print-title">منهج «اِقْرَأْ» — مرجعُ المعلم ووليّ الأمر</span>
+    <a class="w-print-url" href="https://read.mishkat.qa/">read.mishkat.qa</a>
+  </div>
 
   <div class="w-head">
     <h1>منهج «اِقْرَأْ» — الرحلة محطةً محطة</h1>
@@ -128,7 +135,7 @@
       <div class="w-stations">
         <article class="w-station" style="--accent: var(--accent-letters)">
           <div class="w-station-head">
-            <img src="../emoji/1f5fa.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f5fa.svg" alt="">
             <div><span class="w-kicker">الشاشة الأولى</span><h3>درب الرحلة</h3></div>
           </div>
           <dl class="w-what">
@@ -216,7 +223,7 @@
       <div class="w-stations">
         <article class="w-station" data-covers="letter" data-count="٢٨" style="--accent: var(--accent-letters)">
           <div class="w-station-head">
-            <img src="../emoji/1f524.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f524.svg" alt="">
             <div><span class="w-kicker">نوع محطة · درسُ حرف</span><h3>درس الحرف</h3></div>
             <span class="w-station-n"><b>٢٨</b>محطة</span>
           </div>
@@ -242,7 +249,7 @@
       <div class="w-stations">
         <article class="w-station" data-covers="words" data-count="٧" style="--accent: var(--accent-letters)">
           <div class="w-station-head">
-            <img src="../emoji/1f9e9.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f9e9.svg" alt="">
             <div><span class="w-kicker">نوع محطة · لعبة</span><h3>ركّب واقرأ — خاتمةُ كل مجموعة</h3></div>
             <span class="w-station-n"><b>٧</b>محطات</span>
           </div>
@@ -304,24 +311,31 @@
       </table>
     </div>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="skill" data-count="٦" style="--accent: var(--accent-skills)">
-        <div class="w-station-head">
-          <img src="../emoji/270f.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · درسُ علامة</span><h3>درس العلامة</h3></div>
-          <span class="w-station-n"><b>٦</b>دروس</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>اسمَ العلامة وأثرَها في النطق — وهي أصعبُ
-            أجزاء فكّ الشيفرة لأنها تُنطق ولا تُقرأ حرفاً.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>قاعدةٌ قصيرة، ثم <b>قارِنْ</b> بين طرفَي الزوج
-            (بَ/بَا) مسموعَين، ثم تمرينان يدخلان القياس: <b>قراءةٌ صامتة</b> («أيُّهما ممدود؟»
-            والخياران مكتوبان بلا صوت) و<b>تمييزٌ بالأذن</b> («أيَّ واحدةٍ سمعت؟»).</dd></div>
-          <div><dt>دورُك أنت</dt><dd>في لوحتك قسمٌ اسمُه «العلامات» بصندوقين لكل درس:
-            القراءةُ الصامتة والسماع. ولونُه <b>لأدناهما</b> — فمن أتقن السماع وحده لم يتقن
-            العلامة.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="skill" data-count="٦" style="--accent: var(--accent-skills)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/270f.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · درسُ علامة</span><h3>درس العلامة</h3></div>
+            <span class="w-station-n"><b>٦</b>دروس</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>اسمَ العلامة وأثرَها في النطق — وهي أصعبُ
+              أجزاء فكّ الشيفرة لأنها تُنطق ولا تُقرأ حرفاً.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>قاعدةٌ قصيرة، ثم <b>قارِنْ</b> بين طرفَي الزوج
+              (بَ/بَا) مسموعَين، ثم تمرينان يدخلان القياس: <b>قراءةٌ صامتة</b> («أيُّهما ممدود؟»
+              والخياران مكتوبان بلا صوت) و<b>تمييزٌ بالأذن</b> («أيَّ واحدةٍ سمعت؟»).</dd></div>
+            <div><dt>دورُك أنت</dt><dd>في لوحتك قسمٌ اسمُه «العلامات» بصندوقين لكل درس:
+              القراءةُ الصامتة والسماع. ولونُه <b>لأدناهما</b> — فمن أتقن السماع وحده لم يتقن
+              العلامة.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/ladder.png" width="820" height="821" loading="lazy"
+             alt="شاشة تمرين من سلّم الجمل: جملة تُقرأ وخيارات تُختار.">
+        <figcaption>شاشةُ تمرينٍ كما تُعرض — والعلامةُ تُقاس بمثلها.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -345,7 +359,7 @@
       <div class="w-stations">
         <article class="w-station" data-covers="story" data-count="٣" style="--accent: var(--accent-stories)">
           <div class="w-station-head">
-            <img src="../emoji/1f4d6.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f4d6.svg" alt="">
             <div><span class="w-kicker">نوع محطة · قصةُ تأسيس</span><h3>قصةٌ مفكوكة بين المجموعات</h3></div>
             <span class="w-station-n"><b>٣</b>قصص</span>
           </div>
@@ -393,24 +407,31 @@
       </table>
     </div>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="contrast" data-count="٢" style="--accent: var(--accent-letters)">
-        <div class="w-station-head">
-          <img src="../emoji/2696.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · مواجهة</span><h3>ميّز بين</h3></div>
-          <span class="w-station-n"><b>٢</b>محطتان</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>أن يفرّق بين الحرفين اللذين تتشابه أصواتُهما
-            في أذنه — لا أن يعرف كلَّ واحدٍ وحده.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>خطوةُ «قارِن» يسمع فيها الفرقَ مقصوداً، ثم
-            جولتان لكل زوج: <b>الخياران هما الزوجُ نفسُه بحركةٍ متطابقة</b> فلا يُميَّز إلا
-            بالصوت. وعند الخطأ يُسمَع الصوتان متتابعين — استثناءٌ معلَن من قاعدة
-            «لا تلقين للصواب».</dd></div>
-          <div><dt>دورُك أنت</dt><dd>إن تكرّر زوجٌ بعينه في لوحتك، انطقْه له أنت وجهاً لوجه:
-            فرقُ ت/ط يُرى في الفم قبل أن يُسمع في السمّاعة.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="contrast" data-count="٢" style="--accent: var(--accent-letters)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/2696.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · مواجهة</span><h3>ميّز بين</h3></div>
+            <span class="w-station-n"><b>٢</b>محطتان</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>أن يفرّق بين الحرفين اللذين تتشابه أصواتُهما
+              في أذنه — لا أن يعرف كلَّ واحدٍ وحده.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>خطوةُ «قارِن» يسمع فيها الفرقَ مقصوداً، ثم
+              جولتان لكل زوج: <b>الخياران هما الزوجُ نفسُه بحركةٍ متطابقة</b> فلا يُميَّز إلا
+              بالصوت. وعند الخطأ يُسمَع الصوتان متتابعين — استثناءٌ معلَن من قاعدة
+              «لا تلقين للصواب».</dd></div>
+            <div><dt>دورُك أنت</dt><dd>إن تكرّر زوجٌ بعينه في لوحتك، انطقْه له أنت وجهاً لوجه:
+              فرقُ ت/ط يُرى في الفم قبل أن يُسمع في السمّاعة.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/contrast.png" width="820" height="924" loading="lazy"
+             alt="محطة «ميّز بين»: زوجان من الحروف المتشابهة بحركة متطابقة.">
+        <figcaption>محطةُ المواجهة — الخياران هما الزوج نفسُه.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -423,23 +444,30 @@
       والبساتين — فقبل كلٍّ منهما <b>بوّابةُ مراجعةٍ إجبارية</b> تُبنى من أضعف مهاراته هو.
     </p>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="gate" data-count="٢" style="--accent: var(--accent-skills)">
-        <div class="w-station-head">
-          <img src="../emoji/1f511.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · بوّابة</span><h3>بوابة المصحف · بوابة الحديقة</h3></div>
-          <span class="w-station-n"><b>٢</b>بوّابتان</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>لا شيءَ جديد — <b>البوّابة تقيس ولا تدرّس</b>.
-            وغايتُها ألّا يدخل المصحفَ ولا الحديقةَ وفي حروفه ثغرة.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>عشرةُ تمارين من <b>أضعف</b> ما في صناديق مراجعته
-            (لا من المستحقّ اليوم)، والعبور بإصابة ≥ ٨٠٪ من المحاولات.</dd></div>
-          <div><dt>دورُك أنت</dt><dd><b>ولا رسوبَ فيها</b>: دونها تبقى التالية مقفلة مع إعادةٍ
-            فورية بلا حدٍّ ولا عقاب، وتُبنى تمارينها من جديدٍ في كل محاولة. فإن تعثّر مراراً
-            فلا تدفعه — راجعْ معه أصواتَ حروفه المتعثّرة بصوتك أنت.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="gate" data-count="٢" style="--accent: var(--accent-skills)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f511.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · بوّابة</span><h3>بوابة المصحف · بوابة الحديقة</h3></div>
+            <span class="w-station-n"><b>٢</b>بوّابتان</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>لا شيءَ جديد — <b>البوّابة تقيس ولا تدرّس</b>.
+              وغايتُها ألّا يدخل المصحفَ ولا الحديقةَ وفي حروفه ثغرة.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>عشرةُ تمارين من <b>أضعف</b> ما في صناديق مراجعته
+              (لا من المستحقّ اليوم)، والعبور بإصابة ≥ ٨٠٪ من المحاولات.</dd></div>
+            <div><dt>دورُك أنت</dt><dd><b>ولا رسوبَ فيها</b>: دونها تبقى التالية مقفلة مع إعادةٍ
+              فورية بلا حدٍّ ولا عقاب، وتُبنى تمارينها من جديدٍ في كل محاولة. فإن تعثّر مراراً
+              فلا تدفعه — راجعْ معه أصواتَ حروفه المتعثّرة بصوتك أنت.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/gate.png" width="820" height="821" loading="lazy"
+             alt="بوابة الإتقان: عشرة تمارين من أضعف مهارات الطفل.">
+        <figcaption>البوّابةُ تقيس ولا تدرّس.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -491,7 +519,7 @@
       <div class="w-stations">
         <article class="w-station" data-covers="quran" data-count="٣٠" style="--accent: var(--accent-quran)">
           <div class="w-station-head">
-            <img src="../emoji/1f54c.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f54c.svg" alt="">
             <div><span class="w-kicker">نوع محطة · قرآنية</span><h3>كلماتُ السورة ثم آياتُها</h3></div>
             <span class="w-station-n"><b>٣٠</b>محطة</span>
           </div>
@@ -509,7 +537,7 @@
         </article>
         <article class="w-station" data-covers="prophet" data-count="١" style="--accent: var(--accent-quran)">
           <div class="w-station-head">
-            <img src="../emoji/1f418.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f54b.svg" alt="">
             <div><span class="w-kicker">نوع محطة · قصةُ سورة</span><h3>«الْفِيلُ وَالْكَعْبَةْ»</h3></div>
             <span class="w-station-n"><b>١</b>قصة</span>
           </div>
@@ -561,23 +589,30 @@
       </table>
     </div>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="garden" data-count="١٠٠" style="--accent: var(--accent-garden)">
-        <div class="w-station-head">
-          <img src="../emoji/1f333.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · باقةُ بستان</span><h3>باقةُ خمس كلمات</h3></div>
-          <span class="w-station-n"><b>١٠٠</b>باقة</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>خمسَ كلماتٍ جديدة بصورها وأصواتها في موضوعٍ
-            واحد — فيتعلّق المعنى بالمعنى لا بالحرف وحده.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>بطاقاتٌ تُقرأ وتُسمَع، ثم «اقرأ واختر»: يقرأ
-            الكلمة مكتوبةً ويختار صورتها. <b>ولا صورةَ تُعرَض لكلمةٍ لا تصوّرها صورةٌ صادقة</b> —
-            تبقى بطاقةً تُنقَر ولا تُجعل جواباً.</dd></div>
-          <div><dt>دورُك أنت</dt><dd>استعملْ كلمةَ اليوم في كلامك معه. الكلمةُ التي تسمعها
-            الأذنُ في البيت تثبت أسرعَ من التي تُرى في شاشة.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="garden" data-count="١٠٠" style="--accent: var(--accent-garden)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f333.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · باقةُ بستان</span><h3>باقةُ خمس كلمات</h3></div>
+            <span class="w-station-n"><b>١٠٠</b>باقة</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>خمسَ كلماتٍ جديدة بصورها وأصواتها في موضوعٍ
+              واحد — فيتعلّق المعنى بالمعنى لا بالحرف وحده.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>بطاقاتٌ تُقرأ وتُسمَع، ثم «اقرأ واختر»: يقرأ
+              الكلمة مكتوبةً ويختار صورتها. <b>ولا صورةَ تُعرَض لكلمةٍ لا تصوّرها صورةٌ صادقة</b> —
+              تبقى بطاقةً تُنقَر ولا تُجعل جواباً.</dd></div>
+            <div><dt>دورُك أنت</dt><dd>استعملْ كلمةَ اليوم في كلامك معه. الكلمةُ التي تسمعها
+              الأذنُ في البيت تثبت أسرعَ من التي تُرى في شاشة.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/garden.png" width="820" height="821" loading="lazy"
+             alt="باقة بستان: خمس كلمات مصوَّرة تُقرأ وتُسمَع.">
+        <figcaption>باقةُ خمس كلماتٍ من بستان «البَيْت».</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -601,24 +636,31 @@
       أولُ درجةٍ في أول بستان، وآخرُ درجةٍ في آخره — بخطّ التطبيق نفسِه ومقاسه.
     </p>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="ladder" data-count="٨٠" style="--accent: var(--accent-garden)">
-        <div class="w-station-head">
-          <img src="../emoji/1fa9c.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · درجةُ سلّم</span><h3>درجةُ جملٍ بثلاث ميكانيكيات</h3></div>
-          <span class="w-station-n"><b>٨٠</b>درجة</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>أن يقرأ <b>جملةً</b> لا كلمات: يفهم معناها،
-            ويعرف موضعَ الكلمة منها، ويكمل ناقصَها.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>ثلاثٌ تتناوب في كل درجة: <b>اقرأ ونفّذ</b>
-            (يقرأ الجملة ويختار صورتها) · <b>رتّب الجملة</b> (بلاطاتٌ مبعثرة ومشتّتات) ·
-            <b>أكمل الجملة</b> (فراغٌ وخياراتٌ ملبَّسةٌ بلباس الموضع — فلا يُعرف الجواب من
-            شكل آخره).</dd></div>
-          <div><dt>دورُك أنت</dt><dd>لا شيء. وإن أردتَ التحقّق فاطلبْ منه أن يقرأ الجملة كلَّها
-            بصوتٍ عالٍ بعد أن يرتّبها.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="ladder" data-count="٨٠" style="--accent: var(--accent-garden)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/1fa9c.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · درجةُ سلّم</span><h3>درجةُ جملٍ بثلاث ميكانيكيات</h3></div>
+            <span class="w-station-n"><b>٨٠</b>درجة</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>أن يقرأ <b>جملةً</b> لا كلمات: يفهم معناها،
+              ويعرف موضعَ الكلمة منها، ويكمل ناقصَها.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>ثلاثٌ تتناوب في كل درجة: <b>اقرأ ونفّذ</b>
+              (يقرأ الجملة ويختار صورتها) · <b>رتّب الجملة</b> (بلاطاتٌ مبعثرة ومشتّتات) ·
+              <b>أكمل الجملة</b> (فراغٌ وخياراتٌ ملبَّسةٌ بلباس الموضع — فلا يُعرف الجواب من
+              شكل آخره).</dd></div>
+            <div><dt>دورُك أنت</dt><dd>لا شيء. وإن أردتَ التحقّق فاطلبْ منه أن يقرأ الجملة كلَّها
+              بصوتٍ عالٍ بعد أن يرتّبها.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/fade.png" width="820" height="821" loading="lazy"
+             alt="جملة من سلّم الجمل وقد خفت تشكيل بعض كلماتها.">
+        <figcaption>وهنا يُرى <b>الخفوت</b>: كلماتٌ بلغت عتبتَها فخفت شكلُها، وحوضُ الخيارات كامل الشكل دائماً.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -656,39 +698,46 @@
       </table>
     </div>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="library" data-count="١٠" style="--accent: var(--accent-stories)">
-        <div class="w-station-head">
-          <img src="../emoji/1f4d3.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · قصةُ بستان</span><h3>قصةٌ تجمع كلمات البستان</h3></div>
-          <span class="w-station-n"><b>١٠</b>قصص</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>يرى كلماتِ بستانه وقد صارت حكايةً لها بداية
-            ونهاية — فيصير الرصيدُ معنىً لا قائمة.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>ثلاثُ صفحاتٍ إلى ثمانٍ بحسب مستواها، ولكلِّ
-            قصةٍ غلافٌ يُختار منه، وسؤالُ فهمٍ مصوَّر في آخرها.</dd></div>
-          <div><dt>دورُك أنت</dt><dd>اسألْه: «ماذا حدث في النهاية؟» — سؤالُك أنفعُ من كل
-            سؤالٍ في شاشة.</dd></div>
-        </dl>
-      </article>
-      <article class="w-station" data-covers="roots" data-count="١٣" style="--accent: var(--accent-stories)">
-        <div class="w-station-head">
-          <img src="../emoji/1f331.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · شجرةُ جذر</span><h3>اجمع العائلة</h3></div>
-          <span class="w-station-n"><b>١٣</b>شجرة</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd>أن الكلمات <b>عائلات</b>: مَن أبصر «كتب» في
-            «مَكْتَبَة» قرأ الجديدَ من أسرتها بلا تهجٍّ. والوعيُ الصرفيّ من أقوى منبئات
-            الفهم القرائي في العربية خاصةً.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>شجرةٌ تُعرَض بأعضائها <b>المدروسين وحدهم</b>
-            (لا قفلٌ مرئيّ ولا إغراءٌ بما لم يبلغه)، ثم «اجمع العائلة» — وأذكى مشتّتٍ فيها
-            <b>«الحروفُ بلا المعنى»</b>: «رُكْبَة» في حوض الرُّكوب.</dd></div>
-          <div><dt>دورُك أنت</dt><dd>موضعُ كل شجرةٍ محسوبٌ لا مكتوب: تُفتح حيث يكتمل ثالثُ
-            عضوٍ في مساره هو. فإن رأيتَه يعود إليها فسيجد غصناً زاد.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="library" data-count="١٠" style="--accent: var(--accent-stories)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f4d3.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · قصةُ بستان</span><h3>قصةٌ تجمع كلمات البستان</h3></div>
+            <span class="w-station-n"><b>١٠</b>قصص</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>يرى كلماتِ بستانه وقد صارت حكايةً لها بداية
+              ونهاية — فيصير الرصيدُ معنىً لا قائمة.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>ثلاثُ صفحاتٍ إلى ثمانٍ بحسب مستواها، ولكلِّ
+              قصةٍ غلافٌ يُختار منه، وسؤالُ فهمٍ مصوَّر في آخرها.</dd></div>
+            <div><dt>دورُك أنت</dt><dd>اسألْه: «ماذا حدث في النهاية؟» — سؤالُك أنفعُ من كل
+              سؤالٍ في شاشة.</dd></div>
+          </dl>
+        </article>
+        <article class="w-station" data-covers="roots" data-count="١٣" style="--accent: var(--accent-stories)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f331.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · شجرةُ جذر</span><h3>اجمع العائلة</h3></div>
+            <span class="w-station-n"><b>١٣</b>شجرة</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd>أن الكلمات <b>عائلات</b>: مَن أبصر «كتب» في
+              «مَكْتَبَة» قرأ الجديدَ من أسرتها بلا تهجٍّ. والوعيُ الصرفيّ من أقوى منبئات
+              الفهم القرائي في العربية خاصةً.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>شجرةٌ تُعرَض بأعضائها <b>المدروسين وحدهم</b>
+              (لا قفلٌ مرئيّ ولا إغراءٌ بما لم يبلغه)، ثم «اجمع العائلة» — وأذكى مشتّتٍ فيها
+              <b>«الحروفُ بلا المعنى»</b>: «رُكْبَة» في حوض الرُّكوب.</dd></div>
+            <div><dt>دورُك أنت</dt><dd>موضعُ كل شجرةٍ محسوبٌ لا مكتوب: تُفتح حيث يكتمل ثالثُ
+              عضوٍ في مساره هو. فإن رأيتَه يعود إليها فسيجد غصناً زاد.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/roots.png" width="820" height="821" loading="lazy"
+             alt="شجرة الجذر: أعضاء العائلة الصرفية المدروسون، ولعبة «اجمع العائلة».">
+        <figcaption>شجرةُ الجذر بأعضائها المدروسين وحدهم.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -719,24 +768,31 @@
       </table>
     </div>
 
-    <div class="w-stations">
-      <article class="w-station" data-covers="shelf" data-count="٩" style="--accent: var(--accent-skills)">
-        <div class="w-station-head">
-          <img src="../emoji/1f4da.svg" alt="">
-          <div><span class="w-kicker">نوع محطة · قصةُ رفّ</span><h3>قصةٌ طويلة تُقرأ بالعين</h3></div>
-          <span class="w-station-n"><b>٩</b>قصص</span>
-        </div>
-        <dl class="w-what">
-          <div><dt>ماذا يتعلّم الطفل</dt><dd><b>حجمَ القراءة</b> نفسَه: أن يمضي في نصٍّ طويل
-            حتى نهايته. وهو ما تُبنى به الطلاقة، ولا تُبنى بالتمارين.</dd></div>
-          <div><dt>كيف يعمل التمرين</dt><dd>القصةُ مقاطعُ، والمقطعُ وحدةُ العرض ووحدةُ
-            السؤال (سؤالٌ لكل مقطع ممّا قرأه <b>إلى صفحته</b> لا ممّا بعدها).
-            <b>ولا صوتَ لجملةٍ فيها</b> — القصةُ تُقرأ لا تُسمع، وتبقى نقرةُ الكلمة شبكةَ
-            الأمان الوحيدة. وتُختَم بخطوة <b>«اِقْرَأْ لِأُمِّكْ»</b>.</dd></div>
-          <div><dt>دورُك أنت</dt><dd>اجلسْ لخطوة «اِقْرَأْ لِأُمِّكْ» — هي الغاية من الرفّ كلِّه،
-            وتسجيلُها يبقى في الجهاز ولا يغادره.</dd></div>
-        </dl>
-      </article>
+    <div class="w-pair">
+      <div class="w-stations">
+        <article class="w-station" data-covers="shelf" data-count="٩" style="--accent: var(--accent-skills)">
+          <div class="w-station-head">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f4da.svg" alt="">
+            <div><span class="w-kicker">نوع محطة · قصةُ رفّ</span><h3>قصةٌ طويلة تُقرأ بالعين</h3></div>
+            <span class="w-station-n"><b>٩</b>قصص</span>
+          </div>
+          <dl class="w-what">
+            <div><dt>ماذا يتعلّم الطفل</dt><dd><b>حجمَ القراءة</b> نفسَه: أن يمضي في نصٍّ طويل
+              حتى نهايته. وهو ما تُبنى به الطلاقة، ولا تُبنى بالتمارين.</dd></div>
+            <div><dt>كيف يعمل التمرين</dt><dd>القصةُ مقاطعُ، والمقطعُ وحدةُ العرض ووحدةُ
+              السؤال (سؤالٌ لكل مقطع ممّا قرأه <b>إلى صفحته</b> لا ممّا بعدها).
+              <b>ولا صوتَ لجملةٍ فيها</b> — القصةُ تُقرأ لا تُسمع، وتبقى نقرةُ الكلمة شبكةَ
+              الأمان الوحيدة. وتُختَم بخطوة <b>«اِقْرَأْ لِأُمِّكْ»</b>.</dd></div>
+            <div><dt>دورُك أنت</dt><dd>اجلسْ لخطوة «اِقْرَأْ لِأُمِّكْ» — هي الغاية من الرفّ كلِّه،
+              وتسجيلُها يبقى في الجهاز ولا يغادره.</dd></div>
+          </dl>
+        </article>
+      </div>
+      <figure>
+        <img src="shots/shelf.png" width="820" height="1160" loading="lazy"
+             alt="قصة من الرفّ: غلافها ثم مقطعها الأول.">
+        <figcaption>قصةُ رفٍّ بغلافها ومقطعها الأول.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -752,7 +808,7 @@
 
     <div class="w-cards">
       <article class="w-card" style="--accent: var(--accent-skills)">
-        <div class="w-face"><img src="../emoji/1f3af.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f3af.svg" alt=""></div>
         <h3>التكرار المتباعد (ليتنر)</h3>
         <p>
           كلُّ خطأ يُسجَّل على مستوى (الحرف × الحركة × نوع التمرين)، فيعود ما أخطأ فيه
@@ -761,7 +817,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-skills)">
-        <div class="w-face"><img src="../emoji/1f4ca.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f4ca.svg" alt=""></div>
         <h3>قياسُ العلامات كقياس الحروف</h3>
         <p>
           العلامةُ لا حرفَ لها، فتُقاس بمفتاحٍ لا حرفَ فيه — <b>مفتاحٌ لكل درسٍ لا لكل
@@ -770,7 +826,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-skills)">
-        <div class="w-face"><img src="../emoji/1f50d.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f50d.svg" alt=""></div>
         <h3>خفوتُ التشكيل — جسرٌ إلى النصّ العاري</h3>
         <p>
           الكتبُ والصحفُ بلا شكل، فلكلِّ كلمةٍ <b>عتبةُ خفوتها الخاصة بتاريخ طفلك معها</b>:
@@ -779,7 +835,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-skills)">
-        <div class="w-face"><img src="../emoji/1f46a.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f46a.svg" alt=""></div>
         <h3>لوحةُ وليّ الأمر</h3>
         <p>
           خلف بوابةٍ لا يفتحها طفل: أين يتعثّر بالضبط (حرفاً بحركةٍ بنوع تمرين)، وأقسامُ
@@ -793,7 +849,7 @@
       <div class="w-stations">
         <article class="w-station" style="--accent: var(--accent-skills)">
           <div class="w-station-head">
-            <img src="../emoji/1f4c5.svg" alt="">
+            <img loading="lazy" width="32" height="32" src="../emoji/1f4c5.svg" alt="">
             <div><span class="w-kicker">خارج الدرب</span><h3>مراجعةُ اليوم</h3></div>
           </div>
           <dl class="w-what">
@@ -825,7 +881,7 @@
 
     <div class="w-cards">
       <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img src="../emoji/1f6a6.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f6a6.svg" alt=""></div>
         <h3>مفكوكيةٌ ١٠٠٪ مفروضةٌ آلياً</h3>
         <p>
           لا كلمةَ ولا جملةَ ولا قصةَ فيها حرفٌ أو علامةٌ لم تُدرَّس بعد — حتى الجملُ
@@ -833,7 +889,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img src="../emoji/1f3b5.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f3b5.svg" alt=""></div>
         <h3>صوتٌ مخزون، وقارئٌ للمصحف حصراً</h3>
         <p>
           كلُّ صوتٍ ملفٌّ مُنتَجٌ مسبقاً <b>ومحقَّقٌ بأذنٍ بشرية</b> ومعه دفترُ نسبٍ يقول
@@ -842,7 +898,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img src="../emoji/1f512.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f512.svg" alt=""></div>
         <h3>تسجيلاتُ طفلك لا تغادر جهازه</h3>
         <p>
           في «اقرأ لي» و«اِقْرَأْ لِأُمِّكْ» يُلتقط صوتُه ويُخزَن <b>محلّياً في الجهاز</b>
@@ -851,7 +907,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img src="../emoji/1f4f1.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f4f1.svg" alt=""></div>
         <h3>يعمل دون إنترنت</h3>
         <p>
           يُثبَّت على الشاشة الرئيسة كتطبيقٍ مستقلّ، ويخزّن الأصواتَ والقصصَ والتلاوةَ من
@@ -859,7 +915,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img src="../emoji/1f5bc.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f5bc.svg" alt=""></div>
         <h3>أيقوناتٌ لا إيموجي — و«صدقُ الصورة»</h3>
         <p>
           صورُ الكلمات <b><span data-stat="icons">٥٧٣</span> أيقونةً مخزونة</b> في التطبيق
@@ -868,7 +924,7 @@
         </p>
       </article>
       <article class="w-card" style="--accent: var(--accent-quran)">
-        <div class="w-face"><img src="../emoji/1f5fa.svg" alt=""></div>
+        <div class="w-face"><img loading="lazy" width="32" height="32" src="../emoji/1f5fa.svg" alt=""></div>
         <h3>لا مؤقّت ولا شاشةَ «خطأ»</h3>
         <p>
           لا عدَّ تنازليّاً في أيّ تمرين، ولا صوتَ رسوبٍ ولا وجهاً حزيناً. الخطأ

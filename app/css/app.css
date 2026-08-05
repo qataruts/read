@@ -2066,3 +2066,17 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
 @media (prefers-reduced-motion: reduce) {
   .shelf-book .cover { transition: none; }
 }
+
+/* بابُ التعريف في ذيل الخريطة (أمر المالك، ١٢ أغسطس ٢٠٢٦): سطرٌ هادئ للراشد —
+   لا زرَّ فعلٍ يزاحم درسَ الطفل، ولا لونَ نجمةٍ يجذب إصبعَه. */
+.map-about {
+  display: block;
+  margin: 2.5rem auto .5rem;
+  text-align: center;
+  font-size: .95rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: .5rem;
+}
+
+.map-about:hover { text-decoration: underline; }
