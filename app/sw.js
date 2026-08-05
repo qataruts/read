@@ -199,12 +199,18 @@ async function precacheAudio() {
   const missing = urls.filter((url) => !have.has(url));
 
   let failed = 0;
+  const total = urls.length;
+  let done = total - missing.length;
+  await report({ stored: done, total, busy: missing.length > 0 });
   for (let i = 0; i < missing.length; i += AUDIO_BATCH) {
     // واحداً واحداً داخل الدفعة: ملفٌ ناقص لا يُسقِط الدفعة كلها (بخلاف cache.addAll)
     const batch = await Promise.all(missing.slice(i, i + AUDIO_BATCH)
       .map((url) => cache.add(url).then(() => true, () => false)));
-    failed += batch.filter((done) => !done).length;
+    failed += batch.filter((ok) => !ok).length;
+    done += batch.filter(Boolean).length;
+    await report({ stored: done, total, busy: true });   // **بعد كل دفعة**: يرى المستعمل تقدّماً حقيقياً
   }
+  await report({ stored: done, total, busy: false, failed });
   if (failed) console.warn(`[sw] تعذّر خزن ${failed} ملفاً صوتياً من ${missing.length}`);
 
   if (!generated) return { complete: false, failed, missing: missing.length };
@@ -267,6 +273,24 @@ async function healAudio() {
   if (await audioComplete()) return;
   await syncAudio();
 }
+
+/** **إبلاغُ النوافذ بحال خزن الصوت** (أمر المالك، ١٣ أغسطس ٢٠٢٦: «يجب أن نُظهر
+ *  التحميل ليتأكّد المستعمل أنّ التحميلات جاهزة»): كان الخزنُ يجري صامتاً في
+ *  الخلفية، فلا يعرف أحدٌ أتمَّ أم لا — حتى يفاجئه صمتٌ في الطائرة. فصار العاملُ
+ *  يبعث حالَه بعد كل دفعة، وتعرضه لوحةُ وليّ الأمر شريطاً حيّاً. */
+async function report(state) {
+  // بيئةٌ بلا `clients` (فحصٌ مزيَّف أو متصفّحٌ قديم): الخزنُ يمضي والإبلاغُ يسقط
+  // وحدَه — فالبلاغ زينةُ شفافيةٍ لا شرطُ عمل.
+  if (typeof self.clients?.matchAll !== 'function') return;
+  const windows = await self.clients.matchAll({ type: 'window' });
+  for (const client of windows) client.postMessage({ type: 'audio-progress', ...state });
+}
+
+/** طلبٌ صريح من المستعمل: «نزّل الأصوات الآن» — يتجاوز مهلةَ الشفاء ولا ينتظرها. */
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== 'audio-sync') return;
+  event.waitUntil(syncAudio());
+});
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {

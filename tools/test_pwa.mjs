@@ -148,6 +148,17 @@ ok(/async function audioComplete/.test(sw) && /await audioComplete\(\)/.test(act
 ok(/await syncAudio\(\)/.test(activate)
   && activate.indexOf('syncAudio()') < activate.indexOf('audioComplete()'),
   'والتبنّي والاستكمالُ قبل الحكم بالتمام (وإلا حُكم بالنقص على مخزنٍ لم يُملأ بعد)');
+// **وحالُ التحميل تُرى وتُدار** (أمر المالك، ١٣ أغسطس ٢٠٢٦): الخزنُ الصامت أوقع
+// المالكَ نفسَه في ظنٍّ خاطئ يوم صمت الصوت — فصار العاملُ يبلّغ تقدّمَه بعد كل دفعة،
+// ويقبل طلباً صريحاً بالتحميل الآن؛ وتعرضهما لوحةُ وليّ الأمر شريطاً وزرّاً.
+ok(/type: 'audio-progress'/.test(sw) && /clients\.matchAll/.test(sw),
+  'والعاملُ يبلّغ النوافذَ بتقدّم خزن الصوت (لا يخزّن صامتاً)');
+ok(/addEventListener\('message'/.test(sw) && /'audio-sync'/.test(sw),
+  'ويقبل طلبَ «نزّل الأصوات الآن» صريحاً بلا انتظار مهلة');
+const panelSrc = read('js/parent.js');
+ok(/audio-progress/.test(panelSrc) && /audio-sync/.test(panelSrc) && /dl-bar/.test(panelSrc),
+  'ولوحةُ وليّ الأمر تعرض شريطاً حيّاً وزرَّ تحميلٍ يدويّ');
+
 ok(/event\.waitUntil\(healAudio\(\)\)/.test(sw) && /HEAL_AFTER/.test(sw)
   && /if \(healed \|\| syncing\) return;/.test(sw)
   && /if \(await audioComplete\(\)\) return;/.test(sw),

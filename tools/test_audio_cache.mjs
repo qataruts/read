@@ -163,16 +163,23 @@ const caches = {
  *  على جهاز الطفل: عاملٌ جديد يجد مخزون سابقه على حاله. */
 function loadSw(source) {
   const listeners = {};
+  const posted = [];
   const selfObj = {
     addEventListener: (type, fn) => { listeners[type] = fn; },
     registration: { scope: SCOPE },
     location: { origin: 'https://muallim.test' },
     skipWaiting: async () => {},
-    clients: { claim: async () => {} },
+    // **ونافذةٌ تستمع**: العاملُ يبعث تقدّمَ الخزن إلى النوافذ بعد كل دفعة (شريطُ
+    // التحميل في لوحة وليّ الأمر)، فتُحاكى هنا لتُجرَّب تلك الطريق لا لتُتخطّى.
+    clients: {
+      claim: async () => {},
+      matchAll: async () => [{ postMessage: (m) => posted.push(m) }],
+    },
   };
   vm.runInContext(source,
     vm.createContext({ self: selfObj, caches, fetch: fakeFetch, URL, Request, Response, console }));
   return {
+    posted,
     fire: async (type) => {
       let waited;
       listeners[type]({ waitUntil: (p) => { waited = p; } });

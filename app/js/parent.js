@@ -415,14 +415,49 @@ function backupSection(rerender) {
   // سطرُ الأصوات المخزونة (حزمة «خفّة التخزين»): كان إخفاقُ الخزن يُبتلَع صامتاً —
   // ومنه تجاوزُ حصة التخزين على الأجهزة الأقدم — فتنقص ملفاتٌ ولا يعلم أحد، ثم يصمت
   // الصوت في الطائرة أو في السيارة. فالعدد معروضٌ لوليّ الأمر: يرى النقص قبل أن يفاجئه.
+  /* **حالُ التحميل تُرى وتُدار** (أمر المالك، ١٣ أغسطس ٢٠٢٦: «يجب أن نُظهر التحميل
+     ليتأكّد المستعمل أنّ التحميلات جاهزة… وأن تكون هناك طريقة لمتابعة التحميل أو
+     إعادته»): كان الخزنُ يجري صامتاً فلا يعرف أحدٌ أتمَّ أم لا — حتى فُتح التطبيقُ
+     بلا شبكةٍ فصمت الصوت، وظُنّ العيبُ في البرنامج. فصار السطرُ **شريطاً حيّاً**
+     يتحرّك مع كل دفعة، ومعه **زرٌّ يبدأ التحميل الآن** بدل انتظار مهلة الشفاء. */
   const cached = h('p', { class: 'hint' });
+  const bar = h('div', { class: 'dl-bar' }, h('span', { class: 'dl-fill' }));
+  const fill = bar.firstChild;
+  const dlBtn = h('button', { class: 'btn', onclick: () => askSync() }, 'نزّل الأصوات الآن');
+  const dlRow = h('div', { class: 'dl' }, cached, bar, dlBtn);
+
+  const paint = (stored, total, busy) => {
+    if (!cached.isConnected || !total) return;
+    const pct = Math.min(100, Math.round((stored / total) * 100));
+    fill.style.width = `${pct}%`;
+    bar.classList.toggle('dl-bar--done', stored >= total);
+    const head = `الأصوات المخزونة: ${arNum(stored)} من ${arNum(total)} (${arNum(pct)}٪)`;
+    cached.textContent = stored >= total
+      ? `${head} — كلُّها على الجهاز، فيعمل التطبيق بلا إنترنت.`
+      : busy
+        ? `${head} — يُنزَّل الآن، أبقِ التطبيق مفتوحاً.`
+        : `${head} — ما نقص يُجلَب عند سماعه، ويكتمل حين يُفتح التطبيق متصلاً.`;
+    dlBtn.hidden = stored >= total;
+    dlBtn.textContent = busy ? 'يُنزَّل…' : 'نزّل الأصوات الآن';
+    dlBtn.disabled = Boolean(busy);
+  };
+
+  /** طلبٌ صريح إلى عامل الخدمة — هو وحده يملك المخزن. */
+  const askSync = () => {
+    const sw = navigator.serviceWorker?.controller;
+    if (!sw) return void toast('التحميل يبدأ بعد تثبيت التطبيق');
+    sw.postMessage({ type: 'audio-sync' });
+    dlBtn.disabled = true;
+    dlBtn.textContent = 'يُنزَّل…';
+  };
+
+  // بلاغاتُ العامل بعد كل دفعة — فالشريطُ يتحرّك بما يجري لا بتقديرٍ منّا
+  navigator.serviceWorker?.addEventListener?.('message', (e) => {
+    if (e.data?.type === 'audio-progress') paint(e.data.stored, e.data.total, e.data.busy);
+  });
+
   progress.audioStored().then((count) => {
-    if (!count || !cached.isConnected) return;
-    cached.textContent = count.stored >= count.total
-      ? `الأصوات المخزونة: ${arNum(count.total)} من ${arNum(count.total)}`
-        + ' — كلُّها على الجهاز، فيعمل التطبيق بلا إنترنت.'
-      : `الأصوات المخزونة: ${arNum(count.stored)} من ${arNum(count.total)}`
-        + ' — تكتمل من تلقائها حين يُفتح التطبيق متصلاً، وما نقص منها يُجلَب عند سماعه.';
+    if (count) paint(count.stored, count.total, false);
   });
 
   progress.persistedStorage().then((persisted) => {
@@ -491,7 +526,7 @@ function backupSection(rerender) {
     ),
     slot,
     storage,
-    cached,
+    dlRow,
     h('p', { class: 'note' },
       'في النسخة: النجوم وصناديق المراجعة ودقائق التعلّم ومدد قراءاته الجهرية'
       + ' وتاريخ خفوت كلماته. وليس فيها تسجيلات صوته — تلك لا تغادر جهازه أبداً.'),
