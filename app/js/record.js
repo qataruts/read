@@ -44,15 +44,28 @@ export function recordBlock({ nodeId, title, label, hint, stopAll, root }) {
 
   const row = h('div', { class: 'row record' });
   let clip = null;      // آخر تسجيل في هذه الجلسة — يُسمَع من الذاكرة بلا فتح المخزن
+  let savedId = 0;      // ومعرّفُ آخرِ محفوظٍ لهذه العقدة — يُقرأ من المخزن عند الحاجة
   let busy = false;
+
+  /* **وزرُّ السماع يبقى بعد مغادرة الشاشة** (أمر المالك، ١٣ أغسطس ٢٠٢٦): كان التسجيلُ
+     في الذاكرة وحدها، فمن قرأ أمسِ وعاد اليوم لم يجد ما يسمعه — وأحبُّ صوتٍ إلى
+     الطفل صوتُه. فيُسأل المخزنُ عند فتح الشاشة عن آخر تسجيلٍ **لهذه العقدة**، فإن
+     وُجد ظهر الزرّ. ولا يُجلَب الصوتُ نفسُه إلا عند النقر — فلا تُثقَل الشاشةُ بميغابايت
+     لا يطلبها أحد. **ولا شبكةَ في هذا كلِّه**: المخزنُ IndexedDB على الجهاز. */
+  recordings.listClips().then((clips) => {
+    const mine = clips.filter((c) => c.node === nodeId).sort((a, b) => b.at - a.at)[0];
+    if (!mine || clip) return;      // سجّل في هذه الجلسة: ما في اليد أحدثُ ممّا في المخزن
+    savedId = mine.id;
+    paintIdle();
+  }).catch(() => { /* مخزنٌ متعذّر: الزرّ لا يظهر، ولا شيء ينكسر */ });
 
   function paintIdle() {
     const buttons = [h('button', {
       class: 'btn rec-mic',
-      'aria-label': clip ? 'سجّل قراءتك من جديد' : 'سجّل قراءتك بصوتك',
+      'aria-label': clip || savedId ? 'سجّل قراءتك من جديد' : 'سجّل قراءتك بصوتك',
       onclick: begin,
-    }, micIcon(), clip ? 'سجّل من جديد' : label)];
-    if (clip) {
+    }, micIcon(), clip || savedId ? 'سجّل من جديد' : label)];
+    if (clip || savedId) {
       buttons.push(h('button', {
         class: 'btn rec-hear',
         'aria-label': 'اسمع صوتك مرة أخرى',
@@ -114,6 +127,7 @@ export function recordBlock({ nodeId, title, label, hint, stopAll, root }) {
     // **يسمع نفسه أولاً** — أحبُّ صوتٍ إلى الطفل صوتُه، فلا يُؤخَّر سماعُه بانتظار
     // كتابة القرص. والصوت في الذاكرة أصلاً، وحفظُه لوليّ أمره يجري خلفه.
     clip = taken.blob;
+    savedId = 0;              // ما في اليد أحدثُ من المخزن — يُسمَع منه مباشرةً
     paintIdle();
     hear();
     progress.logRecording({ node: nodeId, title, seconds: taken.seconds });
@@ -122,9 +136,10 @@ export function recordBlock({ nodeId, title, label, hint, stopAll, root }) {
     }).catch((e) => console.warn('[record] تعذّر حفظ التسجيل:', e));
   }
 
-  function hear() {
-    if (!clip) return;
+  async function hear() {
     stopAll();
+    if (!clip && savedId) clip = await recordings.clipBlob(savedId).catch(() => null);
+    if (!clip) return;
     recorder.playClip(clip);
   }
 

@@ -312,8 +312,16 @@ for (const surah of QURAN.surahs) {
   const rebuilt = surah.ayat.map((a) => a.split(' ').join(' ')).join('|');
   ok(rebuilt === surah.ayat.join('|'),
     `ووصلُ كلمات ${surah.name} يعيد آياتها حرفاً بحرف (لا فراغ مزدوج ولا حذف)`);
-  ok(new Set(words.map((w) => w.text)).size === words.length,
-    `ولا بطاقةَ كلمةٍ مكرَّرة في ${surah.name}`);
+  // **والبطاقاتُ تتابعُ السورة كاملاً، والمكرَّرُ في موضعه** (أمر المالك، ١٣ أغسطس
+  // ٢٠٢٦، انقلاباً عن شرطٍ سابق كان يمنع التكرار): كانت القائمةُ مصفّاةً فيرى الطفلُ
+  // كلماتٍ مبعثرةً لا سورةً يقرؤها؛ والناسُ تعرف كلماتِ السورة على تتابعها. والحارسُ
+  // الآن **أقوى من سابقه**: لا يكتفي بمنع شيءٍ بل يُثبت أنّ البطاقات **هي نصُّ السورة
+  // كلمةً كلمة بترتيبه** — فحذفُ كلمةٍ أو إزاحتُها يُسقِطه في حينه.
+  ok(words.map((w) => w.text).join(' ') === surah.ayat.join(' '),
+    `وبطاقاتُ ${surah.name} هي كلماتُ السورة بتتابعها (${words.length} بطاقة)`);
+  const dupes = words.length - new Set(words.map((w) => w.text)).size;
+  ok(words.every((w) => surah.ayat[w.ayah - 1].split(' ')[w.pos - 1] === w.text),
+    `ولكلٍّ موضعُها الصحيح من آيتها (${dupes} مكرَّرةً في موضعها)`);
 }
 ok(stationWords === quranWordTexts().length,
   `وجملةُ ما تعرضه المحطات ${stationWords} كلمة (بلا تكرارٍ داخل السورة)`);

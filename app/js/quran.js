@@ -353,9 +353,12 @@ export function buildFindRounds(words, rounds = FIND_ROUNDS, rnd = Math.random) 
   const pool = shuffle(words, rnd);
   const out = [];
   let used = new Set();
+  // **والتمييزُ بالنصّ لا بالعنصر**: صارت الكلماتُ تُعرَض بتتابعها، فالكلمةُ الواحدة
+  // قد تَرِد مرّتين بعنصرين — ولو مُيِّزت بالعنصر لسُئل الطفلُ عن «ٱللَّهُ» جولتين.
   while (out.length < Math.min(rounds, pool.length)) {
-    const fresh = pool.find((w) => !out.includes(w) && !used.has(w.ayah));
-    const pick = fresh || pool.find((w) => !out.includes(w));
+    const taken = (w) => out.some((o) => o.text === w.text);
+    const fresh = pool.find((w) => !taken(w) && !used.has(w.ayah));
+    const pick = fresh || pool.find((w) => !taken(w));
     if (!pick) break;
     if (!fresh) used = new Set();          // دارت الآيات كلها: نبدأ دورةً جديدة
     used.add(pick.ayah);
@@ -395,13 +398,16 @@ function renderSurahWords(surahId) {
               + arCount(words.length, ['كلمة', 'كلمتين', 'كلمات', 'كلمة']);
           };
 
-          const grid = h('div', { class: 'sw-grid' }, words.map((word) => {
+          // **العدُّ بالموضع لا بالنصّ**: صارت الكلماتُ تُعرَض بتتابعها والمكرَّرُ في
+          // موضعه (أمر المالك)، فلو عُدّت النصوصُ لَما بلغ العدّادُ التمامَ أبداً في
+          // سورةٍ فيها تكرار — يسمع الطفلُ الكلَّ ويقرأ «سمعتَ ١٣ من ١٥».
+          const grid = h('div', { class: 'sw-grid' }, words.map((word, at) => {
             const btn = h('button', {
               class: 'vchip vchip--mushaf',
               'aria-label': `اسمع كلمة ${word.text}`,
               onclick: () => {
                 btn.classList.add('good');
-                heard.add(word.text);
+                heard.add(at);
                 paintFoot();
                 recitation.play(word.text);
               },

@@ -1232,14 +1232,19 @@ export const surahOfWordsPart = (part) =>
   (String(part).startsWith('sw-') ? surahById(String(part).slice(3)) : null);
 
 /** كلمات السورة بترتيب ورودها، بلا تكرار، ومع موضع أول ورودٍ لكل كلمة. */
+/** كلماتُ السورة **بتتابعها الحقيقيّ، والمكرَّرُ يُعرَض في موضعه** (أمر المالك،
+ *  ١٣ أغسطس ٢٠٢٦): كانت تُسقط المكرَّر فتُقدّم للطفل قائمةً مصفّاة — وهو صحيحٌ
+ *  تعليمياً في التوفير، لكنّ الناسَ تعوّدت كلماتِ السورة كاملةً على تتابعها، وهو
+ *  أقربُ إلى ما يعرفه الطفلُ ووليُّه، ويُعطيه التسلسلَ كما يقرؤه لا كما نصفّيه.
+ *  والزيادةُ ٣١ كلمةً في السور الاثنتي عشرة كلِّها — تتابعٌ بلا ثقل. */
 export function surahWords(surah) {
-  const out = new Map();
+  const out = [];
   surah.ayat.forEach((ayah, i) => {
     ayah.split(' ').forEach((text, j) => {
-      if (text && !out.has(text)) out.set(text, { text, ayah: i + 1, pos: j + 1 });
+      if (text) out.push({ text, ayah: i + 1, pos: j + 1 });
     });
   });
-  return [...out.values()];
+  return out;
 }
 
 /**

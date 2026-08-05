@@ -171,6 +171,11 @@ export function playClip(blob) {
 // على شاشة قصة. وهو شرطُ إبقاء المجرى مفتوحاً أصلاً.
 if (typeof document !== 'undefined' && document.addEventListener) {
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') release();
+    if (document.visibilityState !== 'hidden') return;
+    // **ولا يُلغى تسجيلٌ جارٍ**: `release()` يُسقِط ما التُقط، فلو ومض إخفاءٌ عارض
+    // أثناء قراءة الطفل ضاعت قراءتُه ولم يجد ما يسمعه. فيُختَم التسجيلُ ختماً
+    // نظيفاً (يُحفظ ثم يُطلَق الميكروفون)، وإلا أُطلق فوراً.
+    if (isRecording()) stop().then(releaseMic, releaseMic);
+    else release();
   });
 }
