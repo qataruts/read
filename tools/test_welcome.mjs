@@ -105,8 +105,10 @@ for (const [name, text] of Object.entries(PAGES)) {
   ok(outward.every((v) => v === SITE) && outward.length <= 1,
     `${name}: ولا رابطَ خارجيّ إلا عنوانَ موقعنا في ترويسة المطبوع`);
 
+  // **و`mailto:` ليس ملفّاً يُطلَب**: هو فعلُ مراسلةٍ يفتحه المتصفّح إن نُقر، ولا
+  // يُجلَب من شبكةٍ ولا من قرص — فيُستثنى من جرد الملفّات كما يُستثنى من الخارجيّ.
   const links = [...text.matchAll(/(?:href|src)="([^"#][^"]*)"/g)].map((m) => m[1])
-    .filter((v) => !/^(?:https?:)?\/\//.test(v));
+    .filter((v) => !/^(?:https?:)?\/\//.test(v) && !/^(?:mailto|tel):/.test(v));
   const missing = links.filter((v) => !existsSync(new URL(v, WELCOME)));
   ok(missing.length === 0,
     `${name}: وكلُّ ملفٍّ تطلبه موجود (${links.length} مرجعاً)`

@@ -885,3 +885,13 @@
 }
 
 .w-wrap .btn:hover, .w-top .btn:hover { filter: brightness(.97); }
+
+/* سطرُ التواصل: **خافتٌ في الذيل لمن يبحث عنه** (أمر المالك، ١٣ أغسطس ٢٠٢٦) —
+   الصفحةُ تعريفٌ بالمنتَج لا دعوةٌ للمراسلة، فلا يزاحم البريدُ ما جاء له الزائر. */
+.w-contact {
+  font-size: .85rem;
+  color: var(--ink-soft);
+  opacity: .75;
+}
+
+.w-contact a { color: inherit; }
