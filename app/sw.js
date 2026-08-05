@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v19';  // v19: خفّة التخزين (مخزن صوتٍ ثابت، ودفعاتٌ معدودة الإخفاق)
+const VERSION = 'v20';  // v20: صيانةُ المخزون (لا يُهدَم كاملٌ لأجل ناقص، ويُشفى عند أول اتصال)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -207,11 +207,64 @@ async function precacheAudio() {
   }
   if (failed) console.warn(`[sw] تعذّر خزن ${failed} ملفاً صوتياً من ${missing.length}`);
 
-  if (!generated) return;            // بيانٌ لم يصل: لا نكنس على غير علم
-  if (failed) return;                // إخفاقٌ وقع: لا نكنس (صيانةً للقديم الصالح)
+  if (!generated) return { complete: false, failed, missing: missing.length };
+  if (failed) return { complete: false, failed, missing: missing.length };
   const wanted = new Set(urls);
   const stale = (await cache.keys()).filter((request) => !wanted.has(request.url));
   await Promise.all(stale.map((request) => cache.delete(request)));
+  return { complete: true, failed: 0, missing: 0 };
+}
+
+/** هل المخزونُ الصوتيّ تامٌّ الآن؟ — يُحسب من البيانات والمخزن، لا يُؤخذ من ذاكرة
+ *  نسخةٍ سابقة من العامل: العاملُ يُنهى ويُبعَث بين `install` و`activate`، فحالةٌ
+ *  محفوظةٌ في متغيّرٍ لا يُوثَق بها في قرارٍ يُتلف مخزوناً. */
+async function audioComplete() {
+  const [generated, versions, recitations] = await Promise.all([
+    json('audio/manifest.json'), json('audio/versions.json'), json('data/recitations.json'),
+  ]);
+  if (!generated) return false;                 // بيانٌ لم يصل: لا نحكم بالتمام
+  const tags = { ...(versions || {}), ...(recitations?.v || {}) };
+  const urls = audioOrder(generated, recitations).map((stem) => audioUrl(stem, tags));
+  const cache = await caches.open(AUDIO_CACHE);
+  const have = new Set((await cache.keys()).map((request) => request.url));
+  return urls.every((url) => have.has(url));
+}
+
+/* **شفاءُ المخزون عند أول اتصال** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦): كان التنزيلُ يقع
+   مرّةً واحدة في `install`؛ فجهازٌ حُذف تطبيقُه وأُعيد تثبيته **وهو مفصولٌ عن
+   الشبكة** لا يخزّن ملفاً واحداً، ولا تعود المحاولةُ إلا بترقيةٍ جديدة — فيصمت
+   الصوتُ ولا يُصلحه إلا صدفة. فصارت المحاولةُ تتكرّر عند كل فتحةٍ للتطبيق،
+   مكبوحةً بدقيقة، ولا تجلب إلا الناقص. */
+let syncing = false;
+let healed = false;             // مرّةً في عمر العامل (وكلُّ بعثٍ فرصةٌ جديدة)
+const HEAL_AFTER = 30000;       // نصفُ دقيقة تمضي للطفل قبل أي تنزيلٍ خلفيّ
+
+async function syncAudio() {
+  if (syncing) return;
+  syncing = true;
+  try {
+    await precacheAudio();
+  } catch (e) {
+    console.warn('[sw] تعذّرت مزامنة الصوت', e);
+  } finally {
+    syncing = false;
+  }
+}
+
+/** شفاءُ الناقص — **مرّةً في عمر العامل وبعد مهلة**، وثلاثةُ قيودٍ لكلٍّ علّته:
+ *
+ *  ١) **مرّةً لا كلَّ فتحة**: العاملُ يُنهى ويُبعث، فمع كل بعثٍ فرصةٌ جديدة — وذلك
+ *     يكفي للشفاء ولا يجعله عادةً في كل تنقّل.
+ *  ٢) **بعد مهلة**: الفتحةُ الأولى للطفل أَولى بالشبكة من تنزيلٍ خلفيّ. ولولا
+ *     المهلةُ لزاحم الشفاءُ الشاشةَ التي جاء يخدمها — وقد قِيس ذلك: كان يُبطئ
+ *     ظهورَ الصوت في الاختبار حتى تنتهي مهلتُه.
+ *  ٣) **ولا يعمل على تامّ**: الجردُ أولاً، فجهازٌ مخزونُه كامل لا يطلب بايتاً. */
+async function healAudio() {
+  if (healed || syncing) return;
+  healed = true;
+  await new Promise((resolve) => setTimeout(resolve, HEAL_AFTER));
+  if (await audioComplete()) return;
+  await syncAudio();
 }
 
 self.addEventListener('install', (event) => {
@@ -228,11 +281,26 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
+    // **ولا يُهدَم مخزونٌ كاملٌ لأجل ناقص** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦): كان الكنسُ
+    // يحذف `muallim-audio-v18` وأخواتِه بلا شرط، فلو انقطعت الشبكةُ أثناء التبنّي
+    // ضاع الكاملُ وبقي الناقص — ولا يستردّه إلا اتصالٌ طويل. فمخازنُ الصوت القديمة
+    // تبقى حتى يثبت تمامُ الجديد **بالجرد لا بالظنّ**.
     const names = await caches.keys();
-    await Promise.all(names
-      .filter((n) => n.startsWith('muallim-') && !KEEP.includes(n))
+    const stale = names.filter((n) => n.startsWith('muallim-') && !KEEP.includes(n));
+    await Promise.all(stale
+      .filter((n) => !n.startsWith('muallim-audio-'))
       .map((n) => caches.delete(n)));
     await self.clients.claim();
+
+    // **الترتيبُ شرط**: يُتبنّى القديمُ ويُستكمَل الناقصُ **أولاً**، ثم يُحكَم بالتمام،
+    // ثم يُحذف القديم. وعكسُه يحكم بالنقصان على مخزنٍ لم يُملأ بعدُ فيُبقي نسختين،
+    // أو — لو قُدّم الحذف — يمحو الكاملَ قبل أن يُنسخ.
+    await syncAudio();
+    const legacyAudio = (await caches.keys())
+      .filter((n) => n.startsWith('muallim-audio-') && n !== AUDIO_CACHE);
+    if (legacyAudio.length && await audioComplete()) {
+      await Promise.all(legacyAudio.map((n) => caches.delete(n)));
+    }
   })());
 });
 
@@ -294,6 +362,9 @@ self.addEventListener('fetch', (event) => {
   }
   // التنقّل دائماً إلى index.html: التطبيق صفحة واحدة بمسارات hash
   if (request.mode === 'navigate') {
+    // وكلُّ فتحةٍ فرصةُ شفاء: ما نقص من الصوت يُستكمَل الآن إن كانت هناك شبكة —
+    // مكبوحاً بدقيقة، ولا يجلب إلا الناقص، فلا يثقل فتحةً ولا يكرّر تنزيلاً.
+    event.waitUntil(healAudio());
     event.respondWith(staleWhileRevalidate(new Request(new URL('index.html', self.registration.scope))));
     return;
   }

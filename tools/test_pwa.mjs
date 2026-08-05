@@ -136,8 +136,22 @@ ok(batch >= 12 && batch <= 16 && /for \(.*AUDIO_BATCH\)/.test(precache) && /\.sl
 ok(/\.keys\(\)/.test(precache) && /filter\(\(url\) => !have\.has\(url\)\)/.test(precache),
   'ولا يُطلَب من الشبكة إلا الناقص (`cache.add` يجلب دائماً وإن كان مخزوناً)');
 ok(!/catch\(\(\) => \{\}\)/.test(precache) && /failed \+=/.test(precache)
-  && /if \(failed\) return;/.test(precache),
+  && /if \(failed\) return\b/.test(precache),
   'والإخفاقاتُ معدودةٌ لا مبتلعة، وإن وقع إخفاقٌ فلا كنسَ (صيانةً للقديم الصالح)');
+
+// **ولا يُحذف مخزونٌ قديم إلا بعد ثبوت تمام الجديد** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦:
+// جهازٌ صمت صوتُه لأنّ الكامل حُذف والجديدُ لم يكتمل). والتمامُ يُحسب من البيانات
+// والمخزن معاً في `audioComplete()` — لا من متغيّرٍ في ذاكرة عاملٍ قد يُبعث من جديد.
+const activate = sw.slice(sw.indexOf("addEventListener('activate'"));
+ok(/async function audioComplete/.test(sw) && /await audioComplete\(\)/.test(activate),
+  'ولا يُمحى مخزونُ صوتٍ قديم إلا بعد جردٍ يثبت تمامَ الجديد');
+ok(/await syncAudio\(\)/.test(activate)
+  && activate.indexOf('syncAudio()') < activate.indexOf('audioComplete()'),
+  'والتبنّي والاستكمالُ قبل الحكم بالتمام (وإلا حُكم بالنقص على مخزنٍ لم يُملأ بعد)');
+ok(/event\.waitUntil\(healAudio\(\)\)/.test(sw) && /HEAL_AFTER/.test(sw)
+  && /if \(healed \|\| syncing\) return;/.test(sw)
+  && /if \(await audioComplete\(\)\) return;/.test(sw),
+  'وللناقص شفاءٌ — مرّةً في عمر العامل، بعد مهلةٍ تمضي للطفل، ولا يعمل على مخزونٍ تامّ');
 const panel = read('js/parent.js');
 ok(read('js/progress.js').includes('export async function audioStored')
   && panel.includes('progress.audioStored()') && panel.includes('الأصوات المخزونة'),

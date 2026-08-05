@@ -11,9 +11,18 @@
 // المدّة تُلتقط **ضمنياً** بفارق ما بين الضغطتين، فتصير مقياس الطلاقة الصامت في لوحة
 // وليّ الأمر — يقرؤه الوالد ولا يراه الطفل عدّاداً يسابقه.
 //
-// **الميكروفون يُطلَق فور التوقف**: لا نُبقي المجرى مفتوحاً بين تسجيلين (مؤشّر
-// التسجيل في الجهاز يجب أن ينطفئ حين لا نسجّل)، و`release()` تُنادى من التوجيه
-// في `main.js` فلا يتبع الميكروفونُ الطفلَ إلى شاشة أخرى.
+// **الميكروفون يُهيَّأ مع الشاشة ويُطلَق بمغادرتها** (أمر المالك، ١٣ أغسطس ٢٠٢٦،
+// بعد أن شكا بطءَ التسجيل على الآيباد): كان يُطلَب `getUserMedia` **عند كل تسجيل**
+// ويُطلَق فورَ التوقّف — وتهيئةُ جلسة الصوت في iOS تأخذ ثانيةً أو أكثر، فتقع كلُّها
+// بين ضغطة الطفل وبدء التسجيل. فصار يُهيَّأ **مرّةً عند فتح شاشةٍ فيها زرُّ تسجيل**
+// ويبقى ما دامت مفتوحة، فتبدأ الضغطةُ فوراً.
+//
+// **وحدودُه ثلاثة**: لا يُهيَّأ إلا في الشاشات التي فيها زرُّ التسجيل (فلا مؤشّرَ
+// برتقاليّ في سائر الرحلة)، ولا يُهيَّأ إلا **بعد إذن وليّ الأمر** (فلا يُفاجأ أحدٌ
+// بطلبِ ميكروفون)، و`release()` تُنادى من التوجيه في `main.js` عند مغادرة الشاشة
+// وعند إخفاء الصفحة — فلا يتبع الميكروفونُ الطفلَ إلى شاشةٍ أخرى ولا إلى الخلفية.
+// **والخصوصيةُ لم تتغيّر بحرف**: لا شيء يغادر الجهاز في الحالين — وإنما تبدّل متى
+// يُفتَح المجرى، وهي حالٌ مرئيةٌ لصاحب الجهاز بمؤشّر النظام.
 
 const MIME_CANDIDATES = [
   'audio/webm;codecs=opus',
@@ -52,12 +61,34 @@ function releaseMic() {
 }
 
 /**
+ * تهيئةُ الميكروفون مسبقاً — تُنادى عند فتح شاشةٍ فيها زرُّ تسجيل، بعد إذن وليّ
+ * الأمر. لا ترمي أبداً: رفضُ الإذن هنا لا يكسر شاشةً، ويُعاد الطلبُ عند أول ضغطة
+ * فتظهر الرسالةُ في موضعها.
+ * @returns {Promise<boolean>} هل صار المجرى جاهزاً؟
+ */
+export async function warm() {
+  if (!supported() || stream) return Boolean(stream);
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    return true;
+  } catch {
+    stream = null;
+    return false;
+  }
+}
+
+/**
  * بدء التسجيل — يطلب إذن الميكروفون إن لم يكن ممنوحاً.
  * يرمي إن رُفض الإذن أو تعذّر الجهاز، ويتكفّل النداءُ بإخفاء الزرّ بهدوء.
+ * **ولا يُطلق مجرىً مهيَّأً**: إعادةُ طلبه هي عينُ البطء الذي عولج.
  */
 export async function start() {
-  release();
-  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  if (recorder) {
+    try { if (recorder.state !== 'inactive') recorder.stop(); } catch { /* أُوقف سلفاً */ }
+    recorder = null;
+  }
+  stopPlayback();
+  if (!stream) stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   chunks = [];
   recorder = new MediaRecorder(stream, options());
   recorder.addEventListener('dataavailable', (e) => {
@@ -73,10 +104,9 @@ export async function start() {
  * @returns {Promise<{blob: Blob, seconds: number}|null>} null إن لم يُسجَّل شيء
  */
 export function stop() {
-  if (!isRecording()) {
-    releaseMic();
-    return Promise.resolve(null);
-  }
+  // **ولا يُطلَق المجرى هنا**: الشاشةُ ما زالت مفتوحة وقد يسجّل الطفلُ من جديد،
+  // وإطلاقُه يُعيد ثمنَ التهيئة كاملاً. إطلاقُه في `release()` عند مغادرة الشاشة.
+  if (!isRecording()) return Promise.resolve(null);
   const active = recorder;
   // المدّة = ما بين الضغطتين (تُلتقط ضمنياً بلا عدّادٍ يراه الطفل) — بخانتين عشريتين
   const seconds = Math.max(0, Math.round((Date.now() - startedAt) / 10) / 100);
@@ -85,7 +115,6 @@ export function stop() {
       const blob = new Blob(chunks, { type: active.mimeType || chunks[0]?.type || 'audio/webm' });
       chunks = [];
       recorder = null;
-      releaseMic();
       resolve(blob.size ? { blob, seconds } : null);
     }, { once: true });
     active.stop();
@@ -134,5 +163,14 @@ export function playClip(blob) {
     element.addEventListener('error', () => finish(false), { once: true });
     const started = element.play();
     if (started && typeof started.catch === 'function') started.catch(() => finish(false));
+  });
+}
+
+// **ولا يتبع الميكروفونُ الطفلَ إلى الخلفية**: قفلُ الجهاز أو الانتقالُ إلى تطبيقٍ
+// آخر يُطلق المجرى في حينه — فلا يبقى المؤشّرُ البرتقاليّ على جهازٍ تُرك مفتوحاً
+// على شاشة قصة. وهو شرطُ إبقاء المجرى مفتوحاً أصلاً.
+if (typeof document !== 'undefined' && document.addEventListener) {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') release();
   });
 }

@@ -35,6 +35,13 @@ import { h, micIcon, toast } from './ui.js';
 export function recordBlock({ nodeId, title, label, hint, stopAll, root }) {
   if (!recorder.supported() || !recordings.supported()) return null;
 
+  // **تهيئةُ الميكروفون مع الشاشة لا مع الضغطة** (أمر المالك، ١٣ أغسطس ٢٠٢٦):
+  // تهيئةُ جلسة الصوت في iOS تأخذ ثانيةً أو أكثر، وكانت تقع كلُّها بين ضغطة الطفل
+  // وبدء التسجيل. **وبشرطين**: هنا وحدَه — أي في الشاشات التي فيها هذا الزرّ لا
+  // غير — و**بعد إذن وليّ الأمر** فلا يُفاجَأ أحدٌ بطلبِ ميكروفون. وإخفاقُها لا
+  // يكسر شيئاً: الطلبُ يُعاد عند أول ضغطة فتظهر الرسالةُ في موضعها.
+  if (progress.micAllowed()) recorder.warm();
+
   const row = h('div', { class: 'row record' });
   let clip = null;      // آخر تسجيل في هذه الجلسة — يُسمَع من الذاكرة بلا فتح المخزن
   let busy = false;

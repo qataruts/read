@@ -257,6 +257,7 @@ offline = false;
 (await audioCache()).entries.set(`${SCOPE}audio/${KEY_A}.mp3`, 'صوت ألف — القديم (edge)');
 (await audioCache()).entries.set(`${SCOPE}audio/${KEY_B}.mp3?v=0000old0`, 'قديم');
 await fire('install');
+await fire('activate');          // خزنُ الصوت وكنسُه انتقلا إلى التفعيل (v20)
 const swept = await cachedUrls();
 ok(swept.length === 4 && !swept.some((u) => !u.includes('?v=')),
   'والتركيب يكنس الأوسمة الغابرة والروابط بلا وسم (لا يبقى في الجهاز أثرٌ للقديم)');
@@ -277,9 +278,9 @@ const bumped = swSource.replace(/(const VERSION = '[^']*)'/, "$1-bump'");
 const next = loadSw(bumped);
 net = [];
 await next.fire('install');
-ok(mp3Hits().length === 0,
-  `التركيبُ الجديد لم يجلب ملفاً صوتياً واحداً (${mp3Hits().length} طلباً)`);
 await next.fire('activate');
+ok(mp3Hits().length === 0,
+  `الترقيةُ لم تجلب ملفاً صوتياً واحداً (${mp3Hits().length} طلباً)`);
 ok((await caches.keys()).filter((n) => n.startsWith('muallim-audio')).length === 1
   && (await caches.keys()).includes(AUDIO_CACHE),
   `ومخزن الصوت واحدٌ باسمه الثابت عبر النسخ (${AUDIO_CACHE})`);
@@ -298,14 +299,14 @@ caches.store.delete(AUDIO_CACHE);
 
 net = [];
 await next.fire('install');
+await next.fire('activate');
 ok(mp3Hits().length === 0,
   `العابرُ من مخزنٍ موسومٍ بنسخة يتبنّى صوته بلا تنزيل (${mp3Hits().length} طلباً)`);
 const adopted = await cachedUrls();
 ok(adopted.length === 4 && adopted.every((u) => u.includes('?v=')),
   `والمخزونُ أربعةٌ موسومة لا خمسة (${adopted.length}) — فما خُلط يكنسه الكنسُ نفسُه`);
-await next.fire('activate');
 ok(!(await caches.keys()).includes('muallim-audio-v18'),
-  'ثم يُمحى المخزون الموسوم القديم عن آخره (لا نسختان على الجهاز)');
+  'ثم يُمحى المخزون الموسوم القديم عن آخره — **بعد** ثبوت تمام الجديد لا قبله');
 
 // ——— الإخفاق يُعدّ ولا يُبتلَع: وإن وقع فلا كنسَ (صيانةً للقديم الصالح) ———
 // حصةُ التخزين تضيق على الأجهزة الأقدم فيفشل الخزن — وكنسُ «ما بَطَل» عندئذٍ يمحو
@@ -314,11 +315,13 @@ disk.delete(`audio/${KEY_B}.mp3`);                       // ملفٌ يُخفق 
 (await audioCache()).entries.delete(`${SCOPE}audio/${KEY_B}.mp3?v=2222bbbb`);
 (await audioCache()).entries.set(`${SCOPE}audio/${KEY_A}.mp3?v=0000old0`, 'وسمٌ بطل');
 await next.fire('install');
+await next.fire('activate');
 const afterFail = await cachedUrls();
 ok(afterFail.includes(`${SCOPE}audio/${KEY_A}.mp3?v=0000old0`),
   'إخفاقُ ملفٍ يمنع الكنس — لا يُمحى مخزونٌ قائم في جولةٍ ناقصة');
 setSite({ aBody: 'صوت ألف — الجديد (Sulafat)', aTag: '9999aaaa' });   // عاد الملف
 await next.fire('install');
+await next.fire('activate');
 ok(!(await cachedUrls()).includes(`${SCOPE}audio/${KEY_A}.mp3?v=0000old0`)
   && (await cachedUrls()).length === 4,
   'وأولُ جولةٍ تامّة تكنسه (الكنس مؤجَّلٌ لا مُلغى)');
