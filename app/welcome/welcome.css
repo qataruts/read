@@ -190,12 +190,15 @@
   margin-bottom: .75rem;
 }
 
-.w-hero img {
+/* **القاعدةُ على أيقونة الوحدة لا على كل صورةٍ في الصدر**: `.w-hero img` كانت تصيب
+   لقطةَ المنتَج نفسَها فتصغّرها إلى مربّعٍ صغير. */
+/* أيقونةُ التطبيق في الشريط بجوار الاسم — لوغو واحدٌ في الصفحة كلِّها */
+.w-top-brand img {
   display: block;
-  width: 64px;
-  height: 64px;
-  border-radius: 14px;
-  box-shadow: var(--shadow);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  margin-inline-end: .5rem;
 }
 
 .w-hero h1 {
@@ -205,11 +208,15 @@
   letter-spacing: .5px;
 }
 
+/* عنوانُ الصدر: وعدُ المنتَج لا اسمُه — فهو أكبرُ ما في الصفحة نصّاً */
 .w-tagline {
-  margin: 0 auto;
-  max-width: 34rem;
-  font-size: clamp(1.05rem, 3vw, 1.25rem);
-  color: var(--ink-soft);
+  margin: 0 auto .75rem;
+  max-width: 32rem;
+  font-family: var(--font-display, 'Cairo'), var(--font-ui);
+  font-size: clamp(1.65rem, 4.2vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--ink);
 }
 
 /* الفقرةُ الطويلة تُحاذى إلى اليمين لا تُوسَّط: التوسيطُ يصلح سطراً لا فقرةً —
@@ -860,3 +867,21 @@
 }
 
 .w-print-head { display: none; }
+
+
+/* ————— الأزرار: أهدأ وأدقّ (حكم المالك بالنظر، ١٣ أغسطس ٢٠٢٦) —————
+   أزرارُ التطبيق مصنوعةٌ لإصبع طفل: ضخمةٌ مدوّرةٌ ذاتُ ظلٍّ عريض. وهذه صفحةُ
+   بالغٍ يقرؤها على شاشة — فيبقى اللونُ والخطّ ويُهدَّأ الظلُّ وتُضبَط الحافّة. */
+.w-wrap .btn, .w-top .btn {
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.w-start {
+  min-height: 3.25rem;
+  padding: .7rem 2rem;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 10%);
+}
+
+.w-wrap .btn:hover, .w-top .btn:hover { filter: brightness(.97); }
