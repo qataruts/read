@@ -63,7 +63,9 @@ def rows(since: float = 0.0) -> list:
         model = str(e.get("model", "")).split("#")[0]
         src = ("Antura بشريّ" if lin == "antura" else
                gen.short_model(model) if model else "سُلافات")
+        say = gen.speech_form(text)
         out.append({"key": key, "text": text,
+                    "say": "" if say == text else say,   # ما أُرسل فعلاً إن خالف المكتوب
                     "cat": cats.get(text, "word"),
                     "sec": round(gen.mp3_duration(path), 2),
                     "src": src, "by": e.get("requestedBy", "منهج")})
@@ -71,7 +73,7 @@ def rows(since: float = 0.0) -> list:
         key = gen.key_for(text)
         path = gen.OUT_DIR / f"{key}.mp3"
         if path.exists() and not (since and path.stat().st_mtime < since):
-            out.append({"key": key, "text": text, "cat": "husary",
+            out.append({"key": key, "text": text, "say": "", "cat": "husary",
                         "sec": round(gen.mp3_duration(path), 2),
                         "src": "الحصري", "by": ref})
     order = list(GROUP_AR)
@@ -118,6 +120,9 @@ def build(since: float = 0.0, title: str = "") -> Path:
  .row.done { opacity:.55 }
  .row.bad { background:#fbeee8 }
  .t { font-size:1.15rem; line-height:1.8 }
+ .say { font-size:.72rem; color:#a07a4a; margin-inline-start:.6rem; font-family:system-ui }
+ .prog { height:4px; background:#e8ddcc; border-radius:2px; overflow:hidden; min-width:8rem }
+ .prog i { display:block; height:100%; background:var(--green); width:0 }
  .meta { font-family:system-ui; font-size:.72rem; color:#8a7a66 }
  .play { font-size:1rem; padding:.25rem .6rem }
  .flag { font-size:.78rem; background:#fbeee8; border-color:#d6a9a0 }
@@ -139,6 +144,7 @@ def build(since: float = 0.0, title: str = "") -> Path:
       <option value="1.25">١٫٢٥×</option><option value="1.5">١٫٥×</option></select></label>
     <label><input type="checkbox" id="hideDone"> أخفِ ما سمعتُه</label>
     <span class="grow"></span>
+    <span class="prog"><i id="bar"></i></span>
     <span id="stat"></span>
   </div>
 </header>
@@ -176,7 +182,7 @@ function render() {
   $('#list').innerHTML = items.map((r) => `
     <div class="row ${done.has(r.key) ? 'done' : ''} ${bad.has(r.key) ? 'bad' : ''}" data-key="${r.key}">
       <button class="play" data-key="${r.key}">▶</button>
-      <div class="t">${r.text}</div>
+      <div class="t">${r.text}${r.say ? `<span class="say">أُرسل: ${r.say}</span>` : ''}</div>
       <div class="meta">${r.sec}ث</div>
       <div class="meta">${r.src} · ${r.by}</div>
       <button class="flag ${bad.has(r.key) ? 'on' : ''}" data-flag="${r.key}">⚑ خطأ</button>
@@ -184,6 +190,7 @@ function render() {
   const heard = items.filter((r) => done.has(r.key)).length;
   $('#stat').textContent = `${heard}/${items.length} سُمعت في هذا القسم · ${done.size}/${DATA.length} إجمالاً`;
   $('#badcount').textContent = bad.size ? `${bad.size} بلاغاً` : 'لا بلاغات';
+  $('#bar').style.width = `${Math.round(100 * done.size / (DATA.length || 1))}%`;
 }
 
 function play(key, then) {
