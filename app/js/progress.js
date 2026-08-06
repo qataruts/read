@@ -117,6 +117,21 @@ function migrateJourney() {
   if (!Object.keys(state.stars).length) return;   // طفلٌ جديد: لا شيء يُرحَّل
   let changed = false;
 
+  /* **إنقاذُ نجمةٍ كُتبت تحت معرّفٍ خطأ** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦): قصةُ السورة
+     كانت تُحفظ تحت `library:` والرحلةُ تنتظرها تحت `prophet:` — فتجمّدت الجبهةُ عند
+     «سُوَرٌ قصار ٣» ولم يُفتح بعدها شيء. والشيفرةُ أُصلحت، **لكنّ مَن قرأ القصة قبل
+     الإصلاح نجمتُه في المكان القديم** — فتُنقَل هنا مرّةً واحدة، ولا يُعاد عليه ما
+     أتمّه. والترحيلُ رحيمٌ كسائر ما في هذه الدالّة. */
+  for (const node of allNodes()) {
+    if (!node.id.startsWith('prophet:')) continue;
+    const stray = `library:${node.id.slice('prophet:'.length)}`;
+    if (state.stars[stray] && !state.stars[node.id]) {
+      state.stars[node.id] = state.stars[stray];
+      delete state.stars[stray];
+      changed = true;
+    }
+  }
+
   for (const [old, heirs] of Object.entries(SPLIT_NODES)) {
     const stars = state.stars[old];
     if (!stars) continue;

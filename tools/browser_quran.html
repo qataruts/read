@@ -125,7 +125,11 @@ const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 const continueCard = () => $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
 // الخريطة كسولة (إصلاح بطء الخريطة): محطاتٌ بعيدة عن جبهة الطفل تُرسم بطاقاتِ عناوين
 // مطوية. وفحوص هذه الصفحة تعدّ عقد الرحلة كلها، فتفردها أولاً — والفرد بنقرة واحدة.
-const unfoldAll = () => { for (const b of $$('.station-head--fold')) b.click(); };
+// **المطويّةَ وحدَها**: صار رأسُ المحطة زرّاً قلّاباً (يفتح ويغلق)، فنقرُ الكلِّ
+// يطوي المفتوحَ ويفتح المطويّ — والمقصودُ فردُ الجميع لا قلبُ حالها.
+const unfoldAll = () => {
+  for (const b of $$('.station--folded .station-head--fold')) b.click();
+};
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 
 async function goto(hash) {
