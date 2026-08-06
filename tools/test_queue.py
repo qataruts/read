@@ -92,7 +92,13 @@ def main():
     ok(failed == 0, "التصريف بلا فشل")
     ok([t for t, _ in calls] == [gen.speech_form("مَدّ"), gen.speech_form("الشَّمْس")], "الترتيب: الأولوية الأصغر أولاً ثم الأقدمية")
     ok(calls[0][1].startswith("انطق ببطء شديد: "), "style_hint يسبق النص بدل افتراضي الفئة")
-    ok(calls[1][1] == gen.STYLE["word"], "بلا style_hint: تعليمة الفئة الافتراضية")
+    ok(calls[1][1].startswith(gen.STYLE["word"].rstrip()),
+       "بلا style_hint: تعليمة الفئة الافتراضية")
+    # جملةُ الرسم الصوتيّ تُلحَق بالمشكول وحدَه (حكم أذن المالك، ٥ أغسطس)
+    ok("/ʔaʃːams/" in calls[1][1],          # شمسيّة: اللام تُدغَم فتسقط
+       "ويلحقها الرسمُ الصوتيّ فلا تحتمل الحروفُ قراءتين")
+    ok(gen.ipa_clause("دائرة صغيرة فوق الحرف: مُرَّ عليه.") == "",
+       "والنثرُ غيرُ المشكول لا رسمَ له (لا يُشتقّ من ناقصٍ رسمٌ صحيح)")
     ok(gen.speech_form("قَديم") not in [t for t, _ in calls], "المُصرَّف سابقاً (done) لا يُعاد توليده")
     ok(all(e["status"] == "done" for e in queue), "كل مدخل صار done")
     ok(queue[1]["doneAt"] == gen.TODAY, "doneAt بتاريخ اليوم")

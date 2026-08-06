@@ -1266,9 +1266,43 @@ def letter_haraka_style(text: str) -> str:
             f"صوتاً واحداً قصيراً بمخرج صحيح، لطفل يتعلم القراءة: ")
 
 
+PREV_DIR = ROOT / "scratch" / "prev"    # سلفُ كل ملفٍ استُبدل — بابُ الرجوع
+
 HARAKA_MARKS = "ًٌٍَُِّْٰ"
 PROSE_MAX_RATIO = 0.35      # الفاصل مقيس: القصة ٠٫٧٧–٠٫٩١ والنثر الإرشادي ٠٫٠٢–٠٫٠٦
 PROSE_DIR = ROOT / "scratch" / "prose"
+
+
+def archive_prev(path) -> bool:
+    """يحفظ الملفَّ القائم قبل استبداله — **سؤالُ المالك: أتحتفظ بالقديم؟**
+
+    كان الجواب «لا، إلا في git» — وهو حفظٌ يشترط التزاماً وقع قبل الاستبدال.
+    فصار الحفظ بنيوياً: كلُّ استبدالٍ يودع سلفَه في `scratch/prev` أولاً، فالرجوع
+    عن صوتٍ بعينه أمرٌ واحد (`--revert`) لا نبشُ تاريخ. والمجلَّدُ خارج المستودع
+    (`scratch/` في `.gitignore`) فلا يثقل الشجرة.
+    """
+    import shutil  # noqa: PLC0415
+    if not path.exists():
+        return False
+    PREV_DIR.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(path, PREV_DIR / path.name)
+    return True
+
+
+def revert_prev(texts: list) -> tuple:
+    """يعيد نصّاً إلى سلفه المحفوظ — ويعيد (ما رُدّ، ما لا سلفَ له)."""
+    import shutil  # noqa: PLC0415
+    back, none = [], []
+    for t in texts:
+        src = PREV_DIR / f"{key_for(t)}.mp3"
+        if src.exists():
+            shutil.copy2(src, OUT_DIR / src.name)
+            back.append(t)
+        else:
+            none.append(t)
+    if back:
+        write_manifest(manifest_map())
+    return back, none
 
 
 def vowel_ratio(text: str) -> float:
@@ -1308,14 +1342,38 @@ def speech_form(text: str) -> str:
     return text
 
 
+def ipa_clause(text: str) -> str:
+    """جملةُ الرسم الصوتيّ تُلحَق بالتعليمة — **حكمُ أذن المالك، ٥ أغسطس ٢٠٢٦**.
+
+    عُرضت ثلاثُ صيغٍ على ستة نصوص (النصّ وحدَه · النصّ ومعه رسمُه · الرسمُ وحدَه)
+    فاختار **«النصّ ومعه رسمُه»** في خمسٍ من ستّ. والعلّة أنّ أخطاء المولّد أخطاءُ
+    **هويةِ حرف** («ثِ» تُنطق «خِ»)، والحرفُ المشكول يحتمل عند نموذجٍ عامّ أكثرَ من
+    قراءة، أمّا `/θi/` فلا يحتمل غيرَ واحدة. والعربيةُ تبقى معه فلا يضيع الأداء.
+
+    **وشرطُه بنيويّ لا بالفئة**: لا يُشتقّ رسمٌ صحيح من نصٍّ غيرِ مشكول — فما نسبةُ
+    تشكيله دون عتبة النثر (الجملُ الإرشادية) لا رسمَ له، وهو عينُ ميزان `is_prose`.
+    ويُشتقّ من **صورة النطق** لا من المكتوب، فيتّفق مع ما يُرسَل فعلاً.
+    """
+    if vowel_ratio(text) < PROSE_MAX_RATIO:
+        return ""
+    try:
+        import arabic_ipa  # noqa: PLC0415
+    except ImportError:
+        return ""
+    drawn = arabic_ipa.ipa(speech_form(text))
+    if not drawn:
+        return ""
+    return f"والنطقُ المطلوب بالرسم الصوتيّ الدوليّ: /{drawn}/ — التزمْه حرفاً بحرف. النصّ: "
+
+
 def style_for(entry: dict) -> str:
+    text = entry.get("text", "")
     hint = (entry.get("style_hint") or "").strip()
     if hint:
         return hint.rstrip(":：").rstrip() + ": "
-    named = letter_haraka_style(entry.get("text", ""))
-    if named:
-        return named
-    return STYLE[entry.get("category", "word")]
+    named = letter_haraka_style(text)
+    base = named if named else STYLE[entry.get("category", "word")]
+    return base.rstrip() + " " + ipa_clause(text) if ipa_clause(text) else base
 
 
 def short_model(model: str) -> str:
@@ -1381,6 +1439,7 @@ def drain_queue(model: str | None, voice: str, api_key, dry_run: bool = False,
             continue
         try:
             pcm, rate, used_key = pool.call(text, style_for(entry), m)
+            archive_prev(path)          # السلفُ يُحفظ قبل الكتابة فوقَه
             if is_prose(entry):
                 # عرف النثر: يُولَّد إلى scratch ولا يدخل التطبيق حتى يُسمع
                 PROSE_DIR.mkdir(parents=True, exist_ok=True)
@@ -2037,6 +2096,8 @@ def main():
                     help="تقاعد نصوص: حذف ملفاتها ووسمُ مدخلاتها (يتيمٌ لم يعد يُطلب)")
     ap.add_argument("--requeue", metavar="TEXTS",
                     help="إعادة نصوص (مفصولة بفاصلة) إلى الانتظار بأولوية ١٠ لعيبٍ مسموع")
+    ap.add_argument("--revert", metavar="TEXTS",
+                    help="ردُّ نصوصٍ إلى سلفها المحفوظ في scratch/prev (رجوعٌ عن استبدال)")
     ap.add_argument("--requeue-reason", default="عيب مسموع",
                     help="سبب الإعادة كما يُقيَّد في سجل المدخل")
     ap.add_argument("--queue-status", action="store_true",
@@ -2090,6 +2151,14 @@ def main():
         write_manifest(manifest_map())
         print(f"تقاعد {n} نصاً (حُذفت ملفاتها وبقيت سجلاتها).")
         sys.exit(0)
+
+    if args.revert:
+        wanted = [t.strip() for t in args.revert.split(",") if t.strip()]
+        back, none = revert_prev(wanted)
+        print(f"رُدّ {len(back)} نصاً إلى سلفه المحفوظ.")
+        for t in none:
+            print(f"  ✗ لا سلفَ محفوظ لـ«{t}»", file=sys.stderr)
+        sys.exit(0 if back else 1)
 
     if args.requeue:
         wanted = [t.strip() for t in args.requeue.split(",") if t.strip()]
