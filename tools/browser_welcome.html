@@ -122,6 +122,22 @@ for (const [page, marker, label] of [
   ok(d.querySelectorAll('.w-topnav a').length >= 4, `${label}: وشريطُ التنقّل فيها`);
   ok(d.documentElement.scrollWidth <= d.documentElement.clientWidth + 1,
     `${label}: ولا تمريرَ أفقيّ`);
+
+  // **ولا عنصرَ يلتصق بما قبله** (بلاغ المالك بالنظر، ١٣ أغسطس ٢٠٢٦: «عند ورود صورة
+  // بعد جدول هناك التصاق»): كان غلافُ الجدول بلا هامشٍ ألبتّة، فالتصقت به بطاقةٌ
+  // وصورةٌ سبعَ مرّات في صفحة المنهج. والقياسُ **على الشاشة بالبكسل** لا بقراءة
+  // التنسيق — فهامشٌ يبتلعه انطباقُ الهوامش (margin collapse) يُمسَك هنا ولا يُمسَك
+  // في المصدر. والحدُّ اثنا عشر بكسلاً: أقلُّ ما تراه العينُ فاصلاً لا تلاصقاً.
+  const tight = [];
+  for (const box of d.querySelectorAll('.w-scroll, .w-figure, figure, table')) {
+    const next = box.nextElementSibling;
+    if (!next) continue;
+    const gap = next.getBoundingClientRect().top - box.getBoundingClientRect().bottom;
+    if (gap < 12) tight.push(`${box.className || box.tagName} ← ${next.className || next.tagName} (${Math.round(gap)}بك)`);
+  }
+  ok(tight.length === 0,
+    `${label}: ولا عنصرَ يلتصق بجدولٍ أو صورةٍ قبله`
+    + (tight.length ? ` — ملتصق: ${tight.slice(0, 3).join(' · ')}` : ''));
 }
 // صفحةُ المنهج: لكل نوع محطةٍ بطاقتُه — يُعدّ على الشاشة لا في النصّ
 await load(frame, 'welcome/curriculum.html');
