@@ -12,6 +12,9 @@
 الكلمة (`fetch_word_recitation.py`) — لا نصَّ ترخيصٍ منشوراً في المصدرين. فأمر
 المالك بتجربةِ توليدها من **الرسم الصوتيّ** الذي حلّله مشروعُ `quran/`.
 
+**وحكمُ المالك عليها (٧ أغسطس ٢٠٢٦): جيدةٌ ولا تُنشر** — محفوظةٌ في
+`archive/quran_ipa_words/` لجلسةٍ تُفرد لها، و`--install` بابُها متى أُذن.
+
 **وهي تعبر قاعدتين قائمتين، فتُبنى معزولةً بأمرَي تركيبٍ ونزع**:
 1. «نصُّ المصحف لا يُنطق آلياً أبداً» (METHOD §٥.٦) — ويخفّفها أنّ المولّد **لا يرى
    رسمَ المصحف**: يُرسَل إليه `/ʔalːaːh/` لا نصٌّ قرآنيّ، فهو نُطقُ نسخٍ صوتيّ.
@@ -37,7 +40,10 @@ import generate_audio as gen  # noqa: E402
 
 IPA_TSV = Path("/Volumes/data/new-projects/quran/build/ipa/quran-words.tsv")
 WORK = gen.ROOT / "scratch" / "quran_ipa"
-STORE = WORK / "wbw"
+# **المخزنُ في `archive/` لا في `scratch/`** (قرار المالك، ٧ أغسطس ٢٠٢٦): سمع الـ٢٠٨
+# فاستحسنها ووجد فيها ما ليس دقيقاً — «لا ننشر، نحتفظ بها لجلسةٍ خاصة بها». وكلاهما
+# خارج المستودع، لكنّ `scratch/` يُمسح والأرشيفُ يبقى. انظر `archive/…/README.md`.
+STORE = gen.ROOT / "archive" / "quran_ipa_words" / "wbw"
 VOICE = "Umbriel"                 # اختيارُ المالك لهذه التجربة وحدَها
 PREFIX = "wbw-"                   # نظيرُ `WORD_PREFIX` في `app/js/recitation.js`
 SUKUN_VARIANTS = {"ۡ": "ْ", "۟": "", "۠": ""}
@@ -332,8 +338,8 @@ def self_test() -> int:
     ok(normalize("بِسْمِ") == "بِسْمِ", "وسكونُنا يبقى كما هو")
     ok(PREFIX == "wbw-", "الوسمُ نظيرُ WORD_PREFIX في recitation.js")
     ok(VOICE == "Umbriel", "الصوتُ اختيارُ المالك لهذه التجربة")
-    ok(STORE.is_relative_to(gen.ROOT / "scratch"),
-       "والمخزنُ في scratch — لا يدخل التطبيق إلا بـ--install")
+    ok(not STORE.is_relative_to(gen.OUT_DIR) and "archive" in str(STORE),
+       "والمخزنُ في archive خارج المستودع — لا يدخل التطبيق إلا بـ--install")
     ok(isolated("ٱللَّهِ", "lːaːhi") == "ʔalːaːhi",
        "همزةُ الوصل تُردّ في الكلمة المفردة (علّةُ «الله»)")
     ok(isolated("مَـٰلِكِ", "maːliki") == "maːliki",
