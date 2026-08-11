@@ -804,6 +804,19 @@ if (progress.PREVIEW) {
 // في التطبيق المثبَّت وفي المعاينة** (شريطان فوق الشاشة ضجيجٌ على المقيّم).
 if (!progress.PREVIEW) install.mount();
 
+// **والعودةُ من الخلفية بمقياس ١** (بلاغ المالك، ١١ أغسطس ٢٠٢٦): iPadOS يسترجع
+// التطبيقَ المثبَّت بعد زيارة تطبيقٍ آخر **مكبَّراً** أحياناً — عيبُ استرجاعٍ معروف
+// في المنصّة لا في شيفرتنا. الميتا تمنع التكبير أصلاً (`maximum-scale=1`)، وإعادةُ
+// إعلانها نفسِها عند العودة تُلزم WebKit بإعادة تطبيقها حيث يتلكّأ.
+const viewportMeta = document.querySelector('meta[name="viewport"]');
+const reassertViewport = () => {
+  if (viewportMeta) viewportMeta.setAttribute('content', viewportMeta.getAttribute('content'));
+};
+window.addEventListener('pageshow', reassertViewport);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') reassertViewport();
+});
+
 window.addEventListener('hashchange', render);
 audio.ready();
 startClock();

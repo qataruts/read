@@ -150,6 +150,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;   /* لا تمرير أفقي أبداً (DESIGN §٤) */
+  touch-action: manipulation;   /* لا تكبيرَ بالنقر المزدوج — والنقرةُ تستجيب بلا مهلة انتظاره */
 }
 
 body {

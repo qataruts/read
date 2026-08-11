@@ -205,5 +205,26 @@ ok(main.includes("location.protocol.startsWith('http')"),
 ok(/\.catch\(/.test(main.slice(main.indexOf('registerServiceWorker'))),
   'ورفضُ التسجيل لا يُسقِط التطبيق');
 
+// ————— ٥. قفل المقياس (بلاغ المالك، ١١ أغسطس ٢٠٢٦) —————
+//
+// iPadOS يسترجع التطبيقَ المثبَّت من الخلفية **مكبَّراً** أحياناً (عيبُ منصةٍ معروف)،
+// والنقرُ المزدوج من طفلٍ يكبّر الشاشة — والتطبيقُ حروفُه كبيرةٌ بتصميمه. فالميتا
+// تقفل المقياس، وإعادةُ إعلانها عند العودة تُلزم WebKit بها حيث يتلكّأ، و«لا تكبيرَ
+// بالنقر المزدوج» في اللوح. **وصفحاتُ التعريف خارج القفل عمداً**: صفحاتُ كبارٍ
+// والتكبيرُ فيها حقٌّ لا عيب.
+
+const viewport = (html.match(/<meta name="viewport" content="([^"]+)"/) || [])[1] || '';
+ok(/maximum-scale=1\b/.test(viewport) && /user-scalable=no/.test(viewport),
+  'ميتا التطبيق تقفل المقياس — فلا يسترجعه iPadOS مكبَّراً ولا يكبّره نقرٌ مزدوج');
+ok(/touch-action:\s*manipulation/.test(read('css/app.css')),
+  'واللوح يُسقِط تكبيرَ النقر المزدوج (touch-action) — والنقرةُ بلا مهلة انتظاره');
+ok(main.includes("meta[name=\"viewport\"]") && main.includes('pageshow')
+  && /visibilitychange[\s\S]{0,200}reassertViewport/.test(main),
+  'والميتا يُعاد إعلانُها عند العودة من الخلفية — علاجُ عيب الاسترجاع في iPadOS');
+for (const page of ['index.html', 'curriculum.html', 'method.html', 'guide.html']) {
+  ok(!/user-scalable=no|maximum-scale/.test(read(`welcome/${page}`)),
+    `welcome/${page}: تبقى قابلةً للتكبير — صفحةُ كبارٍ والتكبيرُ فيها حقّ`);
+}
+
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات العمل دون إنترنت ناجحة');
 process.exit(fails ? 1 : 0);

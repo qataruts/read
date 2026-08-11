@@ -22,6 +22,7 @@ let manifestKeys = null;   // Set لمفاتيح الملفات الموجودة
 let versions = null;       // مفتاح ← بصمة محتواه (null = لا بيان بصمات)
 let manifestLoad = null;
 let current = null;        // آخر عنصر صوت شُغِّل (لإيقافه قبل التالي)
+let epoch = 0;             // جيلُ التشغيل: كل stop() يزيده فيُبطل ما كان في الطريق
 const cache = new Map();   // نص → مفتاح (تفادي إعادة حساب sha1)
 
 // ————— sha1 خالص (بلا اعتماد على crypto.subtle كي يعمل من file:// أيضاً) —————
@@ -114,6 +115,9 @@ export function hasFile(text) {
  *  متقطّعاً**، فرُدّت — والخصوصيةُ لا تُقايَض بجزءٍ من ثانية. */
 function releaseEl(el) {
   if (!el) return;
+  const hush = el._hush;
+  el._hush = null;
+  if (hush) hush();                      // إيقافٌ متعمَّد: وعدُ التشغيل يُسوّى بهدوء لا يُرمى
   try {
     el.pause();
     el.removeAttribute('src');
@@ -121,8 +125,9 @@ function releaseEl(el) {
   } catch { /* عنصرٌ لم يبلغ حالةً تسمح — لا يمنع شيئاً */ }
 }
 
-/** إيقاف ما يُشغَّل الآن (ملفاً كان أو نطقاً آلياً). */
+/** إيقاف ما يُشغَّل الآن (ملفاً كان أو نطقاً آلياً)، وإبطالُ ما كان في طريقه إليه. */
 export function stop() {
+  epoch++;                               // يُبطل تتابعاتٍ ومحاولاتِ إعادةٍ ما زالت في الطريق
   if (current) {
     releaseEl(current);
     current = null;
@@ -130,13 +135,23 @@ export function stop() {
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
+// **الإيقافُ المتعمَّد ليس عطلاً** (بلاغ الابنة، ١١ أغسطس ٢٠٢٦: النقرُ المتكرر السريع
+// يكدّس الأصوات بعضَها فوق بعض):
+//
+// كانت نقرةٌ أحدث تُوقف عنصرَ سابقتها، فيرفض وعدُ تشغيله، **فيسقط في `catch` إعادةِ
+// المحاولة** — وهي مكتوبةٌ لملفٍّ تأخّر لا لملفٍّ أُسكت عمداً — فيُبعَث الصوتُ الموقوف
+// من جديدٍ فوق الجديد، وتتكاثر بعدد النقرات. فصار الإيقافُ المتعمَّد **تسويةً هادئة**
+// (`_hush` يحلّ الوعد بـfalse قبل الإيقاف) فلا `catch` يراه ولا إعادةَ بعده، وبقيت
+// الإعادةُ لعطبها الحقيقيّ: ملفٌّ موجودٌ في الفهرس تعثّر تحميلُه.
 function playFile(text) {
   return new Promise((resolve, reject) => {
     const el = new Audio(urlFor(text));
     el.preload = 'auto';
     current = el;
+    el._hush = () => resolve(false);
     el.addEventListener('ended', () => {
       if (current === el) current = null;
+      el._hush = null;
       releaseEl(el);                     // بعد `ended`: صمت فلا حاجة إلى موارده
       resolve(true);
     }, { once: true });
@@ -176,7 +191,12 @@ function speak(text) {
 export async function play(text) {
   if (!text) return false;
   stop();
+  return playAs(text, epoch);
+}
+
+async function playAs(text, my) {
   await ready();
+  if (my !== epoch) return false;               // نقرةٌ أحدث سبقتنا ونحن ننتظر الفهرس
 
   // **الاحتياطُ لغياب الملف لا لبطء الشبكة** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦: «عند
   // التقدّم بسرعة في الحروف يبدأ الصوتُ الآليّ»):
@@ -196,6 +216,7 @@ export async function play(text) {
   try {
     return await playFile(text);
   } catch {
+    if (my !== epoch) return false;             // أُسكتنا عمداً — لا إعادةَ ولا نطق
     if (known !== true) return speak(text);     // فهرسٌ لم يُقرأ: لا نعرف، فالاحتياط
     try {
       return await playFile(text);              // موجودٌ وتأخّر: محاولةٌ ثانية
@@ -206,11 +227,16 @@ export async function play(text) {
   }
 }
 
-/** تشغيل نصوص متتابعة (مقاطع كلمة مثلاً) مع فاصل قصير بينها. */
+/** تشغيل نصوص متتابعة (مقاطع كلمة مثلاً) مع فاصل قصير بينها.
+ *  التتابعُ جيلٌ واحد: نقرةٌ أحدث (أو stop) تُبطل بقيّتَه — كان يمضي إلى آخره
+ *  فيتداخل تتابعان على أذن الطفل بعدد نقراته. */
 export async function playSequence(texts, gapMs = 220) {
+  stop();
+  const my = epoch;
   for (const t of texts) {
-    await play(t);
-    if (gapMs) await new Promise((r) => setTimeout(r, gapMs));
+    if (my !== epoch) return;
+    await playAs(t, my);
+    if (gapMs && my === epoch) await new Promise((r) => setTimeout(r, gapMs));
   }
 }
 
