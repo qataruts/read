@@ -2135,3 +2135,31 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
   color: var(--paper);
   border-color: color-mix(in srgb, var(--paper) 55%, transparent);
 }
+
+/* **شريطُ التثبيت** (أمر المالك، ١١ أغسطس ٢٠٢٦): رسالةٌ لكل جهازٍ بلسانه، وزرٌّ
+   حقيقيّ حيث يتيحه النظام — ويغيب كلياً في التطبيق المثبَّت (`install.js`). */
+.install-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem .85rem;
+  padding: .6rem 1rem;
+  background: var(--paper-deep);
+  border-bottom: 1px solid var(--line);
+  font-size: .95rem;
+  line-height: 1.6;
+}
+
+.install-bar .install-text { flex: 1 1 16rem; }
+
+.install-bar .install-go { min-height: 3rem; padding: .35rem 1.15rem; font-size: 1rem; }
+
+.install-x {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  background: none;
+  border: 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  cursor: pointer;
+}

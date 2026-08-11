@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v20';  // v20: صيانةُ المخزون (لا يُهدَم كاملٌ لأجل ناقص، ويُشفى عند أول اتصال)
+const VERSION = 'v21';  // v21: بابُ التثبيت داخل التطبيق (شريطٌ يعرف جهازَه ويصمت في المثبَّت)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -63,6 +63,7 @@ const SHELL = [
   'js/roots.js',
   'js/gate.js',
   'js/ladder.js',
+  'js/install.js',
   'js/lesson.js',
   'js/library.js',
   'js/lexicon.js',

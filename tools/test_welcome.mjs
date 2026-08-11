@@ -270,7 +270,11 @@ ok(expected.stageFound + expected.stageQuran + expected.stageGarden
 
 console.log('\n٦. تغطية المحطات');
 
-const covers = [...cur.matchAll(/data-covers="([^"]+)" data-count="([٠-٩]+)"/g)];
+// **المطابقةُ محايدةٌ لهيئة الملف** (١١ أغسطس ٢٠٢٦): مرّت الصفحاتُ بمُنسِّقٍ آليّ
+// في محرّر المالك (التزام «update email») فتوزّعت السماتُ والنصوصُ على أسطر —
+// والمحتوى سليم. فالحارسُ يقارن **المعنى بعد توحيد الفراغات**، لا الهيئةَ التي
+// يملكها المنسِّق: `\s+` بين السمات، و`flat()` للنصوص المنقولة.
+const covers = [...cur.matchAll(/data-covers="([^"]+)"\s+data-count="([٠-٩]+)"/g)];
 const nodeTypes = {};
 for (const node of progress.allNodes()) nodeTypes[node.type] = (nodeTypes[node.type] || 0) + 1;
 const covered = new Set(covers.map((m) => m[1]));
@@ -402,12 +406,14 @@ ok(parentJs.includes('backupText') && /askPersistence|persistedStorage/.test(par
 
 console.log('\n٩. النقل الحرفيّ من البيانات');
 
-const has = (needle) => cur.includes(needle);
+const flat = (t) => t.replace(/\s+/g, ' ');
+const curFlat = flat(cur);
+const has = (needle) => curFlat.includes(flat(needle));
 const tatweel = (s) => s.replace(/ـ/g, '');
-ok(GROUPS.every((g) => tatweel(cur).includes(g.letters.join(' '))),
+ok(GROUPS.every((g) => tatweel(curFlat).includes(g.letters.join(' '))),
   'وحروفُ كل مجموعةٍ مكتوبةٌ كما في البيانات');
 ok(SKILLS.every((s) => has(s.title) && has(s.rule)), 'وقاعدةُ كل درسِ علامةٍ منقولةٌ بحرفها');
-ok(CONTRASTS.every((c) => c.pairs.every((p) => tatweel(cur).includes(p.letters.join('/')))),
+ok(CONTRASTS.every((c) => c.pairs.every((p) => tatweel(curFlat).includes(p.letters.join('/')))),
   'وأزواجُ «ميّز بين» السبعةُ كلُّها معروضة');
 ok(GATES.every((g) => has(g.title)), 'والبوّابتان باسميهما');
 ok(QURAN.surahs.every((s) => has(s.name)), 'وسورُ المرحلة الاثنتا عشرة بأسمائها');
@@ -421,7 +427,7 @@ ok(LIBRARY.every((s) => has(s.title)), 'وقصصُ المكتبة والرفّ �
 
 // عيّناتُ القراءة: بخطّ التطبيق، **ومن بياناته** — لا جملةً مؤلَّفةً لصفحة عرض
 const samples = Object.values(PAGES)
-  .flatMap((t) => [...t.matchAll(/<span class="w-sample">([^<]+)<\/span>/g)].map((m) => m[1].trim()));
+  .flatMap((t) => [...t.matchAll(/<span class="w-sample"\s*>([^<]+)<\/span\s*>/g)].map((m) => flat(m[1]).trim()));
 const sentenceTexts = new Set(SENTENCES.map((s) => s.text));
 const storyLines = new Set(STORIES.flatMap((s) => s.sentences.map((x) => x.words.join(' '))));
 ok(samples.length >= 3 && samples.every((t) => sentenceTexts.has(t) || storyLines.has(t)),

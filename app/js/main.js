@@ -6,6 +6,7 @@ import * as progress from './progress.js';
 import * as audio from './audio.js';
 import * as recitation from './recitation.js';
 import * as recorder from './recorder.js';
+import * as install from './install.js';
 import { renderLesson } from './lesson.js';
 import { renderWordsGame } from './words.js';
 import { renderReview } from './review.js';
@@ -797,6 +798,11 @@ if (progress.PREVIEW) {
     h('span', {}, ' — كلُّ المحطات مفتوحةٌ للاطّلاع، ولا يُحفَظ أيُّ تقدّم على هذا الجهاز.'),
     h('a', { class: 'btn btn--ghost', href: './' }, 'اخرج إلى تجربة الطفل')));
 }
+
+// وشريطُ التثبيت لكل زائرٍ من متصفّح (أمر المالك، ١١ أغسطس ٢٠٢٦): يعرف جهازَه
+// فيعطي رسالتَه — زرٌّ حقيقيّ حيث يسمح النظام، وخطوتا سفاري حيث لا يسمح — **ويصمت
+// في التطبيق المثبَّت وفي المعاينة** (شريطان فوق الشاشة ضجيجٌ على المقيّم).
+if (!progress.PREVIEW) install.mount();
 
 window.addEventListener('hashchange', render);
 audio.ready();
