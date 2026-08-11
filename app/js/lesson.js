@@ -207,7 +207,7 @@ export function renderLesson(groupId, letter) {
         btn.classList.add('bad');
         setTimeout(() => btn.classList.remove('bad'), 700);
         prompt.textContent = 'ليست هي… استمع مرة أخرى';
-        setTimeout(() => audio.play(target.text), 450);
+        audio.afterSpeech(450, () => audio.play(target.text));
       }
     }
 
@@ -346,29 +346,30 @@ export function renderLesson(groupId, letter) {
         }, h('span', { class: 'vchip-face' }, text));
         return btn;
       }));
-      setTimeout(playTarget, 250);
+      audio.afterSpeech(250, playTarget);   // نداءُ الجولة بعد سكوت ما قبلها
     }
 
     function onPick(ch, btn, r) {
       if (locked) return;
       progress.recordAttempt(r.target, HARAKA_BY_MARK[r.mark], progress.KINDS.QUIZ, ch === r.target);
       if (ch === r.target) {
-        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — وإلا لتلاصق بنداء الجولة التالية.
-        // المهلة قبل النداء ٧٥٠ م.ث ثم ٢٥٠ داخل الجولة: فاصلٌ يُسمع.
+        // الصواب لا يُعاد نطقه (DESIGN §٥.٢). والانتقالُ بقاعدة «لا انتقالَ وكلامٌ
+        // في الجوّ» (بلاغ احسب): سكوتُ القناة والمهلةُ معاً — فطفلٌ سريعٌ أجاب
+        // والسؤالُ في الجو لا يُقطَش سؤالُه بنداء الجولة التالية.
         locked = true;
         btn.classList.add('good');
         pop(btn);
-        setTimeout(() => {
+        audio.afterSpeech(750, () => {
           state.round++;
           if (state.round < rounds.length) startRound();
           else finish();
-        }, 750);
+        });
       } else {
         state.errors++;
         shake(btn);
         btn.classList.add('bad');
         setTimeout(() => btn.classList.remove('bad'), 700);
-        setTimeout(playTarget, 450);
+        audio.afterSpeech(450, playTarget);   // الإعادة بعد تمام ما في الجو
       }
     }
 

@@ -229,11 +229,11 @@ function renderQuranRasm() {
             if (sign.sign === r.target.sign) {
               locked = true;
               btn.classList.add('good');
-              setTimeout(() => {
+              audio.afterSpeech(AFTER_PICK_MS, () => {   // قاعدةُ العلامة قد تكون في الجو
                 index++;
                 if (index < rounds.length) startRound();
                 else next();
-              }, AFTER_PICK_MS);
+              });
             } else {
               fail();
               shake(btn);

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>عدّة قياس التعاقب الصوتي</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+const report = (what) => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+// «عدّة قياس التعاقب» — بلاغٌ عائليّ من «احسب» (١١ أغسطس ٢٠٢٦): حرّاسُ المتصفح
+// كانوا يعدّون التشغيلات ولا يقيسون التعاقب — صوتُهم المزيّف ينتهي في ٥ مللي فلا
+// تراكبَ ولا قطشَ يمكن أن يُرى أصلاً. هنا لكل صوتٍ **مدةٌ حقيقية** (١١٠٠ مللي)،
+// والنقرُ نقرُ «طفلٍ سريع» يجيب والصوتُ في الجو، ويُقاس أمران في ثلاثة مسالك
+// (المراجعة — محرّكُ البوابتين · «اقرأ واختر» في البستان · «ميّز بين»):
+//   ١) **لا تراكب**: لا لحظةَ فيها صوتان يعملان معاً.
+//   ٢) **لا قطشَ مبرمَج**: صوتٌ يُقطع قبل تمامه بلا نقرةٍ قريبةٍ تبرّره (>٦٠٠ مللي
+//      منذ آخر نقرة = قاطعُه انتقالٌ مبرمَج لا يدُ الطفل) — وقطعُ الطفل بيده مشروع.
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 145000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 8000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const { HARAKAT } = await import('./js/curriculum.js');
+const { allNodes, skillKey, KINDS } = await import('./js/progress.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const frame = document.getElementById('frame');
+
+const DUR = 1100;              // مدةُ كل صوتٍ مزيّف — أطول من كل سياج مهلةٍ في التطبيق
+const CLICK_EXCUSE = 600;      // قصٌّ بعد أكثر من هذا منذ آخر نقرة ⇒ مبرمَجٌ لا يدَ للطفل فيه
+let plays, cuts, overlaps, jsErrors, lastClick;
+const now = () => performance.now();
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  const active = new Set();
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (String(this.src).split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      const text = manifest[key] ?? `?${key}`;
+      for (const other of active) overlaps.push(`${other._rec.text} × ${text}`);
+      this._rec = { text, t0: now() };
+      plays.push(this._rec);
+      active.add(this);
+      this._timer = setTimeout(() => {
+        this._done = true;
+        active.delete(this);
+        this._rec.endedAt = now();
+        this.dispatchEvent(new Event('ended'));
+      }, DUR);
+      return Promise.resolve();
+    }
+    pause() {
+      if (this._done || !this._timer) return;
+      clearTimeout(this._timer);
+      this._timer = null;
+      active.delete(this);
+      const since = now() - lastClick;
+      this._rec.cutAt = now();
+      if (since > CLICK_EXCUSE) cuts.push(`${this._rec.text} (بعد ${Math.round(now() - this._rec.t0)} من ${DUR} مللي، وآخرُ نقرةٍ قبل ${Math.round(since)})`);
+    }
+  };
+}
+
+const tap = (el) => { lastClick = now(); el.click(); };
+const lastPlayed = () => plays.length ? plays[plays.length - 1].text : null;
+
+/** كل معرّفات العقد السابقة لعقدة بعينها — لزرع تقدّم يفتحها. */
+function idsBefore(id) {
+  const outIds = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return outIds;
+    outIds.push(node.id);
+  }
+  return outIds;
+}
+
+async function seed(nodeIds, extra = {}, hash = '#/') {
+  plays = []; cuts = []; overlaps = []; jsErrors = []; lastClick = -1e9;
+  const boot = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'about:blank';
+  await boot;
+  frame.contentWindow.localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(nodeIds.map((k) => [k, 3])),
+    skills: {}, days: {}, reviews: {}, records: [], mic: false, seconds: 0,
+    startedAt: Date.now(), updatedAt: Date.now(),
+    ...extra,
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html' + (hash ? hash : '');
+  await done;
+  attach();
+  await sleep(200);
+  if (hash && hash !== '#/') { win.location.hash = hash; await sleep(250); }
+}
+
+/** سائقُ جولات عام: يقرأ هدفَ الجولة من آخر صوتٍ سُمع، وإلا جسّ الأزرارَ حتى الصواب. */
+async function driveRounds(label, { maxRounds = 14, budgetMs = 55000 } = {}) {
+  const t0 = Date.now();
+  let rounds = 0;
+  while (Date.now() - t0 < budgetMs && rounds < maxRounds) {
+    const btns = [...doc.querySelectorAll('.vrow button, button.piccard, button.tile, button.example-word')]
+      .filter((b) => !b.disabled && !b.classList.contains('tile--used'));
+    if (!btns.length) {
+      // لا أزرارَ تمرين: خطوةٌ تُطوى بزرّها أو شاشةٌ انتهت
+      const step = [...doc.querySelectorAll('main button, .lesson-body button, .wgame-body button')].find((b) => /تابع|التالي|ابدأ|أكمل|جرّب/.test(b.textContent) && !b.disabled && !/الخريطة/.test(b.textContent));
+      if (!step) break;
+      tap(step);
+      await sleep(300);
+      continue;
+    }
+    // الطفل السريع: ينتظر أولَ صوتِ سؤالٍ نصُّه على زرٍّ (يقع بعد ~٢٥٠ مللي من الرسم)
+    // ثم يجيب فوراً والصوتُ في الجوّ — وهو عينُ ما يفعله طفلٌ يعرف الجواب
+    let target = null;
+    const tRound = now();
+    while (!target && now() - tRound < 900) {
+      const heard = lastPlayed();
+      target = heard && btns.find((b) => (b.getAttribute('aria-label') || b.textContent.trim()) === heard);
+      if (!target) await sleep(60);
+    }
+    if (target) {
+      tap(target);
+      rounds++;
+      await sleep(1400 + DUR);           // يشهد الانتقالَ وما بعده (سياجاً كان أو انتظاراً)
+      continue;
+    }
+    // تمرينُ قراءةٍ صامت (أو لوح تركيب): جسٌّ — نقرةٌ تلو نقرةٍ حتى يظهر الصواب
+    let advanced = false;
+    for (const b of btns) {
+      if (b.isConnected === false) continue;
+      tap(b);
+      await sleep(180);
+      if (b.classList.contains('good') || b.classList.contains('tile--used')) { advanced = true; break; }
+    }
+    if (advanced) {
+      rounds++;
+      await sleep(1400 + DUR);
+    } else {
+      // جسٌّ بلا صواب (بطاقاتُ سماعٍ مثلاً): إن جهز زرُّ الخطوة فالخطوةُ طُويت
+      const step = [...doc.querySelectorAll('main button, .lesson-body button, .wgame-body button')].find((b) => /تابع|التالي|ابدأ|أكمل|جرّب/.test(b.textContent) && !b.disabled && !/الخريطة/.test(b.textContent));
+      if (step) { tap(step); await sleep(300); }
+      else await sleep(400);             // لعل صوتَ السؤال لم يُطلق بعد
+    }
+  }
+  return rounds;
+}
+
+const verdict = (label, played) => {
+  ok(overlaps.length === 0,
+    `${label}: لا لحظةَ فيها صوتان معاً (${played} تشغيلاً مقيساً)`
+    + (overlaps.length ? ` — تراكب: ${overlaps.slice(0, 3).join(' · ')}` : ''));
+  ok(cuts.length === 0,
+    `${label}: ولا قطشَ مبرمَجاً — الانتقالُ لا يقع وكلامٌ في الجوّ`
+    + (cuts.length ? ` — قُطش: ${cuts.slice(0, 3).join(' · ')}` : ''));
+};
+
+try {
+  // ————— ١) المراجعة — محرّك البوابتين والجلسة اليومية —————
+  const quizzes = {};
+  const early = idsBefore('contrast:alike');       // مجموعتان: حروفٌ مدروسة تكفي الحوض
+  const letters = ['ب', 'ت', 'م', 'ر', 'د'];
+  for (const letter of letters) {
+    for (const haraka of [HARAKAT[0].key, HARAKAT[1].key]) {
+      quizzes[skillKey(letter, haraka, KINDS.QUIZ)] = { right: 0, wrong: 2, box: 0, due: 0, seen: 0 };
+    }
+  }
+  await seed(early, { skills: quizzes }, '#/review');
+  await waitFor(() => doc.querySelector('.vrow button'), 'تمارين المراجعة');
+  const r1 = await driveRounds('المراجعة', { maxRounds: 8, budgetMs: 45000 });
+  ok(r1 >= 6, `المراجعة: سِيقت ${r1} جولات بنقر طفلٍ سريع`);
+  verdict('المراجعة', plays.length);
+  ok(jsErrors.length === 0, 'المراجعة: لا أخطاء جافاسكربت' + (jsErrors.length ? ' — ' + jsErrors[0] : ''));
+
+  // ————— ٢) «اقرأ واختر» في أول بستان — تغذيةُ الصواب تُسمَع لا تُدهَس —————
+  await seed(idsBefore('garden:home:1'), {}, '#/garden/home:1');
+  await waitFor(() => doc.querySelector('button'), 'شاشة البستان');
+  const r2 = await driveRounds('البستان', { maxRounds: 8, budgetMs: 30000 });
+  ok(r2 >= 3, `البستان: سِيقت ${r2} خطوات وجولات`);
+  verdict('البستان («اقرأ واختر»)', plays.length);
+
+  // ————— ٣) «ميّز بين» — تتابعُ «اسمع الفرق» لا يقطشه سياجُ الانتقال —————
+  await seed(idsBefore('contrast:alike'), {}, '#/contrast/alike');
+  await waitFor(() => doc.querySelector('button'), 'شاشة ميّز بين');
+  const r3 = await driveRounds('ميّز بين', { maxRounds: 8, budgetMs: 30000 });
+  ok(r3 >= 2, `ميّز بين: سِيقت ${r3} خطوات وجولات`);
+  verdict('«ميّز بين» (بتتابع اسمع الفرق)', plays.length);
+
+  ok(true, 'اكتمل القياس — التعاقبُ مقيسٌ لا معدود');
+} catch (err) {
+  ok(false, 'تعطّل القياس: ' + (err?.message || err));
+}
+post();
+</script>
+</body>
+</html>

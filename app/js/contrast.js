@@ -151,7 +151,7 @@ export function renderContrast(contrastId) {
         }, h('span', { class: 'vchip-face' }, text));
         return btn;
       }));
-      setTimeout(playTarget, 250);
+      audio.afterSpeech(250, playTarget);   // نداءُ الجولة بعد سكوت ما قبلها
     }
 
     function onPick(letter, text, btn, r) {
@@ -159,15 +159,16 @@ export function renderContrast(contrastId) {
       const correct = letter === r.letter;
       progress.recordAttempt(r.letter, r.haraka, progress.KINDS.CONTRAST, correct);
       if (correct) {
-        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — أثرٌ بصريّ ثم الجولة التالية بمهلة
+        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — والانتقالُ بعد سكوت القناة والمهلة معاً:
+        // تتابعُ «اسمع الفرق» ثانيتان، وكان سياجُ ٧٥٠ الثابت يقطشه (قياسُ --voice)
         locked = true;
         btn.classList.add('good');
         pop(btn);
-        setTimeout(() => {
+        audio.afterSpeech(750, () => {
           state.round++;
           if (state.round < rounds.length) startRound();
           else finish();
-        }, 750);
+        });
         return;
       }
       state.errors++;

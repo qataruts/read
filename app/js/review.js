@@ -374,14 +374,16 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
     shake(btn);
     btn.classList.add('bad');
     setTimeout(() => btn.classList.remove('bad'), 700);
-    if (replay) setTimeout(replay, 450);
+    if (replay) audio.afterSpeech(450, replay);   // الإعادة بعد تمام ما يُسمَع لا فوقه
   }
 
-  /** صواب في تمرين سماعيّ: أثرٌ بصريّ بلا إعادة قراءة، ثم التمرين التالي (DESIGN §٥.٢). */
+  /** صواب في تمرين سماعيّ: أثرٌ بصريّ بلا إعادة قراءة، ثم التمرين التالي (DESIGN §٥.٢).
+   *  والانتقالُ بقاعدة «لا انتقالَ وكلامٌ في الجوّ» (بلاغ احسب): سكوتُ القناة ومهلةُ
+   *  العين معاً — فالتمرين الصامت ينتقل بمهلته كما كان، والناطق يُتمّ كلامه أولاً. */
   function right(btn) {
     btn.classList.add('good');
     pop(btn);
-    setTimeout(next, 750);   // ثم ٢٥٠ م.ث قبل نداء التمرين التالي: فاصلٌ يُسمع
+    audio.afterSpeech(750, next);   // ثم ٢٥٠ م.ث قبل نداء التمرين التالي: فاصلٌ يُسمع
   }
 
   // ————— ١) ميّز بأذنك: أيَّ حرف سمعت؟ —————
@@ -406,7 +408,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       return btn;
     }));
 
-    setTimeout(play, 250);
+    audio.afterSpeech(250, play);   // نداءُ التمرين بعد سكوت ما قبله
     return h('div', {},
       h('h2', {}, 'أيَّ حرف سمعت؟'),
       h('div', { class: 'row foot' },
@@ -498,7 +500,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
             // يسمع ما اختاره ليقارنه، ثم يُعاد الهدف بمهلةٍ تفصل الصوتين (كما في الدرس)
             wrong(btn);
             audio.play(text);
-            return void setTimeout(play, 900);
+            return void audio.afterSpeech(500, play);   // الهدفُ بعد تمام صدى المختار
           }
           locked = true;
           right(btn);
@@ -507,7 +509,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       return btn;
     }));
 
-    setTimeout(play, 250);
+    audio.afterSpeech(250, play);   // نداءُ التمرين بعد سكوت ما قبله
     return h('div', {},
       h('h2', {}, 'أيَّ واحدة سمعت؟'),
       h('p', { class: 'hint' }, item.mark.title),
@@ -540,7 +542,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       return btn;
     }));
 
-    setTimeout(play, 250);
+    audio.afterSpeech(250, play);   // نداءُ التمرين بعد سكوت ما قبله
     return h('div', {},
       h('h2', {}, 'أيَّ حرف سمعت؟'),
       h('p', { class: 'hint' }, 'الحرفان متشابهان — أنصت للفرق'),
@@ -574,7 +576,7 @@ export function renderSession({ make, verdict, pill, accent = ACCENT, leaveAsk, 
       return btn;
     }));
 
-    setTimeout(play, 250);
+    audio.afterSpeech(250, play);   // نداءُ التمرين بعد سكوت ما قبله
     return h('div', {},
       h('h2', {}, `أيَّ حركة سمعت مع ${letterTitle(item.letter)}؟`),
       h('div', { class: 'row foot' },

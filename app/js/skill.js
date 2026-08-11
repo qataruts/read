@@ -242,12 +242,12 @@ export function renderSkillLesson(skillId) {
         btn.classList.add('good');
         pop(btn);
         audio.play(text);                       // الآن يُنطق ما قرأه: قراءةٌ ثم سماع
-        setTimeout(() => {
+        audio.afterSpeech(750, () => {          // «لا انتقالَ وكلامٌ في الجوّ» (بلاغ احسب)
           if (!wrap.isConnected) return;        // غادر الشاشة قبل انقضاء المهلة
           state.mark++;
           if (state.mark < marks.length) startRound();
           else next();
-        }, 750);
+        });
       }
 
       const screen = h('div', {},
@@ -287,29 +287,29 @@ export function renderSkillLesson(skillId) {
         }, h('span', { class: 'vchip-face' }, text));
         return btn;
       }));
-      setTimeout(playTarget, 250);
+      audio.afterSpeech(250, playTarget);   // نداءُ الجولة بعد سكوت ما قبلها
     }
 
     function onPick(text, btn, r) {
       if (locked) return;
       progress.recordAttempt(markKey, null, progress.KINDS.MARK_QUIZ, text === r.target);
       if (text === r.target) {
-        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — أثرٌ بصريّ، ثم نداء الجولة التالية بمهلة.
+        // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — والانتقالُ بعد سكوت القناة والمهلة معاً.
         locked = true;
         btn.classList.add('good');
         pop(btn);
-        setTimeout(() => {
+        audio.afterSpeech(750, () => {
           state.round++;
           if (state.round < rounds.length) startRound();
           else finish();
-        }, 750);
+        });
       } else {
         state.errors++;
         shake(btn);
         btn.classList.add('bad');
         setTimeout(() => btn.classList.remove('bad'), 700);
         audio.play(text);                       // يسمع ما اختاره ليقارنه (بلا تلقين)
-        setTimeout(playTarget, 900);
+        audio.afterSpeech(500, playTarget);     // الهدفُ بعد تمام صدى المختار
       }
     }
 

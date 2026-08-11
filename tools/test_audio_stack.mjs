@@ -121,5 +121,37 @@ FakeAudio.created[1].fire('ended');
 ok((await retried) === true, 'والثانيةُ تُسمَع إلى آخرها');
 stop();
 
+// ————— ٥. «لا انتقالَ وكلامٌ في الجوّ» — quiet/afterSpeech (بلاغُ «احسب» العائليّ) —————
+
+console.log('\n٥. سكوتُ القناة قبل الانتقال المبرمَج');
+const { afterSpeech } = audio;
+const tick = (ms) => new Promise((r) => setTimeout(r, ms));
+
+FakeAudio.created = [];
+const speaking = play(WORDS[0]);
+await settle();
+let advanced = false;
+afterSpeech(30, () => { advanced = true; });
+await tick(60);
+ok(!advanced, 'الانتقالُ لا يقع والكلامُ في الجوّ — ولو انقضت مهلتُه');
+FakeAudio.created[0].fire('ended');
+await speaking;
+await tick(30);
+ok(advanced, 'ويقع بعد تمام الكلام والمهلة معاً');
+
+FakeAudio.created = [];
+const first5 = play(WORDS[0]);
+await settle();
+let advanced2 = false;
+afterSpeech(10, () => { advanced2 = true; });
+const second5 = play(WORDS[1]);          // نقرةُ «اسمع مرة أخرى» أثناء الانتظار
+await settle(); await tick(30);
+ok(!advanced2, 'ونداءٌ لاحق أثناء الانتظار يُمدّده — لا انتقالَ وصوتُه في الجوّ');
+FakeAudio.created[FakeAudio.created.length - 1].fire('ended');
+await first5; await second5;
+await tick(30);
+ok(advanced2, 'ثم يقع بعد تمامه هو أيضاً');
+stop();
+
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «صوتٌ واحدٌ لا يتكدّس» ناجحة');
 process.exit(fails ? 1 : 0);

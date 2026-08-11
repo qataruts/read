@@ -70,11 +70,11 @@ export function readQuizStep(items, { next, fail }, { onPick } = {}) {
       locked = true;
       btn.classList.add('good');
       audio.play(word.say ?? word.read);
-      setTimeout(() => {
+      audio.afterSpeech(AFTER_PICK_MS, () => {   // «لا انتقالَ وكلامٌ في الجوّ» (بلاغ احسب)
         index++;
         if (index < rounds.length) startRound();
         else next();
-      }, AFTER_PICK_MS);
+      });
     } else {
       fail();
       shake(btn);

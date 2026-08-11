@@ -191,7 +191,9 @@ function speak(text) {
 export async function play(text) {
   if (!text) return false;
   stop();
-  return playAs(text, epoch);
+  const run = playAs(text, epoch);
+  tail = run;
+  return run;
 }
 
 async function playAs(text, my) {
@@ -233,11 +235,45 @@ async function playAs(text, my) {
 export async function playSequence(texts, gapMs = 220) {
   stop();
   const my = epoch;
-  for (const t of texts) {
-    if (my !== epoch) return;
-    await playAs(t, my);
-    if (gapMs && my === epoch) await new Promise((r) => setTimeout(r, gapMs));
+  const run = (async () => {
+    for (const t of texts) {
+      if (my !== epoch) return;
+      await playAs(t, my);
+      if (gapMs && my === epoch) await new Promise((r) => setTimeout(r, gapMs));
+    }
+  })();
+  tail = run;
+  return run;
+}
+
+// ————— «لا انتقالَ وكلامٌ في الجوّ» (بلاغٌ عائليّ من «احسب»، ١١ أغسطس ٢٠٢٦) —————
+//
+// بلاغُ ميدانهم الأول: «البرنامج لا ينتظر الصوت فينتقل» — والصنفُ نفسُه كان عندنا:
+// مواضعُ انتقالٍ مبرمَجٍ على **سياج مهلةٍ ثابت** (٧٥٠ م.ث ونحوها) يفترض أن الطفل
+// يجيب بعد تمام السؤال — وطفلٌ سريع يجيب والصوتُ في الجو، فيُقطَش كلامٌ بانتقالٍ
+// لم ينتظره (تغذيةُ «يسمع ما اختاره»، وتتابعُ «اسمع الفرق»، وقاعدةُ العلامة).
+// و`words.js` كان نموذجَ الصواب منذ بُني: انتظارُ كل صوتٍ ثم مهلة ثم انتقال.
+//
+// فصار للقناة **ذيلٌ** (`tail`: وعدُ آخرِ نداءٍ قُدّم) و`quiet()` تتمّ حين يسكت —
+// وإن استجدّ نداءٌ ونحن ننتظر (طفلٌ ينقر «اسمع مرة أخرى») انتظرناه هو أيضاً.
+// و`afterSpeech(fenceMs, fn)` هي قاعدةُ الانتقال المبرمَج: **السكوتُ ومهلةُ العين
+// معاً** — فالشاشة الصامتة تنتقل بمهلتها كما كانت حرفاً، والناطقة تُتمّ كلامها.
+// (وقطعُ الطفل بيده — نقرةٌ تُسكت وتُبدّل — مشروعٌ وليس من هذا الباب.)
+
+let tail = Promise.resolve(false);   // ذيلُ القناة: وعدُ آخر تشغيلٍ قُدّم
+
+/** تتمّ حين تسكت القناة — لا كلامَ يعمل ولا نداءَ لحق بنا ونحن ننتظر. */
+export async function quiet() {
+  for (;;) {
+    const last = tail;
+    await last;
+    if (last === tail) return;
   }
+}
+
+/** انتقالٌ مبرمَج بعد سكوت القناة **و**مهلة العين معاً — لا يقع وكلامٌ في الجوّ. */
+export function afterSpeech(fenceMs, fn) {
+  Promise.all([quiet(), new Promise((r) => setTimeout(r, fenceMs))]).then(fn);
 }
 
 /** تحميل مسبق لأصوات الشاشة التالية (لا يشغّلها). */

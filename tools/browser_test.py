@@ -16,6 +16,7 @@
     python3 tools/browser_test.py --roots      # شبكات الجذور (حزمة الجذور)
     python3 tools/browser_test.py --marks      # قياس العلامات (مدّ · سكون · شدّة · تنوين · لام)
     python3 tools/browser_test.py --fade       # خفوت التشكيل ز١→ز٣ (المرحلة ز)
+    python3 tools/browser_test.py --voice      # قياس التعاقب الصوتي: لا تراكب ولا قطش مبرمَج
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
     python3 tools/browser_test.py --shots out.png [--words|--review|--story|--quran|--garden|--sentences|--stories|--record|--gate|--map]
@@ -79,6 +80,7 @@ PAGES = {
     "/__welcome.html": TOOLS / "browser_welcome.html",
     "/__parent.html": TOOLS / "browser_parent.html",
     "/__fade.html": TOOLS / "browser_fade.html",
+    "/__voice.html": TOOLS / "browser_voice.html",
     "/__parent_shots.html": TOOLS / "browser_parent_shots.html",
 }
 # نافذة Chrome بلا واجهة تحجز ٨٧ بكسلاً لإطارٍ وهميّ فوق المنظور — فلولا تعويضها لقِسنا
@@ -345,6 +347,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8790)
     ap.add_argument("--timeout", type=int, default=140, help="ثوانٍ قبل الاستسلام")
+    # عدّةُ التعاقب أصواتُها بمدد حقيقية فمشوارُها أطول من إخوتها
     ap.add_argument("--shots", metavar="PNG", help="لقطة للمراجعة البصرية بدل تشغيل الاختبارات")
     ap.add_argument("--words", action="store_true", help="لعبة تركيب الكلمات بدل درس الحرف")
     ap.add_argument("--review", action="store_true", help="المراجعة اليومية ولوحة وليّ الأمر")
@@ -365,6 +368,8 @@ def main():
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--fade", action="store_true",
                     help="خفوت التشكيل ز١→ز٣: العتبة والكشف عند الطلب وحصانة التهجّي والمصحف")
+    ap.add_argument("--voice", action="store_true",
+                    help="قياس التعاقب الصوتي: أصوات بمدة حقيقية، لا تراكب ولا قطش مبرمَج (بلاغ احسب)")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
     ap.add_argument("--welcome", action="store_true",
                     help="الصفحة التعريفية: لا طلب خارجي، ولا يبتلعها عامل الخدمة (ومع --shots لقطتها)")
@@ -378,6 +383,8 @@ def main():
     ap.add_argument("--size", help="مقاس النافذة W,H لصفحة الجهاز (مع --device)")
     ap.add_argument("--show", action="store_true", help="متصفّح مرئي")
     args = ap.parse_args()
+    if args.voice and args.timeout == 140:
+        args.timeout = 165
 
     if args.device:
         return device_main(args)
@@ -419,6 +426,7 @@ def main():
             return 0 if out.exists() else 1
 
         page = ("__welcome.html" if args.welcome
+                else "__voice.html" if args.voice
                 else "__fade.html" if args.fade
                 else "__parent.html" if args.parent
                 else "__roots.html" if args.roots
@@ -437,7 +445,7 @@ def main():
         deadline = time.time() + args.timeout
         while time.time() < deadline:
             time.sleep(0.5)
-            if results and results[-1].get("msg", "").startswith(("لا أخطاء جافاسكربت", "استثناء", "انتهت المهلة")):
+            if results and results[-1].get("msg", "").startswith(("لا أخطاء جافاسكربت", "استثناء", "انتهت المهلة", "اكتمل القياس", "تعطّل القياس")):
                 break
         proc.kill()
     finally:

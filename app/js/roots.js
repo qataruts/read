@@ -178,10 +178,10 @@ export function renderRoots(rootId) {
         answered = true;
         btn.classList.add('good');
         audio.play(memberSay(text));
-        setTimeout(() => {
+        audio.afterSpeech(500, () => {          // بعد تمام الصدى لا فوقه (بلاغ احسب)
           if (!wrap.isConnected) return;
           if (state.round < rounds.length - 1) { state.round++; paint(); } else next();
-        }, 900);
+        });
       }
 
       paintDots();
