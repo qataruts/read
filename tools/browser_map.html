@@ -5,7 +5,7 @@
 <pre id="out" style="font:14px/1.6 monospace"></pre>
 <iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
 <script>
-const report = (what) => navigator.sendBeacon('/result',
+const report = (what) => navigator.sendBeacon('/result?from=read',
   new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
     { type: 'text/plain' }));
 window.addEventListener('error', (e) => report(e.message));
@@ -21,7 +21,7 @@ window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e
 
 const out = document.getElementById('out');
 const results = [];
-const post = () => navigator.sendBeacon('/result',
+const post = () => navigator.sendBeacon('/result?from=read',
   new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
 const ok = (cond, msg) => {
   results.push({ ok: !!cond, msg });

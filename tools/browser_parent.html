@@ -15,7 +15,7 @@
 <script type="module">
 const out = document.getElementById('out');
 const results = [];
-const post = () => navigator.sendBeacon('/result',
+const post = () => navigator.sendBeacon('/result?from=read',
   new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
 const ok = (cond, msg) => {
   results.push({ ok: !!cond, msg });

@@ -175,11 +175,18 @@ def make_server(port: int, results: list):
             super().do_GET()
 
         def do_POST(self):
+            # **بصمةُ المصدر** (بلاغا العائلة، ١٢ أغسطس ٢٠٢٦ — «تقريرُ متصفّحِ الجار
+            # قُرئ تقريرَنا»): لا يُقبل تقريرٌ إلا من صفحاتنا (`?from=read`) — فأسوأُ
+            # ما يقع عند أي التباسٍ «لم تصل نتيجة» الصادقة، لا خضرةُ جارٍ تُنسب لنا.
+            path, _, query = self.path.partition("?")
             raw = self.rfile.read(int(self.headers.get("Content-Length", 0)))
-            try:
-                results[:] = json.loads(raw.decode("utf-8"))
-            except json.JSONDecodeError:
-                pass
+            if "from=read" not in query:
+                print(f"⚠ تقريرٌ غريب رُفض (المسار {self.path}) — ليس من صفحات اقرأ")
+            else:
+                try:
+                    results[:] = json.loads(raw.decode("utf-8"))
+                except json.JSONDecodeError:
+                    pass
             self.send_response(204)
             self.end_headers()
 
@@ -187,10 +194,26 @@ def make_server(port: int, results: list):
             pass
 
     socketserver.TCPServer.allow_reuse_address = True
-    return socketserver.TCPServer(("127.0.0.1", port), Handler)
+    try:
+        return socketserver.TCPServer(("127.0.0.1", port), Handler)
+    except OSError as err:
+        sys.exit(f"المنفذ {port} مشغول ({err}) — أعدّةُ جارٍ من العائلة تعمل الآن؟ "
+                 f"(منافذ العائلة: اقرأ 8790 · احسب 8791 · اكتب 8792) جرّب --port آخر.")
+
+
+def sweep_orphans():
+    """قتلُ نسخ كروم الخفية **العالقة من جولاتنا نحن** قبل إطلاق جولةٍ جديدة.
+
+    بلاغُ اكتب العائليّ (١٢ أغسطس ٢٠٢٦): يتيمُ فحصٍ ميت يخطف نقرةَ أيقونة كروم
+    عند المالك فيبدو المتصفح معطّلاً. التنظيفُ عند الإقلاع لا عند الخروج وحده —
+    فالجلسة تُقتل والفحص يُقاطَع ويبقى اليتيم. ولا نقرب إلا ما يحمل سابقتَنا
+    (muallim-chrome-) — نسخُ الجيران ومتصفحُ المالك الحي خارج المرمى بالبناء."""
+    subprocess.run(["pkill", "-f", "user-data-dir=[^ ]*muallim-chrome-"],
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
 
 
 def run_chrome(url: str, profile: Path, extra: list, show: bool):
+    sweep_orphans()
     if not Path(CHROME).exists():
         sys.exit(f"لم يُعثر على Chrome في {CHROME}")
     cmd = [CHROME, f"--user-data-dir={profile}", "--no-first-run", "--no-default-browser-check"]
