@@ -2,10 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <!-- قفلُ المقياس (بلاغ المالك، ١١ أغسطس ٢٠٢٦): iPadOS يسترجع المثبَّتَ من الخلفية
-       مكبَّراً أحياناً، والنقرُ المزدوج من طفلٍ يكبّر الشاشة — والتطبيقُ حروفُه كبيرةٌ
-       بتصميمه فلا حاجةَ لتكبيرٍ فيه. صفحاتُ التعريف تبقى قابلةً للتكبير (تلك للكبار). -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <!-- **قرصةُ الطفل حرة** (بلاغ الميدان الثاني، ١١ أغسطس ٢٠٢٦ — نقضَ قفلَ المقياس):
+       الطفل يكبّر الصفحةَ ليرى التشكيلَ جيداً، وكان ذلك مريحاً تلقائياً — فقفلُ
+       maximum-scale/user-scalable كان تحويطاً أوسعَ من عيبه فرُدّ. يبقى من العلاج:
+       العودةُ من الخلفية تُرجِع المقياسَ ١ برمجياً (main.js — عيبُ استرجاع iPadOS
+       وبقايا تكبيرِ جلسةٍ سابقة معاً)، وتكبيرُ النقر المزدوج العارض ساقطٌ باللوح
+       (touch-action: manipulation) والقرصةُ المتعمَّدة لا يمسّها. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="اِقْرَأْ — يعلّم طفلك قراءة العربية، من الحرف الأول إلى القرآن">
   <meta name="theme-color" content="#FAF4E8">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2A241C">

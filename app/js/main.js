@@ -804,17 +804,22 @@ if (progress.PREVIEW) {
 // في التطبيق المثبَّت وفي المعاينة** (شريطان فوق الشاشة ضجيجٌ على المقيّم).
 if (!progress.PREVIEW) install.mount();
 
-// **والعودةُ من الخلفية بمقياس ١** (بلاغ المالك، ١١ أغسطس ٢٠٢٦): iPadOS يسترجع
-// التطبيقَ المثبَّت بعد زيارة تطبيقٍ آخر **مكبَّراً** أحياناً — عيبُ استرجاعٍ معروف
-// في المنصّة لا في شيفرتنا. الميتا تمنع التكبير أصلاً (`maximum-scale=1`)، وإعادةُ
-// إعلانها نفسِها عند العودة تُلزم WebKit بإعادة تطبيقها حيث يتلكّأ.
+// **العودةُ من الخلفية بمقياس ١، والقرصةُ حرةٌ فيما سواها** (بلاغا المالك، ١١ أغسطس
+// ٢٠٢٦): الأول — iPadOS يسترجع المثبَّتَ بعد تطبيقٍ آخر مكبَّراً أحياناً؛ والثاني
+// نقضَ علاجَه الأول — قفلُ الميتا الشامل حرم الطفلَ قرصةَ تكبيرٍ كان يرى بها
+// التشكيلَ جيداً. فصار العلاجُ في موضع العيب وحدَه: عند العودة للواجهة يُشدّ
+// المقياسُ إلى ١ لحظةً (`maximum-scale=1`) ثم تُرَدّ الحريةُ فوراً — فتزول بقايا
+// الاسترجاع المعيب وبقايا تكبيرِ ما قبل الخلفية، وتبقى القرصةُ أثناء الاستعمال حقاً.
 const viewportMeta = document.querySelector('meta[name="viewport"]');
-const reassertViewport = () => {
-  if (viewportMeta) viewportMeta.setAttribute('content', viewportMeta.getAttribute('content'));
+const viewportFree = viewportMeta && viewportMeta.getAttribute('content');
+const resetZoom = () => {
+  if (!viewportMeta) return;
+  viewportMeta.setAttribute('content', `${viewportFree}, maximum-scale=1`);
+  setTimeout(() => viewportMeta.setAttribute('content', viewportFree), 80);
 };
-window.addEventListener('pageshow', reassertViewport);
+window.addEventListener('pageshow', resetZoom);
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') reassertViewport();
+  if (document.visibilityState === 'visible') resetZoom();
 });
 
 window.addEventListener('hashchange', render);
