@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh ../family/check_mail.sh",
+            "timeout": 10,
+            "statusMessage": "فحص بريد العائلة"
+          }
+        ]
+      }
+    ]
+  }
+}
