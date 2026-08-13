@@ -64,7 +64,10 @@ const emojiIndex = JSON.parse(read('emoji/index.json', APP));
 const audioVersions = JSON.parse(read('audio/versions.json', APP));
 const recitations = JSON.parse(read('data/recitations.json', APP));
 
-const SITE = 'https://read.mishkat.qa/';          // الاستثناءُ المعلَن الوحيد
+const SITE = 'https://read.mishkat.qa/';          // عنوانُنا في ترويسة المطبوع
+// **بوابةُ العائلة** (أمر المالك، ١٣ أغسطس ٢٠٢٦): رابطُ المجموعة في كل تعريفية —
+// ثاني الاستثناءين المعلَنين، و`<a>` يُفتح إن نُقر ولا يُجلَب كأخيه.
+const FAMILY = 'https://learn.mishkat.qa/';
 
 // ————— ١. خارج التطبيق وخارج قشرة عامل الخدمة —————
 
@@ -102,8 +105,10 @@ for (const [name, text] of Object.entries(PAGES)) {
     `${name}: صفرُ مَوردٍ خارجيّ يُجلَب${fetched.length ? ' — ' + fetched.join('، ') : ''}`);
 
   const outward = [...text.matchAll(/<a[^>]*href="(https?:[^"]+)"/g)].map((m) => m[1]);
-  ok(outward.every((v) => v === SITE) && outward.length <= 1,
-    `${name}: ولا رابطَ خارجيّ إلا عنوانَ موقعنا في ترويسة المطبوع`);
+  ok(outward.every((v) => v === SITE || v === FAMILY),
+    `${name}: ولا رابطَ خارجيّ إلا عنوانَنا وبوابةَ العائلة`);
+  ok(text.includes(FAMILY),
+    `${name}: ورابطُ عائلة التعليم الأولي حاضرٌ في القشرة (أمر المالك)`);
 
   // **و`mailto:` ليس ملفّاً يُطلَب**: هو فعلُ مراسلةٍ يفتحه المتصفّح إن نُقر، ولا
   // يُجلَب من شبكةٍ ولا من قرص — فيُستثنى من جرد الملفّات كما يُستثنى من الخارجيّ.
