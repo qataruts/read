@@ -232,5 +232,13 @@ for (const page of ['index.html', 'curriculum.html', 'method.html', 'guide.html'
 ok(/\.toast \{[^}]*pointer-events:\s*none/s.test(read('css/app.css')),
   'الرسالةُ العابرة (.toast) تُرى ولا تحجب — لا نقرةَ تموت تحتها');
 
+// **نسخةُ القشرة تُرى** (أمر المالك عبر بريد العائلة، ١٣ أغسطس ٢٠٢٦): فلا يشهد
+// ميدانٌ على شيفرةٍ لم تصل جهازَه — العاملُ يجيب عن نسخته، واللوحةُ تعرضها.
+ok(/event\.data\?\.type === 'version'/.test(sw) && /postMessage\(\{ type: 'version', version: VERSION \}\)/.test(sw),
+  'وعاملُ الخدمة يجيب عن نسخته حين يُسأل');
+const parentSrc = read('js/parent.js');
+ok(/postMessage\(\{ type: 'version' \}\)/.test(parentSrc) && /نسخة التطبيق/.test(parentSrc),
+  'ولوحةُ وليّ الأمر تعرضها — فيُعرَف وصولُ التحديث بنظرة');
+
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات العمل دون إنترنت ناجحة');
 process.exit(fails ? 1 : 0);

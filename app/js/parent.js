@@ -485,6 +485,21 @@ function backupSection(rerender) {
     if (count) paint(count.stored, count.total, false);
   });
 
+  // **رقمُ النسخة تحت حال التخزين** (أمر المالك): سطرٌ هادئ يقرؤه الوالد فيعرف
+  // أنّ التحديث بلغ جهازَه — ومن قبله كان يُظنّ ولا يُرى.
+  const version = h('p', { class: 'note' }, 'نسخة التطبيق: …');
+  navigator.serviceWorker?.addEventListener?.('message', (e) => {
+    if (e.data?.type === 'version' && version.isConnected) {
+      version.textContent = `نسخة التطبيق: ${e.data.version}`;
+    }
+  });
+  const askVersion = () => {
+    const sw = navigator.serviceWorker?.controller;
+    if (sw) sw.postMessage({ type: 'version' });
+    else version.textContent = 'نسخة التطبيق: تظهر بعد تثبيته (يعمل العاملُ حينها)';
+  };
+  askVersion();
+
   progress.persistedStorage().then((persisted) => {
     if (!storage.isConnected) return;
     storage.textContent = persisted === null
@@ -551,6 +566,7 @@ function backupSection(rerender) {
     ),
     slot,
     storage,
+    version,
     dlRow,
     h('p', { class: 'note' },
       'في النسخة: النجوم وصناديق المراجعة ودقائق التعلّم ومدد قراءاته الجهرية'

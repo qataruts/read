@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v25';  // v25: الرسالةُ العابرة لا تبتلع النقر (عيبُ بذرةٍ أعاده ميدانُ اكتب)
+const VERSION = 'v26';  // v26: نسخةُ القشرة تُرى في لوحة وليّ الأمر (أمر المالك عبر بريد العائلة)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -289,6 +289,13 @@ async function report(state) {
 
 /** طلبٌ صريح من المستعمل: «نزّل الأصوات الآن» — يتجاوز مهلةَ الشفاء ولا ينتظرها. */
 self.addEventListener('message', (event) => {
+  // **نسخةُ القشرة تُرى** (أمر المالك عبر بريد العائلة، ١٣ أغسطس ٢٠٢٦): «رؤيةُ
+  // النسخة الحالية في مكانٍ ما تسهّل التأكد من وصول النسخة الأخيرة» — فلا يشهد
+  // ميدانٌ على شيفرةٍ لم تصل جهازَه. والعاملُ وحده يعرف نسختَه، فيجيب حين يُسأل.
+  if (event.data?.type === 'version') {
+    event.source?.postMessage({ type: 'version', version: VERSION });
+    return;
+  }
   if (event.data?.type !== 'audio-sync') return;
   event.waitUntil(syncAudio());
 });
