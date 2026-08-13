@@ -227,6 +227,10 @@ for (const page of ['index.html', 'curriculum.html', 'method.html', 'guide.html'
   ok(!/user-scalable=no|maximum-scale/.test(read(`welcome/${page}`)),
     `welcome/${page}: تبقى قابلةً للتكبير — صفحةُ كبارٍ والتكبيرُ فيها حقّ`);
 }
+// **الرسالة العابرة لا تبتلع النقر** (عيبُ بذرةٍ أعاده ميدانُ اكتب): .toast طافيةٌ
+// فوق أسفل الشاشة عمرَها كلَّه (٢٫٢ ث) — فبلا pointer-events:none تموت تحتها النقرات.
+ok(/\.toast \{[^}]*pointer-events:\s*none/s.test(read('css/app.css')),
+  'الرسالةُ العابرة (.toast) تُرى ولا تحجب — لا نقرةَ تموت تحتها');
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات العمل دون إنترنت ناجحة');
 process.exit(fails ? 1 : 0);
