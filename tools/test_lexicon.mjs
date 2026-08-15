@@ -82,9 +82,14 @@ const gardenIds = bundles.map((b) => `garden:${b.id}`);
 ok(gardenIds.every((id) => ids.includes(id)) && nodeIdOf(bundles[0].id) === gardenIds[0],
   `عقد البساتين في الرحلة (${gardenIds.length} عقدة)`);
 ok(gardenIds.every((id, i) => i === 0 || ids.indexOf(id) > ids.indexOf(gardenIds[i - 1]))
-  && ids.indexOf(gardenIds[0]) > ids.lastIndexOf('quran:s114'),
-  'وهي بعد المرحلة القرآنية بترتيبها، يتخلّلها سلّم جمل كل بستان (الحزمة ٨)');
-ok(ids.indexOf(gardenIds[0]) > ids.indexOf('quran:s114'), 'وأول باقة بعد آخر سورة');
+  && ids.indexOf(gardenIds[0]) > ids.indexOf('quran:rasm'),
+  'وهي بعد تهيئة المرحلة القرآنية بترتيبها، يتخلّلها سلّم جمل كل بستان (الحزمة ٨)');
+// **ولم تعد خلف السور كلِّها** (وز١، ١٥ أغسطس ٢٠٢٦): كان رصيدُ الطلاقة كلُّه محبوساً
+// خلف اثنتي عشرة سورة، فصار خلف الدفعة الأولى وحدَها وتخلّلت البواقي البساتين.
+const lastSurah = ids.filter((id) => /^quran:s\d+$/.test(id)).at(-1);
+ok(ids.indexOf(gardenIds[0]) > ids.indexOf('quran:s1')
+  && ids.indexOf(gardenIds[0]) < ids.indexOf(lastSurah),
+  `وأول باقة بعد الدفعة القرآنية الأولى وقبل آخر السور (${lastSurah}) — لا خلفها كلِّها`);
 
 p.reset();
 ok(!p.isNodeUnlockedById(gardenIds[0]), 'البساتين مقفلة في بداية الرحلة');
@@ -93,7 +98,7 @@ for (const n of nodes) {
   p.setStars(n.id, 3);
 }
 ok(p.isNodeUnlockedById(gardenIds[0]) && p.nextNode().id === gardenIds[0],
-  'وأول باقة تُفتح بإتمام الرحلة كلها');
+  'وأول باقة تُفتح بإتمام كل ما قبلها (التأسيسُ والتهيئةُ والدفعةُ الأولى وبوابتُها)');
 ok(!p.isNodeUnlockedById(gardenIds[1]), 'والباقة الثانية تنتظر التي قبلها (تُفتح تباعاً)');
 p.setStars(gardenIds[0], 3);
 ok(p.isNodeUnlockedById(gardenIds[1]), 'فإذا أُتمّت فُتحت');

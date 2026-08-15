@@ -81,13 +81,22 @@ const ids = nodes.map((n) => n.id);
 const rungIds = RUNGS.map((r) => nodeIdOf(r.id));
 ok(rungIds.every((id) => ids.includes(id)), `عقد السلّم في الرحلة (${rungIds.length} درجة)`);
 
+// **البستانُ مشقوقٌ بالنوع** (وز١، ١٥ أغسطس ٢٠٢٦ — الحكم ب١٠): باقاتُ أ ← درجاتُ
+// سلّمه الأولى ← باقاتُ ب ← بقيةُ السلّم. فالمحروسُ أنّ كتلته **متّصلةٌ بهذا الترتيب**
+// بعينه — والدرجةُ لا تسبق باقتَها بحال (المفكوكيةُ يحرسها `check_lexicon.py`).
 const misplaced = LADDERS.filter((ladder) => {
-  const lastBundle = ids.indexOf(`garden:${ladder.garden.bundles.at(-1).id}`);
-  const firstRung = ids.indexOf(nodeIdOf(ladder.rungs[0].id));
-  return !(firstRung === lastBundle + 1);
+  const bundles = ladder.garden.bundles.map((b) => ids.indexOf(`garden:${b.id}`));
+  const rungs = ladder.rungs.map((r) => ids.indexOf(nodeIdOf(r.id)));
+  const half = p.GARDEN_HALF;
+  const cut = rungs.findIndex((at) => at > bundles[half]);
+  const first = cut < 0 ? rungs.length : cut;
+  const chain = [...bundles.slice(0, half), ...rungs.slice(0, first),
+    ...bundles.slice(half), ...rungs.slice(first)];
+  return chain.some((at, i) => at < 0 || (i > 0 && at !== chain[i - 1] + 1));
 });
 ok(misplaced.length === 0,
-  `ودرجات كل بستان تلي باقاته مباشرةً${misplaced.length ? ' — ' + misplaced.map((l) => l.id).join('، ') : ''}`);
+  'وكتلةُ كل بستان متّصلةٌ بترتيب الشقّ: باقاتُ أ ← درجاتُ سلّمه الأولى ← باقاتُ ب ← بقيتُه'
+  + (misplaced.length ? ' — ' + misplaced.map((l) => l.id).join('، ') : ''));
 // أشجارُ الجذور محطاتٌ تلي كتلةَ بستانها (حزمة الجذور)، فقد تقع في ذيل الرحلة،
 // و**رفُّ المكتبة** بعدها كلِّها (حزمة المكتبة) — والمحروسُ هنا تدرّجُ البستان
 // نفسِه: سلّمُه ثم مكتبتُه بلا فاصلٍ بينهما، فيُقاس على صلبٍ بلا جذورٍ ولا رفّ.

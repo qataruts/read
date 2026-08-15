@@ -21,7 +21,11 @@ const ok = (cond, msg) => {
   out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
   post();
 };
-setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 110000);
+// **رُفعت المهلة في وز١** (١٥ أغسطس ٢٠٢٦، ١١٠ ← ٢٤٠ ثانية): توزيعُ الدفعات نقل
+// آخرَ السور إلى ذيل الرحلة، فزرعُ «ما قبلها» صار مئتين وثمانين عقدةً بدل تسعين
+// — والزرعُ يُعيد رسم الخريطة في كل مشهد. **بطءُ سَقيٍ لا بطءُ تطبيق**، ولا مشهدَ
+// سقط؛ والصفحةُ تتمّ في نحو ١٥٠ ثانية، فالمهلةُ سعةٌ لا تعطيل.
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 240000);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // **وتنتظر المُهلِبَ كما تنتظر المتزامن** (إصلاح ١٢ أغسطس ٢٠٢٦): كانت تختبر
@@ -551,9 +555,10 @@ try {
 
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
-  // (الحزمة ١٤) بين المصحف والبساتين بوابةُ إتقانٍ ثانية — فهي وجهتُه لا أول باقة
-  ok(continueCard()?.textContent.includes('بوابة الحديقة'),
-    `والخريطة تدلّه على بوابة الحديقة بعد آخر سورة (${continueCard()?.textContent.trim().split('\n')[0]})`);
+  // (وز١) الدفعةُ الرابعة خاتمةُ المصحف، وبعدها البساتينُ الأربعة الباقية فالرفّ —
+  // وبوابةُ الحديقة صارت قبل الدفعة الثانية، فقد عبَرها قبل أن يبلغ هذه السورة.
+  ok(/بستان|باقة/.test(continueCard()?.textContent || ''),
+    `والخريطة تدلّه على ما بقي من البساتين بعد الختام القرآني (${continueCard()?.textContent.trim().split('\n')[0]})`);
 
   // ————— ٨) نصّ المصحف: يُتلى من تسجيل القارئ ولا يُولَّد صوتُه أبداً —————
   const mushaf = new Set(quranMushafTexts());
@@ -628,7 +633,7 @@ try {
     const have = new Set(keys.map((r) => new URL(r.url).pathname.split('/').pop()));
     const hit = ayatKeys.filter((k) => have.has(`${k}.mp3`));
     return hit.length === ayatKeys.length ? hit : null;
-  }, 'تخزين تلاوات القارئ', 60000).catch(() => []);
+  }, 'تخزين تلاوات القارئ', 120000).catch(() => []);
   ok(offline.length === ayatKeys.length,
     `وتلاواتُ القارئ كلها مخزونة فتعمل دون إنترنت (${offline.length}/`
     + `${ayatKeys.length} في ${audioName})`);

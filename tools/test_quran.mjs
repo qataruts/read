@@ -47,9 +47,10 @@ ok(QURAN.after === GROUPS.at(-1).id, `المرحلة القرآنية بعد ا�
 
 const parts = quranParts().map((x) => x.part);
 ok(parts.join(' ← ') === ('letters words1 words2 words3 rasm muqattaat '
-  + 'sw-s1 s1 sw-s112 s112 sw-s113 s113 sw-s114 s114 '
-  + 'sw-s108 s108 sw-s103 s103 sw-s106 s106 sw-s111 s111 '
-  + 'sw-s105 s105 sw-s94 s94 sw-s107 s107 sw-s101 s101').split(' ').join(' ← '),
+  + 'sw-s1 s1 sw-s108 s108 sw-s112 s112 '
+  + 'sw-s113 s113 sw-s114 s114 sw-s103 s103 '
+  + 'sw-s106 s106 sw-s111 s111 sw-s105 s105 '
+  + 'sw-s94 s94 sw-s107 s107 sw-s101 s101').split(' ').join(' ← '),
   `درجاتها بالترتيب: ${parts.join(' ← ')}`);
 ok(parts.indexOf('letters') < parts.indexOf('words1'),
   'درس الحرفين قبل الكلمات (كلماتها تستعملهما)');
@@ -94,18 +95,16 @@ ok(ids.filter((id) => id.startsWith('quran:')).length === parts.length,
   `عقد المرحلة في الرحلة (${parts.length} عقدة)`);
 const quranStart = ids.indexOf('quran:letters');
 // **قصصُ الأنبياء عقدٌ داخل المرحلة** (حزمة قصص الأنبياء): كلُّ واحدةٍ تسبق محطةَ
-// كلمات سورتها، فتتخلّل السلسلة. والمحروسُ أن تبقى المرحلةُ **كتلةً متصلة** لا أن
-// تكون كلُّ عقدةٍ فيها `quran:` — فالخلطُ بينهما يمنع كلَّ قصةٍ قادمة من دخولها.
-const stageIds = ids.slice(quranStart, quranStart + parts.length + prophetNodes.length);
+// كلمات سورتها، فتتخلّل السلسلة. والمحروسُ ترتيبُها لا تجاورُها — فالمرحلةُ صارت
+// دفعاتٍ موزّعة (وز١) لا كتلةً واحدة، انظر «توزيعُ الدفعات» أدناه.
+const stageIds = ids.filter((id) => id.startsWith('quran:') || id.startsWith('prophet:'));
 ok(stageIds.filter((id) => id.startsWith('quran:')).join('|') === parts.map((x) => `quran:${x}`).join('|')
-  && stageIds.every((id) => id.startsWith('quran:') || id.startsWith('prophet:'))
-  && ids.slice(0, quranStart).every((id) => !id.startsWith('quran:') && !id.startsWith('prophet:')),
-  `وهي كتلةٌ متصلة بعد الرحلة كلها (${stageIds.length} عقدة: ${parts.length} محطة و${prophetNodes.length} قصة)`);
-ok(ids.slice(quranStart + parts.length + prophetNodes.length).every((id) => id.startsWith('garden:')
-  || id.startsWith('ladder:') || id.startsWith('library:') || id.startsWith('roots:')
-  || id.startsWith('shelf:') || id === 'gate:gardens'),
-  'ولا يليها إلا بوابة الحديقة (١٤) وبساتين الموضوعات (٧) وسلالم جملها (٨) '
-  + 'ومكتبة قصصها (٩) وأشجار جذورها (الجذور) ورفُّ قراءتها الطويلة (المكتبة)');
+  && stageIds.length === parts.length + prophetNodes.length,
+  `عقدُها بترتيبها في الرحلة (${stageIds.length} عقدة: ${parts.length} محطة و${prophetNodes.length} قصة)`);
+const FOUNDATION = new Set(['letter', 'words', 'skill', 'story', 'contrast']);
+ok(ids.slice(0, quranStart).every((id) => !id.startsWith('quran:') && !id.startsWith('prophet:'))
+  && nodes.slice(quranStart).every((n) => !FOUNDATION.has(n.type)),
+  'ولا شيءَ من المرحلة قبل بوابة المصحف، ولا عقدةَ تأسيسٍ بعدها (حرفٌ · مهارةٌ · قصةٌ · مواجهة)');
 // ————— مفاصلُ المرحلة: محطاتٌ مسمّاة، والشقُّ بلا أثر —————
 //
 // **بلاغ المالك (١٢ أغسطس ٢٠٢٦)**: ٣١ عقدةً تحت عنوانٍ واحد بينما البساتين مئةٌ في
@@ -135,6 +134,57 @@ ok(sections.flatMap((x) => x.nodes).map((n) => n.id).join('|')
 ok(p.journey().filter((x) => x.kind === 'quran').length === sections.length,
   'وأقسامُ الرحلة تحمل المحطات كما هي (لا كتلةَ باقية)');
 
+// ————— توزيعُ الدفعات (وز١، ١٥ أغسطس ٢٠٢٦ — قرار المالك على `REVIEW_METHOD §٢`) —————
+//
+// كانت المحطاتُ الخمسُ **متتاليةً** بين البوابتين: ٣١ عقدةً يقرؤها الطفلُ بأقلّ
+// طلاقةٍ يملكها، وخلفَها محبوسٌ رصيدُ الطلاقة كلُّه. فصارت **دفعاتٍ تتخلّل البساتين**.
+// والمحروسُ هنا خمسةٌ: الجدولُ المقرَّر بعينه، وأنّ مواضعَه **محسوبةٌ لا مكتوبة**،
+// وأنّ القيودَ الأربعة باقية، وأنّ الامتدادَ الواحد لم يعد جداراً، وأنّ الخاتمة قرآنية.
+console.log('\n— توزيعُ الدفعات: دفعةٌ ← بستانان ← دفعة —');
+const journeySections = p.journey();
+const kinds = journeySections.map((x) => (x.kind === 'quran' ? x.key : x.kind));
+const shape = kinds.filter((k) => k === 'prep' || k === 'rasm' || k.startsWith('short')
+  || k === 'gate' || k === 'garden' || k === 'shelf');
+ok(shape.slice(0, 6).join(' ← ') === 'gate ← prep ← rasm ← short1 ← gate ← garden',
+  `التهيئةُ والرسمُ والدفعةُ الأولى بين البوابتين (${shape.slice(0, 6).join(' ← ')})`);
+// بعد كل بستانين دفعة: نصفا كل بستانٍ محطتان من نوع `garden`، فالدفعةُ بعد أربع
+const between = [];
+let seen = 0;
+for (const k of shape.slice(4)) {
+  if (k === 'garden') seen++;
+  else if (k.startsWith('short')) { between.push(seen); seen = 0; }
+}
+ok(between.length === shorts.length - 1 && between.every((n) => n === 4),
+  `وكلُّ دفعةٍ بعدها بعد بستانين تامّين (${between.map(arNum).join('، ')} محطةَ باقاتٍ بين الدفعات)`);
+ok(kinds.at(-1) === 'shelf' && kinds.filter((k) => k.startsWith('short')).at(-1) === `short${shorts.length}`
+  && kinds.lastIndexOf(`short${shorts.length}`) < kinds.lastIndexOf('garden'),
+  '**والخاتمةُ قرآنية**: الدفعةُ الأخيرة (وفيها أطولُ السور) قبل البساتين الباقية والرفّ');
+// **الامتدادُ الواحد**: أطولُ محطةٍ في المرحلة — كانت ٣١ عقدةً في كتلةٍ واحدة
+const longest = Math.max(...sections.map((x) => x.nodes.length));
+ok(longest <= 7,
+  `وأطولُ محطةٍ قرآنية ${arNum(longest)} عقد لا ٣١ (حدُّ المالك ١٠–١٢، `
+  + `وأكبرُها دفعةُ قصة الفيل)`);
+// **والقيدُ الأعلى محفوظ**: لا علامةَ رسمٍ ولا حرفَ يُعرض قبل درسه — والرسمُ والتهيئة
+// كتلةٌ واحدة في موضعها قبل أول نصٍّ عثماني مهما تحرّكت الدفعات بعدها.
+const firstSurah = ids.indexOf(`quran:${QURAN.surahs[0].id}`);
+ok(ids.indexOf('quran:rasm') < firstSurah && ids.indexOf('quran:letters') < firstSurah
+  && QURAN.surahs.every((s) => ids.indexOf(`quran:${surahWordsPart(s.id)}`) < ids.indexOf(`quran:${s.id}`)),
+  'والقيودُ الأربعة باقية: الحرفان والرسمُ قبل أول نصٍّ عثماني، وكلماتُ كلِّ سورةٍ قبلها');
+
+// **الفاتحةُ أولى السور بإعلان سببها** (تعديلُ المالك على §٢.٤): خلافُ معيار الطول،
+// فيُشترط أن يكون السببُ **منصوصاً في المنهج** لا مسكوتاً عنه — والإعلانُ عقدُ الشفافية.
+const method = readFileSync(new URL('../docs/METHOD.md', import.meta.url), 'utf8');
+ok(QURAN.surahs[0].id === 's1' && /الفاتحة أولاً لمكانتها التعبدية/.test(method),
+  'والفاتحةُ أولى السور، وسببُها منصوصٌ في `METHOD.md` (لا مخالفةَ معيارٍ بلا إعلان)');
+// وما بعدها يصعد بالدفعات: أطولُ سورةٍ في كل دفعةٍ أطولُ من أطولِ سابقتها
+const bulkOf = (s) => s.ayat.join(' ').length;
+const peaks = shorts.map((station) => Math.max(...station.nodes
+  .filter((n) => n.type === 'quran' && !n.part.startsWith('sw-'))
+  .filter((n) => n.part !== 's1')
+  .map((n) => bulkOf(surahById(n.part)))));
+ok(peaks.every((n, i) => i === 0 || peaks[i - 1] < n),
+  `والصعودُ بالدفعات بعدها (${peaks.map(arNum).join(' ← ')} رمزاً)`);
+
 ok(ids[quranStart - 1] === 'gate:quran',
   'ويسبقها مباشرةً بوابة الإتقان — لا مصحف بحروف هشّة (الحزمة ١٤)');
 // عقد التأسيس: حروف المجموعات ولعبها + المهارات + القصص + البوابتان + المرحلة القرآنية
@@ -162,8 +212,16 @@ const lastSurah = `quran:${QURAN.surahs.at(-1).id}`;
 upTo(lastSurah);
 ok(p.isNodeUnlockedById(lastSurah), `وآخر سورة تُفتح بإتمام ما قبلها (${lastSurah})`);
 p.setStars(lastSurah, 3);
-ok(p.nextNode()?.id === ids[quranStart + parts.length + prophetNodes.length],
-  `وبإتمامها يُفتح أول بستان (${p.nextNode()?.id})`);
+ok(p.nextNode()?.id === ids[ids.indexOf(lastSurah) + 1]
+  && p.nextNode()?.type === 'garden',
+  `وبإتمامها يُفتح ما بعدها من البساتين الباقية (${p.nextNode()?.id})`);
+// **وأولُ بستانٍ لا ينتظر السورَ كلَّها**: هذا هو مقصدُ التوزيع — رصيدُ الطلاقة
+// كان محبوساً خلف اثنتي عشرة سورة، فصار خلف ثلاثٍ وحدَها.
+const firstGarden = nodes.find((n) => n.type === 'garden').id;
+upTo(firstGarden);
+ok(p.isNodeUnlockedById(firstGarden)
+  && !p.isNodeUnlockedById(`quran:${QURAN.surahs[3].id}`),
+  `وأولُ بستانٍ يُفتح بعد الدفعة الأولى وحدَها (${firstGarden}) — ورابعةُ السور خلفه`);
 
 // ————— ١د. قصصُ الأنبياء: «لا سورةَ قَصَصيّةٌ قبل قصتها» —————
 //
@@ -185,6 +243,9 @@ ok(prophetNodes.every((n) => !/[\u0640]/.test(JSON.stringify(n.story))),
 // **معيارُ الاختيار صار بنيوياً**: أقرّ المدير الشريحة بترتيب الطول التصاعدي، فإن
 // أُقحمت سورةٌ طويلة بين قصيرتين يوماً سقط هذا الاختبار — لا يبقى المعيار في ورقةٍ
 // وحدها. والطولُ بالرمز (لا بعدد الآيات) فهو ما يراه الطفل على الصفحة.
+//
+// **وهو معيارُ اختيارٍ لا معيارُ موضع** (بعد توزيع وز١): سُلّمُ الطول هنا يحرس
+// **مَن دخل الشريحة**، وترتيبُ قراءتها يحرسه «الصعودُ بالدفعات» أعلاه.
 
 const SLICE = ['s108', 's103', 's106', 's111', 's105', 's94', 's107', 's101'];
 ok(QURAN.surahs.length === 12 && SLICE.every((id) => surahById(id)),

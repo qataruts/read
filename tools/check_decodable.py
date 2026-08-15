@@ -1263,8 +1263,12 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
            "وكلمةٌ ليست من نصّ سورتها في المصدر المرجعي تُمسَك (بند ١٢/٤)")
 
         # عبث مقصود: آية محرَّفة، وعلامة بلا درس، وحرف جديد بلا كلمة
+        # موضعُ العبث **يُشتقّ لا يُكتب**: ترتيبُ السور بيانُ منهجٍ يتحرّك (وز١ وزّعها
+        # دفعاتٍ فصار ثانيها الكوثرَ ولا ضمّةَ في آيته) — فتُلتمس أولُ آيةٍ فيها ضمّة.
         broken = json.loads(json.dumps(quran))
-        broken["surahs"][1]["ayat"][1] = broken["surahs"][1]["ayat"][1].replace("ُ", "َ")
+        si, ai = next((i, j) for i, s in enumerate(broken["surahs"])
+                      for j, a in enumerate(s["ayat"]) if "ُ" in a)
+        broken["surahs"][si]["ayat"][ai] = broken["surahs"][si]["ayat"][ai].replace("ُ", "َ")
         ok(any("لا تطابق المصدر" in e for e in check_quran(broken, all_letters, letters, source)[0]),
            "وتحريف حركة واحدة في آية يُمسَك بمطابقة المصدر")
 

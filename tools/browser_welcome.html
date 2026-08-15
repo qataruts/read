@@ -31,7 +31,7 @@ const ok = (cond, msg) => {
   out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
   post();
 };
-setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 110000);
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 280000);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function waitFor(fn, label = '', ms = 5000) {
@@ -202,7 +202,9 @@ ok(!!frame.contentDocument.getElementById('app')
 const reg = await waitFor(async () => {
   const regs = await navigator.serviceWorker.getRegistrations();
   return regs.find((r) => r.active) || null;
-}, 'تفعيل عامل الخدمة', 60000);
+}, 'تفعيل عامل الخدمة', 180000);
+// المهلةُ ثلاثُ دقائق قراراً معلناً (١٥ أغسطس ٢٠٢٦): التفعيلُ ينتظر خزنَ التثبيت
+// كلَّه (~٢٩٧٦ صوتاً) — ٦٠ ثانية كانت حافةَ جهازٍ فارغ، وأيُّ حملٍ يقلبها حُمرةً كاذبة.
 ok(!!reg, `عامل الخدمة مسجَّل ونشط (${new URL(reg.scope).pathname})`);
 
 const names = await waitFor(async () => {

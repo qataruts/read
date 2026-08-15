@@ -15,11 +15,32 @@ import { libraryOf, shelfStories, storiesOfSurah } from './library.js';
 
 const STORE_KEY = 'muallim.progress.v1';
 export const VERSION = 2;            // ١ = نجوم فقط (تُرقّى تلقائياً بلا فقد)
+
+/**
+ * **ترتيبُ الرحلة** — رقمٌ يُختَم به تقدّمُ الطفل، لا نسخةُ تخزينٍ (رفعُ `VERSION`
+ * يُسقِط حالةَ كل طفلٍ قائم). ١ = الكتلةُ القرآنية متّصلة قبل البساتين؛ **٢** =
+ * الدفعاتُ الأربع تتخلّل البساتين (وز١، ١٥ أغسطس ٢٠٢٦). ومنه يعرف الترحيلُ أنّ
+ * الفجوةَ التي يراها **إزاحةٌ** لا محطةٌ مستحدثة — انظر `migrateJourney`.
+ */
+export const ORDER = 2;
 export const MAX_STARS = 3;
 export const WORDS_PART = 'words';   // عقدة لعبة الكلمات في آخر كل مجموعة
 
-/** «أربعُ سورٍ لكل محطة» — به تُشقّ السورُ محطاتٍ، ويتبعه عددُها بلا سطرٍ يُعدَّل. */
-export const SURAHS_PER_STATION = 4;
+/**
+ * «ثلاثُ سورٍ لكل دفعة» — به تُشقّ السورُ محطاتٍ، ويتبعه عددُها بلا سطرٍ يُعدَّل.
+ *
+ * **وكانت أربعاً** (قرار المالك، ١٥ أغسطس ٢٠٢٦، على `REVIEW_METHOD §٢`): صارت ثلاثاً
+ * حين تخلّلت الدفعاتُ البساتينَ — حجمٌ يوازن بين حضور المصحف المتجدّد وبين ألّا تعود
+ * الكتلةُ جداراً، فأطولُ امتدادٍ قرآنيّ ستُّ عقدٍ (وسبعٌ في دفعة قصة الفيل).
+ */
+export const SURAHS_PER_STATION = 3;
+
+/**
+ * **باقاتُ نصف البستان** (الحكم ب١٠، ١٥ أغسطس ٢٠٢٦): الوحدةُ الموضوعية للبستان كانت
+ * ١٩–٢٣ حلقةً متّصلة بميكانيكيّاتٍ متطابقة — تجاوزُ روحِ حدّ المالك ١٠–١٢. فتُشَقّ
+ * **بالنوع** لا بالعدد: باقاتٌ ← درجاتُ سلّمٍ ← باقاتٌ ← بقيةُ السلّم ← المكتبة.
+ */
+export const GARDEN_HALF = 5;
 
 // رقمٌ عربيّ لعنوان المحطة. ونسخةٌ صغيرة هنا لا استيرادٌ من `ui.js`: اتجاهُ الاعتماد
 // واحد (`ui.js` ← `progress.js`)، ولا تُقلَب طبقةٌ لأجل سطرٍ من عشرة محارف.
@@ -69,6 +90,7 @@ function blank() {
     skills: {},       // «حرف|حركة|تمرين» ← {right, wrong, box, due, seen}
     days: {},         // «YYYY-MM-DD» ← ثوانٍ من الاستعمال الفعلي
     reviews: {},      // «YYYY-MM-DD» ← {items, right, at}
+    order: ORDER,     // ترتيبُ الرحلة الذي بُنيت عليه هذه الحالة (انظر `migrateJourney`)
     records: [],      // «اقرأ لي»: [{node, title, seconds, day, at}] — بيانٌ نصيّ لا صوت
     reads: {},        // «جذع كلمة» ← {n, day} — عدّاد خفوت التشكيل (حزمة الخفوت)
     mic: false,       // إذنُ وليّ الأمر بالتسجيل (يُعطى مرة واحدة خلف بوابته)
@@ -83,7 +105,10 @@ function migrate(data) {
   if (!data || typeof data !== 'object' || typeof data.stars !== 'object') return null;
   if (data.v !== 1 && data.v !== VERSION) return null;
   const { errors, ...rest } = data;   // errors: حقل النسخة ١ المحجوز، حلّت محلّه skills
-  return { ...blank(), ...rest, v: VERSION };
+  // **وسمُ الترتيب يُقرأ من المحفوظ لا من الفراغ**: `blank()` يسم الجديد بالترتيب
+  // القائم، فلو تُرك الدمجُ لظاهره لادّعت كلُّ حالةٍ قديمة أنها مبنيّةٌ عليه —
+  // وضاع على الترحيل أنّ فجوتَها إزاحةٌ لا محطةٌ مستحدثة.
+  return { ...blank(), ...rest, v: VERSION, order: data.order || 1 };
 }
 
 function load() {
@@ -113,9 +138,43 @@ const SPLIT_NODES = {
   'quran:words': ['quran:words1', 'quran:words2', 'quran:words3'],
 };
 
+/**
+ * **العقدةُ المُزاحة لا تُوهَب نجمة** (ترحيل وز١، ١٥ أغسطس ٢٠٢٦): وهبةُ النجمة أدناه
+ * علّتُها «محطةٌ استحدثناها خلف موضع الطفل» — فتفكّ حبسه عن شيءٍ لم يكن موجوداً يوم
+ * مرّ. أمّا توزيعُ الدفعات فلم يستحدث عقدةً واحدة: **أزاح** سورَ الدفعات الثلاث
+ * الأخيرة وبوابةَ الحديقة إلى ما بعد بساتينَ لم يبلغها الطفل بعد. فلو وُهبت لها
+ * نجمةٌ لتخطّى الطفلُ سورةً لم يقرأها وبوابةً لم يعبرها — وهو ضدُّ الرحمة لا وجهُها.
+ *
+ * **ولا حبسَ في تركها**: القفلُ جبهةٌ لا شرطٌ رجعيّ — فمن أزاحه الترتيبُ إلى الوراء
+ * يستأنف من أول عقدةٍ ناقصة، ونجومُه كلُّها محفوظةٌ بمعرّفاتها تُتخطّى حين يبلغها.
+ *
+ * **والمُزاحُ معدودٌ لا مقيسٌ بنوعه**: التوزيعُ حفظ ترتيبَ السور بينها إلا اثنين —
+ * **الكوثرَ** (صار ثانيَ الدفعة الأولى بعد أن كان خامسَ السور) و**بوابةَ الحديقة**
+ * (صارت قبل الدفعة الثانية بعد أن كانت بعد السور كلِّها) — فهذان وحدهما يقعان خلف
+ * نجمةٍ لصاحبها بلا أن يكون مرّ بهما. وما عداهما على ترتيبه النسبيّ، فتبقى له
+ * قاعدةُ الوهبة كما هي (ومنها محطاتُ «كلمات السورة» المستحدَثة في الحزمة ١٢).
+ *
+ * **وشاهدُ المجاوَزة نجمةٌ فيما بعد المرحلة**: مَن بلغ بستاناً أو سلّماً أو مكتبةً أو
+ * شجرةً أو رفّاً فقد عبَر المرحلةَ كلَّها حقاً — فالفجوةُ عنده **محطةٌ استُحدثت خلفه**
+ * (سورُ حزمة «القرآني الموسّع») وتُوهَب له كما كانت. ومَن هو في المرحلة بعدُ فالفجوةُ
+ * عنده **إزاحة**، فيقرأ ما أُزيح أمامه ولا يتخطّاه.
+ *
+ * والقيدُ كلُّه **لحالةٍ واحدة**: المبنيّةُ على الترتيب القديم (`order < ORDER`).
+ */
+const DISPLACED = new Set(['quran:s108', 'quran:sw-s108', 'gate:gardens']);
+
+const BEYOND_QURAN = new Set(['garden', 'ladder', 'library', 'roots', 'shelf']);
+
 function migrateJourney() {
-  if (!Object.keys(state.stars).length) return;   // طفلٌ جديد: لا شيء يُرحَّل
-  let changed = false;
+  const reordered = (state.order || 1) < ORDER;
+  if (!Object.keys(state.stars).length) {          // طفلٌ جديد: لا شيء يُرحَّل
+    if (reordered) { state.order = ORDER; save(); }
+    return;
+  }
+  let changed = reordered;
+  state.order = ORDER;
+  const passedStage = allNodes().some(
+    (node) => BEYOND_QURAN.has(node.type) && state.stars[node.id] > 0);
 
   /* **إنقاذُ نجمةٍ كُتبت تحت معرّفٍ خطأ** (بلاغ المالك، ١٣ أغسطس ٢٠٢٦): قصةُ السورة
      كانت تُحفظ تحت `library:` والرحلةُ تنتظرها تحت `prophet:` — فتجمّدت الجبهةُ عند
@@ -145,6 +204,8 @@ function migrateJourney() {
   for (const [i, node] of nodes.entries()) if (state.stars[node.id] > 0) last = i;
   for (const [i, node] of nodes.entries()) {
     if (state.stars[node.id] || i >= last) continue;
+    // مُزاحةٌ لا مستحدثة، وصاحبُها لم يجاوز المرحلة بعدُ — انظر `DISPLACED` أعلاه
+    if (reordered && !passedStage && DISPLACED.has(node.id)) continue;
     if (node.type === 'gate') {
       state.stars[node.id] = MAX_STARS;           // بوابةٌ عبَر مفصلَها قبل وجودها ⇒ مجتازة
       changed = true;
@@ -348,6 +409,9 @@ export function contrastNodes(contrast) {
 /**
  * عقد بستان الموضوعات (الحزمة ٧): باقةٌ لكل عقدة، بترتيب `lexicon.js`.
  * موضعها بعد المرحلة القرآنية — حصيلة الطفل عندها كاملة، فالجديد رصيدٌ لا شيفرة.
+ *
+ * **والعقدةُ تحمل بستانَها كاملاً** وإن شُقَّت محطتُه نصفين (`gardenSections`):
+ * الشقُّ عرضٌ على الخريطة، ومادّةُ الشاشة (مشتّتاتُها وحوضُها) بستانٌ واحد لا نصفُه.
  */
 export function gardenNodes(garden) {
   return garden.bundles.map((bundle) => ({
@@ -363,6 +427,78 @@ export function ladderNodes(ladder) {
   return ladder.rungs.map((rung) => ({
     id: `ladder:${rung.id}`, type: 'ladder', part: rung.id, garden: ladder.garden, rung,
   }));
+}
+
+/**
+ * **موضعُ شقّ السلّم محسوبٌ لا مكتوب** (الحكم ب١٠): أطولُ بادئةٍ من الدرجات كلُّ
+ * كلماتِ جملها المعجمية في **باقات أ** — فالشقُّ لا يخرق المفكوكية بحرف، وباقةٌ
+ * تنتقل من نصفٍ إلى نصفٍ غداً تحرّك موضعَ الشقّ وحدَها بلا سطرٍ يُعدَّل.
+ *
+ * والمطابقةُ بالجذع كما في `sentences.js` نفسِه (`stemGarden`)، وما ليس من كلمات
+ * البستان (المعجمُ المساند وكلماتُ المنهج) مدروسٌ قبل البستان كلِّه فلا يقيّد شيئاً.
+ */
+function ladderCut(garden, ladder) {
+  const at = new Map();                        // جذعُ كلمة البستان ← رقمُ باقتها
+  garden.bundles.forEach((bundle, index) => {
+    for (const word of bundle.words) {
+      const stem = stemOf(word.word);
+      if (!at.has(stem)) at.set(stem, index);
+    }
+  });
+  const beyond = (rung) => rung.sentences.some((sentence) => sentence.words
+    .some((token) => at.get(stemOf(token)) >= GARDEN_HALF));
+  const first = ladder.rungs.findIndex(beyond);
+  return first < 0 ? ladder.rungs.length : first;
+}
+
+/**
+ * **محطاتُ البستان الواحد** (الحكم ب١٠، ١٥ أغسطس ٢٠٢٦): كان البستانُ كتلةً من
+ * ١٩–٢٣ عقدة بميكانيكيّاتٍ متطابقة، فيُشَقّ بالنوع: **باقات أ ← درجاتُ سلّمه الأولى
+ * ← باقات ب ← بقيةُ السلّم ← المكتبة**.
+ *
+ * **والعقدُ لا تُمَسّ**: معرّفاتُها وترتيبُها المسطَّح هما هما حرفاً بحرف — قسمةُ
+ * القائمة لا إعادةُ بنائها، فلا نجمةَ تُفقَد ولا قفلٌ يتبدّل (كشقّ المرحلة القرآنية).
+ *
+ * **والعنوانُ يصدُق نصفَه**: يحمل القسمُ نسخةَ عرضٍ من بستانه بعنوانٍ مرقَّم وكلماتِ
+ * نصفِه وحدَها — فلا يقول للطفل «خمسون كلمة» وأمامه خمسٌ وعشرون. والعقدُ تبقى على
+ * بستانها الكامل (`gardenNodes`)، فمادّةُ الشاشة لا تعرف الشقَّ أصلاً.
+ */
+export function gardenSections(garden) {
+  const bundles = gardenNodes(garden);
+  const ladder = ladderOf(garden.id);
+  const rungs = ladder ? ladderNodes(ladder) : [];
+  const cut = ladder ? ladderCut(garden, ladder) : 0;
+  const half = (index, nodes) => ({
+    ...garden,
+    title: `${garden.title} ${arNumeral(index)}`,
+    words: nodes.flatMap((node) => node.bundle.words),
+  });
+
+  const out = [];
+  const push = (part, index) => {
+    const slice = bundles.slice(part === 'a' ? 0 : GARDEN_HALF, part === 'a' ? GARDEN_HALF : undefined);
+    if (slice.length) {
+      out.push({
+        kind: 'garden', id: `garden:${garden.id}:${part}`, garden: half(index, slice), nodes: slice,
+      });
+    }
+    const steps = part === 'a' ? rungs.slice(0, cut) : rungs.slice(cut);
+    if (steps.length) {
+      out.push({
+        kind: 'ladder',
+        id: `ladder:${garden.id}:${part}`,
+        garden: half(index, slice),
+        ladder: { ...ladder, rungs: steps.map((node) => node.rung) },
+        nodes: steps,
+      });
+    }
+  };
+  push('a', 1);
+  push('b', 2);
+
+  const stories = libraryNodes(garden);
+  if (stories.length) out.push({ kind: 'library', id: `library:${garden.id}`, garden, nodes: stories });
+  return out;
 }
 
 /**
@@ -439,11 +575,24 @@ function rootPlacement(sections) {
 
 /**
  * الرحلة كاملةً بأقسامها بالترتيب: مجموعة ← ما بعدها من مهارات وقصص ← محطة «ميّز بين»
- * إن كانت لها ← … ← بوابة المصحف ← المرحلة القرآنية ← بوابة الحديقة ←
- * (بستان ← سلّم جمله ← قصصه) × البساتين.
+ * إن كانت لها ← … ← بوابة المصحف ← تهيئةُ المرحلة القرآنية ورسمُها ودفعتُها الأولى
+ * ← بوابة الحديقة ← (بستانان ← دفعةُ سورٍ) × ثلاث ← البساتين الأربعة الباقية ← الرفّ.
  *
  * ومحطة المواجهة **بعد مهارات مجموعتها وقصصها**: الحرف يُدرَس، ثم تُسمّى علامته،
  * ثم تُقرأ قصته، ثم يُواجَه بشبيهه — فالمواجهة مراجعةٌ لما استقرّ لا امتحانٌ لما جدّ.
+ *
+ * **وتوزيعُ الدفعات** (قرار المالك، ١٥ أغسطس ٢٠٢٦، على `REVIEW_METHOD §٢.٤`): كانت
+ * المرحلةُ القرآنية ٣١ عقدةً متّصلة بين البوابتين — أطولُ امتدادٍ في الرحلة، يقرؤها
+ * الطفلُ بأقلّ طلاقةٍ يملكها، وخلفَها **محبوسٌ** رصيدُ الطلاقة كلُّه (٥٠٠ كلمة معجم
+ * وسلالمُ جملها وقصصُها). فصارت **دفعاتٍ تتخلّل البساتين**: أميالُ القراءة السهلة
+ * تسبق النصَّ الصعب لا العكس، والسورُ الطوالُ يقرؤها طفلٌ عبَر مئات الكلمات فيقرؤها
+ * قراءةً لا فكّاً متعثراً. **والقيودُ الأربعةُ محفوظة**: التهيئةُ والرسمُ قبل كل نصٍّ
+ * عثماني (كتلةً واحدة في موضعها)، وقصةُ السورة قبل كلماتها، وكلماتُها قبلها، والقفلُ
+ * تسلسليّ كما هو. **والخاتمةُ قرآنية**: الدفعةُ الرابعة (وفيها أطولُ السور) آخرُ ما
+ * قبل الرفّ — فالتتويجُ صعودٌ موزون لا جدارٌ يُتسلَّق.
+ *
+ * **ومواضعُ الدفعات محسوبةٌ لا مكتوبة**: الأولى قبل البساتين، وما بعدها بعد كل
+ * بستانين — فسورةٌ ثالثةَ عشرةَ تفتح دفعةً خامسة في موضعها بلا سطرٍ يُعدَّل.
  */
 export function journey() {
   if (journeyCache) return journeyCache;
@@ -464,20 +613,20 @@ export function journey() {
       });
     }
   }
+  // التهيئةُ والرسمُ والدفعةُ الأولى قبل البوابة الثانية، وبقيةُ الدفعات بين البساتين
+  const quran = quranSections();
+  const batches = quran.filter((section) => section.key.startsWith('short'));
   pushGate('quran');
-  out.push(...quranSections());
+  out.push(...quran.filter((section) => !section.key.startsWith('short')), ...batches.slice(0, 1));
   pushGate('gardens');
-  for (const garden of GARDENS) {
-    out.push({ kind: 'garden', id: `garden:${garden.id}`, garden, nodes: gardenNodes(garden) });
-    const ladder = ladderOf(garden.id);
-    if (ladder?.rungs.length) {
-      out.push({ kind: 'ladder', id: `ladder:${garden.id}`, garden, ladder, nodes: ladderNodes(ladder) });
-    }
-    const stories = libraryNodes(garden);
-    if (stories.length) {
-      out.push({ kind: 'library', id: `library:${garden.id}`, garden, nodes: stories });
-    }
-  }
+  GARDENS.forEach((garden, index) => {
+    out.push(...gardenSections(garden));
+    // بعد كل بستانين دفعةٌ — والباقي من الدفعات (إن نفدت البساتين قبلها) في الذيل
+    const batch = index % 2 === 1 ? batches[(index + 1) / 2] : null;
+    if (batch) out.push(batch);
+  });
+  const placed = new Set(out);
+  out.push(...batches.filter((batch) => !placed.has(batch)));
   // أقسامُ الأشجار تُدرَج بعد بنائها كلِّها — فموضعُها يُقاس على الرحلة التامّة.
   // وتُؤخَّر إلى آخر كتلة بستانها (باقاتُه ثم سلّمُه ثم مكتبتُه): الشجرةُ ثمرةُ ما
   // دُرِس، فلا تُقحَم بين البستان ودرجاته فتقطع تدرّجَه المُقَرّ في الحزمة ٨.
@@ -488,9 +637,11 @@ export function journey() {
     withRoots.push(section);
     const trees = after.get(index) || [];
     if (!trees.length) return;
-    // إن تلت هذا القسمَ أقسامُ بستانِه نفسِه (سلّمٌ أو مكتبة) فالشجرةُ بعدها
+    // إن تلت هذا القسمَ أقسامُ بستانِه نفسِه (نصفُه الثاني أو سلّمٌ أو مكتبة) فالشجرةُ
+    // بعدها — والمقياسُ البستانُ لا نوعُ القسم: شقُّ ب١٠ جعل للبستان الواحد محطاتٍ
+    // من نوع `garden` مرّتين، فلو وقف المسحُ عندها لأُقحمت الشجرةُ في وسط بستانها.
     let tail = index;
-    while (sameGarden(out[tail + 1], out[index]) && out[tail + 1].kind !== 'garden') tail++;
+    while (sameGarden(out[tail + 1], out[index])) tail++;
     if (tail !== index) { (after.get(tail) || after.set(tail, []).get(tail)).push(...trees); return; }
     for (const root of trees) {
       withRoots.push({ kind: 'roots', id: `roots:${root.id}`, root, nodes: rootNodes(root) });

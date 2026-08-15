@@ -193,9 +193,15 @@ def make_server(port: int, results: list):
         def log_message(self, *a):
             pass
 
-    socketserver.TCPServer.allow_reuse_address = True
+    # **خادمٌ خيطيّ لا أحاديّ** (١٥ أغسطس ٢٠٢٦ — التشخيص اكتمل): تفعيلُ عامل الخدمة
+    # ينتظر خزنَ التثبيت كلَّه (~٢٩٧٦ صوتاً بدفعات ١٦ + القشرة والقصص والأيقونات)،
+    # وعلى خيطٍ واحد يقف ذلك على حافة مهلة الستين ثانية — فيقلبه أيُّ حملٍ حُمرةً
+    # كاذبة («انتظار طويل: تفعيل عامل الخدمة»). التوازي يعيد الهامش.
+    class Server(socketserver.ThreadingMixIn, socketserver.TCPServer):
+        allow_reuse_address = True
+        daemon_threads = True
     try:
-        return socketserver.TCPServer(("127.0.0.1", port), Handler)
+        return Server(("127.0.0.1", port), Handler)
     except OSError as err:
         sys.exit(f"المنفذ {port} مشغول ({err}) — أعدّةُ جارٍ من العائلة تعمل الآن؟ "
                  f"(منافذ العائلة: اقرأ 8790 · احسب 8791 · اكتب 8792) جرّب --port آخر.")
@@ -408,6 +414,8 @@ def main():
     args = ap.parse_args()
     if args.voice and args.timeout == 140:
         args.timeout = 165
+    if args.welcome and args.timeout == 140:
+        args.timeout = 300   # مهلةُ التفعيل الموسّعة (خزنُ التثبيت الكامل تحت حمل)
 
     if args.device:
         return device_main(args)
