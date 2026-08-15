@@ -7,6 +7,15 @@
     {
       "name": "calc",
       "path": "../calc"
+    },
+    {
+      "path": "../write"
+    },
+    {
+      "path": "../english"
+    },
+    {
+      "path": "../learn"
     }
   ],
   "settings": {},
