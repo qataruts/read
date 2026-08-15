@@ -1240,7 +1240,8 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
         ok(len(contrasts) == 2 and [c["after"] for c in contrasts] == ["g6", "g7"],
            f"محلّل «ميّز بين» يقرأ محطتين بعد المجموعتين ٦ و٧ "
            f"({'، '.join(c['id'] + '@' + c['after'] for c in contrasts)})")
-        ok([len(c["pairs"]) for c in contrasts] == [3, 4]
+        # ثلاثةٌ في الأولى وستةٌ في الثانية (زوجا الحلق ع/ح وغ/خ بالحكم ج٢، جلسة وز٣)
+        ok([len(c["pairs"]) for c in contrasts] == [3, 6]
            and all(len(p["letters"]) >= 2 for c in contrasts for p in c["pairs"]),
            f"بأزواجها ({[len(c['pairs']) for c in contrasts]}) وحروفِ كل زوج")
         c_errors, _, c_spoken = check_contrasts(contrasts, groups, letters)

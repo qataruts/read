@@ -71,7 +71,10 @@ attach();
 const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const texts = (sel) => $$(sel).map((el) => el.textContent.trim());
-const bare = (s) => s.replace(/[ً-ْٰـ\s]/g, '');
+// **كرسيُّ الألف يُردّ إلى الألف** (الحكم ب٩، جلسة وز٣): الألفُ المتحرّكة تُرسم
+// «أَ إِ أُ» — رسمُ الألفِ مع حركتها لا حرفٌ جديد، فلا يُعَدّ في قياس المفكوكية
+// حرفاً لم يُدرَّس. وتبقى «ء ؤ ئ» غريبةً يمسكها الحارسُ كما كان.
+const bare = (s) => s.replace(/[ً-ْٰـ\s]/g, '').replace(/[أإ]/g, 'ا');
 const lastPlayed = () => played[played.length - 1];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 
@@ -141,15 +144,17 @@ try {
   // وعددُ الأخيرة من عدد السور. فسورةٌ تُضاف تفتح محطتَها بلا سطرٍ يُعدَّل هنا.
   const { QURAN } = await import('/js/curriculum.js');
   const { SURAHS_PER_STATION } = await import('/js/progress.js');
-  const quranStations = 2 + Math.ceil(QURAN.surahs.length / SURAHS_PER_STATION);
+  // مفاصلُ المرحلة بعد وز١/وز٢: تهيئةٌ ورسمان ودفعاتُ السور — تُشتقّ لا تُكتب
+  const quranStations = 3 + Math.ceil(QURAN.surahs.length / SURAHS_PER_STATION);
   ok($$('.station--quran').length === quranStations,
     `والمرحلة القرآنية بعدها في ${quranStations} محطاتٍ مسمّاة (${$$('.station--quran').length})`);
   ok($$('.station--garden').length >= 8, `وبساتين الموضوعات بعدها (${$$('.station--garden').length} بستاناً — الحزمة ٧)`);
   // **ورفُّ القراءة الطويلة ليس مكتبةَ بستان**: يحمل الصنفين في الشكل (`station--library
   // station--shelf`) وموضعُه ذيلُ الرحلة لا خاتمةُ سلّم — فيُعَدّ وحدَه (حزمة «رفّ المكتبة»).
   const libraries = $$('.station--library:not(.station--shelf)').length;
-  ok(libraries === $$('.station--ladder').length,
-    `ومكتبةُ قصصٍ بعد كل سلّم (${libraries} مكتبة — الحزمة ٩)`);
+  // بعد شقّ البستان بالنوع (وز١): بستانان وسلّمان لكل موضوع، والمكتبةُ واحدةٌ خاتمتَه
+  ok(libraries * 2 === $$('.station--ladder').length,
+    `ومكتبةُ قصصٍ خاتمةَ كل موضوعٍ مشقوق (${libraries} مكتبة — الحزمة ٩ ووز١)`);
   ok($$('.station--shelf').length === 1,
     `ورفُّ القراءة الطويلة واحدٌ في ذيل الرحلة (${$$('.station--shelf').length})`);
   ok($$('.station--ladder').length === $$('.station--garden').length,
@@ -170,20 +175,21 @@ try {
   ok(lastPlayed() === 'أَلِف', `زر «اسمه» يشغّل اسم الحرف (${lastPlayed()})`);
   $('.giant').click();
   await sleep(40);
-  ok(lastPlayed() === 'اَ', `الحرف الكبير يشغّل صوته (${lastPlayed()})`);
+  // بطاقاتُ الألف وصوتُها «أَ إِ أُ» (الحكم ب٩) — والمفتاحُ نصُّه فالملفّ هو الملف.
+  ok(lastPlayed() === 'أَ', `الحرف الكبير يشغّل صوته (${lastPlayed()})`);
 
   // الخطوة ٢: الحركات — نتعمّد خطأً واحداً
   await clickNext();
   ok(stepName() === 'الحركات', 'انتقلنا إلى خطوة الحركات');
-  ok(texts('.vchip-face').join('|') === 'اَ|اِ|اُ', `الحركات الثلاث معروضة (${texts('.vchip-face').join('|')})`);
+  ok(texts('.vchip-face').join('|') === 'أَ|إِ|أُ', `الحركات الثلاث معروضة (${texts('.vchip-face').join('|')})`);
   $$('.vchip')[1].click();
   await sleep(40);
-  ok(lastPlayed() === 'اِ', 'نقرة على البلاطة تُسمعها قبل السؤال');
+  ok(lastPlayed() === 'إِ', 'نقرة على البلاطة تُسمعها قبل السؤال');
 
   btn('أيها سمعت').click();
   await sleep(60);
   const target = lastPlayed();
-  ok(['اَ', 'اِ', 'اُ'].includes(target), `السؤال يشغّل إحدى الحركات (${target})`);
+  ok(target === 'أَ', `السؤال الأول على الفتحة دائماً — §٥.١ والحكم ج٨ (${target})`);
   const chips = $$('.vchip');
   const wrong = chips.find((c) => c.querySelector('.vchip-face').textContent !== target);
   wrong.click();

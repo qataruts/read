@@ -2,6 +2,8 @@
 //   node tools/test_lesson.mjs
 // القاعدة المحروسة هنا: لا يظهر في أي تمرين أو مثال حرفٌ لم يُدرَّس بعد.
 
+import { readFileSync } from 'node:fs';
+
 const APP = new URL('../app/js/', import.meta.url);
 
 const store = new Map();
@@ -11,8 +13,12 @@ globalThis.localStorage = {
   removeItem: (k) => store.delete(k),
 };
 
-const { GROUPS, lettersThrough, exampleWordFor, bareLetters } = await import(new URL('curriculum.js', APP));
-const { buildRounds, starsForErrors, clusters } = await import(new URL('lesson.js', APP));
+const {
+  GROUPS, HARAKAT, SUKUN, harakaText, lettersThrough, exampleWordFor, bareLetters,
+} = await import(new URL('curriculum.js', APP));
+const {
+  buildRounds, harakaTarget, starsForErrors, clusters,
+} = await import(new URL('lesson.js', APP));
 
 let fails = 0;
 const ok = (cond, msg) => { if (!cond) { fails++; console.log('  ✗', msg); } else console.log('  ✓', msg); };
@@ -118,6 +124,32 @@ ok(starsForErrors(0) === 3 && starsForErrors(1) === 2 && starsForErrors(2) === 1
 
 ok(clusters('بَابْ').join('|') === 'بَ|ا|بْ', 'تقطيع الحروف بحركاتها لتلوين الحرف داخل الكلمة');
 ok(clusters('مَا').filter((c) => c[0] === 'م').length === 1, 'الحرف المستهدف يُلتقط مرة واحدة في «مَا»');
+
+// ————— ٤. رسمُ الحرف مع حركته: الألفُ بالهمزة (الحكم ب٩) —————
+
+const alef = HARAKAT.map((k) => harakaText('ا', k.mark));
+ok(alef.join(' ') === 'أَ إِ أُ', `بطاقاتُ الألف تُرسم بالهمزة: ${alef.join(' ')}`);
+ok(HARAKAT.every((k) => harakaText('ب', k.mark) === 'ب' + k.mark)
+  && harakaText('ا', SUKUN) === 'ا' + SUKUN,
+  'ولا يمسّ الرسمُ سواها — ولا الألفَ الساكنة (حرفُ مدٍّ لا نطقَ له مفرداً)');
+
+// **صفرُ إضافةٍ صوتية**: النصوص الثلاثة لها ملفاتُها المولَّدة (المفتاح نصُّه).
+const manifest = JSON.parse(readFileSync(new URL('../app/audio/manifest.json', import.meta.url), 'utf8'));
+const queue = JSON.parse(readFileSync(new URL('audio_queue.json', import.meta.url), 'utf8'));
+const have = new Set(Object.values(manifest));
+const waiting = new Set(queue.filter((e) => e.status !== 'done').map((e) => e.text));
+ok(alef.every((t) => have.has(t)),
+  `ولكلٍّ ملفُّه الجاهز — لا توليدَ ولا نسخ (${alef.filter((t) => !have.has(t)).join('،') || 'الثلاثة'})`);
+ok(alef.every((t) => !waiting.has(t)), 'ولا واحدٌ منها في قائمة الانتظار الصوتية');
+
+// ————— ٥. خطوة الحركات: الفتحةُ أولاً ثم عشوائية (الحكم ج٨) —————
+
+const items = HARAKAT.map((k) => ({ ...k, text: harakaText('ب', k.mark) }));
+ok(harakaTarget(0, items).key === 'fatha', 'أولُ سؤالٍ في خطوة الحركات على الفتحة دائماً (§٥.١)');
+const rnd = rng(7);
+const later = new Set(Array.from({ length: 60 }, (_, i) => harakaTarget(1 + i, items, rnd).key));
+ok(later.size === HARAKAT.length,
+  `وما بعدها عشوائيّ يبلغ الحركات الثلاث (${[...later].join('، ')})`);
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات درس الحرف ناجحة');
 process.exit(fails ? 1 : 0);

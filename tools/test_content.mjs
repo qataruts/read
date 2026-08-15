@@ -122,8 +122,11 @@ ok(ids.indexOf('skill:madd-alif') === ids.indexOf('g1:words') + 1
 ok(ids.indexOf('skill:sukun') === ids.indexOf('g2:words') + 1
   && ids.indexOf('g3:ت') === ids.indexOf('skill:sukun') + 1,
   'والسكون بين ٢ و٣');
+// أولُ حرفٍ في المجموعة **مشتقٌّ لا مكتوب**: ترتيبُ المجموعة ٤ صار `ك ع ف ق`
+// (الحكم ب٥) — والمحروسُ هنا موضعُ المهارة من المجموعة لا هويّةُ الحرف.
+const firstOf = (gid) => `${gid}:${GROUPS.find((g) => g.id === gid).letters[0]}`;
 ok(ids.indexOf('skill:madd-waw-ya') === ids.indexOf('g3:words') + 1
-  && ids.indexOf('g4:ع') === ids.indexOf('skill:madd-waw-ya') + 1,
+  && ids.indexOf(firstOf('g4')) === ids.indexOf('skill:madd-waw-ya') + 1,
   'ومدّ الواو والياء بين ٣ و٤');
 ok(ids.indexOf('story:st1') === ids.indexOf('skill:shadda') + 1,
   'والقصة تلي مهارتها مباشرة');

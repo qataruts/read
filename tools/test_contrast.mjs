@@ -46,14 +46,16 @@ ok(CONTRASTS.length === 2 && CONTRASTS.map((c) => c.after).join('،') === 'g6،g
   `محطتا مواجهة: بعد المجموعة ٦ وبعد ٧ (${CONTRASTS.map((c) => c.title).join(' · ')})`);
 ok(CONTRASTS.every((c) => c.id && c.title && c.face && c.hint && c.pairs.length),
   'لكل محطة معرّفها وعنوانها ووجهها وسطرُ توجيهها وأزواجها');
-ok(CONTRASTS.map((c) => c.pairs.length).join('،') === '3،4',
-  `ثلاثة أزواج في الأولى وأربعة في الثانية (${CONTRASTS.map((c) => c.pairs.length).join('،')})`);
+// ثلاثةٌ في الأولى وستةٌ في الثانية: أربعةٌ منذ الحزمة ١٣، وزوجا الحلق (ع/ح · غ/خ)
+// بالحكم ج٢ — والثانيةُ موضعُهما لأن الغين لا تُدرَّس إلا في السابعة.
+ok(CONTRASTS.map((c) => c.pairs.length).join('،') === '3،6',
+  `ثلاثة أزواج في الأولى وستة في الثانية (${CONTRASTS.map((c) => c.pairs.length).join('،')})`);
 ok(contrastById('alike') && !contrastById('لا-وجود-لها'),
   'والبحث عن محطة مجهولة يعود بلا شيء');
 
 const pairs = contrastPairs();
-ok(pairs.length === 7 && pairs.every((p2) => p2.id && p2.letters.length >= 2),
-  `سبعة أزواج مسطَّحة (${pairs.map((x) => x.letters.join('/')).join(' · ')})`);
+ok(pairs.length === 9 && pairs.every((p2) => p2.id && p2.letters.length >= 2),
+  `تسعة أزواج مسطَّحة (${pairs.map((x) => x.letters.join('/')).join(' · ')})`);
 ok(new Set(pairs.map((x) => [...x.letters].sort().join(''))).size === pairs.length,
   'لا زوج مكرَّر بين المحطتين — مواجهةٌ واحدة تكفي');
 

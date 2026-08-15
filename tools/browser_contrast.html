@@ -37,6 +37,7 @@ async function waitFor(fn, label = '', ms = 5000) {
 
 const { CONTRASTS, LETTERS, HARAKAT } = await import('./js/curriculum.js');  // بيانات المنهج مصدرها الوحيد
 const { allNodes } = await import('./js/progress.js');
+const { arNum } = await import('./js/ui.js');
 const manifest = await (await fetch('audio/manifest.json')).json();
 // النصوص المنتظِرة في القائمة الصوتية: لا ملف لها بعدُ، فالنطق الآلي صوابٌ مؤقتاً
 const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
@@ -223,9 +224,12 @@ try {
   const contrastSkills = skills.filter((s) => s.k.endsWith('|contrast'));
   ok(contrastSkills.length >= CONTRASTS[0].pairs.length,
     `القياس يدخل ليتنر بنوع «contrast» (${contrastSkills.length} مهارة)`);
+  // قاعدةُ وز٢ (ب٨): أولُ محاولةٍ في الجولة وحدها تدخل ليتنر — فالجولةُ التي
+  // أُخطئ فيها أولاً تسجّل خطأها ولا تسجّل صوابَها اللاحق (تعلّمٌ لا قياس)
   ok(contrastSkills.reduce((n, s) => n + s.wrong, 0) === 1
-    && contrastSkills.every((s) => s.right >= 1 && s.box >= 1),
-    `خطأٌ واحد مسجَّل، وكلّ ما أصابه رفع صندوقه (${contrastSkills.map((s) => s.box).join('،')})`);
+    && contrastSkills.filter((s) => s.box === 0).length === 1
+    && contrastSkills.filter((s) => s.right >= 1 && s.box >= 1).length === contrastSkills.length - 1,
+    `خطأٌ واحد مسجَّل بقاعدة أول محاولة، وسائرُ الجولات رفعت صناديقها (${contrastSkills.map((s) => s.box).join('،')})`);
   ok(contrastSkills.every((s) => CONTRASTS[0].pairs.some((p) => p.letters.includes(s.k[0]))),
     'وكل مهارة على حرفٍ من أزواج المحطة');
 
@@ -243,13 +247,16 @@ try {
   await waitFor(() => $('.contrast-head'), 'شاشة المحطة الثانية');
   ok($('.contrast-head').textContent.includes('ميّز بين الأصعب'), 'المحطة الثانية تُفتح بعد السابعة');
   ok($$('.pairs .pair').length === CONTRASTS[1].pairs.length,
-    `بأربعة أزواج (${$$('.pairs .pair').length})`);
+    `بأزواجها الستة (${$$('.pairs .pair').length})`);
   const triple = $$('.pairs .pair').find((r) => r.querySelectorAll('.vchip').length === 3);
   ok(!!triple, `وفيها ثلاثيّ ذ/ظ/ز (${triple ? [...triple.querySelectorAll('.vchip')].map(faceOf).join('|') : 'لا شيء'})`);
 
   btn('تابع').click();
   await waitFor(() => $('.vchip--big'), 'جولات المحطة الثانية');
-  ok(counter().includes('٨'), `ثماني جولات (جولتان لكل زوج) — ${counter()}`);
+  // **العددُ محسوبٌ لا مكتوب**: جولتان لكل زوج — فزوجٌ يُضاف (ع/ح وغ/خ بالحكم ج٢)
+  // يحرّك العددَ بلا سطرٍ يُعدَّل هنا.
+  const expected = arNum(CONTRASTS[1].pairs.length * 2);
+  ok(counter().includes(expected), `${expected} جولات (جولتان لكل زوج) — ${counter()}`);
 
   const small = $$('.screen-card button')
     .map((el) => [el, el.getBoundingClientRect()])

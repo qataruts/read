@@ -5,7 +5,7 @@
 // lettersThrough(group, letter) — أي المدروس فعلاً حتى هذا الدرس، لا حتى نهاية المجموعة.
 
 import {
-  LETTERS, HARAKAT, HARAKA_BY_MARK, letterForms, lettersThrough, exampleWordFor,
+  LETTERS, HARAKAT, HARAKA_BY_MARK, harakaText, letterForms, lettersThrough, exampleWordFor,
 } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
@@ -42,6 +42,16 @@ export function buildRounds(studied, letter, rnd = Math.random) {
   return rounds;
 }
 
+/**
+ * هدفُ سؤال «أيها سمعت؟» في خطوة الحركات: **الفتحةُ أولاً ثم عشوائية**
+ * (الحكم ج٨، جلسة وز٣ — تنفيذُ نصّ METHOD §٥.١ «الفتحة أولاً، ثم الكسرة والضمة»).
+ * كان الهدفُ عشوائياً من أول سؤال، فقد يُمتحَن الطفلُ بالضمّة قبل أن يقصده أحدٌ
+ * بالفتحة — والأولى فتحةٌ كنظيرتها في `buildRounds`، وما بعدها عشوائيٌّ فلا يُحفَظ
+ * ترتيبٌ بدل أن تُسمَع الحركة. دالّةٌ نقيّة: `items` بترتيب HARAKAT (الفتحة أولها).
+ */
+export const harakaTarget = (asked, items, rnd = Math.random) => (
+  asked === 0 ? items[0] : pick(items, rnd));
+
 /** تقطيع نص مشكول إلى «حرف + حركاته» لتلوين الحرف المستهدف داخل الكلمة. */
 export function clusters(text) {
   const out = [];
@@ -65,8 +75,8 @@ export function renderLesson(groupId, letter) {
 
   audio.preload([
     name,
-    ...HARAKAT.map((k) => letter + k.mark),
-    ...rounds.flatMap((r) => r.options.map((c) => c + r.mark)),
+    ...HARAKAT.map((k) => harakaText(letter, k.mark)),
+    ...rounds.flatMap((r) => r.options.map((c) => harakaText(c, r.mark))),
     ...(example ? [example.say] : []),
   ]);
 
@@ -115,6 +125,7 @@ export function renderLesson(groupId, letter) {
 
   function stepListen() {
     const forms = letterForms(letter);
+    const sound = harakaText(letter, FATHA);   // رسمُ الصوت ومفتاحُه (الألفُ «أَ» — الحكم ب٩)
     const cell = (label, text) => h('div', { class: 'form-cell' },
       h('span', { class: 'form-face' }, text),
       h('small', {}, label));
@@ -125,7 +136,7 @@ export function renderLesson(groupId, letter) {
       h('button', {
         class: 'giant',
         'aria-label': `اسمع صوت ${letterTitle(letter)}`,
-        onclick: () => audio.play(letter + FATHA),
+        onclick: () => audio.play(sound),
       }, giantInk(letter)),
     ], [
       h('div', { class: 'row' },
@@ -136,9 +147,9 @@ export function renderLesson(groupId, letter) {
         }, icon('ear'), ` اسمه: ${name}`),
         h('button', {
           class: 'btn btn--primary',
-          'aria-label': `اسمع صوت الحرف: ${letter + FATHA}`,
-          onclick: () => audio.play(letter + FATHA),
-        }, icon('ear'), ` صوته: ${letter + FATHA}`),
+          'aria-label': `اسمع صوت الحرف: ${sound}`,
+          onclick: () => audio.play(sound),
+        }, icon('ear'), ` صوته: ${sound}`),
       ),
       h('h3', { class: 'sub' }, 'أشكاله في الكلمة'),
       h('div', { class: 'forms' },
@@ -168,9 +179,12 @@ export function renderLesson(groupId, letter) {
   // ————— ٢) الحركات: استماع ثم «أيها سمعت؟» —————
 
   function stepHarakat() {
-    const items = HARAKAT.map((k) => ({ ...k, text: letter + k.mark }));
+    // البطاقاتُ بترتيب HARAKAT: الفتحة أولاً (§٥.١)، ورسمُها `harakaText` — فبطاقاتُ
+    // الألف «أَ إِ أُ» لا «اَ اِ اُ» (الحكم ب٩).
+    const items = HARAKAT.map((k) => ({ ...k, text: harakaText(letter, k.mark) }));
     let target = null;
     let solved = false;
+    let asked = 0;
 
     const prompt = h('p', { class: 'hint' }, 'اضغط كلَّ واحدة لتسمعها');
     const foot = h('div', { class: 'row foot' });
@@ -212,7 +226,8 @@ export function renderLesson(groupId, letter) {
     }
 
     function ask() {
-      target = pick(items);
+      target = harakaTarget(asked, items);   // الفتحةُ أولاً ثم عشوائية (الحكم ج٨)
+      asked++;
       solved = false;
       for (const c of cards) c.classList.remove('good', 'bad');
       prompt.textContent = 'اضغط ما سمعت';
@@ -330,7 +345,7 @@ export function renderLesson(groupId, letter) {
     const row = h('div', { class: 'row vrow' });
     let locked = false;
 
-    const playTarget = () => audio.play(rounds[state.round].target + rounds[state.round].mark);
+    const playTarget = () => audio.play(harakaText(rounds[state.round].target, rounds[state.round].mark));
 
     function startRound() {
       const r = rounds[state.round];
@@ -338,7 +353,7 @@ export function renderLesson(groupId, letter) {
       prompt.textContent = 'أيَّ حرف سمعت؟';
       counter.textContent = `الجولة ${arNum(state.round + 1)} من ${arNum(rounds.length)}`;
       row.replaceChildren(...r.options.map((ch) => {
-        const text = ch + r.mark;
+        const text = harakaText(ch, r.mark);
         const btn = h('button', {
           class: 'vchip vchip--big',
           'aria-label': text,
