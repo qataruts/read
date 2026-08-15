@@ -11,15 +11,18 @@ let fails = 0;
 const ok = (c, m) => { if (!c) { fails++; console.log('  ✗', m); } else console.log('  ✓', m); };
 
 const parent = read('js/parent.js');
-ok(parent.includes('wa.me/97433882806'), 'واتساب بالرقم المعتمد (+974 3388 2806)');
-ok(parent.includes('mailto:info@mishkat.qa'), 'والبريدُ المرجع info@mishkat.qa');
-ok(/feedbackSection/.test(parent) && parent.includes('بلِّغنا'), 'وقسمُ «بلِّغنا» في اللوحة');
-ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(parent.slice(parent.indexOf('function feedbackSection'))
-  .split('\nexport ')[0]), 'والقسمُ لا يعرف الشبكة — روابطُ فتحٍ لا جلب');
+const feedback = read('js/feedback.js');
+ok(feedback.includes('wa.me/97433882806'), 'واتساب بالرقم المعتمد (+974 3388 2806)');
+ok(feedback.includes('mailto:info@mishkat.qa'), 'والبريدُ المرجع info@mishkat.qa');
+ok(/feedbackSection/.test(parent) && feedback.includes('بلِّغنا'), 'وقسمُ «بلِّغنا» في اللوحة');
+ok(!/fetch\(|XMLHttpRequest|sendBeacon|WebSocket/.test(feedback),
+  'والوحدةُ لا تعرف الشبكة — روابطُ فتحٍ لا جلب');
+ok(!/https:\/\//.test(parent),
+  'وparent.js صفرُ عناوينَ خارجية — سطحُ «تسجيلات طفلي» يبقى صارماً كما وُلد');
 
 // لا ذكرَ لواتساب في وحدات شاشات الطفل — البابُ للراشد وحدَه
 for (const mod of readdirSync(new URL('js/', APP))) {
-  if (mod === 'parent.js') continue;
+  if (mod === 'parent.js' || mod === 'feedback.js') continue;
   ok(!read(`js/${mod}`).includes('wa.me'), `js/${mod}: لا بابَ بلاغٍ في شاشة طفل`);
 }
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «بلِّغنا» ناجحة');
