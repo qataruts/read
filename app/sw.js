@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v26';  // v26: نسخةُ القشرة تُرى في لوحة وليّ الأمر (أمر المالك عبر بريد العائلة)
+const VERSION = 'v27';  // v27: «بلِّغنا» — بابُ البلاغ والاقتراح في لوحة وليّ الأمر (واتساب وبريد)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];

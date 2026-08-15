@@ -487,10 +487,11 @@ function backupSection(rerender) {
 
   // **رقمُ النسخة تحت حال التخزين** (أمر المالك): سطرٌ هادئ يقرؤه الوالد فيعرف
   // أنّ التحديث بلغ جهازَه — ومن قبله كان يُظنّ ولا يُرى.
-  const version = h('p', { class: 'note' }, 'نسخة التطبيق: …');
+  const version = h('p', { class: 'note', id: 'app-version' }, 'نسخة التطبيق: …');
   navigator.serviceWorker?.addEventListener?.('message', (e) => {
     if (e.data?.type === 'version' && version.isConnected) {
       version.textContent = `نسخة التطبيق: ${e.data.version}`;
+      version.dataset.v = e.data.version;      // تقرؤه «بلِّغنا» فيدخل السياقَ
     }
   });
   const askVersion = () => {
@@ -778,6 +779,8 @@ function dashboard(rerender = () => {}) {
 
     ...section('معاينةُ التطبيق كلِّه', previewSection()),
 
+    ...section('بلِّغنا عن خطأ أو اقتراح', feedbackSection()),
+
     h('p', { class: 'note' }, 'المهارة = حرف × حركة × نوع تمرين — وللعلامات والعائلات الصرفية مهاراتُها كذلك بلا حرف. الخطأ يعيدها إلى مراجعة الغد، والإصابة تُباعد موعدها (١ ← ٢ ← ٤ ← ٨ ← ١٦ يوماً).'),
   );
 
@@ -792,6 +795,36 @@ function dashboard(rerender = () => {}) {
 }
 
 /** الشاشة: البوابة أولاً، ثم اللوحة — والفتح يبقى ما دامت الصفحة مفتوحة. */
+
+/** **«بلِّغنا»** (أمر المالك، ١٥ أغسطس ٢٠٢٦ — «اجعلها بسيطة»): بابُ الجمهور لكل
+ *  خطأٍ أو مقترح — من قسم وليّ الأمر وحدَه (فعلُ راشدٍ متعمَّد، ولا زرَّ في شاشة
+ *  طفل)، رابطا واتساب وبريدٍ **مملوءان بسطر سياقٍ** يجعل البلاغ قابلاً للعمل
+ *  (التطبيق ونسخته) — **ولا يُرفَق من بيانات الطفل شيءٌ أبداً**، والمرسِل يرى
+ *  نصَّه كاملاً في تطبيقه قبل الإرسال. `<a>` خارجيان يُفتحان إن نُقرا ولا
+ *  يُجلَبان — صفرُ شبكةٍ من التطبيق نفسِه. */
+function feedbackSection() {
+  const context = () => {
+    const v = document.getElementById('app-version')?.dataset?.v || '';
+    return `بلاغ من تطبيق اقرأ${v ? ` (قشرة ${v})` : ''}:\n`;
+  };
+  const wa = h('a', { class: 'btn', target: '_blank', rel: 'noopener' }, 'عبر واتساب');
+  const mail = h('a', { class: 'btn' }, 'عبر البريد');
+  const arm = () => {
+    const text = context() + 'اكتب ملاحظتك هنا — وأرفق لقطة شاشة إن أمكن.';
+    wa.href = `https://wa.me/97433882806?text=${encodeURIComponent(text)}`;
+    mail.href = `mailto:info@mishkat.qa?subject=${encodeURIComponent('بلاغ من تطبيق اقرأ')}&body=${encodeURIComponent(text)}`;
+  };
+  arm();
+  navigator.serviceWorker?.addEventListener?.('message', (e) => {
+    if (e.data?.type === 'version') arm();     // النسخة وصلت — يدخل رقمُها السياق
+  });
+  return h('div', {},
+    h('p', { class: 'hint' },
+      'وجدتَ خطأً؟ عندك اقتراح؟ رسالتُك تصلنا مباشرة — وتُفتح في تطبيقك فترى نصَّها قبل إرسالها، ولا يُرفَق معها شيءٌ من بيانات طفلك.'),
+    h('div', { class: 'row' }, wa, mail),
+  );
+}
+
 export function renderParent(rerender) {
   if (unlocked) return dashboard(rerender);
   return gateScreen(() => {
