@@ -1192,12 +1192,17 @@ def route_model(entry: dict, lexicon_ok: bool | None = None) -> str:
         lexicon_ok = is_approved(MODEL_LEXICON)
     if entry.get("category") in SHORT_CATEGORIES:
         return MODEL_CORE                        # القصير كله على 3.1 — بلا استثناء
+    # **الجملةُ لا تُحوَّل إلى 3.1 أبداً** (قياسُ جلسة صوتيات ١٥ أغسطس ٢٠٢٦):
+    # إيقاعُ 3.1 في جمل الكلمتين ٠٫٣١٦ث/حرف مقابل ٠٫١٦٨ على 2.5-pro (٩١ مقابل ٤٣٤
+    # جملة) — الضِّعف. وتوجيهُ «إصلاح العيب المسموع» إلى 3.1 كان هو ما صنع تثاقلَ
+    # «الْمِظَلَّةُ مَفْتُوحَةْ» (٤ محاولات على 3.1: صفر في النطاق؛ ٤ على 2.5-pro:
+    # ٨/٨). فإصلاحُ الجملة يبقى على نموذج الجمل، والتحويلُ إلى 3.1 للقصير وحده.
+    if entry.get("category") == "sentence":
+        return MODEL_SENTENCE
     if entry.get("failCount") and entry.get("lastFailModel") != MODEL_CORE:
         return MODEL_CORE                        # «ما فشل في نموذج يعود لـ3.1» (السياسة)
     if entry.get("priority", 100) <= URGENT_PRIORITY:
-        return MODEL_CORE                        # إصلاح عيب مسموع: الأمتن المجرَّب
-    if entry.get("category") == "sentence":
-        return MODEL_SENTENCE                    # الجمل الطويلة وحدها
+        return MODEL_CORE                        # إصلاح عيب مسموع (غير الجمل): الأمتن المجرَّب
     # كلمة كاملة مفردة: 2.5-flash بعد إجازة المالك، وقبلها تبقى محبوسة
     return MODEL_LEXICON if lexicon_ok else ""
 
