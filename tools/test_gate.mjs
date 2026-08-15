@@ -72,14 +72,26 @@ upTo('gate:gardens');
 ok(p.isNodeUnlockedById('gate:gardens') && !p.isNodeUnlockedById(firstGarden),
   'وبوابة الحديقة كذلك: مفتوحة، والبساتين خلفها');
 
-// ————— ٣. عتبة العبور: بالمحاولة لا بالتمرين، ولا رسوب —————
+// ————— ٣. عتبة العبور: **بالتمرين لا باللمسة** (الحكم ب٧)، ولا رسوب —————
 
 ok(PASS_RATE === 0.8 && GATE_SIZE === 10, 'عشرة تمارين وعتبة ٨٠٪ (نصّ التكليف)');
 ok(passed(8, 2) && passed(10, 0), 'ثمانٍ من عشر ⇒ عبور');
 ok(!passed(7, 3) && !passed(0, 5), 'وسبعٌ من عشر ⇒ لا عبور');
 ok(!passed(0, 0), 'وجلسةٌ بلا محاولة لا تفتح البوابة');
-ok(passed(16, 4) && !passed(15, 5),
-  'والحكم على نسبة المحاولات لا على عددها (لوح تركيبٍ فيه أربع لمسات لا يساوي سؤالاً)');
+ok(passed(16, 4) && !passed(15, 5), 'والحكم على النسبة لا على العدد');
+
+// **وحدةُ الحكم تمرينٌ لا لمسة** (الحكم ب٧، جلسة وز٢): كان محرّك الجلسة يعطي البوابةَ
+// عدَّ اللمسات، فلوحُ تركيبٍ من أربعة مقاطع يزن أربعةَ أضعاف تمييزٍ في نسبة الـ٨٠٪.
+// والمحروسُ أنّ ما يصل إلى `passed` هو `rightItems/missedItems` — يُقرأ من الشيفرة
+// نصّاً، فمن أعادها إلى اللمسات أحمرَّ هذا السطر يومَ يفعل.
+const gateSrc = readFileSync(new URL('../app/js/gate.js', import.meta.url), 'utf8');
+const reviewSrc = readFileSync(new URL('../app/js/review.js', import.meta.url), 'utf8');
+ok(/verdict:\s*\(\{\s*rightItems,\s*missedItems/.test(gateSrc)
+  && /passed\(rightItems, missedItems\)/.test(gateSrc)
+  && /markReview\(tries, rightItems\)/.test(gateSrc),
+  'والبوابةُ تحكم بـ`rightItems/missedItems` — تمارينَ لا لمسات، ولوحةُ الوالد تتبعها');
+ok(/state\.missed = true/.test(reviewSrc) && /function tally\(\)/.test(reviewSrc),
+  'ومحرّكُ الجلسة يطوي كلَّ تمرينٍ مرّةً واحدة مهما بلغت لمساتُه');
 ok(starsForReview(0, 10) === 3 && starsForReview(2, 10) === 2,
   'ونجومها بعتبة المراجعة نفسها (٣ بلا خطأ، ٢ ما دام الخطأ ≤ عدد التمارين)');
 
@@ -91,9 +103,11 @@ const words = p.studiedWords(letters);
 ok(letters.length === 28, `حصيلته عند البوابة كل الحروف (${letters.length})`);
 
 const today = p.dayNumber();
+// **كلُّ محاولةٍ هنا جولةٌ مستقلّة**: `endRound()` بينها — فبعد الحكم ب٨ لا تُسجَّل
+// إلا أولى محاولات الجولة، والمزروعُ هنا محاولاتُ جولاتٍ متفرّقة لا نقراتُ جولةٍ واحدة.
 const seedSkill = (letter, haraka, kind, box, wrong) => {
-  for (let i = 0; i < wrong; i++) p.recordAttempt(letter, haraka, kind, false, today);
-  for (let i = 0; i < box; i++) p.recordAttempt(letter, haraka, kind, true, today);
+  for (let i = 0; i < wrong; i++) { p.endRound(); p.recordAttempt(letter, haraka, kind, false, today); }
+  for (let i = 0; i < box; i++) { p.endRound(); p.recordAttempt(letter, haraka, kind, true, today); }
 };
 // الضعيف (صندوق ٠ بأخطاء) موعده اليوم، والقويّ (صندوق ٥) موعده بعد ١٦ يوماً:
 // `dueSkills` لا ترى القويّ، و`weakestSkills` ترى الكلّ مرتّباً بالضعف.

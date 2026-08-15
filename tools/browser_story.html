@@ -35,8 +35,10 @@ async function waitFor(fn, label = '', ms = 4000) {
   }
 }
 
-const { GROUPS, SKILLS, STORIES, sentenceText } = await import('./js/curriculum.js');
+const { GROUPS, SKILLS, STORIES, sentenceText, storyAsk } = await import('./js/curriculum.js');
 const { allNodes } = await import('./js/progress.js');   // ترتيب الرحلة مصدره واحد
+// الرمزُ صورةُ SVG لا محرفاً («أيقونات لا إيموجي») ومعلَنٌ في `data-emoji` على `<img>`
+const picOf = (el) => el?.querySelector('[data-emoji]')?.dataset.emoji ?? el?.textContent.trim() ?? '';
 const manifest = await (await fetch('audio/manifest.json')).json();
 // النصوص المنتظِرة في قائمة الانتظار الصوتية: لا ملف لها بعدُ، فاحتياط النطق الآلي
 // هو الصواب مؤقتاً — وتفرغ القائمة بعد التصريف فيعود الفحص صارماً بلا تعديل هنا.
@@ -315,9 +317,36 @@ try {
   ok($('.foot .hint').textContent.includes(`سمعتَ ${arNum(st1.sentences.length)}`),
     'وعدّاد المسموع يبلغ الجمل كلها');
 
+  // ————— ٣ب) قصةُ المنهج تُقاس بما قرأ لا بما سمع (الحكم ب٤، جلسة وز٢) —————
+  //
+  // كانت ثلاثُ نجومٍ تُنال بنقرة «اسمع القصة كاملة». والمحروسُ هنا شيئان: أنّ سماعَ
+  // الجمل كلِّها **لا يبلغ الثلاث** ما لم يقرأها كلمةً كلمة، وأنّ للقصة سؤالَ فهمٍ
+  // مصوَّراً يقع الحكمُ فيه على قراءةٍ صامتة (لا صوت قبل الاختيار).
+  const ask1 = storyAsk(st1);
   $('.next').click();
+  await waitFor(() => $('.ask'), 'سؤال فهم القصة');
+  ok(texts('.sentence .sentence-word').join(' ') === ask1.text,
+    `وسؤالُ فهمها معروضٌ يُقرأ («${texts('.sentence .sentence-word').join(' ')}»)`);
+  ok($$('.piccard').length === 3, 'وخياراتُه ثلاثُ صور');
+  const beforeAsk = [heardLog.length, played.length];
+  ok(beforeAsk[1] === played.length, 'ولا صوتَ قبل الاختيار — الحكم على القراءة');
+  $$('.piccard').find((c) => picOf(c) === ask1.answer.emoji).click();
   await waitFor(() => $('.celebrate'), 'ختام القراءة');
-  ok($$('.big-stars .on').length === 3, `من سمع الجمل كلها ⇒ ثلاث نجوم (${$$('.big-stars .on').length})`);
+  ok($$('.big-stars .on').length === 1,
+    `من سمع الجمل كلها ولم يقرأ إلا واحدة ⇒ نجمةٌ واحدة (${$$('.big-stars .on').length})`);
+
+  // ثم يقرأ: نقرُ كلمات الجمل كلِّها — فتكتمل نجومُه بسؤالٍ أصابه من أوّله
+  btn('أعِد القراءة').click();
+  await waitFor(() => $('.sheet'), 'إعادة القراءة');
+  for (const line of $$('.line')) {
+    for (const w of line.querySelectorAll('.story-word')) { w.click(); await sleep(30); }
+  }
+  $('.next').click();
+  await waitFor(() => $('.ask'), 'سؤال الفهم بعد القراءة');
+  $$('.piccard').find((c) => picOf(c) === ask1.answer.emoji).click();
+  await waitFor(() => $('.celebrate'), 'ختام القراءة الثانية');
+  ok($$('.big-stars .on').length === 3,
+    `ومن قرأ الجمل كلها كلمةً كلمة وأجاب من أوّله ⇒ ثلاث نجوم (${$$('.big-stars .on').length})`);
   ok(stored().stars['story:st1'] === 3, 'ونجوم القصة محفوظة');
 
   // ————— ٤) القصة الثالثة: اللام الشمسية بعد درسها —————

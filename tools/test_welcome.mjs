@@ -52,7 +52,7 @@ globalThis.localStorage = {
 const JS = new URL('js/', APP);
 const progress = await import(new URL('progress.js', JS));
 const {
-  GROUPS, LETTERS, STORIES, QURAN, SKILLS, CONTRASTS, GATES, ROOTS, surahWords,
+  GROUPS, LETTERS, STORIES, QURAN, SKILLS, CONTRASTS, GATES, ROOTS, surahWords, rasmSigns,
 } = await import(new URL('curriculum.js', JS));
 const { GARDENS } = await import(new URL('lexicon.js', JS));
 const { RUNGS, SENTENCES } = await import(new URL('sentences.js', JS));
@@ -232,7 +232,7 @@ const expected = {
   quranWords: QURAN.words.levels.reduce((s, l) => s + l.items.length, 0),
   quranLevels: QURAN.words.levels.length,
   hamzaShapes: QURAN.letters.signs[0].shapes.length,
-  rasmSigns: QURAN.rasm.signs.length,
+  rasmSigns: rasmSigns().length,      // درسان بعد شقّ وز٢ — والعددُ عددُهما مجموعين
   muqattaat: QURAN.muqattaat.items.length,
   ayat: QURAN.surahs.reduce((s, x) => s + x.ayat.length, 0),
   surahWords: QURAN.surahs.reduce((s, x) => s + surahWords(x).length, 0),

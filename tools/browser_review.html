@@ -153,10 +153,13 @@ try {
   const hKeys = Object.keys(afterHaraka).filter((k) => k.endsWith('|haraka'));
   ok(hKeys.length === 1 && hKeys[0].startsWith('ب|'),
     `خطوة الحركات تسجّل مهارة واحدة بمفتاح (حرف|حركة|تمرين): ${hKeys.join('،')}`);
-  ok(afterHaraka[hKeys[0]].wrong === 1 && afterHaraka[hKeys[0]].right === 1,
-    'الخطأ والإصابة كلاهما مسجَّل على المهارة نفسها');
-  ok(afterHaraka[hKeys[0]].box === 1 && afterHaraka[hKeys[0]].due === dayNumber() + 1,
-    'الإصابة بعد الخطأ ترفع الصندوق وتجدول المراجعة للغد');
+  // **أولُ محاولةٍ في الجولة وحدَها تدخل ليتنر** (الحكم ب٨، جلسة وز٢): نُقر الخطأُ
+  // ثم الصواب في **الجولة نفسِها** — فتُسجَّل واحدة: الخطأ. وهذا شاهدُ الحكم الحيّ
+  // على شاشةٍ حقيقية: كان يُسجَّل خطأ وصواب فيتضخّم الضعفُ المقيس بعدد النقرات.
+  ok(afterHaraka[hKeys[0]].wrong === 1 && afterHaraka[hKeys[0]].right === 0,
+    'جولةٌ بخطأ ثم صواب: الخطأ وحدَه يُسجَّل — وما بعده تعلُّمٌ لا قياس');
+  ok(afterHaraka[hKeys[0]].box === 0 && afterHaraka[hKeys[0]].due === dayNumber(),
+    'فتبقى في صندوق اليوم وتعود في مراجعته (تصفيرٌ واحد لا تصفيران)');
 
   btn('تابع').click();                                   // ٣ تتبّع
   await waitFor(() => $('canvas.trace'), 'لوح التتبّع');
@@ -292,8 +295,10 @@ try {
     `مراجعة اليوم محفوظة بوحدة المحاولة: خطأ واحد من ${log.tries} (${JSON.stringify(log)})`);
   const wrongSkill = Object.entries(after.skills)
     .find(([k, s]) => k.startsWith(`${firstWrongLetter}|`) && s.wrong > 0);
-  ok(!!wrongSkill && wrongSkill[1].due === now + 1,
-    'ما أخطأ فيه ثم صحّحه يعود غداً (لا يقفز إلى التباعد الطويل)');
+  // **وتصحيحُه في الجولة نفسِها تعلُّمٌ لا قياس** (الحكم ب٨): فلا يرفع الصندوق —
+  // يبقى ما أخطأ فيه في صندوق اليوم ويعود في مراجعته، وهو نصُّ METHOD §٦ بعينه.
+  ok(!!wrongSkill && wrongSkill[1].box === 0 && wrongSkill[1].due === now,
+    'وما أخطأ فيه يعود في مراجعة اليوم نفسِه — وتصحيحُه في جولته لا يقفز به إلى التباعد');
   const advanced = Object.values(after.skills).filter((s) => s.box > 0 && s.due > now).length;
   ok(advanced >= 4, `وما أصابه تباعد موعده (${advanced} مهارات)`);
 

@@ -28,7 +28,11 @@ globalThis.localStorage = {
   removeItem: (k) => store.delete(k),
 };
 
-const { SKILLS, contrastPairs, markSkillKey, skillById } = await import(new URL('curriculum.js', APP));
+const {
+  QURAN, SKILLS, contrastPairs, isLetterlessKey, markSkillKey, muqSkillKey, quranLetterSkills,
+  rasmSigns, rasmSkillKey, skillById,
+} = await import(new URL('curriculum.js', APP));
+const SURAHS = QURAN.surahs;
 const { buildSession } = await import(new URL('review.js', APP));
 const p = await import(new URL('progress.js', APP));
 
@@ -116,9 +120,20 @@ const STATIONS = {
       + 'يقيسه ولا نجمةَ تُنقَص لبطئه. **ووليُّ الأمر يقرأ أثرَها** حيث تُقرأ: '
       + 'في «نحو القراءة الحرة» بلوحته (عدّاداتُ الخفوت) وفي مدد تسجيلاته.',
   },
-  quran: {
-    title: 'المرحلة القرآنية (وفيها خطوةُ الترديد)',
+  // **المرحلة القرآنية محطتان لا محطة** (الحكم ب١، جلسة وز٢): كان إعفاءُ «يُتلى ولا
+  // يُمتحَن» يغطّي المرحلة كلَّها — والصادقُ منه **نصُّ المصحف المتلوّ وحدَه**. أمّا
+  // الهمزةُ وكلماتٌ إملائية وعلاماتُ رسمٍ وفواتحُ سورٍ فمهاراتُ فكّ شيفرة، فلها قياسُها.
+  'quran-drill': {
+    title: 'تمارين المرحلة القرآنية (الحرفان · الكلمات · الرسم · الفواتح · كلمات السورة)',
     file: 'quran.js',
+    kinds: [K.MARK_COMPARE, K.BUILD, K.RASM, K.MUQ, K.QUIZ],
+  },
+  quran: {
+    title: 'شاشةُ السورة (وفيها خطوةُ الترديد)',
+    file: 'quran.js',
+    // الإعفاءُ ضيّقٌ بحدّه: يُفحَص **قسمُ شاشة السورة** من الملف وحدَه، فلو كتبت
+    // محاولةً على آيةٍ يوماً احمرّ هذا الاختبار — وما قبلها من تمارين يُفحَص بقياسه.
+    region: ['export function renderSurah(', '// ————— التوجيه داخل المرحلة —————'],
     exempt: 'المصحفُ يُتلى ولا يُمتحَن (METHOD §٥.٦): لا خطأ يُسجَّل على نصّه، '
       + 'والقفلُ فيه تسلسليّ بالإتمام لا بالإصابة. و**خطوةُ الترديد** داخلها معفاةٌ '
       + 'بعينها (حزمة «القرآني الموسّع»، حكم المدير): الترديد تعبّديٌّ تلقينيّ لا '
@@ -137,7 +152,14 @@ const STATIONS = {
 // ————— ١) الإعلان: لا نوعَ محطةٍ في الرحلة خارج الجرد —————
 
 console.log('\n— جرد الرحلة: كل نوع محطةٍ مُعلَن —');
-const types = [...new Set(p.allNodes().map((n) => n.type))].sort();
+
+// عقدُ المرحلة القرآنية نوعُها واحد وحكمُها اثنان: ما يُتلى (السورة) وما يُدرَّس
+// ويُقاس (ما عداها) — فيُفرَّق بينهما هنا كما يفرّق بينهما الإعفاء.
+const SURAH_IDS = new Set(SURAHS.map((s) => `quran:${s.id}`));
+const typeOf = (node) =>
+  (node.type === 'quran' && !SURAH_IDS.has(node.id) ? 'quran-drill' : node.type);
+
+const types = [...new Set(p.allNodes().map(typeOf))].sort();
 const unknown = types.filter((t) => !STATIONS[t]);
 ok(unknown.length === 0,
   `${types.length} نوعَ محطةٍ في الرحلة، كلُّها في الجرد (${types.join('، ')})`
@@ -159,8 +181,14 @@ ok(declared.filter(([, s]) => s.exempt).every(([, s]) => s.exempt.length > 40),
 console.log('\n— الشيفرة: مَن أعلن قياساً كتبه —');
 const KIND_CONST = Object.fromEntries(Object.entries(K).map(([name, value]) => [value, name]));
 for (const [type, station] of declared) {
-  const body = src(station.file);
+  const whole = src(station.file);
+  // الإعفاءُ قد يكون لقسمٍ من ملفٍ لا لملفٍ كامل (شاشةُ السورة في `quran.js`)
+  const body = station.region
+    ? whole.slice(whole.indexOf(station.region[0]), whole.indexOf(station.region[1]))
+    : whole;
   if (station.exempt) {
+    ok(station.region ? body.length > 200 : true,
+      `[${type}] حدُّ الإعفاء موجودٌ في ${station.file}${station.region ? ` (${station.region[0]}…)` : ''}`);
     ok(!/progress\.recordAttempt\s*\(/.test(body),
       `[${type}] ${station.title}: لا تسجّل مهارةً — ${station.exempt.split('(')[0].trim()}`);
     continue;
@@ -204,6 +232,9 @@ const pairs = contrastPairs();
 const rootId = (await import(new URL('curriculum.js', APP))).ROOTS
   .find((r) => r.members.some((m) => words.some((w) => w.text === m)))?.id;
 
+const signs = rasmSigns();
+const muq = QURAN.muqattaat.items;
+
 const DUE = {
   [K.QUIZ]: { letter: 'ب', haraka: 'fatha' },
   [K.HARAKA]: { letter: 'ب', haraka: 'damma' },
@@ -213,20 +244,44 @@ const DUE = {
   [K.ROOT]: { letter: `root-${rootId}`, haraka: 'none' },
   [K.MARK_COMPARE]: { letter: markSkillKey('shadda'), haraka: 'none' },
   [K.MARK_QUIZ]: { letter: markSkillKey('shadda'), haraka: 'none' },
+  [K.RASM]: { letter: rasmSkillKey(signs[0].sign), haraka: 'none' },
+  [K.MUQ]: { letter: muqSkillKey(muq[0].read), haraka: 'none' },
 };
+
+const session = (due, seed) => buildSession({
+  letters,
+  words,
+  sentences,
+  pairs,
+  marks: [skillById('shadda'), ...quranLetterSkills()],
+  signs,
+  muq,
+  due,
+  rnd: rng(seed),
+});
+
+// **والمستحقُّ أولُ الجلسة لا في حشوها**: حوضُ التنويع قد يُنتج النوعَ نفسَه صدفةً
+// فيستر انقطاعَ مسار المستحقّ — والمهارةُ الضعيفة بعينها تبقى في الصندوق الأول أبداً.
+// فيُطلَب أن يكون **أولُ التمارين** تمرينَ المستحقّ (وبمفتاحه إن كان لا حرفَ له).
+// مفتاحُ التمرين في ليتنر كما تكتبه شاشتُه (والعائلةُ تركّبه من شجرتها لا من حقلٍ)
+const keyOf = (item) => item?.letter ?? (item?.root ? `root-${item.root.id}` : null);
 
 for (const kind of Object.values(K)) {
   const due = [{ kind, box: 0, wrong: 1, ...DUE[kind] }];
-  const built = [1, 5, 11, 23].some((seed) => buildSession({
-    letters,
-    words,
-    sentences,
-    pairs,
-    marks: [skillById('shadda')],
-    due,
-    rnd: rng(seed),
-  }).some((item) => item.kind === kind));
-  ok(built, `[${kind}] مهارةٌ مستحقّة تُنتج تمرينَها في جلسة المراجعة`);
+  const keyed = isLetterlessKey(DUE[kind].letter);
+  const built = [1, 5, 11, 23].some((seed) => {
+    const first = session(due, seed)[0];
+    return first?.kind === kind && (!keyed || keyOf(first) === DUE[kind].letter);
+  });
+  ok(built, `[${kind}] مهارةٌ مستحقّة تُنتج تمرينَها **أولَ** جلسة المراجعة`);
+}
+
+// **وحرفا المرحلة القرآنية بمفتاحيهما**: النوعُ وحده لا يكفي — `mark-compare` يُنتَج
+// من درس الشدّة، فلو بقي `mark-hamza` بلا تمرينٍ لظلّ في الصندوق الأول أبداً.
+for (const sign of quranLetterSkills()) {
+  const due = [{ kind: K.MARK_COMPARE, letter: markSkillKey(sign.id), haraka: 'none', box: 0, wrong: 1 }];
+  const built = [1, 5, 11, 23].some((seed) => keyOf(session(due, seed)[0]) === markSkillKey(sign.id));
+  ok(built, `[mark-${sign.id}] ${sign.title}: مهارتُها تُنتج تمرينَها في المراجعة`);
 }
 
 // والبوابةُ تُبنى بالمحرّك نفسِه، فما دخل المراجعةَ دخلها
@@ -240,15 +295,25 @@ ok(/buildSession/.test(src('gate.js')) && /weakestSkills/.test(src('gate.js')),
 
 console.log('\n— لوحة وليّ الأمر: لكل مقيسٍ موضعُه —');
 const parentSrc = src('parent.js');
+// **بمفاتيحها الحقيقية لا بحرفٍ متخيَّل**: الفصلُ بسابقة المفتاح (`isLetterlessKey`)،
+// فعيّنةٌ مفتاحُها «ب» تدّعي أنّ كلّ نوعٍ يدخل لوحةَ الحروف — وتُخفي الغياب.
+const SECTION = {
+  [K.ROOT]: [/عائلات الجذور/, 'قسم «عائلات الجذور»'],
+  [K.MARK_COMPARE]: [/العلامات \(/, 'قسم «العلامات»'],
+  [K.MARK_QUIZ]: [/العلامات \(/, 'قسم «العلامات»'],
+  [K.RASM]: [/رسمُ المصحف \(/, 'قسم «رسمُ المصحف»'],
+  [K.MUQ]: [/رسمُ المصحف \(/, 'قسم «رسمُ المصحف»'],
+};
+
 for (const kind of Object.values(K)) {
-  const sample = { kind, letter: 'ب', haraka: 'fatha' };
+  const sample = { kind, ...DUE[kind] };
   const inLetters = p.isLetterSkill(sample);
-  const section = inLetters ? 'لوحة الحروف'
-    : kind === K.ROOT ? 'قسم «عائلات الجذور»' : 'قسم «العلامات»';
-  const shown = inLetters
-    || (kind === K.ROOT ? /عائلات الجذور/.test(parentSrc) : /العلامات \(/.test(parentSrc));
-  ok(shown, `[${kind}] يقرؤه وليُّ الأمر في ${section}`);
+  const [pattern, name] = SECTION[kind] || [];
+  ok(inLetters ? !pattern : Boolean(pattern) && pattern.test(parentSrc),
+    `[${kind}] يقرؤه وليُّ الأمر في ${inLetters ? 'لوحة الحروف' : name || '**لا موضعَ له**'}`);
 }
+ok(/quranStats\(progress\.skills\(\)\)/.test(parentSrc),
+  'وقسمُ المرحلة القرآنية يُبنى من سجلّ ليتنر نفسِه');
 ok(/markStats\(progress\.skills\(\)\)/.test(parentSrc) && /KINDS\.ROOT/.test(parentSrc),
   'وقسما العلامات والجذور يُبنيان من سجلّ ليتنر نفسِه — لا من عدٍّ ثانٍ يفترق عنه');
 

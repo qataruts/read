@@ -323,12 +323,20 @@ def parse_stories(src: str) -> list:
             for m in re.finditer(r"words:\s*\[([^\]]*)\]\s*,\s*emoji:\s*'([^']*)'",
                                  bracket_region(chunk, "sentences:"))
         ]
+        # **سؤالُ فهمِ القصة** (الحكم ب٤، جلسة وز٢): نصٌّ يُقرأ وخياراتٌ كلماتُ منهج —
+        # فيدخل فحصَ المفكوكية كسائر ما يراه الطفل، ويُفحَص جوابُه أنّه ممّا قرأ.
+        ask = region(chunk, "question:", "{", "}")
         out.append({
             "id": ident,
             "after": one(r"after:\s*'([^']+)'", chunk),
             "title": one(r"title:\s*'([^']*)'", chunk, ""),
             "emoji": one(r"emoji:\s*'([^']*)'", chunk, ""),
             "sentences": sentences,
+            "question": {
+                "text": one(r"text:\s*'([^']*)'", ask, ""),
+                "answer": one(r"answer:\s*'([^']*)'", ask, ""),
+                "distractors": re.findall(r"'([^']*)'", bracket_region(ask, "distractors:")),
+            } if ask else None,
         })
     return out
 
@@ -339,11 +347,12 @@ def parse_quran(src: str) -> dict:
     # بـ`words:` الذي داخل بطاقة الحرف (الربط بالتسلسل لا بالتنسيق).
     rest = src
     cut = {}
-    for key in ("letters", "words", "rasm", "muqattaat"):
+    for key in ("letters", "words", "rasm", "muqattaat", "rasm2"):
         cut[key] = region(rest, f"{key}:", "{", "}")
         i = rest.find(cut[key]) + len(cut[key]) if cut[key] else 0
         rest = rest[i:]
-    letters, words, rasm, muq = (cut[k] for k in ("letters", "words", "rasm", "muqattaat"))
+    letters, words, rasm, muq, rasm2 = (
+        cut[k] for k in ("letters", "words", "rasm", "muqattaat", "rasm2"))
     surahs_src = region(rest, "surahs:")
 
     def worded(chunk):
@@ -370,15 +379,23 @@ def parse_quran(src: str) -> dict:
             "words": worded(chunk),
         })
 
-    rasm_signs = []
-    for chunk in chunks_by_key(region(rasm, "signs:"), "sign"):
-        rasm_signs.append({
-            "sign": one(r"sign:\s*'([^']*)'", chunk, ""),
-            "name": one(r"name:\s*'([^']*)'", chunk, ""),
-            "rule": one(r"rule:\s*'([^']*)'", chunk, ""),
-            "read": one(r"read:\s*'([^']*)'", chunk, ""),
-            "from": one(r"from:\s*'([^']*)'", chunk, ""),
-        })
+    # **درسا رسمٍ لا درس** (شقُّ وز٢): العلاماتُ تسعٌ موزّعةٌ عليهما، والعقدُ أنّ
+    # جردَ الرموز المسموحة في نصّ المصحف يقرأ **الدرسين معاً** — فلو قُرئ أحدُهما
+    # لاحمرّ نصٌّ عثمانيّ صحيح، ولو أُسقط درسٌ لسكت الفاحصُ عن علامةٍ لا تُدرَّس.
+    def rasm_of(chunk):
+        out = []
+        for c in chunks_by_key(region(chunk, "signs:"), "sign"):
+            out.append({
+                "sign": one(r"sign:\s*'([^']*)'", c, ""),
+                "name": one(r"name:\s*'([^']*)'", c, ""),
+                "rule": one(r"rule:\s*'([^']*)'", c, ""),
+                "read": one(r"read:\s*'([^']*)'", c, ""),
+                "from": one(r"from:\s*'([^']*)'", c, ""),
+            })
+        return out
+
+    rasm_signs = rasm_of(rasm)
+    rasm2_signs = rasm_of(rasm2)
 
     # درجات «كلمات من القرآن» (الحزمة ١٢): ثلاثٌ، حدُّ كلٍّ عددُ حروف كلماتها (`size`)
     levels = []
@@ -429,6 +446,10 @@ def parse_quran(src: str) -> dict:
                  "face": one(r"face:\s*'([^']*)'", rasm, ""),
                  "rule": one(r"rule:\s*'([^']*)'", rasm, ""),
                  "signs": rasm_signs},
+        "rasm2": {"title": one(r"title:\s*'([^']*)'", rasm2, ""),
+                  "face": one(r"face:\s*'([^']*)'", rasm2, ""),
+                  "rule": one(r"rule:\s*'([^']*)'", rasm2, ""),
+                  "signs": rasm2_signs},
         "muqattaat": {"title": one(r"title:\s*'([^']*)'", muq, ""),
                       "face": one(r"face:\s*'([^']*)'", muq, ""),
                       "rule": one(r"rule:\s*'([^']*)'", muq, ""),
@@ -562,9 +583,10 @@ def check_quran(quran, taught, letters, source):
 
     # ٣. رموز المصحف المسموح بها = حروفٌ مدروسة + علاماتٌ يعرضها درس الرسم
     rasm_marks = set()
-    for s in quran["rasm"]["signs"]:
-        rasm_marks |= set(s["sign"])
-        spoken.append(s["rule"])
+    for lesson in ("rasm", "rasm2"):
+        for s in quran[lesson]["signs"]:
+            rasm_marks |= set(s["sign"])
+            spoken.append(s["rule"])
     mushaf_allowed = (quran_taught | set(MARKS) | TANWEEN | {SHADDA, TATWEEL, " "} | rasm_marks)
 
     def mushaf_errors(text, label):
@@ -971,6 +993,34 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
                 audio_texts.update(sentence["words"])
                 audio_texts.add(" ".join(sentence["words"]))
 
+            # **سؤالُ الفهم** (الحكم ب٤): نصُّه مفكوكٌ بحصيلة موضعه، وخياراتُه الثلاثة
+            # كلماتُ منهجٍ **مصوَّرة** درسها قبلَه، وجوابُه كلمةٌ **في نصّ القصة نفسِه**
+            # (لا استنباطَ يُحكَم به على طفل). **ونصُّه معروضٌ لا منطوق** فلا صوتَ يُطلب.
+            ask = st.get("question")
+            if ask:
+                for word in ask["text"].split():
+                    errors += text_errors(word, f"{label} سؤالُه", taught, letters, allowed)
+                options = [ask["answer"], *ask["distractors"]]
+                if len(options) != 3 or len(set(options)) != 3:
+                    errors.append(f"{label}: سؤالُه {len(options)} خيارات (المطلوب ثلاثة مختلفة)")
+                # حوضُ الخيارات كلماتُ المنهج — و`text_errors` تحرس مفكوكيتها عند موضعها
+                pool = {"".join(w["tiles"]): w for g2 in groups for w in g2["words"]}
+                for word in options:
+                    got = pool.get(word)
+                    if not got:
+                        errors.append(f"{label}: خيارُ سؤاله «{word}» ليس كلمةَ منهج")
+                        continue
+                    if not got["emoji"]:
+                        errors.append(f"{label}: خيارُ سؤاله «{word}» بلا صورة")
+                    errors += text_errors(word, f"{label} خيارُه", taught, letters, allowed)
+                # المقابلةُ بالجذع كما في `stemOf` بالتطبيق: «الْحَلِيبْ» في القصة هي
+                # «حَلِيبْ» في الخيار — لامُ التعريف عرضٌ لا كلمةٌ أخرى.
+                def stem(word):
+                    return re.sub(r"^ال", "", bare(word))
+                bare_said = {stem(w) for sen in st["sentences"] for w in sen["words"]}
+                if stem(ask["answer"]) not in bare_said:
+                    errors.append(f"{label}: جوابُ سؤاله «{ask['answer']}» ليس في نصّ القصة")
+
     # ٣ب. محطات «ميّز بين» (الحزمة ١٣): مواجهة المتشابهات بعد أن باعد المنهج بينها.
     if contrasts:
         c_errors, c_warnings, c_spoken = check_contrasts(contrasts, groups, letters)
@@ -1015,13 +1065,15 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
         quran_literals = set(q_spoken) | set(q_mushaf) | set(q_station) | {
             *[w[3] for w in quran["words"]["items"] if len(w) > 3 and w[3]],
             quran["title"], quran["basmala"],
-            *[quran[k][f] for k in ("letters", "words", "rasm", "muqattaat") for f in ("title", "face")],
+            *[quran[k][f] for k in ("letters", "words", "rasm", "muqattaat", "rasm2")
+              for f in ("title", "face")],
             *[s[f] for s in quran["letters"]["signs"] for f in ("sign", "name")],
             *[sh for s in quran["letters"]["signs"] for sh in s["shapes"]],
             *[t for s in quran["letters"]["signs"] for w in s["words"] for t in w[:2]],
             *[t for w in quran["words"]["items"] for t in w[:2]],
             *[level[f] for level in quran["words"]["levels"] for f in ("title", "face")],
-            *[s[f] for s in quran["rasm"]["signs"] for f in ("sign", "name", "from")],
+            *[s[f] for k in ("rasm", "rasm2") for s in quran[k]["signs"]
+              for f in ("sign", "name", "from")],
             *[i["surah"] for i in quran["muqattaat"]["items"]],
             *[c for i in quran["muqattaat"]["items"] for p in i["parts"] for c in p],
             *[s[f] for s in quran["surahs"] for f in ("name", "emoji")],
@@ -1036,9 +1088,11 @@ def check(letters, groups, skills=(), stories=(), parts=None, quiet=False, quran
                               *[t for p in s["pairs"] for t in p], *s["wordRefs"],
                               *[t for w in s["words"] for t in w]}
         for st in stories:
+            ask = st.get("question") or {"text": "", "answer": "", "distractors": []}
             seen_literals |= {st["title"], st["emoji"],
                               *[w for sen in st["sentences"] for w in sen["words"]],
-                              *[sen["emoji"] for sen in st["sentences"]]}
+                              *[sen["emoji"] for sen in st["sentences"]],
+                              ask["text"], ask["answer"], *ask["distractors"]}
         for c in contrasts:
             seen_literals |= {c["title"], c["face"], c["hint"],
                               *[ch for p in c["pairs"] for ch in p["letters"]]}

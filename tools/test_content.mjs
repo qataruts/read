@@ -16,10 +16,11 @@ globalThis.localStorage = {
 
 const {
   GROUPS, SKILLS, STORIES, GATES, CONTRASTS, quranParts, skillById, storyById, skillExamples,
+  storyAsk,
   skillTexts, storyTexts, sentenceText, bareLetters,
 } = await import(new URL('curriculum.js', APP));
 const { buildSkillRounds } = await import(new URL('skill.js', APP));
-const { starsForStory } = await import(new URL('story.js', APP));
+const { starsForStory, starsForTale } = await import(new URL('story.js', APP));
 const p = await import(new URL('progress.js', APP));
 
 let fails = 0;
@@ -166,6 +167,28 @@ ok(p.findNode('skill:lam') && !p.findNode('skill:لا-وجود-له'), 'البح
 ok(starsForStory(5, 5) === 3, 'من سمع الجمل كلها ⇒ ثلاث نجوم');
 ok(starsForStory(3, 5) === 2 && starsForStory(2, 4) === 2, 'ومن سمع نصفها فأكثر ⇒ نجمتان');
 ok(starsForStory(1, 5) === 1 && starsForStory(0, 5) === 1, 'ومن مرّ مروراً ⇒ نجمة');
+
+// ————— ٥ب. قصصُ المنهج: قراءةٌ مقيسة وسؤالُ فهم (الحكم ب٤، جلسة وز٢) —————
+//
+// كانت ثلاثُ نجومٍ تُنال بنقرةٍ واحدة على «اسمع القصة كاملة»: أعلى تقديرٍ في المحطة
+// بلا قراءةٍ ولا سؤال. والمحروسُ هنا ثلاثة: أنّ السماعَ وحده **لا يبلغ الثلاث**، وأنّ
+// لكل قصةٍ سؤالَ فهمٍ بخياراتٍ مصوَّرة، وأنّ نصَّ السؤال **معروضٌ لا منطوق** (صفرُ
+// إضافةٍ صوتية: لا يدخل جردَ المنطوق فلا يُطلب له ملف).
+console.log('\n— قصص المنهج: تُقاس بما قرأ لا بما سمع —');
+ok(starsForTale(5, 5, true) === 3 && starsForTale(5, 5, false) === 2,
+  'من قرأ الجمل كلها: ثلاثٌ بسؤالٍ أصابه من أوّله، ونجمتان بدونه');
+ok(starsForTale(0, 5, false) === 1 && starsForTale(0, 5, true) === 1,
+  'ومن لم يقرأ جملةً: نجمةٌ واحدة — والقراءةُ بالعين لا تُحرَم');
+ok(starsForTale(3, 5, true) === 2, 'ومن قرأ نصفها وأصاب: نجمتان');
+
+const asks = STORIES.map((s) => ({ story: s, ask: storyAsk(s) }));
+ok(asks.every(({ ask }) => ask && ask.options.length === 3 && ask.options.every((o) => o.emoji)),
+  `ولكل قصةٍ سؤالُ فهمٍ بثلاث صور (${asks.map(({ ask }) => ask?.text || '—').join(' · ')})`);
+ok(asks.every(({ ask }) => ask.options.includes(ask.answer)
+  && new Set(ask.options.map((o) => o.emoji)).size === 3),
+  'وجوابُه بين خياراته، ولا صورتان متطابقتان في حوضٍ واحد («صدق الصورة»)');
+ok(asks.every(({ story, ask }) => !storyTexts(story).includes(ask.text)),
+  'ونصُّ السؤال معروضٌ لا منطوق — فلا ملفَّ صوتٍ جديداً يطلبه الحكم');
 
 // ————— ٦. الصوت: ملف مولَّد أو مكان في قائمة الانتظار —————
 

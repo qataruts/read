@@ -6,7 +6,10 @@
 
 import * as progress from './progress.js';
 import { feedbackSection } from './feedback.js';
-import { SKILLS, rootById, skillByMarkKey } from './curriculum.js';
+import {
+  QURAN, SKILLS, muqByKey, muqSkillKey, rasmSignByKey, rasmSigns, rasmSkillKey,
+  rootById, skillByMarkKey,
+} from './curriculum.js';
 import * as recordings from './recordings.js';
 import * as recorder from './recorder.js';
 import { FADE_AT, BARE_AT, levelOf, fadeText } from './fade.js';
@@ -183,8 +186,36 @@ export function markStats(skills) {
     acc.kinds++;
     byMark.set(skill.id, acc);
   }
+  // ترتيبُ المنهج، وحرفا المرحلة القرآنية (`mark-hamza`/`mark-taa`) في آخر القسم —
+  // فهما آخرُ ما يدرسه، ولا يُقحَمان بين دروس العلامات الستة.
   const order = SKILLS.map((s) => s.id);
-  return [...byMark.values()].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  const rank = (id) => (order.indexOf(id) < 0 ? order.length : order.indexOf(id));
+  return [...byMark.values()].sort((a, b) => rank(a.id) - rank(b.id));
+}
+
+/**
+ * حصيلةُ المرحلة القرآنية من سجلّها (الحكمان ب١ وب٣، جلسة وز٢) — علاماتُ الرسم
+ * وفواتحُ السور: لا حرفَ لهما فلا تدخلان لوحةَ الحروف، ومقيستان في ليتنر فيقرؤهما
+ * وليُّ الأمر هنا. **بطاقةٌ لكل علامةٍ باسمها** لا بمفتاحها، ودالّةٌ خالصة كأختها.
+ */
+export function quranStats(skills) {
+  const out = [];
+  for (const s of skills) {
+    const sign = rasmSignByKey(s.letter);
+    const muq = sign ? null : muqByKey(s.letter);
+    if (!sign && !muq) continue;
+    out.push({
+      key: s.letter,
+      face: sign ? sign.sign : muq.read,
+      title: sign ? sign.name : `فواتح ${muq.surah}`,
+      right: s.right,
+      wrong: s.wrong,
+      box: s.box,
+    });
+  }
+  const order = [...rasmSigns().map((s) => rasmSkillKey(s.sign)),
+    ...QURAN.muqattaat.items.map((m) => muqSkillKey(m.read))];
+  return out.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
 }
 
 // ————— «نحو القراءة الحرة» (حزمة الخفوت — ROADMAP §المرحلة ز) —————
@@ -667,6 +698,7 @@ function dashboard(rerender = () => {}) {
   // **العلامات صفٌّ إلى جوار الحروف**: مفتاحان لكل درس (قراءةً وسماعاً) يُجمعان في
   // بطاقةٍ واحدة — فوليّ الأمر يقرأ «الشدّة» لا «mark-shadda|none|mark-quiz» مرتين.
   const marks = markStats(progress.skills());
+  const quran = quranStats(progress.skills());
   const mastered = stats.filter((s) => s.mastered);
   const weak = stats.filter((s) => s.struggling);
   const learning = stats.filter((s) => !s.mastered && !s.struggling);
@@ -735,8 +767,26 @@ function dashboard(rerender = () => {}) {
           h('small', {}, `${s.title} · ${arNum(s.right)} ✓ · ${arNum(s.wrong)} ✗`)))),
           h('p', { class: 'hint' },
             'المدّ والسكون والشدّة والتنوين واللام: تُقاس مرّتين — أن يقرأ العلامة بعينه '
-            + 'وأن يميّزها بأذنه، واللون لأدنى الاثنين.')]
+            + 'وأن يميّزها بأذنه، واللون لأدنى الاثنين. والهمزةُ والتاء المربوطة '
+            + 'قراءةً بالعين وحدها (درسُهما في المرحلة القرآنية).')]
         : emptyNote('لم يبلغ درس علامةٍ بعدُ — أوّلها مدّ الألِف بعد المجموعة الأولى.')),
+
+    // **المرحلة القرآنية تُقرأ كما تُقرأ الحروف** (الحكمان ب١ وب٣، جلسة وز٢): كانت
+    // تدرّس ولا تقيس، فاللوحةُ عمياء عن علامات المصحف وفواتح السور — وهي مهاراتُ فكّ
+    // شيفرةٍ صريحة لا تلاوةً معفاة. والحرفان (الهمزةُ والتاء) في قسم العلامات أعلاه.
+    ...section(`رسمُ المصحف (${arNum(quran.length)})`,
+      quran.length
+        ? [h('div', { class: 'audit-row' }, quran.map((s) => h('span', {
+          class: 'vchip',
+          css: { '--accent': s.box >= progress.MASTERED_BOX ? GOOD : s.wrong >= 2 ? BAD : ACCENT },
+          title: `${s.title} — ${arNum(s.right)} صواب، ${arNum(s.wrong)} خطأ`,
+        },
+          h('span', { class: 'vchip-face' }, s.face),
+          h('small', {}, `${s.title} · ${arNum(s.right)} ✓ · ${arNum(s.wrong)} ✗`)))),
+          h('p', { class: 'hint' },
+            'علاماتُ المصحف الصغيرة وفواتحُ السور: يراها في كل صفحة، فتُقاس كما تُقاس '
+            + 'حروفُه — والنصُّ نفسُه يُتلى ولا يُمتحَن.')]
+        : emptyNote('لم يبلغ رسم المصحف بعدُ — موضعُه في المرحلة القرآنية.')),
 
     // **الجذور قسمٌ خاصٌّ بها**: العائلةُ ليست حرفاً، فلا تدخل لوحةَ الحروف (وإلا ظهر
     // «حرفٌ» اسمُه `root-katb`)، ولكنها مقيسةٌ في ليتنر كسائر المهارات فتُقرأ هنا.

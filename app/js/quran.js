@@ -10,12 +10,18 @@
 // وما يمرّ على `audio.play()` هنا ثلاثة أصناف لا رابع لها: قواعدُنا نحن، وكلماتٌ
 // بالرسم الإملائي، وأسماءُ حروف.
 //
-// **الثانية**: لا قياس (كما في دروس المهارات) — المقيس في §٦ حرفٌ بحركة في تمرين،
-// والمقيس هنا علامةُ رسم أو كلمة كاملة، فلا يُبنى منه تكرارٌ متباعد لا تمرين له.
+// **الثانية**: **يُقاس ما يُدرَّس، ويُعفى ما يُتلى** (الحكم ب١، جلسة وز٢). كانت المرحلة
+// كلُّها بلا قياس بحجّة «المصحف يُتلى ولا يُمتحن» — والإعفاءُ الصادق يخصّ **نصَّ المصحف
+// المتلوّ وحدَه** (شاشةُ السورة وخطوةُ الترديد). أمّا الهمزةُ والتاء المربوطة وكلماتٌ
+// إملائية وعلاماتُ رسمٍ وفواتحُ سورٍ فمهاراتُ فكّ شيفرةٍ صريحة، فلها مفاتيحُها في ليتنر:
+//   `mark-hamza`/`mark-taa` · `build` بمهارة الكلمة · `rasm-<علامة>` · `muq-<فواتح>` ·
+//   و«جِدْها في الآية» بمهارة كلمتها (`quiz`) — ولكلٍّ تمرينٌ يراجعه في `review.js`.
+// **وصفرُ إضافةٍ صوتية**: كلُّ ما يُنطق هنا له ملفُّه منذ حزمته.
 
 import {
   QURAN, SURAH_WORDS_FACE, surahById, surahWords, surahWordsPart, surahOfWordsPart,
-  quranWordLevel,
+  quranWordLevel, rasmLessonById, rasmSkillKey, muqSkillKey, muqSays,
+  markSkillKey, wordSkill, QURAN_LETTERS,
 } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
@@ -31,20 +37,38 @@ import {
 } from './ui.js';
 
 const QUIZ_OPTIONS = 3;
-const RASM_ROUNDS = 3;
 const AFTER_PICK_MS = 750;
 const FIND_ROUNDS = 6;      // جولات «جِدْها في الآية» في محطة كلمات السورة
 
 const nodeIdOf = (part) => `quran:${part}`;
 
-/** جولات رسم المصحف: كلمة عثمانية معروضة، وأيّ علامةٍ فيها؟ (بصريّ صامت). */
-export function buildRasmRounds(signs, rnd = Math.random) {
-  if (signs.length < QUIZ_OPTIONS) return [];
-  return shuffle(signs, rnd).slice(0, RASM_ROUNDS).map((target) => {
-    const others = shuffle(signs.filter((s) => s.sign !== target.sign), rnd);
+/**
+ * جولات رسم المصحف: كلمة عثمانية معروضة، وأيّ علامةٍ فيها؟ (بصريّ صامت).
+ *
+ * **جولةٌ لكل علامةٍ في الدرس** (الحكم ب٢، جلسة وز٢): كانت ثلاثاً ثابتة والعلاماتُ
+ * تسع — فثلثا المادّة قد لا تُختبَر قط. فصار العددُ عددَ علاماته، **يتبعها بلا
+ * سطرٍ يُعدَّل**: ستٌّ في الدرس الأول وثلاثٌ في الثاني.
+ *
+ * **والمشتّتاتُ من كل ما دُرِس** لا من الدرس وحده: درسٌ من ثلاث علاماتٍ خياراتُه
+ * ثابتةٌ لا تمييزَ فيها، وضمُّ ما سبقه يجعل السؤال سؤالاً — ولا يُعرَض غيرُ المدروس.
+ */
+export function buildRasmRounds(signs, pool = signs, rnd = Math.random) {
+  const all = [...signs, ...pool.filter((p) => !signs.some((s) => s.sign === p.sign))];
+  if (all.length < QUIZ_OPTIONS) return [];
+  return shuffle(signs, rnd).map((target) => {
+    const others = shuffle(all.filter((s) => s.sign !== target.sign), rnd);
     return { target, options: shuffle([target, ...others.slice(0, QUIZ_OPTIONS - 1)], rnd) };
   });
 }
+
+/**
+ * **مهارةُ الكلمة العثمانية**: أوّلُ حرفٍ متحرّكٍ **من حروف المجموعات** — كما تقيس
+ * درجةُ السلّم جملتَها (`wordSkill`). وحرفا المرحلة (الهمزةُ بكراسيها والتاءُ
+ * المربوطة) يُنزَعان أولاً: لهما مفتاحاهما `mark-` في درسهما، ولا تمرينَ في المراجعة
+ * لحرفٍ خارج المجموعات (`quizItem` يشترط حرفاً مدروساً) — فقياسٌ بلا مراجعةٍ صمتٌ.
+ */
+const mushafSkill = (text) =>
+  wordSkill([...String(text)].filter((c) => !QURAN_LETTERS.has(c)).join(''));
 
 /** شاشة درجةٍ من المرحلة القرآنية: الهيكل المشترك بلونها ومعرّف عقدتها. */
 const stepped = ({ part, pill, face, steps, celebrate }) => steppedScreen({
@@ -79,6 +103,11 @@ const spokenWord = (word) => h('button', {
 function renderQuranLetters() {
   const data = QURAN.letters;
   const words = data.signs.flatMap((s) => s.words);
+  // **القياسُ على العلامة لا على الكلمة** (الحكم ب١): الكلمةُ شاهدٌ، والمقيسُ أن يعرف
+  // الطفلُ الهمزةَ (بكراسيها) والتاءَ المربوطة في كلمةٍ يقرؤها — فمفتاحُ كلِّ كلمةٍ
+  // مفتاحُ علامتها، ونوعُه `mark-compare` لأنّ الحكم على **قراءةٍ صامتة** (لا صوت قبل
+  // الاختيار). وتمرينُه في المراجعة `markItem` نفسُه — لا نسخةَ ثانية منه.
+  const signOf = (word) => data.signs.find((s) => s.words.includes(word));
 
   return stepped({
     part: data.id,
@@ -119,7 +148,17 @@ function renderQuranLetters() {
           nextButton(next),
         ),
       },
-      { title: 'اقرأ واختر', build: (api) => readQuizStep(words, api) },
+      {
+        title: 'اقرأ واختر',
+        build: (api) => readQuizStep(words, api, {
+          onPick: (target, _chosen, correct) => {
+            const sign = signOf(target);
+            if (sign) {
+              progress.recordAttempt(markSkillKey(sign.id), null, progress.KINDS.MARK_COMPARE, correct);
+            }
+          },
+        }),
+      },
     ],
     celebrate: (state) => ({
       stars: starsForGame(state.errors, words.length),
@@ -148,7 +187,18 @@ function renderQuranWords(level) {
           nextButton(next),
         ),
       },
-      { title: 'اقرأ واختر', build: (api) => readQuizStep(items, api) },
+      // **الكلمةُ تُقاس بمقطعها** (الحكم ب١): مفتاحُ الكلمة الإملائية مهارتُها
+      // (`wordSkill` — أوّلُ حرفٍ متحرّك، وحدةُ §٦ نفسُها)، ونوعُها `build` فتلقاه
+      // المراجعةُ بلوحِ تركيبٍ من حصيلته. فما قرأه هنا يعود إليه متباعداً.
+      {
+        title: 'اقرأ واختر',
+        build: (api) => readQuizStep(items, api, {
+          onPick: (target, _chosen, correct) => {
+            const skill = wordSkill(target.read);
+            if (skill) progress.recordAttempt(skill.letter, skill.haraka, progress.KINDS.BUILD, correct);
+          },
+        }),
+      },
     ],
     celebrate: (state) => ({
       stars: starsForGame(state.errors, items.length),
@@ -161,8 +211,13 @@ function renderQuranWords(level) {
 
 // ————— ٣) رسم المصحف —————
 
-function renderQuranRasm() {
-  const data = QURAN.rasm;
+/**
+ * شاشةُ درسِ رسمٍ — **ببيانِ درسه لا بدرسٍ بعينه** (بلاغُ وز١ الموقوف، جلسة وز٢):
+ * صار الرسمُ درسين، فلو بقي المُصيِّر على `QURAN.rasm` لسقطت العقدةُ الثانية إلى
+ * شاشة السورة وانكسرت. والمشتّتاتُ من علاماته وما سبقه من علامات (حصيلةُ الطفل).
+ */
+function renderQuranRasm(data) {
+  const pool = progress.studiedRasm();
 
   return stepped({
     part: data.id,
@@ -194,7 +249,7 @@ function renderQuranRasm() {
       {
         title: 'ميّز العلامة',
         build: ({ next, fail }) => {
-          const rounds = buildRasmRounds(data.signs);
+          const rounds = buildRasmRounds(data.signs, [...data.signs, ...pool]);
           if (!rounds.length) {
             setTimeout(next, 0);
             return h('p', { class: 'hint' }, '…');
@@ -226,7 +281,10 @@ function renderQuranRasm() {
 
           function onPick(sign, btn, r) {
             if (locked) return;
-            if (sign.sign === r.target.sign) {
+            const correct = sign.sign === r.target.sign;
+            // مفتاحُ العلامة المسؤول عنها — لا مفتاحُ ما نقره الطفل (الحكم ب١)
+            progress.recordAttempt(rasmSkillKey(r.target.sign), null, progress.KINDS.RASM, correct);
+            if (correct) {
               locked = true;
               btn.classList.add('good');
               audio.afterSpeech(AFTER_PICK_MS, () => {   // قاعدةُ العلامة قد تكون في الجو
@@ -255,7 +313,7 @@ function renderQuranRasm() {
       },
     ],
     celebrate: (state) => ({
-      stars: starsForGame(state.errors, RASM_ROUNDS),
+      stars: starsForGame(state.errors, data.signs.length),
       line: state.errors === 0
         ? cheer('عرفتَ علامات المصحف بلا خطأ!')
         : 'صارت مألوفة لعينك — وستراها في كل صفحة.',
@@ -264,6 +322,23 @@ function renderQuranRasm() {
 }
 
 // ————— ٤) الحروف المقطَّعة —————
+
+/**
+ * جولاتُ «أيَّ فواتحَ سمعت؟» (الحكم ب٣، جلسة وز٢): جولةٌ لكل مجموعة، تُسمَع أسماءُ
+ * حروفها بالتتابع وتُختار مكتوبةً بين مجموعتين أُخريين — تمييزٌ سمعيّ بصريّ.
+ *
+ * **وصفرُ إضافةٍ صوتية**: أسماءُ الحروف لها ملفاتُها منذ الحزمة ٦، ونصُّ المقطَّعة
+ * **يُعرَض ولا يُنطَق أبداً** (نصُّ مصحفٍ — METHOD §٥.٦).
+ */
+export function buildMuqRounds(items, rnd = Math.random) {
+  if (items.length < QUIZ_OPTIONS) return [];
+  return shuffle(items, rnd).map((target) => {
+    const others = shuffle(items.filter((i) => i.read !== target.read), rnd);
+    return { target, options: shuffle([target, ...others.slice(0, QUIZ_OPTIONS - 1)], rnd) };
+  });
+}
+
+const MUQ_GAP_MS = 380;     // فاصلٌ بين اسمين — بغيره تُسمع الأسماءُ اسماً واحداً
 
 function renderQuranMuqattaat() {
   const data = QURAN.muqattaat;
@@ -322,12 +397,79 @@ function renderQuranMuqattaat() {
           );
         },
       },
+      {
+        // **محطةٌ بتمرين لا بنقرات** (الحكم ب٣): كانت ثمانُ نقراتٍ تعطي ثلاثَ نجوم،
+        // فلا يُختبَر الطفلُ في شيء. فصارت لها جولاتُها كأخواتها، وصارت نجومُها منها.
+        title: 'أيُّ فواتح؟',
+        build: ({ next, fail }) => {
+          const rounds = buildMuqRounds(data.items);
+          if (!rounds.length) {
+            setTimeout(next, 0);
+            return h('p', { class: 'hint' }, '…');
+          }
+          let index = 0;
+          let locked = false;
+
+          const counter = h('p', { class: 'hint' });
+          const row = h('div', { class: 'row vrow' });
+          const say = (item) => audio.playSequence(muqSays(item), MUQ_GAP_MS);
+
+          function startRound() {
+            const r = rounds[index];
+            locked = false;
+            counter.textContent = `الجولة ${arNum(index + 1)} من ${arNum(rounds.length)}`;
+            row.replaceChildren(...r.options.map((item) => {
+              const btn = h('button', {
+                class: 'vchip vchip--sign',
+                'aria-label': muqSays(item).join(' '),
+                onclick: () => onPick(item, btn, r),
+              }, h('span', { class: 'vchip-face mushaf' }, item.read));
+              return btn;
+            }));
+            audio.afterSpeech(250, () => say(r.target));   // نداءُ الجولة بعد سكوت ما قبلها
+          }
+
+          function onPick(item, btn, r) {
+            if (locked) return;
+            const correct = item.read === r.target.read;
+            progress.recordAttempt(muqSkillKey(r.target.read), null, progress.KINDS.MUQ, correct);
+            if (correct) {
+              locked = true;
+              btn.classList.add('good');
+              audio.afterSpeech(AFTER_PICK_MS, () => {
+                index++;
+                if (index < rounds.length) startRound();
+                else next();
+              });
+            } else {
+              fail();
+              shake(btn);
+              btn.classList.add('bad');
+              setTimeout(() => btn.classList.remove('bad'), 700);
+              say(item);          // يسمع أسماءَ ما اختاره هو فيقارن (بلا تلقين)
+            }
+          }
+
+          const screen = h('div', {},
+            h('h2', {}, 'أيَّ فواتحَ سمعت؟'),
+            h('div', { class: 'row foot' },
+              h('button', {
+                class: 'btn btn--primary',
+                onclick: () => say(rounds[index].target),
+              }, icon('ear'), ' اسمع مرة أخرى')),
+            counter,
+            row,
+          );
+          startRound();
+          return screen;
+        },
+      },
     ],
-    celebrate: () => ({
-      stars: starsForStory(heard.size, data.items.length),
-      line: heard.size >= data.items.length
+    celebrate: (state) => ({
+      stars: starsForGame(state.errors, data.items.length),
+      line: state.errors === 0 && heard.size >= data.items.length
         ? cheer('قرأتَ الحروف المقطَّعة بأسمائها كلها!')
-        : 'أعِد واقرأ كل مجموعة بأسماء حروفها لتزيد نجومك.',
+        : 'أعِد واقرأ كل مجموعة بأسماء حروفها، ثم ميّزها بأذنك.',
     }),
   });
 }
@@ -478,6 +620,12 @@ function renderSurahWords(surahId) {
 
           function onPick(text, btn, r) {
             if (locked) return;
+            // **قياسُ «جِدْها»: مهارةُ كلمتها** (الحكم ب١) — قراءةٌ صامتة يقع الحكم فيها
+            // على أن يقرأ الطفلُ الكلمة ويجدها، فتُنسب إلى أوّل حرفٍ متحرّكٍ فيها كما
+            // ينسب سلّمُ الجمل درجتَه. ونوعُها `quiz` بنمطه القائم — تمرينُه في المراجعة
+            // موجودٌ منذ الجلسة ٥، فلا مهارةَ تُقاس بلا تمرينٍ يراجعها.
+            const skill = mushafSkill(r.text);
+            if (skill) progress.recordAttempt(skill.letter, skill.haraka, progress.KINDS.QUIZ, text === r.text);
             if (text === r.text) {         // الكلمة قد تتكرّر في الآية — وكلُّ موضعٍ لها صواب
               locked = true;
               btn.classList.add('good');
@@ -817,12 +965,19 @@ export function renderSurah(surahId) {
 
 const SCREENS = {
   letters: renderQuranLetters,
-  rasm: renderQuranRasm,
   muqattaat: renderQuranMuqattaat,
 };
 
-/** شاشة عقدة قرآنية بمعرّف جزئها — أو null إن كان مجهولاً (فيعود التوجيه بالطفل للخريطة). */
+/**
+ * شاشة عقدة قرآنية بمعرّف جزئها — أو null إن كان مجهولاً (فيعود التوجيه بالطفل للخريطة).
+ *
+ * **ودرسُ الرسم بمفتاحٍ مشتقّ لا ثابت** (بلاغُ وز١، جلسة وز٢): كان `SCREENS.rasm`
+ * اسماً واحداً، فعقدةُ الدرس الثاني كانت تسقط إلى `renderSurah` وتنكسر. فصار
+ * السؤالُ عن **بيان درسٍ بمعرّفه** — ودرسٌ ثالث غداً يجد شاشته بلا سطرٍ يُعدَّل.
+ */
 export function renderQuran(part) {
+  const rasm = rasmLessonById(part);
+  if (rasm) return renderQuranRasm(rasm);
   if (SCREENS[part]) return SCREENS[part]();
   const level = quranWordLevel(part);
   if (level) return renderQuranWords(level);

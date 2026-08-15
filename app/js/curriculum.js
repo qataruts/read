@@ -527,6 +527,11 @@ export const STORIES = [
       { words: ['مَعَ', 'سَامِي', 'كَلْبْ'], emoji: '🐕' },
       { words: ['الْكَلْبُ', 'نَامْ'], emoji: '😴' },
     ],
+    // **سؤالُ فهمٍ لقصة المنهج** (الحكم ب٤، جلسة وز٢): كانت ثلاثُ نجومٍ تُنال بنقرة
+    // «اسمع القصة كاملة» بلا قراءةٍ ولا سؤال. وخياراتُه **كلماتُ منهجٍ مصوَّرة**
+    // (`curriculumWord`) كخيارات قصة السورة، وجوابُه ممّا قرأه نصّاً لا استنباطاً.
+    // **ونصُّه يُقرأ بالعين ولا يُنطق** — فصفرُ إضافةٍ صوتية في الحكم كلِّه.
+    question: { text: 'مَنْ نَامْ', answer: 'كَلْبْ', distractors: ['وَلَدْ', 'فِيلْ'] },
   },
   {
     id: 'st2',
@@ -539,6 +544,7 @@ export const STORIES = [
       { words: ['الْجَمَلُ', 'يَحْمِلُ', 'الْحَلِيبْ'], emoji: '🥛' },
       { words: ['حَسَنٌ', 'يُحِبُّ', 'جَمَلَهْ'], emoji: '❤️' },
     ],
+    question: { text: 'مَا حَمَلَ الْجَمَلْ', answer: 'حَلِيبْ', distractors: ['تَمْرْ', 'عِنَبْ'] },
   },
   {
     id: 'st3',
@@ -552,6 +558,7 @@ export const STORIES = [
       { words: ['رَجَعَ', 'زَيْدٌ', 'لِلدَّارْ'], emoji: '🏃' },
       { words: ['زَيْدٌ', 'سَعِيدْ'], emoji: '😀' },
     ],
+    question: { text: 'نَزَلَ بَعْدَ الشَّمْسْ', answer: 'مَطَرْ', distractors: ['شَمْسْ', 'زَيْتْ'] },
   },
 ];
 
@@ -597,6 +604,7 @@ export const QURAN = {
         // الموسّع»): كانت ثلاثَ صورٍ فصارت خمساً — و«ؤ» لا تطلبها سورةٌ في هذه
         // الشريحة، لكنّ تأجيلَها يعيد فتحَ الدرس في الشريحة الثالثة، والطفل يتعلّم
         // الكراسيّ جملةً كما يتعلّمها في المكتب.
+        id: 'hamza',                      // مفتاحُ قياسه في ليتنر `mark-hamza` (الحكم ب١)
         sign: 'ء',
         name: 'الهَمزة',
         rule: 'الهمزةُ تُكتب وحدها، أو تركب على ألف، أو على واو، أو على ياء.',
@@ -610,6 +618,7 @@ export const QURAN = {
         ],
       },
       {
+        id: 'taa',
         sign: 'ة',
         name: 'التاء المربوطة',
         rule: 'والتاءُ المربوطة في آخر الكلمة تقف عليها هاءً.',
@@ -689,7 +698,14 @@ export const QURAN = {
     ],
   },
 
-  // ٣) رسم المصحف — كل علامة بمثالها الحقيقي من السور الأربع (نصّ حرفيّ لا يُنطق آلياً)
+  // ٣) رسم المصحف — كل علامة بمثالها الحقيقي من السور (نصّ حرفيّ لا يُنطق آلياً)
+  //
+  // **درسان لا درسٌ واحد** (الحكم ب٢ وبلاغُ وز١ الموقوف، جلسة وز٢): كانت العلاماتُ
+  // التسعُ في بطاقةٍ واحدة قبل السور كلِّها — والمفكوكيةُ محفوظةٌ بذلك يقيناً، لكنّ
+  // الطفلَ يحمل تسعَ علاماتٍ دفعةً واحدة ولا يلقى ثلاثاً منها إلا بعد دفعتين. فشُقّ
+  // الدرسُ درسين: ستٌّ هنا قبل الدفعة الأولى، و**ثلاثُ أخواتٍ** (`rasm2` أدناه) قبل
+  // الدفعة الثانية — عند أول نصٍّ يوظّفها. و**موضعُ كلٍّ محسوبٌ لا مكتوب**:
+  // `journey()` تضع الدرسَ قبل أوّلِ دفعةٍ تُظهر علامةً من علاماته.
   rasm: {
     id: 'rasm',
     title: 'رَسْم المصحف',
@@ -731,38 +747,12 @@ export const QURAN = {
         read: 'لَّهُۥ',
         from: 'الإخلاص',
       },
-      // **أختُ الواو الصغيرة** (حزمة «القرآني الموسّع»): القاعدة عينُها والحرفُ ياء —
-      // تدخل الدرس لأنّ سورة قريش تعرضها، ولا تُرى علامةٌ قبل أن تُدرَّس.
-      {
-        sign: 'ۦ',
-        name: 'الياء الصغيرة',
-        rule: 'ياء صغيرة بعد الحرف: تمدّ بها الكسرة، كما تمدّ الواو الصغيرة الضمة.',
-        read: 'إِۦلَـٰفِهِمْ',
-        from: 'قريش',
-      },
       {
         sign: 'ۢ',
         name: 'الميم الصغيرة',
         rule: 'ميم صغيرة ترشد القارئ إلى نطق التنوين ميماً.',
         read: 'أَحَدٌۢ',
         from: 'الإخلاص',
-      },
-      // **أختُ الميم الصغيرة**: القاعدة عينُها وموضعُها أسفلَ الحرف لا فوقه.
-      {
-        sign: 'ۭ',
-        name: 'الميم الصغيرة تحت الحرف',
-        rule: 'ميم صغيرة تحت الحرف: حكمها حكم أختها التي فوقه — تنوين يُنطق ميماً.',
-        read: 'مَّأْكُولٍۭ',
-        from: 'الفيل',
-      },
-      // **العلامة الوحيدة بقاعدةٍ جديدة في هذه الشريحة**: حرفٌ يُكتب ولا يُنطق —
-      // وهي أكثر ما يلقاه الطفل في قصار السور (واو الجماعة).
-      {
-        sign: '۟',
-        name: 'الدائرة الصغيرة',
-        rule: 'دائرة صغيرة فوق الحرف: حرفٌ مكتوب لا تنطقه، مُرَّ عليه ولا تقف عنده.',
-        read: 'ءَامَنُوا۟',
-        from: 'العصر',
       },
     ],
   },
@@ -795,6 +785,46 @@ export const QURAN = {
         read: 'نٓ',
         surah: 'القلم',
         parts: [{ ch: 'ن', say: 'نون' }],
+      },
+    ],
+  },
+
+  // ٣ب) رسم المصحف ٢ — **الأخوات الثلاث** عند أوّل نصٍّ يوظّفها (الحكم ب٢، جلسة وز٢).
+  //
+  // ثلاثٌ لا يُظهِرها نصٌّ قبل الدفعة الثانية: الدائرةُ في العصر، والأختان في قريش
+  // والفيل. **وقاعدتُها قاعدةُ أختها** نصّاً واحداً (`rasm.rule`) — فلا نصَّ منطوقٌ
+  // جديد في الشقّ كلِّه، وقواعدُ العلامات الثلاث لها ملفاتُها منذ «القرآني الموسّع».
+  rasm2: {
+    id: 'rasm2',
+    title: 'علاماتٌ أُخرى في المصحف',
+    face: '۟',
+    rule: 'المصحف يُكتب برسم خاص فيه علامات صغيرة ترشد القارئ، وحروفه هي حروفك التي تعرفها.',
+    signs: [
+      // **أختُ الواو الصغيرة** (حزمة «القرآني الموسّع»): القاعدة عينُها والحرفُ ياء —
+      // تدخل الدرس لأنّ سورة قريش تعرضها، ولا تُرى علامةٌ قبل أن تُدرَّس.
+      {
+        sign: 'ۦ',
+        name: 'الياء الصغيرة',
+        rule: 'ياء صغيرة بعد الحرف: تمدّ بها الكسرة، كما تمدّ الواو الصغيرة الضمة.',
+        read: 'إِۦلَـٰفِهِمْ',
+        from: 'قريش',
+      },
+      // **أختُ الميم الصغيرة**: القاعدة عينُها وموضعُها أسفلَ الحرف لا فوقه.
+      {
+        sign: 'ۭ',
+        name: 'الميم الصغيرة تحت الحرف',
+        rule: 'ميم صغيرة تحت الحرف: حكمها حكم أختها التي فوقه — تنوين يُنطق ميماً.',
+        read: 'مَّأْكُولٍۭ',
+        from: 'الفيل',
+      },
+      // **العلامة الوحيدة بقاعدةٍ جديدة في هذه الشريحة**: حرفٌ يُكتب ولا يُنطق —
+      // وهي أكثر ما يلقاه الطفل في قصار السور (واو الجماعة).
+      {
+        sign: '۟',
+        name: 'الدائرة الصغيرة',
+        rule: 'دائرة صغيرة فوق الحرف: حرفٌ مكتوب لا تنطقه، مُرَّ عليه ولا تقف عنده.',
+        read: 'ءَامَنُوا۟',
+        from: 'العصر',
       },
     ],
   },
@@ -1208,9 +1238,68 @@ export const markSkillKey = (skillId) => `${MARK_PREFIX}${skillId}`;
 /** هل هذا المفتاح مفتاحُ علامةٍ لا حرفاً؟ */
 export const isMarkKey = (key) => String(key ?? '').startsWith(MARK_PREFIX);
 
-/** درسُ العلامة من مفتاحه (أو null إن لم يكن مفتاحَ علامة قائمة). */
-export const skillByMarkKey = (key) =>
-  (isMarkKey(key) ? skillById(String(key).slice(MARK_PREFIX.length)) : null);
+/**
+ * درسُ العلامة من مفتاحه (أو null إن لم يكن مفتاحَ علامة قائمة).
+ *
+ * **وحرفا المرحلة القرآنية معه** (الحكم ب١، جلسة وز٢): الهمزةُ والتاء المربوطة
+ * تُدرَّسان درساً كدروس العلامات ولا حركةَ لهما تُقاس، فمفتاحُهما `mark-hamza`
+ * و`mark-taa` — ومن هنا يقرؤهما ما يقرأ العلاماتِ نفسَه (المراجعة ولوحةُ الوالد)،
+ * فلا نسخةَ ثانية من منطقٍ واحد.
+ */
+export const quranLetterSkills = () => QURAN.letters.signs.map((sign) => ({
+  id: sign.id, title: sign.name, face: sign.sign, quranSign: sign,
+}));
+
+export const skillByMarkKey = (key) => {
+  if (!isMarkKey(key)) return null;
+  const id = String(key).slice(MARK_PREFIX.length);
+  return skillById(id) || quranLetterSkills().find((s) => s.id === id) || null;
+};
+
+// ————— مفاتيحُ المرحلة القرآنية (الحكم ب١ وب٣، جلسة وز٢) —————
+//
+// **لا حرفَ وهميّ في لوحة وليّ الأمر** (حكم المدير في الحزمة ١٣، وقد صار قاعدةً):
+// علامةُ الرسم وفواتحُ السور مقيستان في ليتنر كسائر المهارات، ووحدةُ §٦ فيهما ليست
+// حرفاً × حركة — فلكلٍّ سابقتُه المعلَنة كما لـ«العائلة» و«الدرس» من قبل.
+
+export const RASM_PREFIX = 'rasm-';
+export const MUQ_PREFIX = 'muq-';
+const ROOT_PREFIX = 'root-';          // يكتبه `skillKeyOf` في roots.js
+
+/** سابقاتُ ما لا حرفَ له — جردٌ واحد يقرؤه القياسُ واللوحةُ والمراجعة. */
+export const LETTERLESS_PREFIXES = [MARK_PREFIX, ROOT_PREFIX, RASM_PREFIX, MUQ_PREFIX];
+
+/** هل هذا المفتاحُ مفتاحُ مهارةٍ لا حرفَ لها؟ (فلا تدخل لوحةَ الحروف) */
+export const isLetterlessKey = (key) =>
+  LETTERLESS_PREFIXES.some((prefix) => String(key ?? '').startsWith(prefix));
+
+/** درسا رسم المصحف بترتيبهما — الستّةُ ثم الأخواتُ الثلاث. */
+export const rasmLessons = () => [QURAN.rasm, QURAN.rasm2];
+
+/** علاماتُ الرسم كلُّها (الدرسان مجموعين) — لمن أراد الجرد لا الدرس. */
+export const rasmSigns = () => rasmLessons().flatMap((lesson) => lesson.signs);
+
+/** درسُ رسمٍ بمعرّفه — به يُصيَّر الدرسان بشاشةٍ واحدة (`renderQuran`). */
+export const rasmLessonById = (id) => rasmLessons().find((lesson) => lesson.id === id) || null;
+
+/** مفتاحُ قياس علامةِ رسمٍ في ليتنر — بلا تطويل (`ـٰ` ← `rasm-ٰ`). */
+export const rasmSkillKey = (sign) => `${RASM_PREFIX}${String(sign).split(TATWEEL).join('')}`;
+
+export const rasmSignByKey = (key) =>
+  rasmSigns().find((sign) => rasmSkillKey(sign.sign) === String(key)) || null;
+
+/** درسُ الرسم الذي يملك هذه العلامة (لِيُعرف أدُرِس أم لا). */
+export const rasmLessonOfSign = (sign) =>
+  rasmLessons().find((lesson) => lesson.signs.some((s) => s.sign === sign)) || null;
+
+/** مفتاحُ قياس مجموعةِ فواتحَ في ليتنر — `muq-الٓمٓ`. */
+export const muqSkillKey = (read) => `${MUQ_PREFIX}${read}`;
+
+export const muqByKey = (key) =>
+  QURAN.muqattaat.items.find((item) => muqSkillKey(item.read) === String(key)) || null;
+
+/** أسماءُ حروف مجموعةِ فواتح كما تُنطق بالتتابع — نصوصٌ لها ملفاتُها منذ الحزمة ٦. */
+export const muqSays = (item) => item.parts.map((p) => p.say);
 
 /**
  * وسمُ طرفٍ من طرفَي المقارنة كما يُسأل عنه: `compare.labels` تُعلن الطرفين
@@ -1229,6 +1318,31 @@ export function skillTexts(skill) {
     ...skill.compare.pairs.flat(),
     ...skillExamples(skill).map((w) => w.say),
   ];
+}
+
+/**
+ * سؤالُ فهمِ قصةِ المنهج في الشكل الذي تعرفه الشاشة (الحكم ب٤، جلسة وز٢) — أو null.
+ *
+ * **خياراتُه كلماتُ منهجٍ مصوَّرة** (`curriculumWord`) كخيارات قصة السورة: القصةُ تقع
+ * قبل البساتين، فلا معجمَ لها. و**الكلمةُ غير المصوَّرة تُسقِط سؤالَها** («صدق الصورة»
+ * — DESIGN §٦): سؤالٌ لا يُسأل خيرٌ من سؤالٍ يظلم. ومقطعُه القصةُ كلُّها (`upto`).
+ *
+ * **ونصُّه معروضٌ لا منطوق**: يُقرأ بالعين كما تُقرأ جملةُ «أكمل» في السلّم — فلا
+ * ملفَّ صوتٍ جديداً يطلبه هذا الحكم، وخياراتُه كلماتٌ لها أصواتها منذ الجلسة ١.
+ */
+export function storyAsk(story) {
+  const q = story?.question;
+  if (!q) return null;
+  const options = [q.answer, ...(q.distractors || [])]
+    .map(curriculumWord).filter((w) => w && w.pictured !== false);
+  if (options.length !== 3) return null;
+  return {
+    upto: story.sentences.length,
+    text: q.text,
+    words: q.text.split(' '),
+    answer: options[0],
+    options,
+  };
 }
 
 /** كل ما تنطقه قصة (العنوان، الجمل، كلماتها). */
@@ -1285,7 +1399,10 @@ export function quranParts() {
   return [
     { part: QURAN.letters.id, title: QURAN.letters.title, face: QURAN.letters.face },
     ...QURAN.words.levels.map((l) => ({ part: l.id, title: l.title, face: l.face })),
-    ...[QURAN.rasm, QURAN.muqattaat]
+    // **ورسمٌ ثانٍ في الذيل لا بين أختيه**: العقدُ هنا قائمةٌ واحدة، و`quranSections`
+    // تقسمها بتتابعها — فلو وقع `rasm2` بين `rasm` والمقطَّعات لانشقّت محطةُ الرسم
+    // محطتين بمعرّفٍ واحد. وموضعُه في الرحلة تحسبه `journey()` بعلاماته لا بترتيبه هنا.
+    ...[QURAN.rasm, QURAN.muqattaat, QURAN.rasm2]
       .map((part) => ({ part: part.id, title: part.title, face: part.face })),
     ...QURAN.surahs.flatMap((s) => [
       { part: surahWordsPart(s.id), title: `كلمات سورة ${s.name}`, face: SURAH_WORDS_FACE },
@@ -1312,8 +1429,8 @@ export function quranSpokenTexts() {
     ...QURAN.letters.signs.flatMap((s) => s.words.map((w) => w.read)),
     QURAN.words.rule,
     ...quranWordItems().map((w) => w.read),
-    QURAN.rasm.rule,
-    ...QURAN.rasm.signs.map((s) => s.rule),
+    ...rasmLessons().map((lesson) => lesson.rule),
+    ...rasmSigns().map((s) => s.rule),
     QURAN.muqattaat.rule,
     ...QURAN.muqattaat.items.flatMap((m) => m.parts.map((p) => p.say)),
   ];
@@ -1329,7 +1446,7 @@ export function quranSpokenTexts() {
 export function quranMushafTexts() {
   return [
     QURAN.basmala,
-    ...QURAN.rasm.signs.map((s) => s.read),
+    ...rasmSigns().map((s) => s.read),
     ...QURAN.muqattaat.items.map((m) => m.read),
     ...QURAN.surahs.flatMap((s) => s.ayat),
   ];

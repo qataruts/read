@@ -8,6 +8,7 @@
 import {
   GROUPS, SKILLS, STORIES, QURAN, GATES, CONTRASTS, ROOTS,
   gateBefore, quranParts, surahOfWordsPart, surahWordsPart, bareLetters,
+  isLetterlessKey, quranLetterSkills, rasmLessons,
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
 import { ladderOf, stemOf } from './sentences.js';
@@ -52,13 +53,19 @@ const arNumeral = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[
 export const KINDS = {
   QUIZ: 'quiz', HARAKA: 'haraka', BUILD: 'build', ORDER: 'order', CONTRAST: 'contrast',
   ROOT: 'root', MARK_COMPARE: 'mark-compare', MARK_QUIZ: 'mark-quiz',
+  RASM: 'rasm', MUQ: 'muq',
 };
 
 /**
  * **المهاراتُ التي لا حرفَ لها**: العائلةُ الصرفية (`root-<العائلة>`) والعلامةُ
- * (`mark-<الدرس>`) مقيستان في ليتنر كسائر المهارات، ووحدةُ §٦ فيهما ليست حرفاً ×
- * حركة. فتُستثنيان من لوحة الحروف كي **لا يظهر حرفٌ وهميّ في لوحة وليّ الأمر**
- * (حكم المدير في الحزمة ١٣ — صار قاعدةً تسري على كل نوعٍ جديد بعده)، ولكلٍّ قسمُه.
+ * (`mark-<الدرس>`) وعلامةُ الرسم (`rasm-<العلامة>`) وفواتحُ السور (`muq-<المجموعة>`)
+ * مقيسةٌ في ليتنر كسائر المهارات، ووحدةُ §٦ فيها ليست حرفاً × حركة. فتُستثنى من لوحة
+ * الحروف كي **لا يظهر حرفٌ وهميّ في لوحة وليّ الأمر** (حكم المدير في الحزمة ١٣ — صار
+ * قاعدةً تسري على كل نوعٍ جديد بعده)، ولكلٍّ قسمُه.
+ *
+ * **والفصلُ بالمفتاح لا بالنوع** (جلسة وز٢): كان بنوع التمرين، فلمّا صار لحرفَي
+ * المرحلة القرآنية مفتاحٌ `mark-` بنوعٍ قد يتبدّل، لزم أن يكون المقياسُ ما يُخزَّن
+ * فعلاً — **سابقةُ المفتاح** (`LETTERLESS_PREFIXES` في `curriculum.js`، جردٌ واحد).
  */
 export const isRootSkill = (skill) => skill?.kind === KINDS.ROOT;
 
@@ -66,7 +73,7 @@ export const isMarkSkill = (skill) =>
   skill?.kind === KINDS.MARK_COMPARE || skill?.kind === KINDS.MARK_QUIZ;
 
 /** هل مهارةٌ وحدتُها حرفٌ × حركة؟ (ما عداها له قسمُه في اللوحة وشرطُه في المراجعة) */
-export const isLetterSkill = (skill) => !isRootSkill(skill) && !isMarkSkill(skill);
+export const isLetterSkill = (skill) => !isLetterlessKey(skill?.letter);
 
 /** تباعد ليتنر بالأيام: كل إجابة صحيحة ترفع الصندوق، والخطأ يعيده إلى الصفر. */
 export const BOX_DAYS = [0, 1, 2, 4, 8, 16];
@@ -345,17 +352,19 @@ export function quranSections() {
   for (const level of QURAN.words.levels) at(level.id, 'prep');
   at(QURAN.rasm.id, 'rasm');
   at(QURAN.muqattaat.id, 'rasm');
+  at(QURAN.rasm2.id, 'rasm2');
   QURAN.surahs.forEach((surah, i) => {
     const key = `short${Math.floor(i / SURAHS_PER_STATION) + 1}`;
     at(surah.id, key);
     at(surahWordsPart(surah.id), key);
   });
 
-  const titles = { prep: 'التهيئة', rasm: 'رسمُ المصحف' };
-  const faces = { prep: QURAN.letters.face, rasm: QURAN.rasm.face };
+  const titles = { prep: 'التهيئة', rasm: 'رسمُ المصحف', rasm2: 'رسمُ المصحف ٢' };
+  const faces = { prep: QURAN.letters.face, rasm: QURAN.rasm.face, rasm2: QURAN.rasm2.face };
   const subs = {
     prep: 'الحرفان وكلماتٌ من القرآن',
     rasm: 'علاماتُ الرسم والحروف المقطَّعة',
+    rasm2: 'ثلاثُ علاماتٍ أُخرى',
   };
   let shorts = 0;
   const out = [];
@@ -594,6 +603,23 @@ function rootPlacement(sections) {
  * **ومواضعُ الدفعات محسوبةٌ لا مكتوبة**: الأولى قبل البساتين، وما بعدها بعد كل
  * بستانين — فسورةٌ ثالثةَ عشرةَ تفتح دفعةً خامسة في موضعها بلا سطرٍ يُعدَّل.
  */
+/**
+ * **موضعُ درس الرسم محسوبٌ لا مكتوب** (الحكم ب٢، جلسة وز٢): رقمُ أوّلِ دفعةٍ يُظهر
+ * نصُّها علامةً من علاماته — فيُدرَّس عند أوّل ما يوظّفه لا قبل السور كلِّها. وعلامةٌ
+ * تنتقل من درسٍ إلى درس غداً تحرّك موضعَ درسها وحدَه بلا سطرٍ يُعدَّل، **والمفكوكيةُ
+ * بالبناء**: لا تُرى علامةٌ في نصٍّ قبل أن تُدرَّس (ويحرسه `check_decodable.py` كذلك).
+ *
+ * وما ليس درسَ رسمٍ (التهيئة) فقبل الدفعة الأولى — موضعُه المُقَرّ في وز١.
+ */
+function headBatch(section) {
+  const lesson = rasmLessons().find((l) => l.id === section.key);
+  if (!lesson) return 0;
+  const marks = lesson.signs.map((sign) => sign.sign.split('ـ').join(''));
+  const at = QURAN.surahs.findIndex((surah) =>
+    [QURAN.basmala, ...surah.ayat].some((line) => marks.some((mark) => line.includes(mark))));
+  return at < 0 ? 0 : Math.floor(at / SURAHS_PER_STATION);
+}
+
 export function journey() {
   if (journeyCache) return journeyCache;
   const out = [];
@@ -616,17 +642,20 @@ export function journey() {
   // التهيئةُ والرسمُ والدفعةُ الأولى قبل البوابة الثانية، وبقيةُ الدفعات بين البساتين
   const quran = quranSections();
   const batches = quran.filter((section) => section.key.startsWith('short'));
+  const heads = quran.filter((section) => !section.key.startsWith('short'));
+  const before = (batch) => heads.filter((section) => headBatch(section) === batch);
   pushGate('quran');
-  out.push(...quran.filter((section) => !section.key.startsWith('short')), ...batches.slice(0, 1));
+  out.push(...before(0), ...batches.slice(0, 1));
   pushGate('gardens');
   GARDENS.forEach((garden, index) => {
     out.push(...gardenSections(garden));
     // بعد كل بستانين دفعةٌ — والباقي من الدفعات (إن نفدت البساتين قبلها) في الذيل
-    const batch = index % 2 === 1 ? batches[(index + 1) / 2] : null;
-    if (batch) out.push(batch);
+    const at = index % 2 === 1 ? (index + 1) / 2 : null;
+    if (at !== null && batches[at]) out.push(...before(at), batches[at]);
   });
   const placed = new Set(out);
-  out.push(...batches.filter((batch) => !placed.has(batch)));
+  out.push(...heads.filter((section) => !placed.has(section)),
+    ...batches.filter((batch) => !placed.has(batch)));
   // أقسامُ الأشجار تُدرَج بعد بنائها كلِّها — فموضعُها يُقاس على الرحلة التامّة.
   // وتُؤخَّر إلى آخر كتلة بستانها (باقاتُه ثم سلّمُه ثم مكتبتُه): الشجرةُ ثمرةُ ما
   // دُرِس، فلا تُقحَم بين البستان ودرجاته فتقطع تدرّجَه المُقَرّ في الحزمة ٨.
@@ -791,7 +820,26 @@ export function studiedLetters() {
  * من لم يبلغ درسه بعدُ. وهو نظيرُ `studiedLetters` للحروف: **حصيلةٌ لا نيّة**.
  */
 export function studiedMarks() {
-  return SKILLS.filter((skill) => isDone(`skill:${skill.id}`));
+  return [
+    ...SKILLS.filter((skill) => isDone(`skill:${skill.id}`)),
+    // **وحرفا المرحلة القرآنية درسٌ كدروسها** (الحكم ب١): مفتاحُهما `mark-` ومراجعتُهما
+    // مراجعةُ العلامات نفسُها، فحصيلتُهما تُقرأ من حيث تُقرأ حصيلتُها.
+    ...(isDone('quran:letters') ? quranLetterSkills() : []),
+  ];
+}
+
+/**
+ * علاماتُ الرسم التي أتمّ درسَها (الحكم ب١) — مادّةُ تمرين «أيّ علامة؟» في المراجعة.
+ * درسان لا درس، فمن أتمّ الأول لا يُسأل عن علامةٍ في الثاني: **المفكوكية بالبناء**.
+ */
+export function studiedRasm() {
+  return rasmLessons().filter((lesson) => isDone(`quran:${lesson.id}`))
+    .flatMap((lesson) => lesson.signs);
+}
+
+/** فواتحُ السور إن أتمّ محطتها — مادّةُ تمرين «أيُّ فواتح سمعت؟» (الحكم ب٣). */
+export function studiedMuqattaat() {
+  return isDone('quran:muqattaat') ? QURAN.muqattaat.items : [];
 }
 
 /**
@@ -872,9 +920,36 @@ export function skills() {
  * والخاطئة تعيده إلى الصفر فتعود المهارة في مراجعة اليوم نفسه (METHOD §٦).
  * @returns {object|null} حالة المهارة بعد التسجيل
  */
+/**
+ * **أولُ محاولةٍ في الجولة وحدَها تدخل ليتنر** (الحكم ب٨، جلسة وز٢): كان كلُّ نقرةٍ
+ * خاطئة تصفّر صندوقَ المهارة، فجولةٌ بثلاثة خيارات يخطئ فيها الطفلُ مرّتين تُسجَّل
+ * **خطأين** — تضخيمٌ للضعف المقيس، وأقساه في الجذور حيث المشتّت مقصودٌ أن يُغري.
+ * فما بعد الأولى **تعلُّمٌ لا قياس**: يقرأ ويقارن حتى يصيب، ولا يُحاسَب مرّتين على
+ * تعثّرٍ واحد.
+ *
+ * **والجولةُ تُعرَف بلا أن تُعلَن**: كلُّ شاشاتنا تسجّل **مفتاحَ المطلوب** لا مفتاحَ ما
+ * نقره الطفل (تعليقُ «القياس على المقطع المطلوب» في `words.js` و`garden.js`، ونظائرُه)
+ * — فمحاولاتُ الجولة الواحدة متتابعةٌ على مفتاحٍ واحد. فالجولةُ تُفتَح بخطأٍ مسجَّل
+ * وتُغلَق بأوّل صواب، وما بينهما لا يُسجَّل. وجولةٌ تالية بالمفتاح نفسِه بعد إغلاقها
+ * تُسجَّل كسائرها.
+ *
+ * ومَن غادر الشاشةَ وسط جولةٍ مفتوحة تُغلقها أوّلُ مهارةٍ أخرى تُسجَّل — و`endRound()`
+ * تُغلقها صراحةً لمن يملك حدَّ تمرينه (محرّك المراجعة يناديها عند كل تمرين).
+ */
+let openRound = null;      // مفتاحُ جولةٍ سُجِّلت وما زالت تنتظر صوابَها
+
+export function endRound() {
+  openRound = null;
+}
+
 export function recordAttempt(letter, haraka, kind, correct, today = dayNumber()) {
   if (!letter || !kind) return null;
   const key = skillKey(letter, haraka, kind);
+  if (openRound === key) {                 // إعادةٌ داخل الجولة نفسِها: تعلُّمٌ لا قياس
+    if (correct) openRound = null;
+    return state.skills[key] || null;
+  }
+  openRound = correct ? null : key;
   const s = state.skills[key] || { right: 0, wrong: 0, box: 0, due: today, seen: today };
   if (correct) {
     s.right++;

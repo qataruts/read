@@ -44,7 +44,7 @@ async function waitFor(fn, label = '', ms = 4000) {
 
 const {
   QURAN, quranMushafTexts, quranSpokenTexts, quranWordTexts, quranWordItems,
-  surahWords, surahWordsPart,
+  surahWords, surahWordsPart, rasmLessons,
 } = await import('./js/curriculum.js');
 const { allNodes, SURAHS_PER_STATION } = await import('./js/progress.js');
 const { LIBRARY } = await import('./js/library.js');
@@ -187,7 +187,8 @@ try {
   await waitFor(() => $('.station'), 'الخريطة');
   // **مفاصلُ المرحلة** (بلاغ المالك، ١٢ أغسطس ٢٠٢٦): كانت محطةً واحدة تحمل ٣١ عقدة،
   // فصارت محطاتٍ مسمّاة **محسوبةً من `QURAN.surahs`** — والعددُ يُقرأ من المنهج لا يُكتب.
-  const wantStations = 2 + Math.ceil(QURAN.surahs.length / SURAHS_PER_STATION);
+  // التهيئةُ ودرسا الرسم ودفعاتُ السور — والعددُ محسوبٌ من البيانات لا مكتوب
+  const wantStations = 1 + rasmLessons().length + Math.ceil(QURAN.surahs.length / SURAHS_PER_STATION);
   ok($$('.station--quran').length === wantStations,
     `الخريطة فيها ${arNum($$('.station--quran').length)} محطاتٍ قرآنية مسمّاة لا كتلةً واحدة`);
   ok($$('.station--quran').every((el) => el.classList.contains('station--locked')),
@@ -201,7 +202,9 @@ try {
   unfoldAll();
   // ومعها قصصُ السور: كلُّ قصةٍ عقدةٌ تسبق محطةَ كلمات سورتها (حزمة قصص الأنبياء)
   const SURAH_STORIES = LIBRARY.filter((s) => s.surah).length;
-  const QURAN_NODES = 3 + QURAN.words.levels.length + QURAN.surahs.length * 2 + SURAH_STORIES;
+  // الحرفان والمقطَّعاتُ ودرسا الرسم (صارا اثنين — البند ٠) ودرجاتُ الكلمات والسور
+  const QURAN_NODES = 2 + rasmLessons().length + QURAN.words.levels.length
+    + QURAN.surahs.length * 2 + SURAH_STORIES;
   ok($$('.station--quran .node').length === QURAN_NODES,
     `وفيها ${arNum(QURAN_NODES)} عقدة (حرفان، ${arNum(QURAN.words.levels.length)} درجات كلمات، `
     + `رسم، مقطَّعة، و${arNum(QURAN.surahs.length)} سورة كلٌّ بمحطة كلماتها، `
@@ -254,8 +257,12 @@ try {
   await waitFor(() => $('.celebrate'), 'ختام درس الحرفين');
   ok($$('.big-stars .on').length === 2, `خطأ واحد ⇒ نجمتان (${$$('.big-stars .on').length})`);
   ok(stored().stars['quran:letters'] === 2, 'ونجوم الدرس محفوظة بمعرّف عقدته');
-  ok(Object.keys(stored().skills).length === 0,
-    'ولا قياس في المرحلة القرآنية (وحدة القياس حرف بحركة في تمرين)');
+  // **ويُقاس ما يُدرَّس** (الحكم ب١، جلسة وز٢): كانت المرحلة كلُّها بلا قياس، فصار
+  // للحرفين مفتاحاهما `mark-hamza`/`mark-taa` — قراءةً صامتة، وهي التي جرت لتوّها.
+  const letterKeys = Object.keys(stored().skills);
+  ok(letterKeys.length > 0 && letterKeys.every((k) => k.startsWith('mark-'))
+    && letterKeys.some((k) => k.startsWith('mark-hamza')),
+    `والحرفان يدخلان ليتنر بمفتاحيهما (${letterKeys.join('، ')})`);
 
   // ————— ٣) كلمات من القرآن: ثلاث درجات صاعدة (الحزمة ١٢) —————
   ok(quranWordItems().length >= 24,
@@ -266,8 +273,11 @@ try {
     await waitFor(() => $('.lesson'), `شاشة ${level.title}`);
     ok($$('.example-word').length === level.items.length,
       `${level.title}: ${arNum(level.items.length)} كلمات، كلُّها في ${arNum(level.size)} حروف فأكثر`);
+    // **يُنتظَر الصوتُ لا يُفترَض**: السجلّ يتراكم عبر الدرجات، فقراءتُه بعد مهلةٍ
+    // ثابتة تلتقط صوتَ الدرجة السابقة على جهازٍ مشغول (حُمرةٌ كاذبة).
+    const beforeCard = heardLog.length;
     $$('.example-word').at(-1).click();
-    await sleep(60);
+    await waitFor(() => heardLog.length > beforeCard, `صوت بطاقة ${level.title}`);
     ok(lastHeard() === level.items.at(-1).read, `وتُسمع بنقرة (${lastHeard()})`);
     $('.next').click();
     await waitFor(() => $('.vchip--word'), 'اقرأ واختر');
@@ -291,19 +301,49 @@ try {
   ok(lastHeard() === QURAN.rasm.signs[0].rule, 'نقرة البطاقة تُسمع قاعدتها (كلامنا نحن)');
   checkTargets('رسم المصحف');
 
+  // **جولةٌ لكل علامةٍ في الدرس** (الحكم ب٢) — لا ثلاثٌ ثابتة، والعددُ يتبع بياناتِه
   $('.next').click();
   await waitFor(() => $('.vchip--sign'), 'خطوة تمييز العلامة');
-  for (let round = 1; round <= 3; round++) {
+  const rasmTargets = new Set();
+  for (let round = 1; round <= QURAN.rasm.signs.length; round++) {
     await waitFor(() => $$('.vchip--sign').length === 3, `خيارات الجولة ${round}`);
     const shown = $('.mushaf--big').textContent.trim();
     const target = QURAN.rasm.signs.find((s) => s.read === shown);
     ok(!!target, `الجولة ${round}: الكلمة المعروضة «${shown}» من أمثلة الدرس`);
+    rasmTargets.add(target.sign);
     const faces = texts('.vchip--sign .vchip-face');
     $$('.vchip--sign')[faces.indexOf(target.sign)].click();
     await sleep(900);
   }
+  ok(rasmTargets.size === QURAN.rasm.signs.length,
+    `وجولاتُه بعدد علاماته: كلُّ علامةٍ هدفٌ مرّة (${arNum(rasmTargets.size)})`);
   await waitFor(() => $('.celebrate'), 'ختام الرسم');
   ok(stored().stars['quran:rasm'] === 3, 'ونجوم الدرس محفوظة');
+  // **والقياسُ يُكتب** (الحكم ب١): مفتاحُ كل علامةٍ في سجلّ ليتنر
+  const rasmKeys = Object.keys(stored().skills).filter((k) => k.startsWith('rasm-'));
+  ok(rasmKeys.length === QURAN.rasm.signs.length,
+    `وعلاماتُه دخلت ليتنر بمفاتيحها (${arNum(rasmKeys.length)} مفتاحاً `
+    + `مثل «${rasmKeys[0]}»)`);
+
+  // ————— ٤ب) رسم المصحف ٢: الأخوات الثلاث قبل الدفعة الثانية (البند ٠) —————
+  await seed(idsBefore('quran:rasm2'));
+  await goto('#/quran/rasm2');
+  await waitFor(() => $('.rasm-card'), 'شاشة الرسم الثاني');
+  ok($$('.rasm-card').length === QURAN.rasm2.signs.length,
+    `${arNum(QURAN.rasm2.signs.length)} علاماتٍ في الدرس الثاني — والموجِّهُ يعرفه بمعرّفه`);
+  $('.next').click();
+  await waitFor(() => $('.vchip--sign'), 'خطوة تمييز العلامة (الثاني)');
+  for (let round = 1; round <= QURAN.rasm2.signs.length; round++) {
+    await waitFor(() => $$('.vchip--sign').length === 3, `خيارات الجولة ${round}`);
+    const shown = $('.mushaf--big').textContent.trim();
+    const target = QURAN.rasm2.signs.find((s) => s.read === shown);
+    ok(!!target, `[رسم٢] الجولة ${round}: «${shown}» من أمثلة الدرس`);
+    const faces = texts('.vchip--sign .vchip-face');
+    $$('.vchip--sign')[faces.indexOf(target.sign)].click();
+    await sleep(900);
+  }
+  await waitFor(() => $('.celebrate'), 'ختام الرسم الثاني');
+  ok(stored().stars['quran:rasm2'] === 3, 'ونجومُه محفوظةٌ بمعرّفه المستقلّ');
 
   // ————— ٥) الحروف المقطَّعة —————
   await seed(idsBefore('quran:muqattaat'));
@@ -320,9 +360,35 @@ try {
   ok(lastHeard() === 'نون', `نقرة الاسم تُسمعه (${lastHeard()})`);
   ok($('.lesson-body').textContent.includes(`قرأتَ ${arNum(4)}`),
     'وعدّاد المقروء يبلغ المجموعات كلها');
+
+  // **محطةٌ بتمرين لا بنقرات** (الحكم ب٣): جولةٌ لكل مجموعة، تُسمَع أسماؤها وتُختار
   $('.next').click();
+  await waitFor(() => $('.vchip--sign'), 'خطوة «أيُّ فواتح؟»');
+  let muqAt = heardLog.length;
+  for (let round = 1; round <= QURAN.muqattaat.items.length; round++) {
+    await waitFor(() => $$('.vchip--sign').length === 3, `خيارات الجولة ${round}`);
+    // **المسموعُ الجديد وحدَه**: السجلّ يتراكم، فتُقرأ أسماءُ هذه الجولة من موضعها —
+    // ويُنتظَر تمامُ التتابع (أسماءٌ بينها فواصل) لا أوّلُ اسمٍ منه.
+    let target = null;
+    await waitFor(() => {
+      const heard = heardLog.slice(muqAt);
+      const shown = texts('.vchip--sign .vchip-face');
+      target = QURAN.muqattaat.items.find((m) => shown.includes(m.read)
+        && m.parts.every((x) => heard.includes(x.say)));
+      return Boolean(target);
+    }, `أسماءُ الجولة ${round}`);
+    const faces = texts('.vchip--sign .vchip-face');
+    ok(!!target, `[فواتح] الجولة ${round}: سُمعت أسماءُ «${target.read}»`
+      + ' — والمقطَّعةُ معروضةٌ لا منطوقة');
+    $$('.vchip--sign')[faces.indexOf(target.read)].click();
+    await sleep(900);
+    muqAt = heardLog.length;
+  }
   await waitFor(() => $('.celebrate'), 'ختام المقطَّعة');
-  ok($$('.big-stars .on').length === 3, 'من قرأها كلها بأسمائها ⇒ ثلاث نجوم');
+  ok($$('.big-stars .on').length === 3, 'من ميّزها كلها بأذنه ⇒ ثلاث نجوم');
+  const muqKeys = Object.keys(stored().skills).filter((k) => k.startsWith('muq-'));
+  ok(muqKeys.length === QURAN.muqattaat.items.length,
+    `وفواتحُها دخلت ليتنر بمفاتيحها (${arNum(muqKeys.length)} مفتاحاً)`);
 
   // ————— ٥ب) محطة «كلمات السورة»: لا سورة قبل كلماتها (الحزمة ١٢) —————
   await seed(idsBefore(`quran:${surahWordsPart('s1')}`));
@@ -388,7 +454,11 @@ try {
   await waitFor(() => $('.celebrate'), 'ختام كلمات السورة');
   ok($$('.big-stars .on').length === 2, `خطأ واحد ⇒ نجمتان (${$$('.big-stars .on').length})`);
   ok(stored().stars[`quran:${surahWordsPart('s1')}`] === 2, 'ونجومها محفوظة بمعرّف عقدتها');
-  ok(Object.keys(stored().skills).length === 0, 'ولا قياس فيها (كسائر المرحلة القرآنية)');
+  // **و«جِدْها في الآية» تُقاس** (الحكم ب١): مهارةُ كلمتها (أوّلُ حرفٍ متحرّك) بنوع
+  // `quiz` — نمطٌ قائم له تمرينُه في المراجعة منذ الجلسة ٥، فلا مهارةَ بلا مراجعة.
+  const swKeys = Object.keys(stored().skills);
+  ok(swKeys.length > 0 && swKeys.every((k) => k.endsWith('|quiz') && !k.includes('-')),
+    `وجولاتُها تدخل ليتنر بمهارة كلمتها (${swKeys.slice(0, 3).join('، ')}…)`);
 
   await goto('#/');
   await waitFor(() => $('.station--quran'), 'الخريطة');
@@ -648,14 +718,21 @@ try {
   // ————— ١٠) التلاوة نفسها: ملفٌّ حقيقيّ يفكّه Chrome (لا مشغّل مزيّف) —————
   // القسم السابق يفحص الوصل بمشغّل مزيَّف؛ وهذا يفحص المادة: كل تلاوةٍ تُفكّ فعلاً
   // ولها مدّة معقولة — فلا يمرّ ملفٌ مبتور أو صفحةُ خطأ باسم mp3.
-  const durations = await Promise.all(Object.keys(recitations.ayat).map((key) =>
-    new Promise((resolve) => {
-      const el = new Audio(`audio/${key}.mp3`);   // Audio الحقيقي (خارج الإطار)
-      el.preload = 'metadata';
-      el.addEventListener('loadedmetadata', () => resolve(el.duration), { once: true });
-      el.addEventListener('error', () => resolve(0), { once: true });
-      setTimeout(() => resolve(-1), 15000);
-    })));
+  // **دفعاتٌ لا قطيع** (نظيرُ دفعات `sw.js`): ثمانٍ وستون طلباً في لحظةٍ واحدة تخنق
+  // خادمَ الفحص (مسارُه خارج عاملِ الخدمة)، فتنتهي مهلةُ أكثرها ويحمرّ الفحصُ بلا
+  // عطبٍ في ملف — حُمرةٌ كاذبة من ازدحامٍ لا من مادة. فتُطلَب ثماني ملفاتٍ في الدفعة.
+  const meta = (key) => new Promise((resolve) => {
+    const el = new Audio(`audio/${key}.mp3`);     // Audio الحقيقي (خارج الإطار)
+    el.preload = 'metadata';
+    el.addEventListener('loadedmetadata', () => resolve(el.duration), { once: true });
+    el.addEventListener('error', () => resolve(0), { once: true });
+    setTimeout(() => resolve(-1), 20000);
+  });
+  const ayahKeys = Object.keys(recitations.ayat);
+  const durations = [];
+  for (let i = 0; i < ayahKeys.length; i += 8) {
+    durations.push(...await Promise.all(ayahKeys.slice(i, i + 8).map(meta)));
+  }
   const broken = durations.filter((d) => !(d > 1));
   ok(broken.length === 0,
     `كل تلاوة تُفكّ في متصفّح حقيقي بمدّة معقولة (${durations.length} ملفاً، `

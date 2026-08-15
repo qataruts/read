@@ -9,9 +9,11 @@
 //    (`buildSession` في review.js)، فكل ما تنطقه له ملفٌ مولَّد أصلاً.
 // ٣) **لا رسوب**: دون العتبة لا نجمة ولا عبور، لكن لا عقاب ولا حدّ للمحاولات —
 //    «لَيْسَ بَعْدُ» ثم إعادةٌ فورية تُبنى تمارينها من جديد (لا نمط يُحفَظ فيُستظهَر).
-// ٤) **الحكم بالمحاولة لا بالتمرين**: نسبة الإصابة = الصواب ÷ كل اللمسات، وهي
-//    وحدةُ `markReview` نفسُها في لوحة وليّ الأمر — فلا يفترق ما يقرؤه الوالد عمّا
-//    فتح البوابة أو أبقاها.
+// ٤) **الحكم بالتمرين لا باللمسة** (الحكم ب٧، جلسة وز٢): كانت النسبةُ الصوابَ ÷ كلَّ
+//    اللمسات، فتركيبُ كلمةٍ من أربعة مقاطع يزن أربعةَ أضعاف تمييزٍ في نسبة الـ٨٠٪ —
+//    والبوابةُ عشرةُ **تمارين** لا عشرُ لمسات. فصار التمرينُ وحدةَ الحكم: أصابه من
+//    أوّله أو أخطأ فيه، مهما بلغت لمساتُه. **ووحدةُ `markReview` تتبعه** فلا يفترق ما
+//    يقرؤه الوالد عمّا فتح البوابة أو أبقاها.
 
 import { gateById } from './curriculum.js';
 import * as progress from './progress.js';
@@ -21,7 +23,7 @@ import { h, icon, faceEl, go, arNum, starsRow, mascot, PAUSE_ACCENT } from './ui
 export const GATE_SIZE = 10;      // عشرة تمارين: أطول من مراجعة اليوم ودون إرهاق
 export const PASS_RATE = 0.8;     // العبور بإصابة ≥٨٠٪ من المحاولات
 
-/** هل تعبر هذه النتيجة البوابة؟ (بلا محاولة أصلاً لا عبور — لئلا تُفتح بجلسة فارغة) */
+/** هل تعبر هذه النتيجة البوابة؟ (بلا تمرينٍ أصلاً لا عبور — لئلا تُفتح بجلسة فارغة) */
 export const passed = (right, errors) =>
   right + errors > 0 && right / (right + errors) >= PASS_RATE;
 
@@ -34,6 +36,8 @@ export function gateItems(rnd = Math.random) {
     letters, words, sentences,
     pairs: studiedPairs(letters),
     marks: progress.studiedMarks(),
+    signs: progress.studiedRasm(),        // علاماتُ الرسم وفواتحُ السور تدخل البوابة
+    muq: progress.studiedMuqattaat(),     // كسائر المقيس (الحكمان ب١ وب٣)
     due: progress.weakestSkills(),
     size: GATE_SIZE,
     rnd,
@@ -57,15 +61,15 @@ export function renderGate(gateId) {
         h('p', { class: 'hint' }, gate.hint),
       ),
     ),
-    verdict: ({ right, errors, items, again }) => {
-      const tries = right + errors;
-      const rate = tries ? Math.round((right / tries) * 100) : 0;
-      const open = passed(right, errors);
-      progress.markReview(tries, right);           // البوابة مراجعةٌ كسائر المراجعات
-      if (open) progress.setStars(nodeId, starsForReview(errors, items.length));
+    verdict: ({ rightItems, missedItems, items, again }) => {
+      const tries = rightItems + missedItems;
+      const rate = tries ? Math.round((rightItems / tries) * 100) : 0;
+      const open = passed(rightItems, missedItems);
+      progress.markReview(tries, rightItems);      // البوابة مراجعةٌ كسائر المراجعات
+      if (open) progress.setStars(nodeId, starsForReview(missedItems, items.length));
 
       const score = h('p', { class: 'hint' },
-        `أصبتَ ${arNum(right)} من ${arNum(tries)} محاولة (${arNum(rate)}٪)`);
+        `أصبتَ ${arNum(rightItems)} من ${arNum(tries)} تمريناً (${arNum(rate)}٪)`);
 
       // العبور: احتفال ونجوم. ودونه: «ليس بعدُ» — لا لفظ رسوب ولا حدّ للإعادة.
       return open
@@ -73,7 +77,7 @@ export function renderGate(gateId) {
           mascot('mascot mascot--cheer'),
           faceEl(gate.face, 'celebrate-face', 'div'),
           h('h2', {}, 'فُتِحَتِ البَوَّابَة!'),
-          starsRow(starsForReview(errors, items.length), 'big-stars'),
+          starsRow(starsForReview(missedItems, items.length), 'big-stars'),
           score,
           h('div', { class: 'row foot' },
             h('button', { class: 'btn btn--primary', onclick: () => go('#/') }, '→ الخريطة')),

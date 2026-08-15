@@ -15,7 +15,7 @@
 // المهارة التي تُوظّفها، وقصص المكتبة بعد سلّم جمل بستانها. يفحص ذلك
 // `tools/check_decodable.py` و`tools/check_lexicon.py`.
 
-import { storyById, storyTexts, sentenceText } from './curriculum.js';
+import { storyAsk, storyById, storyTexts, sentenceText } from './curriculum.js';
 import { libraryStory, readsAloud, storyTexts as libraryStoryTexts } from './library.js';
 import { textWord } from './fade.js';   // عرضٌ بدرجات الخفوت — ولا احتساب هنا (الشاهد الواحد)
 import * as progress from './progress.js';
@@ -31,12 +31,23 @@ const LINE_GAP_MS = 500;     // فاصلٌ بين جملتين في الكاري
 const AFTER_PICK_MS = 900;   // مهلة سماع الجواب قبل الاحتفال
 
 /**
- * نجوم قصص المنهج: ٣ لمن استمع إلى الجمل كلها، ٢ لمن استمع إلى نصفها فأكثر، وإلا ١.
- * لا خطأ يُحتسب هنا (لا سؤال أصلاً)، فالمقياس هو المتابعة لا الإصابة.
+ * نجوم المتابعة: ٣ لمن تابع الجمل كلها، ٢ لمن تابع نصفها فأكثر، وإلا ١.
+ * (تستعملها شاشةُ السورة وقصصُ المكتبة — لا قصصُ المنهج بعد الحكم ب٤ أدناه.)
  */
 export function starsForStory(heard, total) {
   if (total && heard >= total) return 3;
   return heard * 2 >= total ? 2 : 1;
+}
+
+/**
+ * نجوم **قصص المنهج** (الحكم ب٤، جلسة وز٢): كانت ثلاثَ نجومٍ تُنال بنقرةٍ واحدة على
+ * «اسمع القصة كاملة» — أعلى تقديرٍ في المحطة بلا قراءةٍ ولا سؤال. فصار المقياسُ
+ * **ما قرأه لا ما سمعه**: `read` هي الجملُ التي نقر كلماتِها كلَّها (وهي عينُ شاهد
+ * الخفوت في هذه الشاشة)، ونجمةُ الفهم لسؤالٍ يُجاب من أوّل مرّة — كقصص الرفّ.
+ * والحدُّ الأدنى نجمةٌ دائماً: القراءةُ بالعين وحدها إنجاز (سابقةُ الجلسة ٤ المُقَرّة).
+ */
+export function starsForTale(read, total, correct) {
+  return Math.max(1, starsForStory(read, total) - 1 + (correct ? 1 : 0));
 }
 
 /**
@@ -61,6 +72,7 @@ export function starsForShelf(clean) {
 export function renderStory(storyId) {
   const story = storyById(storyId);
   if (!story) return null;
+  const ask = storyAsk(story);
   return readingScreen({
     nodeId: `story:${story.id}`,
     title: story.title,
@@ -68,7 +80,12 @@ export function renderStory(storyId) {
     pill: 'قصة',
     texts: storyTexts(story),
     lines: story.sentences.map((s) => ({ words: s.words, emoji: s.emoji, text: sentenceText(s) })),
-    stars: ({ heard, total }) => starsForStory(heard, total),
+    questions: ask ? [ask] : [],
+    // **المقياسُ قراءةٌ لا سماع** (الحكم ب٤): الكاريوكي يبقى معيناً على القراءة
+    // ولا يشتري نجمةً — النجمةُ لجملةٍ نقر كلماتِها كلَّها، ولسؤالٍ أصابه من أوّله.
+    measure: 'read',
+    stars: ({ read, total, clean, asked }) =>
+      starsForTale(read, total, asked ? clean === asked : false),
   });
 }
 
@@ -117,9 +134,12 @@ export function renderLibraryStory(storyId) {
  * @param {boolean} readToMother أتُختَم بخطوة «اِقْرَأْ لِأُمِّكْ»؟
  */
 function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [],
-  aloud = true, readToMother = false, cover = null, stars }) {
+  aloud = true, readToMother = false, cover = null, measure = 'listen', stars }) {
   const total = lines.length;
   const heard = new Set();      // فهارس الجمل التي سمعها الطفل (كلمةً كلمةً أو كاملةً)
+  // **وما قرأه غيرُ ما سمعه** (الحكم ب٤): جملةٌ نقر كلماتِها كلَّها — لا ما مرّ عليه
+  // الكاريوكي. فالعدّادان اثنان: `heard` يخبر الطفلَ أين بلغ، و`read` تُبنى منه نجومُه.
+  const read = new Set();
 
   // **المقاطع وحدةُ العرض**: حدودُها من `upto` الذي حسبه الفاحص من عدد الصفحات.
   // وبلا سؤالٍ (قصةُ منهج) فمقطعٌ واحد يسع الصفحات كلَّها.
@@ -201,7 +221,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [
           stopAll();
           e.currentTarget.classList.add('story-word--said');
           said.add(i);
-          if (said.size === line.words.length) markHeard(index);
+          if (said.size === line.words.length) markHeard(index, true);
           audio.play(word);
         },
       }));
@@ -274,7 +294,8 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [
     stopAll();
   }
 
-  function markHeard(index) {
+  function markHeard(index, byReading = false) {
+    if (byReading) read.add(index);
     if (heard.has(index) || done) return;
     heard.add(index);
     paintFoot();
@@ -406,7 +427,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [
     stopAll();
     done = true;
     const asked = questions.length;
-    const won = stars({ heard: heard.size, total, clean, asked });
+    const won = stars({ heard: heard.size, read: read.size, total, clean, asked });
     const before = progress.getStars(nodeId);
     progress.setStars(nodeId, won);
     const last = !progress.nextNode();
@@ -417,11 +438,14 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [
       h('h2', {}, 'قرأتَ قصة كاملة!'),
       starsRow(won, 'big-stars'),
       h('p', { class: 'hint' }, won === 3
-        ? cheer(aloud ? 'سمعتَ الجمل كلها وأجبتَ عن السؤال — أحسنت!'
-          : `قرأتَ ${arCount(total, ['صفحة', 'صفحتين', 'صفحات', 'صفحة'])} وأجبتَ عن الأسئلة كلها — أحسنت!`)
+        ? cheer(measure === 'read'
+          ? 'قرأتَ الجمل كلها كلمةً كلمة وأجبتَ عن السؤال — أحسنت!'
+          : aloud ? 'سمعتَ الجمل كلها وأجبتَ عن السؤال — أحسنت!'
+            : `قرأتَ ${arCount(total, ['صفحة', 'صفحتين', 'صفحات', 'صفحة'])} وأجبتَ عن الأسئلة كلها — أحسنت!`)
         : !asked ? 'أعِد القراءة واسمع كل جملة لتزيد نجومك.'
-          : aloud ? 'أعِد القراءة واسمع كل جملة، وأجب عن السؤال من أول مرة.'
-            : 'أعِد القراءة، وأجب عن أسئلة المقاطع من أول مرة.'),
+          : measure === 'read' ? 'انقر كلمات كل جملة لتقرأها، وأجب عن السؤال من أول مرة.'
+            : aloud ? 'أعِد القراءة واسمع كل جملة، وأجب عن السؤال من أول مرة.'
+              : 'أعِد القراءة، وأجب عن أسئلة المقاطع من أول مرة.'),
       before > won && h('p', { class: 'hint' }, `نجومك السابقة محفوظة: ${arNum(before)} ★`),
       last && h('p', { class: 'note' }, icon('party'),
         ' أتممتَ الرحلة كلها — من الحرف الأول إلى المكتبة.'),
@@ -437,6 +461,7 @@ function readingScreen({ nodeId, title, emoji, pill, texts, lines, questions = [
             clean = 0;
             missedHere = false;
             heard.clear();
+            read.clear();
             paint();
           },
         }, '↻ أعِد القراءة'),

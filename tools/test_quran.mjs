@@ -20,9 +20,11 @@ const {
   GROUPS, SKILLS, STORIES, GATES, CONTRASTS, ROOTS, QURAN, quranParts, surahById,
   quranSpokenTexts, quranMushafTexts, quranWordTexts, quranWordItems, surahWords,
   surahWordsPart, surahOfWordsPart, quranWordLevel, bareLetters,
+  rasmLessons, rasmSigns, rasmLessonById, rasmSkillKey, muqSkillKey, quranLetterSkills,
+  markSkillKey,
 } = await import(new URL('curriculum.js', APP));
 const { keyFor } = await import(new URL('audio.js', APP));   // مفتاح النصّ نفسه في كل المشروع
-const { buildRasmRounds, buildFindRounds } = await import(new URL('quran.js', APP));
+const { buildRasmRounds, buildFindRounds, buildMuqRounds } = await import(new URL('quran.js', APP));
 // «اقرأ واختر» انتقلت إلى screens.js في الحزمة ٧ (تشترك فيها المرحلة القرآنية والبساتين)
 const { buildReadRounds } = await import(new URL('screens.js', APP));
 const { starsForStory } = await import(new URL('story.js', APP));
@@ -46,7 +48,7 @@ function rng(seed) {
 ok(QURAN.after === GROUPS.at(-1).id, `المرحلة القرآنية بعد المجموعة الأخيرة (${QURAN.after})`);
 
 const parts = quranParts().map((x) => x.part);
-ok(parts.join(' ← ') === ('letters words1 words2 words3 rasm muqattaat '
+ok(parts.join(' ← ') === ('letters words1 words2 words3 rasm muqattaat rasm2 '
   + 'sw-s1 s1 sw-s108 s108 sw-s112 s112 '
   + 'sw-s113 s113 sw-s114 s114 sw-s103 s103 '
   + 'sw-s106 s106 sw-s111 s111 sw-s105 s105 '
@@ -98,7 +100,13 @@ const quranStart = ids.indexOf('quran:letters');
 // كلمات سورتها، فتتخلّل السلسلة. والمحروسُ ترتيبُها لا تجاورُها — فالمرحلةُ صارت
 // دفعاتٍ موزّعة (وز١) لا كتلةً واحدة، انظر «توزيعُ الدفعات» أدناه.
 const stageIds = ids.filter((id) => id.startsWith('quran:') || id.startsWith('prophet:'));
-ok(stageIds.filter((id) => id.startsWith('quran:')).join('|') === parts.map((x) => `quran:${x}`).join('|')
+// **ودرسُ الرسم موضعُه محسوب** (الحكم ب٢، جلسة وز٢): صار درسين، والثاني يُزاح إلى ما
+// قبل الدفعة التي تُظهر علاماته — فالمقايسةُ على ما عدا دروسِ الرسم، ولها حارسُها
+// أدناه («لا علامةَ قبل درسها»). وما سواها على ترتيبه المعلَن حرفاً بحرف.
+const rasmIds = rasmLessons().map((l) => `quran:${l.id}`);
+const declared = parts.map((x) => `quran:${x}`).filter((id) => !rasmIds.includes(id));
+ok(stageIds.filter((id) => id.startsWith('quran:') && !rasmIds.includes(id)).join('|') === declared.join('|')
+  && rasmIds.every((id) => ids.includes(id))
   && stageIds.length === parts.length + prophetNodes.length,
   `عقدُها بترتيبها في الرحلة (${stageIds.length} عقدة: ${parts.length} محطة و${prophetNodes.length} قصة)`);
 const FOUNDATION = new Set(['letter', 'words', 'skill', 'story', 'contrast']);
@@ -118,9 +126,10 @@ console.log('\n— مفاصلُ المرحلة (محطاتٌ مسمّاة) —')
 const sections = p.quranSections();
 const wantShort = Math.ceil(QURAN.surahs.length / p.SURAHS_PER_STATION);
 const shorts = sections.filter((x) => x.key.startsWith('short'));
-ok(sections.length === 2 + wantShort && shorts.length === wantShort,
+ok(sections.length === rasmLessons().length + 1 + wantShort && shorts.length === wantShort,
   `المرحلةُ ${arNum(sections.length)} محطاتٍ مسمّاة لا كتلةً واحدة `
-  + `(التهيئة · رسمُ المصحف · ${arNum(wantShort)} محطاتِ سورٍ — محسوبةٌ من ${arNum(QURAN.surahs.length)} سورة)`);
+  + `(التهيئة · ${arNum(rasmLessons().length)} درسَي رسمٍ · ${arNum(wantShort)} محطاتِ سورٍ`
+  + ` — محسوبةٌ من ${arNum(QURAN.surahs.length)} سورة)`);
 ok(sections.every((x) => x.title && x.sub && x.face && x.nodes.length),
   'ولكلٍّ عنوانُها ووصفُها ووجهُها وعقدُها — كالبساتين والرفّ');
 const perStation = shorts.map((x) => x.nodes.filter(
@@ -170,6 +179,25 @@ const firstSurah = ids.indexOf(`quran:${QURAN.surahs[0].id}`);
 ok(ids.indexOf('quran:rasm') < firstSurah && ids.indexOf('quran:letters') < firstSurah
   && QURAN.surahs.every((s) => ids.indexOf(`quran:${surahWordsPart(s.id)}`) < ids.indexOf(`quran:${s.id}`)),
   'والقيودُ الأربعة باقية: الحرفان والرسمُ قبل أول نصٍّ عثماني، وكلماتُ كلِّ سورةٍ قبلها');
+
+// **ولا علامةَ تُعرَض قبل درسها** (الحكم ب٢، جلسة وز٢): شقُّ الرسم درسين يقرّب العلامةَ
+// من أول نصٍّ يوظّفها — والقيدُ أن يبقى **درسُها قبله**. يُمسَح نصُّ كل سورةٍ بعلامته:
+// فعلامةٌ تنتقل بين الدرسين غداً، أو سورةٌ تُقدَّم، تُسقِط هذا الحارس يومَ تُكتب.
+const bareSign = (sign) => sign.split('ـ').join('');
+const lateSigns = [];
+for (const lesson of rasmLessons()) {
+  const taughtAt = ids.indexOf(`quran:${lesson.id}`);
+  for (const sign of lesson.signs) {
+    const first = QURAN.surahs.find((surah) =>
+      [QURAN.basmala, ...surah.ayat].some((line) => line.includes(bareSign(sign.sign))));
+    if (first && ids.indexOf(`quran:${first.id}`) < taughtAt) {
+      lateSigns.push(`${sign.name} (${first.name})`);
+    }
+  }
+}
+ok(lateSigns.length === 0,
+  `و${rasmSigns().length} علاماتِ الرسم كلُّها مدروسةٌ قبل أوّل سورةٍ تُظهرها`
+  + (lateSigns.length ? ` — متأخّرة: ${lateSigns.join('، ')}` : ''));
 
 // **الفاتحةُ أولى السور بإعلان سببها** (تعديلُ المالك على §٢.٤): خلافُ معيار الطول،
 // فيُشترط أن يكون السببُ **منصوصاً في المنهج** لا مسكوتاً عنه — والإعلانُ عقدُ الشفافية.
@@ -280,12 +308,22 @@ for (let seed = 1; seed <= 60; seed++) {
       if (r.options.some((o) => !items.includes(o))) { fails++; console.log('  ✗ خيار من خارج الشاشة'); }
     }
   }
-  for (const r of buildRasmRounds(QURAN.rasm.signs, rnd)) {
-    if (!r.options.includes(r.target) || r.options.length !== 3) {
-      fails++; console.log('  ✗ جولة رسم معطوبة');
+  // درسا الرسم كلاهما: الأول بعلاماته وحدها، والثاني بمشتّتاتٍ من حصيلة أخيه
+  for (const lesson of rasmLessons()) {
+    const pool = [...lesson.signs, ...rasmSigns()];
+    for (const r of buildRasmRounds(lesson.signs, pool, rnd)) {
+      if (!r.options.includes(r.target) || r.options.length !== 3) {
+        fails++; console.log('  ✗ جولة رسم معطوبة');
+      }
+      if (r.options.filter((o) => o.sign === r.target.sign).length !== 1) {
+        fails++; console.log('  ✗ علامة الهدف مكرَّرة بين الخيارات');
+      }
     }
-    if (r.options.filter((o) => o.sign === r.target.sign).length !== 1) {
-      fails++; console.log('  ✗ علامة الهدف مكرَّرة بين الخيارات');
+  }
+  for (const r of buildMuqRounds(QURAN.muqattaat.items, rnd)) {
+    if (!r.options.includes(r.target) || r.options.length !== 3
+      || new Set(r.options.map((o) => o.read)).size !== 3) {
+      fails++; console.log('  ✗ جولة فواتح معطوبة');
     }
   }
 }
@@ -298,8 +336,23 @@ ok(buildReadRounds(level1).length === pictured.length,
 ok(buildReadRounds(level1).every((r) => r.target.pictured !== false),
   'ولا غيرَ مصوَّرةٍ هدفاً — الصورة هي السؤال كلُّه في «اقرأ واختر»');
 ok(buildReadRounds([{ read: 'أ', emoji: '' }]).length === 0
-  && buildRasmRounds([QURAN.rasm.signs[0]]).length === 0,
+  && buildRasmRounds([QURAN.rasm.signs[0]]).length === 0
+  && buildMuqRounds(QURAN.muqattaat.items.slice(0, 2)).length === 0,
   'ومادةٌ أقلّ من ثلاثة خيارات ⇒ لا جولات (يفشل مغلقاً)');
+
+// ————— ٢ب. جولاتٌ بعدد العلامات لا ثلاثاً ثابتة (الحكم ب٢، جلسة وز٢) —————
+//
+// كانت ثلاثَ جولاتٍ من تسع علامات — ثلثا المادة قد لا تُختبَر قط. والمحروسُ أن يكون
+// **العددُ عددَ علامات درسه** لا رقماً مكتوباً، وأن تأتي كلُّ علامةٍ هدفاً مرّةً.
+console.log('\n— جولاتُ الرسم بعدد علاماته —');
+for (const lesson of rasmLessons()) {
+  const built = buildRasmRounds(lesson.signs, [...lesson.signs, ...rasmSigns()]);
+  const targets = new Set(built.map((r) => r.target.sign));
+  ok(built.length === lesson.signs.length && targets.size === lesson.signs.length,
+    `[${lesson.id}] ${arNum(built.length)} جولات لـ${arNum(lesson.signs.length)} علامات — كلُّ علامةٍ هدفٌ مرّة`);
+}
+ok(buildMuqRounds(QURAN.muqattaat.items).length === QURAN.muqattaat.items.length,
+  `ومحطةُ الفواتح ${arNum(QURAN.muqattaat.items.length)} جولاتٍ لا نقراتٍ بلا تمرين (الحكم ب٣)`);
 
 // ————— ٣. المفكوكية: مادة القراءة الإملائية داخل حصيلة الطفل —————
 
@@ -545,10 +598,19 @@ ok(/blob/i.test(codeOf(recordSrc))
 ok(/recordBlock\(/.test(storySrc) && /from '\.\/record\.js'/.test(storySrc),
   'والقصةُ تستعمل الكتلةَ نفسَها — لا نسخةً ثانية تشيخ وحدها');
 
-// **إعفاءُ القياس منصوصٌ** حيث يطالب به حارسُ «لا تدريسَ بلا قياس»
+// **إعفاءُ القياس منصوصٌ** حيث يطالب به حارسُ «لا تدريسَ بلا قياس» — **وحدُّه شاشةُ
+// السورة وحدَها** (الحكم ب١، جلسة وز٢): ما قبلها من تمارين المرحلة صار مقيساً، وما
+// فيها (القراءةُ والترديد) يبقى معفىً بنصّه. فيُقتطع قسمُها ويُفحَص أنه لا يسجّل شيئاً.
 const measureSrc = readFileSync(new URL('test_measure.mjs', import.meta.url), 'utf8');
-ok(/الترديد/.test(measureSrc) && !/progress\.recordAttempt\s*\(/.test(quranSrc),
-  'وإعفاءُ الترديد من القياس مكتوبٌ بسببه في `test_measure.mjs`، ولا مهارةَ تُسجَّل هنا');
+const surahRegion = quranSrc.slice(quranSrc.indexOf('export function renderSurah('),
+  quranSrc.indexOf('// ————— التوجيه داخل المرحلة —————'));
+ok(/الترديد/.test(measureSrc) && surahRegion.length > 200
+  && !/progress\.recordAttempt\s*\(/.test(surahRegion),
+  'وإعفاءُ الترديد من القياس مكتوبٌ بسببه في `test_measure.mjs`، ولا مهارةَ تُسجَّل في شاشة السورة');
+// وما عداها **يُقاس**: المحطاتُ الأربع الأخرى تكتب مفاتيحها (الحكمان ب١ وب٣)
+ok(/markSkillKey\(sign\.id\)/.test(quranSrc) && /rasmSkillKey\(/.test(quranSrc)
+  && /muqSkillKey\(/.test(quranSrc) && /KINDS\.BUILD/.test(quranSrc),
+  'وتماريُنها الأربعُ تكتب مفاتيحَها: الحرفان `mark-` · الكلماتُ `build` · الرسمُ `rasm-` · الفواتحُ `muq-`');
 
 // ————— ٥د. الترحيلُ الرحيم: امتدادُ الدرسين لا يقفل على أحدٍ شيئاً —————
 //
@@ -557,21 +619,28 @@ ok(/الترديد/.test(measureSrc) && !/progress\.recordAttempt\s*\(/.test(qur
 // بالعودة إليهما. والسورُ الثماني عقدٌ **مستحدَثة خلف موضع مَن أتمّ الرحلة**،
 // فيرحّلها `migrateJourney` بنجمة إتمامٍ واحدة (لا تدّعي إتقاناً وتدعوه إلى لعبها).
 
-ok(QURAN.rasm.signs.length === 9 && QURAN.letters.signs[0].shapes.length === 5,
-  `درسُ الرسم ${QURAN.rasm.signs.length} علامات ودرسُ الهمزة `
-  + `${QURAN.letters.signs[0].shapes.length} صور`);
+ok(rasmSigns().length === 9 && QURAN.letters.signs[0].shapes.length === 5,
+  `درسا الرسم ${rasmSigns().length} علامات (${rasmLessons().map((l) => l.signs.length).join('+')}) `
+  + `ودرسُ الهمزة ${QURAN.letters.signs[0].shapes.length} صور`);
 
 // حالةُ طفلٍ أتمّ الرحلة **قبل هذه الحزمة**: نجومٌ لكل عقدةٍ إلا الستّ عشرة الجديدة
+// **ولا درسَ الرسم الثاني** — فهو لم يكن موجوداً يوم مرّ (شقُّ وز٢).
 const fresh = SLICE.flatMap((s) => [`quran:${s}`, `quran:sw-${s}`]);
+const born = [...fresh, 'quran:rasm2'];
 store.set('muallim.progress.v1', JSON.stringify({
   v: p.VERSION,
-  stars: Object.fromEntries(nodes.map((n) => [n.id, 3]).filter(([id]) => !fresh.includes(id))),
+  stars: Object.fromEntries(nodes.map((n) => [n.id, 3]).filter(([id]) => !born.includes(id))),
   skills: {}, days: {}, reviews: {},
 }));
 const after = await import(new URL('progress.js?slice=1', APP));   // الترحيل يجري عند الاستيراد
 
 ok(after.getStars('quran:rasm') === 3 && after.getStars('quran:letters') === 3,
   'مَن تجاوز درسَي الرسم والهمزة: نجومُه الثلاث كما هي — الامتدادُ لا يمسّها');
+// **وشقُّ الرسم درسين لا يحبس أحداً** (البند ٠، جلسة وز٢): `quran:rasm2` عقدةٌ
+// **استُحدثت خلف موضعه**، فتُرحَّل بنجمةِ إتمامٍ واحدة كسائر المستحدَث — لا تدّعي
+// إتقاناً وتبقى تدعوه إلى لعبها، ولا يُعاد قفلُ ما بعدها عليه.
+ok(after.getStars('quran:rasm2') === 1,
+  'ودرسُ الرسم الثاني المستحدَث خلفه يُرحَّل بنجمةِ إتمامٍ واحدة (ترحيلٌ رحيم)');
 ok(fresh.every((id) => after.getStars(id) === 1),
   `والسورُ الثماني المستحدَثة خلفه تُرحَّل بنجمةِ إتمامٍ واحدة (${fresh.length} عقدة)`);
 ok(after.isNodeUnlockedById('gate:gardens') && after.isNodeUnlockedById(nodes.at(-1).id),

@@ -116,32 +116,41 @@ ok(p.findNode(all.at(-1).id) === all.at(-1) && p.findNode('لا-وجود-لها'
 const today = p.dayNumber();
 const K = p.skillKey('ب', 'fatha', p.KINDS.QUIZ);
 
-p.recordAttempt('ب', 'fatha', p.KINDS.QUIZ, false);
+// **محاولةٌ في جولةٍ مستقلّة** (الحكم ب٨، جلسة وز٢): لا تُسجَّل إلا أولى محاولات
+// الجولة، فما يُزرَع هنا محاولاتُ جولاتٍ متفرّقة — و`endRound()` تفصل بينها كما
+// يفصل بينها في التطبيق انتقالُ الشاشة إلى جولةٍ جديدة.
+const attempt = (letter, haraka, kind, correct, day) => {
+  p.endRound();
+  return p.recordAttempt(letter, haraka, kind, correct, day);
+};
+
+attempt('ب', 'fatha', p.KINDS.QUIZ, false);
 let s = p.getSkill(K);
 ok(s.wrong === 1 && s.box === 0 && s.due === today, 'الخطأ يُرجع المهارة إلى صندوق اليوم فتُراجَع اليوم');
 
-p.recordAttempt('ب', 'fatha', p.KINDS.QUIZ, true);
+attempt('ب', 'fatha', p.KINDS.QUIZ, true);
 s = p.getSkill(K);
 ok(s.right === 1 && s.box === 1 && s.due === today + 1, 'الإصابة ترفع الصندوق وتباعد الموعد يوماً');
 
-p.recordAttempt('ب', 'fatha', p.KINDS.QUIZ, true);
+attempt('ب', 'fatha', p.KINDS.QUIZ, true);
 s = p.getSkill(K);
 ok(s.box === 2 && s.due === today + 2, 'الإصابة الثانية تباعده يومين');
 ok(p.dueSkills(today).length === 0, 'ما تباعد موعده لا يظهر في مراجعة اليوم');
 ok(p.dueSkills(today + 2).some((x) => x.key === K), 'ويعود في موعده تماماً');
 
-for (let i = 0; i < 9; i++) p.recordAttempt('ب', 'fatha', p.KINDS.QUIZ, true);
+for (let i = 0; i < 9; i++) attempt('ب', 'fatha', p.KINDS.QUIZ, true);
 ok(p.getSkill(K).box === p.MAX_BOX && p.getSkill(K).due === today + 16,
   `الصندوق لا يتجاوز سقفه (${p.MAX_BOX} ← ١٦ يوماً)`);
-p.recordAttempt('ب', 'fatha', p.KINDS.QUIZ, false);
+attempt('ب', 'fatha', p.KINDS.QUIZ, false);
 ok(p.getSkill(K).box === 0 && p.getSkill(K).due === today, 'خطأ واحد بعد الإتقان يعيدها إلى مراجعة اليوم');
 
 ok(p.recordAttempt('', 'fatha', p.KINDS.QUIZ, true) === null, 'محاولة بلا حرف تُرفض (لا مفاتيح مشوّهة)');
 
+
 // الترتيب: الأضعف أولاً (أدنى صندوق، ثم أكثر أخطاءً)
-p.recordAttempt('م', 'kasra', p.KINDS.HARAKA, true);      // صندوق ١
-p.recordAttempt('ل', 'damma', p.KINDS.BUILD, false);
-p.recordAttempt('ل', 'damma', p.KINDS.BUILD, false);      // صندوق ٠ بخطأين
+attempt('م', 'kasra', p.KINDS.HARAKA, true);      // صندوق ١
+attempt('ل', 'damma', p.KINDS.BUILD, false);
+attempt('ل', 'damma', p.KINDS.BUILD, false);      // صندوق ٠ بخطأين
 const dueNow = p.dueSkills(today + 1);
 const order = dueNow.map((x) => x.key);
 ok(dueNow[0].box === 0 && dueNow[0].wrong === 2, 'المستحقّ الأضعف يتصدّر (صندوق ٠ بخطأين)');
@@ -156,6 +165,32 @@ ok(stats['ل'].struggling && !stats['ل'].mastered, 'الحرف بخطأين ف�
 for (let i = 0; i < 3; i++) p.recordAttempt('ن', 'fatha', p.KINDS.QUIZ, true);
 ok(p.letterStats().find((x) => x.letter === 'ن').mastered, 'ثلاث إصابات متتابعة ⇒ متقن');
 ok(p.letterStats().map((x) => x.letter).join('') === 'بملن', 'الحروف تُعرض بترتيب المنهج لا بترتيب الأخطاء');
+// ————— الحكم ب٨: أولُ محاولةٍ في الجولة وحدها تدخل ليتنر —————
+//
+// كانت كلُّ نقرةٍ خاطئة تصفّر الصندوق، فجولةٌ بخطأين تُسجَّل خطأين — تضخيمُ الضعف
+// المقيس. والمحروسُ هنا أربعة: التصفيرُ مرّةً واحدة، وأنّ ما بعد الأولى لا يُسجَّل
+// أصلاً، وأنّ الصوابَ يُغلق الجولة فتُسجَّل التاليةُ بمفتاحها نفسِه، وأنّ مفتاحاً
+// آخرَ في أثنائها يُسجَّل على حِدَته (جولاتُ الشاشة الواحدة قد تتداخل مفاتيحُها).
+console.log('\n— الجولة: محاولةٌ واحدة تدخل ليتنر —');
+p.reset();
+const R = p.skillKey('ن', 'fatha', p.KINDS.QUIZ);
+p.endRound();
+p.recordAttempt('ن', 'fatha', p.KINDS.QUIZ, false, today);   // خطأٌ أول: يُسجَّل
+p.recordAttempt('ن', 'fatha', p.KINDS.QUIZ, false, today);   // خطأٌ ثانٍ في الجولة
+p.recordAttempt('ن', 'fatha', p.KINDS.QUIZ, true, today);    // ثم أصاب فأُغلقت
+let r = p.getSkill(R);
+ok(r.wrong === 1 && r.right === 0 && r.box === 0,
+  `جولةٌ بخطأين ثم صواب: خطأٌ واحد يُسجَّل ولا صواب (${r.wrong} خطأ · ${r.right} صواب)`);
+
+p.recordAttempt('ن', 'fatha', p.KINDS.QUIZ, true, today);    // جولةٌ تالية بالمفتاح نفسِه
+r = p.getSkill(R);
+ok(r.right === 1 && r.box === 1, 'والجولةُ التالية بالمفتاح نفسِه تُسجَّل كسائرها');
+
+p.recordAttempt('ن', 'fatha', p.KINDS.QUIZ, false, today);   // جولةٌ ثالثة: خطأ
+p.recordAttempt('س', 'fatha', p.KINDS.QUIZ, false, today);   // مفتاحٌ آخر في أثنائها
+ok(p.getSkill(R).wrong === 2 && p.getSkill(p.skillKey('س', 'fatha', p.KINDS.QUIZ)).wrong === 1,
+  'ومفتاحٌ آخرُ يُسجَّل على حِدَته ولا يبتلعه الجولةُ المفتوحة');
+p.reset();
 
 // ————— دقائق الاستخدام —————
 
