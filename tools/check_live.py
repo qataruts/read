@@ -94,6 +94,33 @@ def check(base: str) -> int:
         fails += 0 if code == 200 else 1
         print(f"  {'✓' if code == 200 else '✗'} /{url or '(جذر التطبيق)':<26} {code}")
 
+    # **الأصلُ متخلّفٌ أم الحافّةُ متلكئة؟** (بلاغ اكتب `sw-edge-cache-lag`، ١٥ أغسطس
+    # ٢٠٢٦): قشرةُ الحيّ إن خالفت الشجرةَ فالمتَّهمان اثنان — نشرٌ لم يبلغ الأصل
+    # (عيبٌ حقيقي)، أو حافّةُ Cloudflare تخدم قديماً (`cf-cache-status: HIT` + عمر).
+    # فيُقال الحالُ باسمه بدل حُمرةٍ تُتَّهم بها الشجرة. (وقاعدةُ المنطقة `sw-bypass`
+    # أُنشئت — فالمنتظَر DYNAMIC دائماً، وHIT هنا يعني سقوطَ القاعدة.)
+    local_v = re.search(r"VERSION = '(v\d+)'", (APP / "sw.js").read_text(encoding="utf-8"))
+    request = urllib.request.Request(base + "sw.js", headers={"User-Agent": "iqra-live-check"})
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+            body = response.read(8192).decode("utf-8", "replace")
+            live_v = re.search(r"VERSION = '(v\d+)'", body)
+            cf = response.headers.get("cf-cache-status", "؟")
+            age = response.headers.get("age", "٠")
+        same = local_v and live_v and local_v.group(1) == live_v.group(1)
+        if same:
+            print(f"  ✓ قشرة الحيّ {live_v.group(1)} تطابق الشجرة (الحافّة: {cf})")
+        else:
+            fails += 1
+            who = ("الحافّةُ متلكئة — cf-cache-status: " + cf + f"، العمر {age}ث؛ "
+                   "قاعدةُ sw-bypass سقطت؟" if cf.upper() == "HIT"
+                   else "الأصلُ متخلّف — النشرُ لم يبلغ GitHub Pages")
+            print(f"  ✗ قشرة الحيّ {live_v.group(1) if live_v else '؟'} والشجرة "
+                  f"{local_v.group(1) if local_v else '؟'} — {who}")
+    except Exception as error:
+        fails += 1
+        print(f"  ✗ تعذّر فحص قشرة الحيّ: {error}")
+
     print(f"\n{fails} إخفاق — المنشورُ ليس ما في الشجرة" if fails
           else "\nالمنشورُ هو ما في الشجرة: كلُّ صفحةٍ وأصلٍ يردّ ٢٠٠ بعنوانه.")
     return 1 if fails else 0
