@@ -1691,13 +1691,19 @@
     "requestedBy": "session-7",
     "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-06",
+    "doneAt": "2026-08-15",
     "fixHistory": [
       {
         "was": "gemini-2.5-flash-preview-tts",
         "doneAt": "2026-08-04",
         "reason": "بلاغ أذن المالك (٥ أغسطس): إعادةٌ بالرسم الصوتيّ الملحَق (الصيغة ب)",
         "requeuedAt": "2026-08-06"
+      },
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-06",
+        "reason": "بلاغ أذن المالك (١٥ أغسطس ٢٠٢٦) عبر بلاغ اكتب: مدّةٌ متثاقلة/مبتورة — والجملتان أُعيدتا على 2.5-pro لا 3.1 (إيقاعُ 3.1 في الجملة ضِعفُ نظيره)",
+        "requeuedAt": "2026-08-15"
       }
     ],
     "model": "gemini-3.1-flash-tts-preview"
@@ -5489,7 +5495,7 @@
     "requestedBy": "session-8",
     "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-04",
+    "doneAt": "2026-08-15",
     "model": "gemini-2.5-pro-preview-tts",
     "fixHistory": [
       {
@@ -5497,10 +5503,14 @@
         "doneAt": "2026-08-03",
         "reason": "بلاغ سماع المالك (٥ أغسطس): نطق التاء المربوطة وقفاً، أو قلبُ حرف",
         "requeuedAt": "2026-08-04"
+      },
+      {
+        "was": "gemini-2.5-pro-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ أذن المالك (١٥ أغسطس ٢٠٢٦) عبر بلاغ اكتب: مدّةٌ متثاقلة/مبتورة — والجملتان أُعيدتا على 2.5-pro لا 3.1 (إيقاعُ 3.1 في الجملة ضِعفُ نظيره)",
+        "requeuedAt": "2026-08-15"
       }
-    ],
-    "lastFailModel": "gemini-2.5-pro-preview-tts",
-    "failCount": 1
+    ]
   },
   {
     "text": "السَّرِيرُ",
@@ -5800,16 +5810,22 @@
     "requestedBy": "session-8",
     "priority": 10,
     "status": "done",
-    "doneAt": "2026-08-06",
+    "doneAt": "2026-08-15",
     "fixHistory": [
       {
         "was": "gemini-2.5-pro-preview-tts",
         "doneAt": "2026-08-03",
         "reason": "بلاغ أذن المالك (٥ أغسطس): إعادةٌ بالرسم الصوتيّ الملحَق (الصيغة ب)",
         "requeuedAt": "2026-08-06"
+      },
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-06",
+        "reason": "بلاغ أذن المالك (١٥ أغسطس ٢٠٢٦) عبر بلاغ اكتب: مدّةٌ متثاقلة/مبتورة — والجملتان أُعيدتا على 2.5-pro لا 3.1 (إيقاعُ 3.1 في الجملة ضِعفُ نظيره)",
+        "requeuedAt": "2026-08-15"
       }
     ],
-    "model": "gemini-3.1-flash-tts-preview"
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "مَفْتُوحَةْ",
@@ -9187,8 +9203,16 @@
     "requestedBy": "session-9a",
     "priority": 100,
     "status": "done",
-    "doneAt": "2026-08-04",
-    "model": "gemini-2.5-flash-preview-tts"
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview",
+    "fixHistory": [
+      {
+        "was": "gemini-2.5-flash-preview-tts",
+        "doneAt": "2026-08-04",
+        "reason": "بلاغ أذن المالك (١٥ أغسطس ٢٠٢٦) عبر بلاغ اكتب: مدّةٌ متثاقلة/مبتورة — والجملتان أُعيدتا على 2.5-pro لا 3.1 (إيقاعُ 3.1 في الجملة ضِعفُ نظيره)",
+        "requeuedAt": "2026-08-15"
+      }
+    ]
   },
   {
     "text": "الْمِكْنَسَةُ",
