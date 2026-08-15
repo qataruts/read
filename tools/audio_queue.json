@@ -28783,7 +28783,7 @@
     "category": "sentence",
     "requestedBy": "session-7",
     "priority": 100,
-    "status": "pending",
+    "status": "obsolete",
     "doneAt": null,
     "hold": "مردودة: المولّد نطق الرمز «ء» «ها» — والتصحيح شقُّ النصّ في curriculum.js (نطاق الجلسة القرآنية)",
     "fixHistory": [
@@ -28808,7 +28808,9 @@
         "at": "2026-08-05"
       }
     ],
-    "retired": true
+    "retired": true,
+    "obsoleteAt": "2026-08-15",
+    "obsoleteReason": "يتيمة: قاعدة الحرفين الطويلة قُصّت قاعدتين قصيرتين (حكم المدير، درس الهمزة) ولم يعد النص في الشيفرة — لا تُولَّد"
   },
   {
     "text": "لُؤْلُؤْ",
@@ -31273,7 +31275,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ضِفْدَعٌ يَلْعَبُ فِي النَّهْرْ",
@@ -31281,7 +31285,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "نَظَرَ الْغُرَابُ مِنَ الشَّجَرْ",
@@ -31289,7 +31295,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "الثَّعْلَبُ يَمْشِي قُرْبَ الضِّفْدَعْ",
@@ -31297,7 +31305,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "صَاحَ الْغُرَابُ فَحَذِرَ الضِّفْدَعْ",
@@ -31305,7 +31315,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "قَفَزَ الضِّفْدَعُ فِي النَّهْرِ فَنَجَا",
@@ -31313,7 +31325,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-2.5-pro-preview-tts"
   },
   {
     "text": "ضِفْدَعٌ",
@@ -31321,7 +31335,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "نَظَرَ",
@@ -31329,7 +31345,17 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "fixHistory": [
+      {
+        "was": "gemini-3.1-flash-tts-preview",
+        "doneAt": "2026-08-15",
+        "reason": "شذوذ مدة: 4.85ث لكلمة ٦ أحرف = 3.6× نظائرها — احتمال تكرار داخلي",
+        "requeuedAt": "2026-08-15"
+      }
+    ],
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الشَّجَرْ",
@@ -31337,7 +31363,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "قُرْبَ",
@@ -31345,7 +31373,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الضِّفْدَعْ",
@@ -31353,7 +31383,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "صَاحَ",
@@ -31361,7 +31393,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "فَحَذِرَ",
@@ -31369,7 +31403,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "قَفَزَ",
@@ -31377,7 +31413,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "الضِّفْدَعُ",
@@ -31385,7 +31423,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "النَّهْرِ",
@@ -31393,7 +31433,9 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   },
   {
     "text": "فَنَجَا",
@@ -31401,6 +31443,8 @@
     "style_hint": null,
     "requestedBy": "manager-st4-story",
     "priority": 10,
-    "status": "pending"
+    "status": "done",
+    "doneAt": "2026-08-15",
+    "model": "gemini-3.1-flash-tts-preview"
   }
 ]
