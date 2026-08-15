@@ -722,6 +722,9 @@ def shape_class(text: str, cat: str) -> str:
     («سُكْ كَرْ» ~٢٫٥ث). فمقارنةُ الساكن بوسيطها كان يتّهم السليمَ بالبتر.
     """
     if cat == "word":
+        # المنوَّنةُ مقطعُها الأخير أطول بطبعه («بَابٌ» = بابُن) — طبقةٌ وحدها
+        if text and text[-1] in "ًٌٍ" or (len(text) > 1 and text[-2] in "ًٌٍ"):
+            return f"word:{len(text)}:منوّنة"
         return f"word:{len(text)}"
     if cat != "syllable":
         return cat
