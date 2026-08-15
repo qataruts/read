@@ -31266,5 +31266,141 @@
     "doneAt": "2026-08-07",
     "hold": "جملة إرشادية: تنتظر سماع المالك (عرف النثر)",
     "model": "gemini-2.5-pro-preview-tts#ear-approved"
+  },
+  {
+    "text": "الْغُرَابُ وَالضِّفْدَعْ",
+    "category": "sentence",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "ضِفْدَعٌ يَلْعَبُ فِي النَّهْرْ",
+    "category": "sentence",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "نَظَرَ الْغُرَابُ مِنَ الشَّجَرْ",
+    "category": "sentence",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "الثَّعْلَبُ يَمْشِي قُرْبَ الضِّفْدَعْ",
+    "category": "sentence",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "صَاحَ الْغُرَابُ فَحَذِرَ الضِّفْدَعْ",
+    "category": "sentence",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "قَفَزَ الضِّفْدَعُ فِي النَّهْرِ فَنَجَا",
+    "category": "sentence",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "ضِفْدَعٌ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "نَظَرَ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "الشَّجَرْ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "قُرْبَ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "الضِّفْدَعْ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "صَاحَ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "فَحَذِرَ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "قَفَزَ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "الضِّفْدَعُ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "النَّهْرِ",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
+  },
+  {
+    "text": "فَنَجَا",
+    "category": "word",
+    "style_hint": null,
+    "requestedBy": "manager-st4-story",
+    "priority": 10,
+    "status": "pending"
   }
 ]

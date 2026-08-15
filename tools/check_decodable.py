@@ -1225,7 +1225,7 @@ def self_test(letters, skills, stories, parts, quran=None, contrasts=(), groups=
        f"محلّل المهارات يقرأ الستّة بالترتيب ({'، '.join(s['id'] for s in skills)})")
     ok(all(len(s["pairs"]) >= 3 and s["labels"] and s["rule"] for s in skills),
        "بأزواجها وعناوينها وقواعدها")
-    ok(len(stories) == 3 and [len(s["sentences"]) for s in stories] == [5, 4, 5],
+    ok(len(stories) == 4 and [len(s["sentences"]) for s in stories] == [5, 4, 5, 5],
        f"ومحلّل القصص يقرأ الثلاث بجملها ({[len(s['sentences']) for s in stories]})")
 
     fake = "export const STORIES = [{ id: 'x', after: 'g1', title: 'عُنوان', hidden: 'كَلِمَة مَنسِيّة' }]"

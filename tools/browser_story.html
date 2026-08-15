@@ -151,8 +151,8 @@ try {
   // ساعةَ أول استعمالٍ له في «بَابَا»، لا بعد ثلاث مجموعات من استعماله.
   await seed(idsBefore('skill:madd-alif'));
   await waitFor(() => $('.station'), 'الخريطة');
-  ok($$('.station--pause').length === 6,
-    `الخريطة فيها ستّ محطات مهارات وقصص (${$$('.station--pause').length})`);
+  ok($$('.station--pause').length === 7,
+    `الخريطة فيها سبع محطات مهارات وقصص (st4 — الحكم ب٦) (${$$('.station--pause').length})`);
   const pause = $$('.station--pause')[0];
   ok(!pause.classList.contains('station--locked'), 'أولاها فُتحت بإتمام المجموعة الأولى');
   ok($$('.station--pause')[1].classList.contains('station--locked'), 'وما بعدها ما زال مقفلاً');

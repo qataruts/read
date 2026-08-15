@@ -144,9 +144,12 @@ ok(ids.filter((id) => id.startsWith('contrast:')).length === 2,
 ok(ids[ids.indexOf('story:st3') + 1] === 'contrast:alike'
   && ids[ids.indexOf('contrast:alike') + 1] === 'g7:ث',
   'محطة المتشابهات بعد قصة المجموعة السادسة وقبل السابعة');
-ok(ids[ids.indexOf('g7:words') + 1] === 'contrast:alike-hard'
+// قصةُ السابعة (st4 — الحكم ب٦) بين اللعبة والمواجهة، على نمط السادسة نفسِه
+// (قصةٌ ثم ميّز): النصُّ يوظّف الحروفَ ثم المواجهةُ تعالج التباسَها.
+ok(ids[ids.indexOf('g7:words') + 1] === 'story:st4'
+  && ids[ids.indexOf('story:st4') + 1] === 'contrast:alike-hard'
   && ids[ids.indexOf('contrast:alike-hard') + 1] === 'gate:quran',
-  'ومحطة الأصعب بعد لعبة كلمات السابعة وقبل بوابة المصحف');
+  'ومحطة الأصعب بعد قصة السابعة وقبل بوابة المصحف — على نمط السادسة');
 ok(nodes.filter((n) => n.type === 'contrast').every((n) => n.contrast && n.groupId === n.contrast.after),
   'ولكل عقدة محطتُها ومجموعتُها');
 

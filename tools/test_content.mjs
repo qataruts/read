@@ -41,8 +41,8 @@ ok(SKILLS.map((s) => s.after).join('،') === 'g1،g2،g3،g4،g5،g6',
   'مواضعها: مدّ الألف بعد ١، السكون بعد ٢، مدّ الواو والياء بعد ٣، ثم الشدّة والتنوين واللام');
 ok(SKILLS.every((s) => s.compare.pairs.every(([a, b]) => a && b && a !== b)),
   'ولكل درس أزواج مقارنة سليمة الطرفين');
-ok(STORIES.length === 3 && STORIES.every((s) => s.sentences.length >= 3 && s.sentences.length <= 5),
-  `ثلاث قصص، كل واحدة ٣–٥ جمل (${STORIES.map((s) => s.sentences.length).join('،')})`);
+ok(STORIES.length === 4 && STORIES.every((s) => s.sentences.length >= 3 && s.sentences.length <= 5),
+  `أربع قصص، كل واحدة ٣–٥ جمل (${STORIES.map((s) => s.sentences.length).join('،')})`);
 ok(STORIES.every((s) => s.sentences.every((x) => x.words.length <= 6)),
   'لا جملة تتجاوز ست كلمات (المبتدئ يقرأ القصير)');
 
@@ -52,8 +52,11 @@ for (const g of GROUPS) {
   order.push(...SKILLS.filter((s) => s.after === g.id).map((s) => `مهارة:${s.id}`));
   order.push(...STORIES.filter((s) => s.after === g.id).map((s) => `قصة:${s.id}`));
 }
-ok(order.join(' ← ') === 'مهارة:madd-alif ← مهارة:sukun ← مهارة:madd-waw-ya ← مهارة:shadda ← قصة:st1 ← مهارة:tanween ← قصة:st2 ← مهارة:lam ← قصة:st3',
-  `كل قصة تلي المهارة التي تُوظّفها (${order.join(' ← ')})`);
+// **وقصةُ السابعة (st4) استثناءٌ معلَن** (الحكم ب٦، اعتماد المالك ١٥ أغسطس ٢٠٢٦):
+// توظّف حروفَ مجموعتها — أصعبَ الحروف نطقاً — لا علامةَ مهارةٍ بعدها (العلاماتُ
+// خُتمت باللام بعد السادسة)، فهي قصةُ حروفٍ تلي مجموعتَها مباشرة.
+ok(order.join(' ← ') === 'مهارة:madd-alif ← مهارة:sukun ← مهارة:madd-waw-ya ← مهارة:shadda ← قصة:st1 ← مهارة:tanween ← قصة:st2 ← مهارة:lam ← قصة:st3 ← قصة:st4',
+  `كل قصة تلي ما تُوظّفه — مهارةً أو مجموعةَ حروف (${order.join(' ← ')})`);
 
 // ————— ٢. الأمثلة: الإحالات تُحلّ، والجديد كامل —————
 
