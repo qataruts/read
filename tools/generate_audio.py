@@ -704,7 +704,12 @@ def recitation_texts() -> dict:
     return {e["text"]: f"{e['surah']:03d}:{e['ayah']:03d}" for e in data if e.get("text")}
 
 
-CORE_CATEGORIES = ("letter_name", "letter_haraka", "syllable")
+# **والكلمةُ دخلت المسطرة** (قياسُ جلسة صوتيات st4، ١٥ أغسطس ٢٠٢٦): «نَظَرَ» خرجت
+# أولَ مرةٍ ٤٫٨٥ث (٣٫٦× نظائرها — بصمةُ التكرار الداخلي) وما كان حارسُ الشذوذ
+# ليمسكها لأن فئة الكلمة كانت خارج التغطية. طبقاتُها بعدد حروفها (word:٥) فلا
+# تُقارَن «فِي» بـ«اِبْتِسَامَتِي». والجملُ تبقى خارجها: تفاوتُها طبْعٌ لا عيب،
+# وحارسُها إيقاعُ ث/حرف في اللوحة.
+CORE_CATEGORIES = ("letter_name", "letter_haraka", "syllable", "word")
 DURATION_RATIO = 1.7        # مدة تتجاوز هذا × وسيط فئتها = شذوذ يُبلَّغ
 DURATION_SHORT = 0.55       # ومدة دونه × الوسيط = مبتورة (نطقٌ ناقص أو مقصوص)
 
@@ -716,6 +721,8 @@ def shape_class(text: str, cat: str) -> str:
     والمقطع البسيط («بَ»)، والمدّ («بَا» ~١٫٥ث)، والمركّب ذي الكلمتين
     («سُكْ كَرْ» ~٢٫٥ث). فمقارنةُ الساكن بوسيطها كان يتّهم السليمَ بالبتر.
     """
+    if cat == "word":
+        return f"word:{len(text)}"
     if cat != "syllable":
         return cat
     if " " in text:
