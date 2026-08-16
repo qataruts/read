@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار بوابة اللحاق</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+// عطب في صفحة الاختبار نفسها (استيراد فاشل مثلاً) يُرسَل تقريراً بدل صمت مُحيِّر
+const report = (what) => navigator.sendBeacon('/result?from=read',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+// المشهدُ الحيّ لبوابة اللحاق (الجلسة ل١): **الشاشةُ نفسُها لا الشيفرةُ وحدَها** —
+// دخولٌ من لوحة وليّ الأمر، واجتيازُ مجموعتين بالإجابة الصحيحة، وإخفاقٌ يوقف،
+// ثم **صحّةُ الجبهة بعده**: ما فُتح مفتوح، وما لم يُمتحَن فيه على حاله، و«تابع من
+// هنا» يقف عند أوّل ما لم يُثبته الطفل — وهي الحقيقةُ التي لا يراها فحصُ node.
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result?from=read',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();                        // نتيجة جزئية بعد كل تحقّق كي لا يضيع التقرير عند التعليق
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 130000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 6000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+const { GROUPS } = await import('./js/curriculum.js');       // بيانات المنهج مصدرها الوحيد
+// بنيةُ الرحلة وعنوانُ العقدة **من التطبيق لا مكتوبين بيد**: عنوانٌ مشكولٌ يُكتب
+// هنا بلا شكله يُخفق بلا علّةٍ في الشيفرة (وقد وقع ساعةَ كُتب هذا المشهد).
+const { allNodes } = await import('./js/progress.js');
+const { nodeTitle } = await import('./js/ui.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+const WORDS = GROUPS.flatMap((g) => g.words);
+
+const played = [];      // نصوص شُغِّلت من الملفات المولَّدة
+const spoken = [];      // ما لجأ إلى النطق الآلي
+const jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      played.push(manifest[key] ?? `?${key}`);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { spoken.push(text); this.text = text; } };
+}
+
+/** طفلٌ جديد تماماً: لا نجمةَ ولا مهارة — وهو حالُ مَن يُمتحَن للّحاق. */
+async function fresh() {
+  win.localStorage.removeItem('muallim.progress.v1');
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(150);
+}
+
+const stored = () => JSON.parse(win.localStorage.getItem('muallim.progress.v1') || 'null');
+
+if (frame.contentDocument?.readyState !== 'complete') {
+  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+}
+attach();
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
+
+/** دخولُ اللوحة: زرُّ الأسرة ثم عمليةُ الضرب (بوابةُ وليّ الأمر نفسُها). */
+async function openPanel() {
+  win.location.hash = '#/';
+  await sleep(180);
+  $('[aria-label="لوحة وليّ الأمر"]').click();
+  await waitFor(() => $('.gate .giant') || $('.audit'), 'شاشة وليّ الأمر');
+  if ($('.audit')) return;            // البوابة مفتوحة ما دامت الصفحة مفتوحة
+  const [a, b] = $('.giant').textContent.split('×')
+    .map((s) => Number(s.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+  $('input.chip').value = String(a * b);
+  btn('ادخل').click();
+  await waitFor(() => $('.audit'), 'لوحة وليّ الأمر');
+}
+
+/** الهدفُ المسموع: أوّلُ صوتٍ **جديد** (بعد العلامة) يطابق أحد الوجوه المعروضة. */
+const heardTarget = (getFaces, mark) => waitFor(
+  () => played.slice(mark).find((t) => getFaces().includes(t)) ?? null, 'صوت الهدف', 7000);
+
+let nextMark = 0;      // علامةُ «ما بعدها نداءُ التمرين التالي» — تضبطها answerOne
+
+/** يجيب عن تمرينٍ واحد. `wrongs` نقراتٌ خاطئة متعمَّدة قبل الصواب. */
+async function answerOne(wrongs = 0, mark = 0) {
+  await waitFor(() => $('.vchip') || $('.tiles'), 'تمرين اللحاق');
+
+  if ($('.tiles')) {                                     // ركّب الكلمة
+    const say = $('.wgame-pic').getAttribute('aria-label').replace('اسمع كلمة ', '');
+    const word = WORDS.find((w) => w.say === say);
+    for (let i = 0; i < wrongs; i++) {
+      const bad = $$('.tile:not([disabled])')
+        .find((b) => b.querySelector('.tile-face').textContent !== word.tiles[0]);
+      if (bad) { bad.click(); await sleep(80); }
+    }
+    for (const t of word.tiles) {
+      const tile = await waitFor(
+        () => $$('.tile:not([disabled])').find((b) => b.querySelector('.tile-face').textContent === t),
+        `بلاطة «${t}»`);
+      tile.click();
+      await sleep(70);
+    }
+    await waitFor(() => played.includes(say), `صوت «${say}»`);
+    nextMark = played.length;
+    await sleep(120);
+    return 'build';
+  }
+
+  const big = $$('.vchip--big').length > 0;              // تمييز حرف أو حركة
+  const heard = await heardTarget(
+    () => $$('.vchip').map((c) => c.querySelector('.vchip-face').textContent), mark);
+  const chips = $$('.vchip');
+  const faces = chips.map((c) => c.querySelector('.vchip-face').textContent);
+  for (let i = 0; i < wrongs; i++) {
+    chips[faces.findIndex((f) => f !== heard)].click();
+    await sleep(120);
+  }
+  chips[faces.indexOf(heard)].click();
+  nextMark = played.length;          // الصواب صامت (DESIGN §٥.٢) — ما بعده نداءُ التالي
+  await sleep(900);
+  return big ? 'quiz' : 'haraka';
+}
+
+/** يسوق درجةً كاملة: `wrongsPlan` أخطاءٌ متعمَّدة لكل تمرين بترتيبه. */
+async function runRung(wrongsPlan = [], enterMark = null) {
+  const kinds = [];
+  const count = $$('.dot').length;
+  nextMark = enterMark ?? Math.max(0, played.length - 1);
+  for (let i = 0; i < count; i++) {
+    if ($('.celebrate')) break;
+    kinds.push(await answerOne(wrongsPlan[i] || 0, nextMark));
+  }
+  await waitFor(() => $('.celebrate'), 'حكم الدرجة', 9000);
+  return kinds;
+}
+
+const nodesOf = (groupId) =>
+  [...GROUPS.find((g) => g.id === groupId).letters.map((c) => `${groupId}:${c}`), `${groupId}:words`];
+
+try {
+  // ————— ١) البابُ الوحيد: قسمٌ في اللوحة، ولا مسارَ يبلغه طفل —————
+  await fresh();
+  await waitFor(() => $('.station'), 'الخريطة');
+  ok(!$$('.station').some((s) => s.textContent.includes('امتحان اللحاق')),
+    'لا أثرَ لامتحان اللحاق في شاشة الطفل (الخريطة)');
+
+  win.location.hash = '#/placement';
+  await sleep(200);
+  ok(!!$('.station') && !$('.dots'),
+    'ومسارٌ مكتوبٌ بيدٍ لا يفتحه — يعود بالطفل إلى الخريطة');
+
+  await openPanel();
+  const panelText = $('.audit').textContent;
+  ok(panelText.includes('امتحان اللحاق'), 'وقسمُه في لوحة وليّ الأمر');
+  ok(panelText.includes(`أمامه ٧ من ٧`),
+    'وأمامه المجموعاتُ السبع كلُّها (طفلٌ جديد لم يُفتح له شيء)');
+
+  // ————— ٢) اجتيازُ مجموعتين: الفتحُ يقع عند كل درجة —————
+  const enterMark = played.length;
+  $('.start-placement').click();
+  await waitFor(() => $('.dots'), 'شاشة الامتحان');
+  ok($$('.dot').length === 6, `جلسةُ الدرجة ستّةُ تمارين (${$$('.dot').length})`);
+  ok($$('.pill').some((p) => p.textContent.includes('امتحان اللحاق')),
+    'وشارتُها «امتحان اللحاق» لا «مراجعة اليوم»');
+  ok($('.gate-head').textContent.includes(GROUPS[0].title),
+    `وترويستُها تُعلن أين يقف (${GROUPS[0].title})`);
+
+  const kinds1 = await runRung([], enterMark);
+  ok(!$('.celebrate--again') && $('.celebrate h2').textContent.includes('أَحْسَنْتْ'),
+    `اجتيازُ الدرجة يُحتفى به (${$('.celebrate h2').textContent})`);
+  ok(nodesOf('g1').every((id) => stored().stars[id] === 1),
+    'وعقدُ المجموعة الأولى فُتحت بنجمةٍ واحدة — تفكّ القفل ولا تدّعي إتقاناً');
+  ok(stored().placement?.groups?.join('،') === 'g1',
+    `وسجلُّ اللحاق يسمّي مصدرَ الفتح (${JSON.stringify(stored().placement?.groups)})`);
+  ok(!nodesOf('g2').some((id) => stored().stars[id]),
+    'ولم يُفتح ما لم يُمتحَن فيه بعد');
+
+  const up = btn(GROUPS[1].title);
+  ok(!!up, `وزرُّ الصعود إلى ${GROUPS[1].title}`);
+  const rung2Mark = played.length;
+  up.click();
+  await waitFor(() => $('.dots') && !$('.celebrate'), 'الدرجة الثانية');
+  ok($$('.dot').length === 6 && $$('.dot--done').length === 0,
+    'والدرجةُ الثانية تبدأ من أولها بستّة تمارين');
+  // **الترويسةُ تتبع الدرجة**: المحرّكُ لا يعيد رسمَ `header`، فسطرٌ ساكن يبقى
+  // «المجموعة الأولى» فوق تمارين الثانية — وهو ما وقع ساعةَ كُتب هذا المشهد.
+  ok($('.gate-head').textContent.includes(GROUPS[1].title)
+    && !$('.gate-head').textContent.includes(GROUPS[0].title),
+    `وترويستُها تتبع الدرجة لا تبقى على الأولى (${$('.gate-head .hint').textContent})`);
+
+  const kinds2 = await runRung([], rung2Mark);
+  ok($('.celebrate h2').textContent.includes('أَحْسَنْتْ'), 'واجتيازُ الثانية كالأولى');
+  ok(nodesOf('g2').every((id) => stored().stars[id] === 1),
+    'وعقدُ المجموعة الثانية فُتحت');
+  ok(stored().placement?.groups?.join('،') === 'g1،g2',
+    'والسجلُّ يتّحد مع سابقه لا يحلّ محلّه');
+
+  // ————— ٣) الإخفاق يوقف: لا إعادةَ داخل الامتحان —————
+  const rung3Mark = played.length;
+  btn(GROUPS[2].title).click();
+  await waitFor(() => $('.dots') && !$('.celebrate'), 'الدرجة الثالثة');
+  await runRung([3, 3, 2, 2], rung3Mark);      // أخطاءٌ متعمَّدة ⇒ دون العتبة
+  ok(!!$('.celebrate--again') && $('.celebrate h2').textContent.includes('وَقَفْنَا'),
+    `دون ٨٠٪ يقف الامتحان (${$('.celebrate h2').textContent})`);
+  ok($('.celebrate .rule').textContent.includes('تَبْدَأُ رِحْلَتُكْ')
+    && $('.celebrate .hint').textContent.includes(GROUPS[2].title),
+    `ويقول من أين تبدأ رحلتُه (${$('.celebrate .rule').textContent})`);
+  ok(!btn('أعِد المحاولة') && !$$('.btn').some((b) => b.textContent.includes(GROUPS[3].title)),
+    'ولا زرَّ إعادةٍ ولا صعود — أوّلُ إخفاقٍ يُنهي');
+  ok(!nodesOf('g3').some((id) => stored().stars[id]),
+    'وما أخفق فيه لم يُفتح منه شيء');
+  const rate = $('.celebrate .hint').textContent;
+  ok(/٪/.test(rate), `والنتيجةُ معروضةٌ بنسبتها (${rate})`);
+
+  // ————— ٤) صحّةُ الجبهة بعده —————
+  btn('→ الخريطة').click();
+  await waitFor(() => $('.station'), 'العودة إلى الخريطة');
+  const cont = $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
+  // أوّلُ عقدةٍ بلا نجمة في الرحلة — وهي **درسُ علامةٍ بين المجموعتين**: لم يُمتحَن
+  // فيه فلم يُفتح عليه، فجبهتُه هناك لا عند المجموعة الثالثة.
+  const first = allNodes().find((n) => !stored().stars[n.id]);
+  ok(cont && first && cont.textContent.includes(nodeTitle(first)),
+    `و«تابع من هنا» عند أوّل ما لم يُثبته: ${nodeTitle(first)}`
+    + ` (المعروض: ${cont?.querySelector('b')?.textContent})`);
+  ok(first?.type === 'skill',
+    `وهو درسُ علامةٍ لا مجموعة — «لم يُمتحَن فيها فلا تُفتح عليه» (${first?.type})`);
+
+  const g1Station = $$('.station').find((s) => s.textContent.includes(GROUPS[0].title));
+  const g3Station = $$('.station').find((s) => s.textContent.includes(GROUPS[2].title));
+  ok(g1Station && !g1Station.classList.contains('station--locked'),
+    'والمجموعتان المفتوحتان مفتوحتان على الخريطة');
+  ok(g3Station && g3Station.classList.contains('station--locked'),
+    'وما بعد الشرخ مقفلٌ حتى يبلغه بالتسلسل');
+
+  win.location.hash = '#/lesson/g1/ا';
+  await sleep(200);
+  ok(!!$('.lesson'), 'ودرسُ ما فُتح يُلعَب (النجمةُ تدعوه ولا تمنعه)');
+
+  // ————— ٥) ليتنر يقرأ محاولاته، والإعادةُ تستأنف من آخر حدّ —————
+  const skills = Object.entries(stored().skills || {});
+  ok(skills.length >= 8, `وليتنر يحمل محاولاتِه (${skills.length} مهارةً سُجّلت)`);
+  ok(skills.some(([, s]) => s.box > 0) && skills.some(([, s]) => s.wrong > 0),
+    'صواباً وخطأً — قياسٌ حقيقيّ بلا وسمٍ خاصّ');
+  ok(!stored().reviews || !Object.keys(stored().reviews).length,
+    'ولا يُقيَّد مراجعةَ يوم — امتحانُ موضعٍ لا جلسةُ تثبيت');
+
+  await openPanel();
+  const after = $('.audit').textContent;
+  ok(after.includes('فُتح باللحاق') && after.includes(GROUPS[0].title)
+    && after.includes(GROUPS[1].title),
+    'واللوحةُ تقرأ «فُتح باللحاق» بأسماء مجموعاته');
+  ok(after.includes('أمامه ٥ من ٧') && after.includes(GROUPS[2].title),
+    'وتقول أين يستأنف — من آخر حدٍّ بلغه لا من الألف');
+
+  $('.start-placement').click();
+  await waitFor(() => $('.dots'), 'إعادةُ الامتحان');
+  ok($('.gate-head').textContent.includes(GROUPS[2].title),
+    `والإعادةُ تبدأ من الدرجة الثالثة لا الأولى (${$('.gate-head h2').nextSibling?.textContent || ''})`);
+
+  // ————— ٦) الصوت والأخطاء —————
+  const missing = played.filter((t) => t.startsWith('?'));
+  ok(missing.length === 0,
+    `كلُّ ما نطقه الامتحان له ملفٌّ مولَّد (${played.length} تشغيلاً، ${missing.length} ناقصاً)`);
+  const stray = spoken.filter((t) => !pendingAudio.has(t));
+  ok(stray.length === 0, 'ولم يلجأ إلى النطق الآلي'
+    + (stray.length ? ` — خارج القائمة: ${stray.join('، ')}` : ''));
+  ok(new Set([...kinds1, ...kinds2]).size >= 2,
+    `والدرجاتُ نوّعت تمارينها (${[...new Set([...kinds1, ...kinds2])].join('، ')})`);
+  const small = $$('.screen-card button')
+    .map((el) => [el, el.getBoundingClientRect()])
+    .filter(([, r]) => r.width && (r.height < 48 || r.width < 48))
+    .map(([el]) => el.className);
+  ok(small.length === 0, `أهداف اللمس ≥٤٨ بكسل${small.length ? ' — ' + small.join('،') : ''}`);
+  ok(jsErrors.length === 0, `لا أخطاء جافاسكربت (${jsErrors.join(' | ') || 'لا شيء'})`);
+} catch (e) {
+  ok(false, 'استثناء: ' + ((e && e.stack) || e));
+}
+
+await fetch('/result', { method: 'POST', body: JSON.stringify(results, null, 1) });
+</script>
+</body>
+</html>

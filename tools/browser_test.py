@@ -11,6 +11,7 @@
     python3 tools/browser_test.py --stories    # مكتبة «مصنع القصص» (المرحلة د)
     python3 tools/browser_test.py --record     # «اقرأ لي»: تسجيل صوت الطفل (المرحلة و)
     python3 tools/browser_test.py --gate       # بوابتا الإتقان (الحزمة ١٤)
+    python3 tools/browser_test.py --placement  # بوابة اللحاق: امتحان تحديد المستوى (الجلسة ل١)
     python3 tools/browser_test.py --parent     # صلابة التقدّم وتحكّم وليّ الأمر (الحزمة ١١)
     python3 tools/browser_test.py --contrast   # محطتا «ميّز بين» (الحزمة ١٣)
     python3 tools/browser_test.py --roots      # شبكات الجذور (حزمة الجذور)
@@ -79,6 +80,7 @@ PAGES = {
     "/__device.html": TOOLS / "browser_device.html",
     "/__welcome.html": TOOLS / "browser_welcome.html",
     "/__parent.html": TOOLS / "browser_parent.html",
+    "/__placement.html": TOOLS / "browser_placement.html",
     "/__fade.html": TOOLS / "browser_fade.html",
     "/__voice.html": TOOLS / "browser_voice.html",
     "/__parent_shots.html": TOOLS / "browser_parent_shots.html",
@@ -389,6 +391,8 @@ def main():
     ap.add_argument("--gate", action="store_true", help="بوابتا الإتقان: العبور والإخفاق والإعادة والترحيل")
     ap.add_argument("--parent", action="store_true",
                     help="صلابة التقدّم وتحكّم وليّ الأمر: ترقية عامل الخدمة والنسخة الاحتياطية (الحزمة ١١)")
+    ap.add_argument("--placement", action="store_true",
+                    help="بوابة اللحاق: امتحانُ تحديد المستوى من اللوحة — اجتيازٌ وإخفاقٌ وصحّةُ الجبهة")
     ap.add_argument("--roots", action="store_true",
                     help="شبكات الجذور: الشجرة و«اجمع العائلة» وقياسُها")
     ap.add_argument("--marks", action="store_true",
@@ -457,6 +461,7 @@ def main():
             return 0 if out.exists() else 1
 
         page = ("__welcome.html" if args.welcome
+                else "__placement.html" if args.placement
                 else "__voice.html" if args.voice
                 else "__fade.html" if args.fade
                 else "__parent.html" if args.parent

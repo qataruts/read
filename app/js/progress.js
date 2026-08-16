@@ -100,6 +100,7 @@ function blank() {
     order: ORDER,     // ترتيبُ الرحلة الذي بُنيت عليه هذه الحالة (انظر `migrateJourney`)
     records: [],      // «اقرأ لي»: [{node, title, seconds, day, at}] — بيانٌ نصيّ لا صوت
     reads: {},        // «جذع كلمة» ← {n, day} — عدّاد خفوت التشكيل (حزمة الخفوت)
+    placement: null,  // امتحان اللحاق: {at, groups, nodes, stopped, right, tries} — أو لا شيء
     mic: false,       // إذنُ وليّ الأمر بالتسجيل (يُعطى مرة واحدة خلف بوابته)
     seconds: 0,
     startedAt: Date.now(),
@@ -1320,6 +1321,56 @@ function unfinishedBefore(id) {
 
 /** كم عقدةً ناقصة قبل هذه العقدة — ما سيفتحه `unlockUpTo` **قبل** أن يفعله. */
 export const pendingBefore = (id) => unfinishedBefore(id).length;
+
+// ————— بوابة اللحاق: فتحٌ بمصدرٍ مميَّز (ملفّ اللحاق، ١٦ أغسطس ٢٠٢٦) —————
+//
+// **العلّة**: تلميذُ مدرسةٍ أو مركزٍ يصل بمستوىً قائم. و`unlockUpTo` أعلاه تفتح له
+// الطريق بيد وليّه **بلا امتحان** — ظنٌّ لا قياس. فامتحانُ اللحاق يقيس ثم يفتح.
+//
+// وهذه الوحدةُ تخزن ولا تحكم: **قواعدُ السلّم وحدودُه في `placement.js`**، وهنا
+// موضعُ الكتابة وحدَه (مصدرُ الإنجاز واحد لا اثنان يفترقان).
+//
+// وثلاثةُ قيودٍ في هذه الدالّة نفسِها:
+// ١) **النجمةُ واحدة** — حكمُ `unlockUpTo` والترحيلِ الرحيم نفسُه: تفكّ القفل ولا
+//    تدّعي إتقاناً، فتبقى العقدةُ تدعوه إلى لعبها والنجومُ تعلو حين يلعبها.
+// ٢) **لا يُغلق مفتوحٌ أبداً**: ما بلغ نجمةً فأكثر لا يُمَسّ — والسجلُّ يتّحد مع
+//    سابقه اتّحادَ مجموعاتٍ ولا يحلّ محلّه، فإعادةُ الامتحان لا تمحو فتحاً سابقاً.
+// ٣) **لا يُعلَّم ما ليس في الرحلة**: معرّفٌ لا موضعَ له لا تُكتب له نجمة.
+
+export const PLACEMENT_STARS = 1;
+
+/** سجلُّ آخر امتحان لحاق مضموناً شكلَه — أو `null` إن لم يُمتحَن بعد. */
+export function placementLog() {
+  const log = state.placement;
+  if (!log || typeof log !== 'object') return null;
+  return { at: 0, groups: [], nodes: [], stopped: null, right: 0, tries: 0, ...log };
+}
+
+/**
+ * تعليمُ عقدٍ منجزةً **بمصدر اللحاق**، وتقييدُ نتيجة الامتحان ليقرأها وليُّ الأمر.
+ * @returns {number} كم عقدةً فُتحت فعلاً (المفتوحُ سلفاً لا يُعدّ ولا يُنقَص)
+ */
+export function recordPlacement({
+  groups = [], nodes = [], stopped = null, right = 0, tries = 0, at = Date.now(),
+} = {}) {
+  const before = placementLog();
+  const opened = [];
+  for (const id of nodes) {
+    if (indexOf(id) < 0 || getStars(id) >= PLACEMENT_STARS) continue;
+    state.stars[id] = PLACEMENT_STARS;
+    opened.push(id);
+  }
+  state.placement = {
+    at,
+    groups: [...new Set([...(before?.groups || []), ...groups])],
+    nodes: [...new Set([...(before?.nodes || []), ...opened])],
+    stopped,
+    right,
+    tries,
+  };
+  save();
+  return opened.length;
+}
 
 /**
  * تصفير محطةٍ لإعادة التدريب: نجومُ عقدها إلى الصفر، فتعود جبهةُ الفتح إليها.

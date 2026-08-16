@@ -12,6 +12,7 @@ import {
 } from './curriculum.js';
 import * as recordings from './recordings.js';
 import * as recorder from './recorder.js';
+import * as placement from './placement.js';
 import { FADE_AT, BARE_AT, levelOf, fadeText } from './fade.js';
 import {
   h, go, toast, arNum, arCount, topbar, letterTitle, nodeTitle, nodeWhere, shake,
@@ -24,6 +25,7 @@ const DAY_NAMES = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خم
 const ENOUGH_MINUTES = 20;   // نصيب اليوم لطفل السادسة — بعده تُنصح الاستراحة
 
 let unlocked = false;        // البوابة تُفتح لهذه الجلسة فقط (لا تُحفظ في التخزين)
+let examining = false;       // امتحانُ اللحاق جارٍ — يحلّ محلّ اللوحة ما دام
 
 /** ثوانٍ ← نصّ عربي مقروء. */
 export function minutesText(seconds) {
@@ -466,6 +468,59 @@ function previewSection() {
   );
 }
 
+/**
+ * **بابُ امتحان اللحاق — وهو بابُه الوحيد** (ملفّ اللحاق، ١٦ أغسطس ٢٠٢٦):
+ *
+ * تلميذُ مدرسةٍ أو مركزٍ يصل بمستوىً قائم. وفوقَه في «تحكّم في الرحلة» بابٌ يفتح
+ * الطريقَ بيد وليّه **بلا امتحان** — ظنٌّ لا قياس؛ وهذا يقيس ثم يفتح، فيصلحان
+ * معاً: مَن يعرف مستوى ابنه يفتح، ومَن لا يعرفه يمتحنه.
+ *
+ * **وموضعُه هذه اللوحة لا شاشةُ الطفل**: امتحانٌ يفتح عقداً لا يقع بلمسةٍ عابرة،
+ * واللوحةُ محميّةٌ سلفاً بمسألةِ ضربٍ يعجز عنها طفلُ السادسة. ونتيجتُه تُقرأ هنا
+ * كذلك — «فُتح باللحاق» بأسماء مجموعاته، فلا يلتبس ما فُتح بامتحانٍ بما لُعِب.
+ */
+function placementSection(rerender) {
+  const info = placement.state();
+  const log = info.log;
+
+  const start = h('button', {
+    class: 'btn btn--primary start-placement',
+    onclick: () => {
+      if (!info.left) { toast('لا مجموعةَ تُمتحَن — فُتحت كلُّها له'); return; }
+      examining = true;
+      // مغادرةُ الشاشة تُنهي الامتحان: فلا يعود وليُّ الأمر إلى نصفِ امتحانٍ لم يطلبه
+      addEventListener('hashchange', () => { examining = false; }, { once: true });
+      rerender();
+    },
+  }, 'امتحان اللحاق');
+
+  return h('div', {},
+    h('p', { class: 'hint' },
+      'طفلٌ يعرف حروفه أصلاً (من مدرسةٍ أو مركز)؟ امتحنه هنا: '
+      + `${arNum(placement.SAMPLE)} تمارين لكل مجموعة من تمارين المراجعة نفسِها — `
+      + 'ما يجتازه بإصابة ٨٠٪ يُفتح له، وعند أول إخفاقٍ يقف فتبدأ رحلتُه من هناك.'),
+    h('div', { class: 'row parent-tool' }, start,
+      info.left
+        ? h('span', { class: 'pill' }, `أمامه ${arNum(info.left)} من ${arNum(info.total)}`)
+        : h('span', { class: 'pill' }, 'فُتحت المجموعات كلُّها')),
+    info.next && h('p', { class: 'hint' }, `يبدأ من: ${info.next}.`),
+    log && log.titles.length
+      ? h('p', { class: 'note' },
+        h('b', {}, 'فُتح باللحاق: '),
+        `${log.titles.join(' · ')} — ${nodesText(log.nodes.length)}`
+        + (log.stoppedTitle ? `، ووقف عند ${log.stoppedTitle}` : '')
+        + (log.at ? ` (${whenText(log.at)})` : '') + '.')
+      : log && h('p', { class: 'note' },
+        `امتُحن ${whenText(log.at)} ولم يجتز ${log.stoppedTitle || 'أولَ مجموعة'} —`
+        + ' فرحلتُه من أولها، وهذا خبرٌ نافع لا إخفاق.'),
+    h('p', { class: 'note' },
+      'ولا يُغلق ما فُتح أبداً: الإعادةُ تستأنف من آخر حدٍّ بلغه، والنجمةُ الواحدة'
+      + ' تفكّ القفل ولا تدّعي إتقاناً — تبقى المحطةُ تدعوه إلى لعبها.'
+      + ' والبوّاباتُ لا تُقفز (تُجتاز بنفسها)، والمرحلةُ القرآنية خارج الامتحان'
+      + ' كلياً — المصحفُ يُتلى ولا يُمتحَن.'),
+  );
+}
+
 function backupSection(rerender) {
   const slot = h('div', { class: 'confirm-slot' });
   const storage = h('p', { class: 'hint' }, 'التخزين على هذا الجهاز: جارٍ الفحص…');
@@ -826,6 +881,8 @@ function dashboard(rerender = () => {}) {
 
     ...section('نسخة احتياطية من تقدّمه', backupSection(rerender)),
 
+    ...section('امتحان اللحاق — لطفلٍ يعرف حروفه', placementSection(rerender)),
+
     ...section('تحكّم في الرحلة', journeySection(rerender)),
 
     ...section('معاينةُ التطبيق كلِّه', previewSection()),
@@ -845,17 +902,34 @@ function dashboard(rerender = () => {}) {
   );
 }
 
-/** الشاشة: البوابة أولاً، ثم اللوحة — والفتح يبقى ما دامت الصفحة مفتوحة. */
+/**
+ * الشاشة: البوابة أولاً، ثم اللوحة — والفتح يبقى ما دامت الصفحة مفتوحة.
+ *
+ * **وامتحانُ اللحاق يحلّ محلّ اللوحة ولا يفتح مساراً ثانياً**: هو جلسةُ ملء شاشةٍ
+ * للطفل خلف بوابة وليّ أمره، فمسارُه مسارُها (`#/parent`) — ولا عنوانَ يُكتب في
+ * شريط المتصفّح يبلغه طفلٌ بنفسه. ويعود إلى اللوحة بـ`onDone`، ومغادرةُ الشاشة
+ * تُنهيه (المستمعُ في `placementSection`).
+ */
 
 export function renderParent(rerender) {
-  if (unlocked) return dashboard(rerender);
-  return gateScreen(() => {
-    unlocked = true;
-    rerender();
-  });
+  if (!unlocked) {
+    return gateScreen(() => {
+      unlocked = true;
+      rerender();
+    });
+  }
+  if (examining) {
+    const exam = placement.renderPlacement({
+      onDone: () => { examining = false; rerender(); },
+    });
+    if (exam) return exam;
+    examining = false;      // لم تبق درجةٌ تُمتحَن: اللوحةُ نفسُها لا شاشةٌ فارغة
+  }
+  return dashboard(rerender);
 }
 
 /** لإعادة إغلاق البوابة في الاختبارات. */
 export function lockGate() {
   unlocked = false;
+  examining = false;
 }

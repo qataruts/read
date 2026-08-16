@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v31';  // v31: وز٣ التسليمة الثانية — قصةُ «الغراب والضفدع» بعد السابعة (الحكم ب٦، بعين المالك)
+const VERSION = 'v32';  // v32: الجلسة ل١ — بوابةُ اللحاق (امتحانُ تحديد المستوى الاختياريّ من لوحة الوالد)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -70,6 +70,7 @@ const SHELL = [
   'js/lexicon.js',
   'js/main.js',
   'js/parent.js',
+  'js/placement.js',
   'js/progress.js',
   'js/quran.js',
   'js/recitation.js',
