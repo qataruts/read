@@ -1820,6 +1820,16 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
   }
 }
 
+/* **الهدوءُ الحسّي** (وضعُ الدعم، الجلسة د١): صنفٌ على الجذر يصنع ما يصنعه تفضيلُ
+   النظام أعلاه — **عينُ القواعد لا قواعدُ ثانية**: لا حركةَ من الحركات الأربع
+   والعشرين تُعاد كتابتُها، وإنما تُطفأ كلُّها من موضعٍ واحد. ولمن أطفأه النظامُ
+   سلفاً لا فرقَ، ولمن يحتاجه ولا يعرف تفضيلَ جهازه مفتاحٌ في لوحة وليّ الأمر. */
+html.calm *, html.calm *::before, html.calm *::after {
+  animation-duration: .001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important;
+}
+
 @media (max-width: 26rem) {
   :root { --node-size: 4.6rem; }
   .station { padding: .85rem .7rem 1rem; }
@@ -2083,6 +2093,8 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
 @media (prefers-reduced-motion: reduce) {
   .shelf-book .cover { transition: none; }
 }
+
+html.calm .shelf-book .cover { transition: none; }
 
 /* بابُ التعريف في ذيل الخريطة (أمر المالك، ١٢ أغسطس ٢٠٢٦): سطرٌ هادئ للراشد —
    لا زرَّ فعلٍ يزاحم درسَ الطفل، ولا لونَ نجمةٍ يجذب إصبعَه. */

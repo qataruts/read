@@ -19,6 +19,11 @@ import {
 } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
+// **مقادير الجلسة من مخزنٍ واحد** (وضعُ الدعم، الجلسة د١): الجرعةُ وسعةُ الحوض
+// تُقرآن من `support.js` لا من ثابتين هنا. و**لا يُستورد منه التلقين** (`mayPrompt`):
+// «لا تلقينَ في المراجعة ولا في البوابتين ولا في اللحاق ألبتّة» — وهذه الشاشاتُ
+// الثلاث تركب هذا المحرّك، فحصانتُها بنيويةٌ لا وصيّة (يجردها `test_support.mjs`).
+import { KNOBS, sessionSize, distractors } from './support.js';
 import { credit } from './fade.js';   // شاهدُ «رتّب» — الكلمةُ في موضعها (مدخلٌ واحد)
 import { buildBoard } from './words.js';
 import {
@@ -26,10 +31,17 @@ import {
   mascot, shuffle, pick, shake, pop, DEV,
 } from './ui.js';
 
-export const SESSION_SIZE = 6;    // جلسة قصيرة تُنجَز في دقائق (لا تُرهق طفل السادسة)
+/**
+ * جلسة قصيرة تُنجَز في دقائق (لا تُرهق طفل السادسة). **والرقمُ من جدول `support.js`**
+ * لا مكتوباً هنا: هذا هو القائم، و`sessionSize()` هو المقدارُ الفعليّ لحظةَ البناء
+ * (يخفضه مِقبضُ «الجرعة» في وضع الدعم).
+ */
+export const SESSION_SIZE = KNOBS.dose.standing;
 export const MAX_BUILD = 2;       // تركيب الكلمات أطول التمارين: اثنان على الأكثر
 export const MAX_ORDER = 1;       // وترتيب الجملة أطولها: واحد
-const OPTIONS = 3;
+
+/** خياراتُ تمرين الاختيار = الهدفُ ومشتّتاته — تُقرأ عند كل بناء لا مرّةً عند التحميل. */
+const options = () => 1 + distractors();
 const ACCENT = 'var(--accent-skills)';   // المراجعة تثبيت مهارات — لونها لون المهارات
 
 /** نجوم الجلسة: ٣ بلا خطأ، ٢ ما دامت الأخطاء ≤ عدد التمارين، وإلا ١ (عتبة متناسبة). */
@@ -41,8 +53,11 @@ function quizItem(letter, haraka, letters, rnd) {
   const pool = [...new Set(letters)].filter((c) => c !== letter);
   if (!pool.length) return null;
   const mark = markOf(haraka) || HARAKAT[0].mark;
-  const options = shuffle([letter, ...shuffle(pool, rnd).slice(0, OPTIONS - 1)], rnd);
-  return { id: `quiz|${letter}|${haraka}`, kind: progress.KINDS.QUIZ, letter, haraka, mark, options };
+  const choices = shuffle([letter, ...shuffle(pool, rnd).slice(0, options() - 1)], rnd);
+  return {
+    id: `quiz|${letter}|${haraka}`, kind: progress.KINDS.QUIZ, letter, haraka, mark,
+    options: choices,
+  };
 }
 
 function harakaItem(letter, haraka, rnd) {
@@ -95,8 +110,8 @@ function rootItem(rootId, words, rnd) {
   if (!branches.length) return null;
   const outside = [...new Set(texts)].filter((t) => !root.members.includes(t));
   const smart = root.stranger ? [root.stranger] : [];
-  const others = [...smart, ...shuffle(outside, rnd)].slice(0, 2);
-  if (others.length < 2) return null;
+  const others = [...smart, ...shuffle(outside, rnd)].slice(0, distractors());
+  if (others.length < distractors()) return null;
   const target = pick(branches, rnd);
   return {
     id: `root|${root.id}`,
@@ -167,14 +182,14 @@ function markItem(key, kind, marks, rnd) {
   }
 
   const others = shuffle(pairs.filter((p) => p !== pair), rnd).flat();
-  const options = [...pair, ...others].filter((t, i, all) => all.indexOf(t) === i);
-  if (options.length < 2) return null;
+  const choices = [...pair, ...others].filter((t, i, all) => all.indexOf(t) === i);
+  if (choices.length < 2) return null;
   return {
     ...base,
     id: `mark-quiz|${skill.id}`,
     kind: progress.KINDS.MARK_QUIZ,
     target: pick(pair, rnd),
-    options: shuffle(options.slice(0, OPTIONS), rnd),
+    options: shuffle(choices.slice(0, options()), rnd),
   };
 }
 
@@ -187,8 +202,8 @@ function markItem(key, kind, marks, rnd) {
 function rasmItem(key, signs, rnd) {
   const target = signs.find((s) => rasmSkillKey(s.sign) === String(key));
   if (!target) return null;
-  const others = shuffle(signs.filter((s) => s.sign !== target.sign), rnd).slice(0, OPTIONS - 1);
-  if (others.length < OPTIONS - 1) return null;
+  const others = shuffle(signs.filter((s) => s.sign !== target.sign), rnd).slice(0, options() - 1);
+  if (others.length < options() - 1) return null;
   return {
     id: `rasm|${target.sign}`,
     kind: progress.KINDS.RASM,
@@ -207,8 +222,8 @@ function rasmItem(key, signs, rnd) {
 function muqItem(key, items, rnd) {
   const target = items.find((i) => muqSkillKey(i.read) === String(key));
   if (!target) return null;
-  const others = shuffle(items.filter((i) => i.read !== target.read), rnd).slice(0, OPTIONS - 1);
-  if (others.length < OPTIONS - 1) return null;
+  const others = shuffle(items.filter((i) => i.read !== target.read), rnd).slice(0, options() - 1);
+  if (others.length < options() - 1) return null;
   return {
     id: `muq|${target.read}`,
     kind: progress.KINDS.MUQ,
@@ -292,7 +307,7 @@ function itemForSkill(skill, ctx, rnd) {
  */
 export function buildSession({
   letters = [], words = [], sentences = [], pairs = [], marks = [], signs = [], muq = [],
-  due = [], size = SESSION_SIZE, rnd = Math.random,
+  due = [], size = sessionSize(), rnd = Math.random,
 } = {}) {
   const known = [...new Set(letters)];
   if (known.length < 2) return [];

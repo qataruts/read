@@ -10,6 +10,8 @@
 // الرابط فيُكسَر كاشُ ذلك الملف **وحده**، وما لم يُبدَّل يبقى مخزوناً كما هو.
 // وغيابُ البيان لا يُعطّل شيئاً — رابطٌ بلا وسم كما كان.
 
+import { rate } from './support.js';
+
 const AUDIO_URL = new URL('../audio/', import.meta.url);
 const MANIFEST_URL = new URL('manifest.json', AUDIO_URL);
 const VERSIONS_URL = new URL('versions.json', AUDIO_URL);
@@ -147,6 +149,10 @@ function playFile(text) {
   return new Promise((resolve, reject) => {
     const el = new Audio(urlFor(text));
     el.preload = 'auto';
+    // **مِقبضُ «الصوت الأبطأ»** (وضعُ الدعم): الملفُّ نفسُه يُسمَع أبطأ — صفرُ ملفٍّ
+    // جديد وصفرُ توليد. ولا يُمَسّ العنصرُ ما دام المِقبضُ مطفأً (المعامل ١).
+    const speed = rate();
+    if (speed !== 1) el.playbackRate = speed;
     current = el;
     el._hush = () => resolve(false);
     el.addEventListener('ended', () => {
@@ -160,6 +166,9 @@ function playFile(text) {
   });
 }
 
+/** سرعةُ النطق الآلي القائمة — أبطأ من الطبيعي كي تتضح الحروف لأذن الطفل. */
+const SPEAK_RATE = 0.75;
+
 /**
  * احتياط: نطق آلي من المتصفح — أبطأ قليلاً كي تتضح الحروف لأذن الطفل.
  * لا يرمي أبداً: متصفّح بلا نطق (أو يرفض النصّ) يعود بـfalse، فلا يسقط الدرس
@@ -172,7 +181,7 @@ function speak(text) {
       if (!synth || !window.SpeechSynthesisUtterance) return resolve(false);
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'ar-SA';
-      u.rate = 0.75;
+      u.rate = SPEAK_RATE * rate();   // ومقبضُ الدعم يبطئ الاحتياطَ كما يبطئ الملفّ
       u.onend = () => resolve(true);
       u.onerror = () => resolve(false);
       synth.cancel();

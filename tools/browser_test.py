@@ -17,6 +17,7 @@
     python3 tools/browser_test.py --roots      # شبكات الجذور (حزمة الجذور)
     python3 tools/browser_test.py --marks      # قياس العلامات (مدّ · سكون · شدّة · تنوين · لام)
     python3 tools/browser_test.py --fade       # خفوت التشكيل ز١→ز٣ (المرحلة ز)
+    python3 tools/browser_test.py --support    # وضعُ الدعم: تشغيلُه من اللوحة وأثرُه في شاشات الطفل
     python3 tools/browser_test.py --voice      # قياس التعاقب الصوتي: لا تراكب ولا قطش مبرمَج
     python3 tools/browser_test.py --map        # الخريطة: الجبهة والطيّ الكسول وقياس سرعتهما
     python3 tools/browser_test.py --welcome    # الصفحة التعريفية (خارج قشرة عامل الخدمة)
@@ -82,6 +83,7 @@ PAGES = {
     "/__parent.html": TOOLS / "browser_parent.html",
     "/__placement.html": TOOLS / "browser_placement.html",
     "/__fade.html": TOOLS / "browser_fade.html",
+    "/__support.html": TOOLS / "browser_support.html",
     "/__voice.html": TOOLS / "browser_voice.html",
     "/__parent_shots.html": TOOLS / "browser_parent_shots.html",
 }
@@ -401,6 +403,8 @@ def main():
                     help="محطتا «ميّز بين»: مواجهة المتشابهات و«اسمع الفرق» (الحزمة ١٣)")
     ap.add_argument("--fade", action="store_true",
                     help="خفوت التشكيل ز١→ز٣: العتبة والكشف عند الطلب وحصانة التهجّي والمصحف")
+    ap.add_argument("--support", action="store_true",
+                    help="وضعُ الدعم: تشغيلُه من اللوحة، وجلسةٌ أقصر ومشتّتٌ واحد وحركةٌ مطفأة وتشكيلٌ ثابت")
     ap.add_argument("--voice", action="store_true",
                     help="قياس التعاقب الصوتي: أصوات بمدة حقيقية، لا تراكب ولا قطش مبرمَج (بلاغ احسب)")
     ap.add_argument("--map", action="store_true", help="الخريطة: جبهة الفتح والطيّ الكسول وقياسهما")
@@ -461,6 +465,7 @@ def main():
             return 0 if out.exists() else 1
 
         page = ("__welcome.html" if args.welcome
+                else "__support.html" if args.support
                 else "__placement.html" if args.placement
                 else "__voice.html" if args.voice
                 else "__fade.html" if args.fade

@@ -7,6 +7,7 @@ import * as audio from './audio.js';
 import * as recitation from './recitation.js';
 import * as recorder from './recorder.js';
 import * as install from './install.js';
+import * as support from './support.js';
 import { renderLesson } from './lesson.js';
 import { renderWordsGame } from './words.js';
 import { renderReview } from './review.js';
@@ -821,6 +822,13 @@ window.addEventListener('pageshow', resetZoom);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') resetZoom();
 });
+
+// **الهدوءُ الحسّي صنفٌ على الجذر** (وضعُ الدعم، الجلسة د١): يشغّل قواعدَ خفض الحركة
+// القائمة في `app.css` — إعادةُ استعمالٍ لا كتابةُ حركاتٍ ثانية. و**الوحدةُ لا تعرف
+// DOM**: هي مقاديرُ وحدَها، والصبغُ هنا حيث تُملَك الصفحة (نظيرُ `progress.onChange`).
+const paintCalm = () => document.documentElement.classList.toggle('calm', support.calm());
+support.onChange(paintCalm);
+paintCalm();
 
 window.addEventListener('hashchange', render);
 audio.ready();

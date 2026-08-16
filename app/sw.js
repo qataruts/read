@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v32';  // v32: الجلسة ل١ — بوابةُ اللحاق (امتحانُ تحديد المستوى الاختياريّ من لوحة الوالد)
+const VERSION = 'v33';  // v33: الجلسة د١ — وضعُ الدعم (إيقاعٌ يُعاير ولا منهجَ يُبدَّل)
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];
@@ -82,6 +82,7 @@ const SHELL = [
   'js/sentences.js',
   'js/skill.js',
   'js/story.js',
+  'js/support.js',
   'js/ui.js',
   'js/words.js',
   'audio/manifest.json',

@@ -13,6 +13,7 @@ import {
 import * as recordings from './recordings.js';
 import * as recorder from './recorder.js';
 import * as placement from './placement.js';
+import * as support from './support.js';
 import { FADE_AT, BARE_AT, levelOf, fadeText } from './fade.js';
 import {
   h, go, toast, arNum, arCount, topbar, letterTitle, nodeTitle, nodeWhere, shake,
@@ -521,6 +522,59 @@ function placementSection(rerender) {
   );
 }
 
+/**
+ * **وضعُ الدعم** (الجلسة د١، ١٧ أغسطس ٢٠٢٦) — مفتاحٌ أعلى وسبعةُ مقابض تحته.
+ *
+ * وموضعُه هذه اللوحةُ لا شاشةُ الطفل: إعدادٌ يقرّره راشدٌ يعرف طفلَه، ولا يُقلَّب
+ * بلمسةٍ عابرة. **ولا يبدّل الوضعُ منهجاً ولا مادّةَ قراءة** — يبدّل الإيقاعَ وحدَه:
+ * جرعةً وتكراراً وسعةَ حوضٍ وحركةً وتشكيلاً وسرعةَ صوت. وأسماءُ المقابض وسطورُها
+ * من جدول `support.js` المعلَن، فلا يفترق ما يقرؤه الوالدُ عمّا يفعله المحرّك.
+ */
+function supportSection(rerender) {
+  const on = support.modeOn();
+  const helped = progress.helpedAttempts();
+
+  const knob = (key) => {
+    const k = support.KNOBS[key];
+    const live = support.isOn(key);
+    return h('div', { class: 'row parent-tool' },
+      h('button', {
+        class: live ? 'btn btn--primary' : 'btn',
+        'aria-pressed': String(live),
+        'data-knob': key,
+        disabled: !on,
+        onclick: () => { support.set(key, !live); rerender(); },
+      }, k.title),
+      h('span', { class: 'hint' }, k.line));
+  };
+
+  return h('div', {},
+    h('p', { class: 'hint' },
+      'لطفلٍ يحتاج وتيرةً أبطأ (صعوبةُ تعلّمٍ أو تشتّتُ انتباه): يمشي في '
+      + 'المنهج نفسِه وبالمحطات نفسِها — ولا يتبدّل حرفٌ ممّا يقرؤه. '
+      + 'وإنما يتبدّل الإيقاع: جلسةٌ أقصر، وتكرارٌ أقرب، وخيارٌ أضيق، وصوتٌ أبطأ.'),
+    h('div', { class: 'row parent-tool' },
+      h('button', {
+        class: on ? 'btn btn--primary' : 'btn',
+        'aria-pressed': String(on),
+        'data-knob': 'on',
+        onclick: () => { support.setMode(!on); rerender(); },
+      }, on ? 'أطفئ وضعَ الدعم' : 'شغّل وضعَ الدعم'),
+      h('span', { class: 'pill' }, on ? 'مشتغل' : 'مطفأ — والتطبيق كما هو تماماً')),
+    ...support.PANEL_KEYS.map(knob),
+    h('p', { class: 'note' },
+      h('b', {}, 'لا يُحتسب ما أُعين عليه إتقاناً. '),
+      'المحاولةُ التي وقعت والتلميحُ معروضٌ تُسجَّل محاولةً معانة: لا ترفع صندوقَ '
+      + 'المراجعة ولا تنقصه، وتعود المهارةُ غداً — فما تقرؤه في «الحروف المتقنة» '
+      + 'أعلاه أثبتَه بنفسه.'
+      + (helped ? ` وقد أُعين حتى الآن في ${arCount(helped, ['محاولة واحدة', 'محاولتين', 'محاولات', 'محاولة'])}.` : '')),
+    h('p', { class: 'note' },
+      'وهو لا يشخّص، ولا يعالج، ولا يحكم على نطق طفلك، ولا يخدم الكفيفَ ولا '
+      + 'الأصمَّ المُشير ولا غيرَ الناطق — وهؤلاء يحتاجون منهجاً آخر لا إعداداً آخر. '
+      + 'ولا يَعِد بحجم أثر: لم يُقَس هذا التطبيق نفسُه قطّ.'),
+  );
+}
+
 function backupSection(rerender) {
   const slot = h('div', { class: 'confirm-slot' });
   const storage = h('p', { class: 'hint' }, 'التخزين على هذا الجهاز: جارٍ الفحص…');
@@ -880,6 +934,8 @@ function dashboard(rerender = () => {}) {
     ...section('تسجيلات طفلي', recordingsSection()),
 
     ...section('نسخة احتياطية من تقدّمه', backupSection(rerender)),
+
+    ...section('وضعُ الدعم — لطفلٍ يحتاج وتيرةً أبطأ', supportSection(rerender)),
 
     ...section('امتحان اللحاق — لطفلٍ يعرف حروفه', placementSection(rerender)),
 

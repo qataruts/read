@@ -420,8 +420,11 @@ ok(!src('main.js').includes('placement'),
   'ولا بابَ له في التوجيه — فلا يفتحه طفلٌ بعنوانٍ يكتبه');
 
 const sw = readFileSync(new URL('../app/sw.js', import.meta.url), 'utf8');
-ok(/'js\/placement\.js'/.test(sw) && /const VERSION = 'v32'/.test(sw),
-  'وهو في قشرة v32 فيعمل دون إنترنت');
+// **رقمُ القشرة مكتوبٌ بيدٍ هنا** فيلزم تحريكُه مع كل حزمةٍ ترفعه (v32 ← v33 في
+// الجلسة د١ — وضعُ الدعم): والمحروسُ أنّ `placement.js` في القشرة فيعمل دون إنترنت،
+// والرقمُ شاهدُ أنّها قشرةٌ حيّةٌ مرفوعة. وشكلُ الحارس ملكُ صاحبه فلم يُمَسّ.
+ok(/'js\/placement\.js'/.test(sw) && /const VERSION = 'v33'/.test(sw),
+  'وهو في قشرة v33 فيعمل دون إنترنت');
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «بوابة اللحاق» ناجحة');
 process.exit(fails ? 1 : 0);

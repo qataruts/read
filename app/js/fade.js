@@ -31,6 +31,7 @@
 // حارساه: `tools/test_fade.mjs` (القاعدة والمصدر) و`browser_test.py --fade` (الشاشة).
 
 import * as progress from './progress.js';
+import { holdFade } from './support.js';
 import { h } from './ui.js';
 
 /** العتبة: ثلاث قراءات صحيحة **متباعدة** — ثابتٌ معلَن قابل للمعايرة. */
@@ -53,8 +54,16 @@ export function levelOf(count) {
   return count >= FADE_AT ? 2 : 1;
 }
 
-/** درجةُ هذه الكلمة الآن بتاريخ الطفل معها. */
-export const wordLevel = (text) => levelOf(progress.readCount(progress.wordKey(text)));
+/**
+ * درجةُ هذه الكلمة الآن بتاريخ الطفل معها.
+ *
+ * **ومِقبضُ «التشكيل الثابت»** (وضعُ الدعم، الجلسة د١ — حاجةُ عُسر القراءة بعينها):
+ * يمسك الدرجةَ عند ز١ فيبقى الشكلُ كاملاً حتى يقرّر الوالدُ رفعَه. وهو **عرضٌ لا
+ * قياس**: `levelOf` تبقى دالّةً نقيّة، و**عدّادُ القراءات لا يُمَسّ ببايت** — يمضي
+ * كما كان، فيومَ يُطفَأ المفتاح تجد الكلماتُ درجاتِها التي بلغتها في غيابه.
+ */
+export const wordLevel = (text) =>
+  (holdFade() ? 1 : levelOf(progress.readCount(progress.wordKey(text))));
 
 /**
  * صورةُ الكلمة في درجتها. **لا يُحذف حرفٌ أبداً** — علاماتٌ تُنزع لا غير،

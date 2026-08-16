@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>اختبار وضع الدعم</title></head>
+<body>
+<pre id="out" style="font:14px/1.6 monospace"></pre>
+<iframe id="frame" src="index.html" style="width:420px;height:900px;border:1px solid #ccc"></iframe>
+<script>
+// عطب في صفحة الاختبار نفسها (استيراد فاشل مثلاً) يُرسَل تقريراً بدل صمت مُحيِّر
+const report = (what) => navigator.sendBeacon('/result?from=read',
+  new Blob([JSON.stringify([{ ok: false, msg: 'استثناء في صفحة الاختبار: ' + what }])],
+    { type: 'text/plain' }));
+window.addEventListener('error', (e) => report(e.message));
+window.addEventListener('unhandledrejection', (e) => report(e.reason?.stack || e.reason));
+</script>
+<script type="module">
+// المشهدُ الحيّ لوضع الدعم (الجلسة د١): **الشاشةُ نفسُها لا الشيفرةُ وحدَها** —
+// تشغيلُ الوضع من لوحة وليّ الأمر بنقرةٍ حقيقية، ثم أثرُه في شاشات الطفل: جلسةٌ
+// أقصر، ومشتّتٌ واحد، وحركةٌ مطفأة، وتشكيلٌ ثابت. **ثم إطفاؤه فيعود كلُّ شيء**
+// — وهي الحقيقةُ التي لا يراها فحصُ node: أن «الافتراضَ هو السلوكُ القائم» على
+// الشاشة لا في الدوالّ.
+const out = document.getElementById('out');
+const results = [];
+const post = () => navigator.sendBeacon('/result?from=read',
+  new Blob([JSON.stringify(results, null, 1)], { type: 'text/plain' }));
+const ok = (cond, msg) => {
+  results.push({ ok: !!cond, msg });
+  out.textContent += `${cond ? '✓' : '✗'} ${msg}\n`;
+  post();                        // نتيجة جزئية بعد كل تحقّق كي لا يضيع التقرير عند التعليق
+};
+setTimeout(() => { ok(false, 'انتهت المهلة الكلية'); post(); }, 130000);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, label = '', ms = 6000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(25);
+  }
+}
+
+// بيانات المنهج وجدولُ المقابض **من التطبيق لا مكتوبةً بيد**: رقمٌ يُكتب هنا
+// يفترق عن نظيره يومَ يتحرّك فيحمرّ المشهدُ بلا علّةٍ في الشيفرة.
+const { GROUPS } = await import('./js/curriculum.js');
+const { RUNGS } = await import('./js/sentences.js');
+const { allNodes, wordKey } = await import('./js/progress.js');
+const { KNOBS, PANEL_KEYS } = await import('./js/support.js');
+const { FADE_AT, BARE_AT } = await import('./js/fade.js');
+const manifest = await (await fetch('audio/manifest.json')).json();
+const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
+const frame = document.getElementById('frame');
+
+const played = [], spoken = [], jsErrors = [];
+let win, doc;
+
+function attach() {
+  win = frame.contentWindow;
+  doc = frame.contentDocument;
+  win.addEventListener('error', (e) => jsErrors.push(String(e.message)));
+  win.addEventListener('unhandledrejection', (e) => jsErrors.push('رفض غير معالَج: ' + e.reason));
+  win.Audio = class extends win.EventTarget {
+    constructor(src = '') { super(); this.src = src; this.preload = ''; this.currentTime = 0; }
+    play() {
+      const key = (this.src.split('/').pop() || '').split('?')[0].replace('.mp3', '');
+      played.push(manifest[key] ?? `?${key}`);
+      setTimeout(() => this.dispatchEvent(new Event('ended')), 5);
+      return Promise.resolve();
+    }
+    pause() {}
+  };
+  win.SpeechSynthesisUtterance = class { constructor(text) { spoken.push(text); this.text = text; } };
+  const synth = { cancel() {}, speak(u) { setTimeout(() => u.onend && u.onend(), 5); } };
+  Object.defineProperty(win, 'speechSynthesis', { configurable: true, get: () => synth });
+}
+
+function idsBefore(id) {
+  const out = [];
+  for (const node of allNodes()) {
+    if (node.id === id) return out;
+    out.push(node.id);
+  }
+  return out;
+}
+
+const DAY = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+
+/** درجةُ سلّمٍ فيها جملةٌ تُقرأ — أوضحُ موضعٍ يُرى فيه الخفوت على الشاشة. */
+const rung = RUNGS.find((r) => r.sentences[0].mechanic === 'read');
+const sentence = rung.sentences[0];
+const readsFor = (words, n) => Object.fromEntries(
+  [...new Set(words.map(wordKey))].filter(Boolean).map((key) => [key, { n, day: DAY - 1 }]));
+
+/**
+ * زرعُ الحالة: كلُّ ما قبل درجة السلّم منجَزٌ، وكلماتُ جملتها بلغت العريَ (ز٣)،
+ * و**مهارةٌ واحدة مستحقّة** — فأولُ تمرينٍ في المراجعة تمييزُ حرفٍ معلومٌ سلفاً،
+ * فيُعَدّ خياراتُه عدّاً بدل انتظار قرعة.
+ */
+const SKILL_LETTER = GROUPS[0].letters[1];
+async function seed() {
+  win.localStorage.removeItem('muallim.support.v1');
+  win.localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2,
+    stars: Object.fromEntries(idsBefore(`ladder:${rung.id}`).map((k) => [k, 3])),
+    skills: { [`${SKILL_LETTER}|fatha|quiz`]: { right: 0, wrong: 1, box: 0, due: DAY - 1, seen: DAY - 1 } },
+    days: {}, reviews: {}, records: [],
+    reads: readsFor(sentence.words, BARE_AT),
+    seconds: 0, startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+  const done = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await done;
+  attach();
+  await sleep(200);
+}
+
+const $ = (sel) => doc.querySelector(sel);
+const $$ = (sel) => [...doc.querySelectorAll(sel)];
+const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
+const calmOn = () => doc.documentElement.classList.contains('calm');
+
+async function goto(hash) {
+  win.location.hash = '#/';
+  await sleep(120);
+  win.location.hash = hash;
+  await sleep(260);
+}
+
+/** دخولُ اللوحة: زرُّ الأسرة ثم عمليةُ الضرب (بوابةُ وليّ الأمر نفسُها). */
+async function openPanel() {
+  await goto('#/parent');
+  await waitFor(() => $('.gate .giant') || $('.audit'), 'شاشة وليّ الأمر');
+  if (!$('.audit')) {
+    const [a, b] = $('.giant').textContent.split('×')
+      .map((s) => Number(s.trim().replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))));
+    $('input.chip').value = String(a * b);
+    btn('ادخل').click();
+    await waitFor(() => $('.audit'), 'لوحة وليّ الأمر');
+  }
+}
+
+/** قياسُ شاشتَي الطفل: عددُ تمارين المراجعة، وخياراتُ أولها، ودرجةُ خفوت الجملة. */
+async function measure() {
+  await goto('#/review');
+  await waitFor(() => $('.dots li'), 'جلسة المراجعة');
+  const dots = $$('.dots li').length;
+  const options = $$('.vchip--big').length;
+  await goto(`#/ladder/${rung.id}`);
+  await waitFor(() => $('.sentence-word[data-fade]'), 'جملةُ السلّم');
+  const fades = [...new Set($$('.sentence-word[data-fade]').map((el) => el.dataset.fade))];
+  const words = $$('.sentence-word[data-fade]').map((el) => el.dataset.word);
+  return { dots, options, fades, words };
+}
+
+if (frame.contentDocument?.readyState !== 'complete') {
+  await new Promise((r) => frame.addEventListener('load', r, { once: true }));
+}
+attach();
+await seed();
+
+// ————— ١) الوضعُ مطفأٌ ابتداءً: الشاشةُ كما كانت حرفاً —————
+
+out.textContent += `— درجة «${rung.garden.title}» · جملة «${sentence.text}» —\n`;
+
+const before = await measure();
+ok(before.dots === KNOBS.dose.standing,
+  `مطفأً: جلسةُ المراجعة ${KNOBS.dose.standing} تمارين (${before.dots})`);
+ok(before.options === 1 + KNOBS.pool.standing,
+  `وتمرينُ التمييز ${1 + KNOBS.pool.standing} خيارات (${before.options})`);
+ok(before.fades.join() === '3', `وكلماتُ الجملة عاريةٌ ز٣ (${before.fades.join('،')})`);
+ok(!calmOn(), 'ولا صنفَ هدوءٍ على جذر الصفحة');
+
+// ————— ٢) تشغيلُ الوضع من اللوحة بنقرةٍ حقيقية —————
+
+await openPanel();
+const master = await waitFor(() => $('[data-knob="on"]'), 'مفتاحُ وضع الدعم');
+ok(Boolean(master), 'ولوحةُ وليّ الأمر فيها قسمُ «وضع الدعم» بمفتاحه الأعلى');
+const knobBtns = $$('[data-knob]').filter((b) => b.dataset.knob !== 'on');
+ok(knobBtns.length === PANEL_KEYS.length,
+  `وتحته ${PANEL_KEYS.length} مقابضَ بأسمائها من الجدول (${knobBtns.length})`);
+ok(knobBtns.every((b) => b.disabled), 'وهي معطَّلةٌ ما دام الوضعُ مطفأً — لا مقبضَ يعمل وحده');
+ok(knobBtns.every((b) => b.textContent.trim() === KNOBS[b.dataset.knob].title),
+  'وأسماؤها عينُ ما في جدول `support.js` (لا نصَّ مكتوبٌ بيد في اللوحة)');
+ok($$('.audit p').some((p) => p.textContent.includes('لا يُحتسب ما أُعين عليه إتقاناً')),
+  'وفيها السطرُ الصريح: «لا يُحتسب ما أُعين عليه إتقاناً»');
+
+master.click();
+await sleep(220);
+ok(win.localStorage.getItem('muallim.support.v1')?.includes('"on":true'),
+  'والنقرةُ تشغّل الوضعَ وتحفظه على الجهاز');
+ok(calmOn(), 'ويظهر صنفُ الهدوء على جذر الصفحة في اللحظة نفسِها');
+const dur = win.getComputedStyle(await waitFor(() => $('.btn'), 'زر')).transitionDuration;
+ok(parseFloat(dur) < 0.01, `والحركةُ مطفأةٌ فعلاً في المصيَّر (${dur})`);
+ok($$('[data-knob]').filter((b) => b.dataset.knob !== 'on').every((b) => !b.disabled),
+  'والمقابضُ صارت تعمل، ولوليّ الأمر أن يطفئ منها ما لا يحتاجه');
+
+// ————— ٣) أثرُه في شاشات الطفل —————
+
+const after = await measure();
+ok(after.dots === KNOBS.dose.supported,
+  `الجرعة: جلسةٌ أقصر — ${KNOBS.dose.supported} تمارين (${after.dots})`);
+ok(after.options === 1 + KNOBS.pool.supported,
+  `الحوض: مشتّتٌ واحد — خياران يُقرآن (${after.options})`);
+ok(after.fades.join() === '1', `تجميدُ الخفوت: كلُّ كلمةٍ ز١ كاملةَ الشكل (${after.fades.join('،')})`);
+ok(calmOn(), 'والهدوءُ باقٍ في شاشات الطفل لا في اللوحة وحدَها');
+
+// **لا نصَّ محتوىً تبدّل**: الجملةُ هي هي كلمةً كلمة — تبدّل لباسُها لا مادّتُها
+ok(after.words.join(' ') === before.words.join(' ')
+  && after.words.join(' ') === sentence.words.join(' '),
+  'ولا كلمةَ تبدّلت في الجملة — الإيقاعُ يُعاير والمادّةُ لا تُمَسّ');
+
+const reads = JSON.parse(win.localStorage.getItem('muallim.progress.v1')).reads;
+ok(Object.values(reads).every((r) => r.n === BARE_AT),
+  `وعدّادُ القراءات لم يُمَسّ تحت التجميد (${BARE_AT} لكل كلمة)`);
+
+// ————— ٤) الإطفاءُ يردّ كلَّ شيء —————
+
+await openPanel();
+(await waitFor(() => $('[data-knob="on"]'), 'مفتاحُ وضع الدعم')).click();
+await sleep(220);
+ok(!calmOn(), 'إطفاءُ الوضع من اللوحة يرفع صنفَ الهدوء فوراً');
+
+const restored = await measure();
+ok(restored.dots === before.dots && restored.options === before.options
+  && restored.fades.join() === before.fades.join(),
+  `ويعود كلُّ شيء كما كان (${restored.dots} تمارين · ${restored.options} خيارات · ز${restored.fades.join('،')})`);
+
+// ————— ٥) صفرُ إضافةٍ صوتية وصفرُ عطب —————
+
+const unknown = played.filter((t) => !Object.values(manifest).includes(t));
+ok(unknown.length === 0, `ولا صوتَ خارج الملفات المولَّدة (${played.length} تشغيلاً)`);
+ok(spoken.filter((t) => !pendingAudio.has(t)).length === 0,
+  'ولا لجوءَ إلى النطق الآليّ في المشهد كلِّه');
+ok(jsErrors.length === 0, jsErrors.length ? `أخطاء جافاسكربت: ${jsErrors.join(' · ')}` : 'لا أخطاء جافاسكربت');
+post();
+</script>
+</body>
+</html>

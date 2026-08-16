@@ -57,6 +57,7 @@ const {
 const { GARDENS } = await import(new URL('lexicon.js', JS));
 const { RUNGS, SENTENCES } = await import(new URL('sentences.js', JS));
 const { LIBRARY } = await import(new URL('library.js', JS));
+const { KNOBS, PANEL_KEYS } = await import(new URL('support.js', JS));
 const emojiIndex = JSON.parse(read('emoji/index.json', APP));
 // **بنكُ الصوت يُحسب من بيانه لا يُقدَّر**: بصمةٌ لكل ملفٍّ مولَّد في `versions.json`،
 // وآيةٌ لكل ملفِّ تلاوةٍ في `recitations.json` — فدفعةٌ جديدة تُسقِط الفحصَ يومَ
@@ -388,6 +389,19 @@ const INVENTORY = [
     ['٨٠٪ يُفتح له ويصعد', 'أوّلُ إخفاقٍ يُنهي']],
   ['الدليل: اللحاق — لا قفلَ رجوعاً وحدُّ البوّابة والقرآنية', 'guide.html',
     ['لا يُغلق أبداً', 'بوّابةَ إتقان', 'المصحفُ يُتلى ولا يُمتحَن']],
+  // **وضعُ الدعم** (الجلسة د١، ١٧ أغسطس ٢٠٢٦): طبقةٌ تُعرَض على مركزٍ يمتحنها —
+  // فجردُها **وعدُها وحدودُه** لا اسمُها: المنهجُ نفسُه (إيقاعٌ لا مادّة)، ومطفأٌ
+  // ابتداءً، ولا يُحتسب المُعان إتقاناً، ومَن لا يخدمهم مسمَّون بأعيانهم، ولا وعدَ
+  // بحجم أثر. فوعدٌ أوسعُ من التطبيق يُسقِط هذه السطور **يومَ يُكتب**.
+  ['الدليل: وضعُ الدعم — إيقاعٌ لا مادّة', 'guide.html',
+    ['وضعُ الدعم', 'المنهجَ نفسَه بمحطاته نفسِها', 'أبطأُ لا أسهل']],
+  ['الدليل: الدعم — مطفأٌ ابتداءً ومقابضُه تُطفأ فرادى', 'guide.html',
+    ['مطفأٌ ابتداءً', 'جرعةٌ أقصر', 'تشكيلٌ ثابت']],
+  ['الدليل: الدعم — لا يُحتسب المُعانُ إتقاناً', 'guide.html',
+    ['لا يُحتسب ما أُعين', 'محاولةً معانة']],
+  ['الدليل: الدعم — حدودُ وعده', 'guide.html',
+    ['لا يشخّص', 'غيرَ الناطق', 'ولا يَعِد بحجم أثر']],
+  ['الرئيسة: وضعُ الدعم بسطره', 'index.html', ['وضعُ الدعم', 'ولا يَعِد بحجم أثر']],
 ];
 for (const [label, page, needles] of INVENTORY) {
   const text = WHERE[page].replace(/\s+/g, ' ');
@@ -409,6 +423,7 @@ for (const [label, src, where] of [
   ['نحو القراءة الحرة', parentJs, 'parent.js'],
   ['عائلات الجذور', parentJs, 'parent.js'],
   ['امتحان اللحاق', parentJs, 'parent.js'],
+  ['وضعُ الدعم', parentJs, 'parent.js'],
   ['أدوات التجربة (?dev=1)', mainJs, 'main.js'],
   ['أنجِز الكل بنجمة', mainJs, 'main.js'],
   ['أنجِز الكل بثلاث', mainJs, 'main.js'],
@@ -419,6 +434,14 @@ for (const [label, src, where] of [
 }
 ok(parentJs.includes('backupText') && /askPersistence|persistedStorage/.test(parentJs),
   'والتطبيق يصدّر النسخة ويطلب تخزيناً دائماً فعلاً');
+
+// **ومقابضُ وضع الدعم بأسمائها من جدولها** (الجلسة د١): الصفحةُ تسمّيها لمعلّمٍ
+// يقرؤها، والجدولُ يسمّيها لواليدٍ يقلّبها — فمقبضٌ يُعاد تسميتُه في `support.js`
+// يُسقِط هذا السطر حتى تُصحَّح الصفحة، ولا يفترق الوعدُ عن المفتاح.
+const guideFlat = guide.replace(/\s+/g, ' ');
+const missingKnobs = PANEL_KEYS.map((k) => KNOBS[k].title).filter((t) => !guideFlat.includes(t));
+ok(missingKnobs.length === 0,
+  `ومقابضُ «وضع الدعم» الستةُ بأسمائها من جدول support.js${missingKnobs.length ? ' — سقط: ' + missingKnobs.join('، ') : ''}`);
 
 // ————— ٩. النصوصُ منقولةٌ من مصدرها لا مُعادةُ الصياغة —————
 

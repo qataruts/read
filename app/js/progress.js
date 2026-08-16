@@ -11,6 +11,7 @@ import {
   isLetterlessKey, quranLetterSkills, rasmLessons,
 } from './curriculum.js';
 import { GARDENS } from './lexicon.js';
+import * as support from './support.js';
 import { ladderOf, stemOf } from './sentences.js';
 import { libraryOf, shelfStories, storiesOfSurah } from './library.js';
 
@@ -75,7 +76,13 @@ export const isMarkSkill = (skill) =>
 /** هل مهارةٌ وحدتُها حرفٌ × حركة؟ (ما عداها له قسمُه في اللوحة وشرطُه في المراجعة) */
 export const isLetterSkill = (skill) => !isLetterlessKey(skill?.letter);
 
-/** تباعد ليتنر بالأيام: كل إجابة صحيحة ترفع الصندوق، والخطأ يعيده إلى الصفر. */
+/**
+ * تباعد ليتنر بالأيام: كل إجابة صحيحة ترفع الصندوق، والخطأ يعيده إلى الصفر.
+ *
+ * **وهو السلّم القائم لا غير**: مِقبضُ «التكرار» في وضع الدعم لا يكتب سلّماً ثانياً،
+ * وإنما يقرّب مواعيدَه بمعاملٍ معلَن عند لحظة الكتابة (`support.days`) — فالسلّمُ
+ * المكتوب هنا يبقى مصدرَ الحقيقة، وما دام الوضعُ مطفأً فالمعاملُ ١ ولا فرق ببايت.
+ */
 export const BOX_DAYS = [0, 1, 2, 4, 8, 16];
 export const MAX_BOX = BOX_DAYS.length - 1;
 export const MASTERED_BOX = 3;       // من بلغه في كل تمارينه يُعدّ متقناً
@@ -943,9 +950,29 @@ export function endRound() {
   openRound = null;
 }
 
-export function recordAttempt(letter, haraka, kind, correct, today = dayNumber()) {
+/**
+ * **العونُ يُسجَّل ولا يُزوَّر القياس** (المبدأ الثاني لوضع الدعم، الجلسة د١):
+ *
+ * محاولةٌ وقعت وتلميحُ الاكتساب معروضٌ على الشاشة **ليست شاهداً على المهارة** —
+ * لا إن أصاب (فقد أُرِيَ الجواب) ولا إن أخطأ (فالخطأُ مع العون أثقلُ ممّا يستحقّ
+ * تسجيلَه ضعفاً). فتُسجَّل **محاولةً معانة**: عدّادٌ خاصّ بها ولمسةُ «رآها اليوم»،
+ * و**الصندوقُ والموعدُ وعدّادا الصواب والخطأ لا تُمَسّ ببايت** — فتبقى المهارةُ حيث
+ * كانت وتعود غداً، وتبقى لوحةُ الوالد صادقة: لا يُحتسب ما أُعين عليه إتقاناً.
+ *
+ * وهي **قاعدةٌ لا تُخرَق**، ولذلك موضعُها هنا لا في الشاشة: مَن نسي في شاشةٍ يوماً
+ * أن يمرّر الوسمَ يسجّل قياساً صادقاً بالخطأ، لا إتقاناً كاذباً.
+ */
+export function recordAttempt(letter, haraka, kind, correct, today = dayNumber(), helped = false) {
   if (!letter || !kind) return null;
   const key = skillKey(letter, haraka, kind);
+  if (helped) {
+    const s = state.skills[key] || { right: 0, wrong: 0, box: 0, due: today, seen: today };
+    s.helped = (s.helped || 0) + 1;
+    s.seen = today;
+    state.skills[key] = s;
+    save();
+    return s;
+  }
   if (openRound === key) {                 // إعادةٌ داخل الجولة نفسِها: تعلُّمٌ لا قياس
     if (correct) openRound = null;
     return state.skills[key] || null;
@@ -959,11 +986,17 @@ export function recordAttempt(letter, haraka, kind, correct, today = dayNumber()
     s.wrong++;
     s.box = 0;
   }
-  s.due = today + BOX_DAYS[s.box];
+  // موعدُ الصندوق بمعامل تقارُب وضع الدعم — وهو ١ ما دام مطفأً (السلّم نفسُه حرفاً)
+  s.due = today + support.days(BOX_DAYS[s.box]);
   s.seen = today;
   state.skills[key] = s;
   save();
   return s;
+}
+
+/** مجموعُ المحاولات المعانة في سجلّ المهارات كلِّه — تقرؤه لوحةُ وليّ الأمر. */
+export function helpedAttempts() {
+  return skills().reduce((n, s) => n + (s.helped || 0), 0);
 }
 
 /** ترتيب الضعف: أدنى صندوق، ثم أكثر أخطاءً، ثم أقدم استحقاقاً (وأخيراً المفتاح لثبات الترتيب). */
