@@ -40,6 +40,9 @@ async function waitFor(fn, label = '', ms = 6000) {
 }
 
 const { GROUPS } = await import('./js/curriculum.js');       // بيانات المنهج مصدرها الوحيد
+// **عددُ تمارين الدرجة وعقدُ شريحتها من التطبيق لا مكتوبةً بيد**: رقمٌ يُكتب هنا
+// يفترق عن نظيره يومَ يتحرّك، فيحمرّ المشهدُ بلا علّةٍ في الشيفرة.
+const { SAMPLE, rungs } = await import('./js/placement.js');
 // بنيةُ الرحلة وعنوانُ العقدة **من التطبيق لا مكتوبين بيد**: عنوانٌ مشكولٌ يُكتب
 // هنا بلا شكله يُخفق بلا علّةٍ في الشيفرة (وقد وقع ساعةَ كُتب هذا المشهد).
 const { allNodes } = await import('./js/progress.js');
@@ -138,6 +141,28 @@ async function answerOne(wrongs = 0, mark = 0) {
     return 'build';
   }
 
+  // **التمرينُ الصامت** (`mark-compare` — «أيُّهما مَمدود؟»): يدخل العيّنةَ منذ صارت
+  // الدرجةُ شريحةً بمحطاتها (الجلسة ل٢)، و**لا صوتَ فيه يدلّ على الجواب**: يُقرأ
+  // بالعين. فيُنقَر الخياران حتى يُقبَل أحدُهما (`good`) كما يفعل طفلٌ يقرأ ثم يصحّح
+  // — و`wrongs` لا تُطاع هنا لأنّ الصوابَ غيرُ معروفٍ من الشاشة؛ وخطأٌ محتمَلٌ واحد
+  // من ثمانيةٍ لا يُسقِط عبوراً (٨٧٪) ولا يُنجّي درجةً أُخفقت عمداً (٥٠٪).
+  const pairs = $$('.vchip--pair');
+  if (pairs.length && !$$('.btn').some((b) => b.textContent.includes('اسمع'))) {
+    const at = $$('.dot--done').length;
+    for (const chip of pairs) {
+      chip.click();
+      await sleep(150);
+      if (chip.classList.contains('good')) break;
+    }
+    // **العلامةُ تُضبَط عند انتقال التمرين لا عند النقرة**: نقرةٌ خاطئة تُعيد سماعَ ما
+    // اختاره بعد مهلة، فلو ضُبطت قبلها لَحُسب ذلك الصدى «هدفَ» التمرين التالي — فيُنقَر
+    // خيارٌ خاطئ ويتوقّف المشهد بلا علّةٍ في التطبيق (وقع ساعةَ كُتب هذا الفرع).
+    await waitFor(() => $$('.dot--done').length > at || $('.celebrate'), 'انتقالٌ بعد الصامت');
+    nextMark = played.length;
+    await sleep(200);
+    return 'mark-compare';
+  }
+
   const big = $$('.vchip--big').length > 0;              // تمييز حرف أو حركة
   const heard = await heardTarget(
     () => $$('.vchip').map((c) => c.querySelector('.vchip-face').textContent), mark);
@@ -150,7 +175,7 @@ async function answerOne(wrongs = 0, mark = 0) {
   chips[faces.indexOf(heard)].click();
   nextMark = played.length;          // الصواب صامت (DESIGN §٥.٢) — ما بعده نداءُ التالي
   await sleep(900);
-  return big ? 'quiz' : 'haraka';
+  return big ? 'quiz' : pairs.length ? 'mark-quiz' : 'haraka';
 }
 
 /** يسوق درجةً كاملة: `wrongsPlan` أخطاءٌ متعمَّدة لكل تمرين بترتيبه. */
@@ -191,7 +216,7 @@ try {
   const enterMark = played.length;
   $('.start-placement').click();
   await waitFor(() => $('.dots'), 'شاشة الامتحان');
-  ok($$('.dot').length === 6, `جلسةُ الدرجة ستّةُ تمارين (${$$('.dot').length})`);
+  ok($$('.dot').length === SAMPLE, `جلسةُ الدرجة ${SAMPLE} تمارين (${$$('.dot').length})`);
   ok($$('.pill').some((p) => p.textContent.includes('امتحان اللحاق')),
     'وشارتُها «امتحان اللحاق» لا «مراجعة اليوم»');
   ok($('.gate-head').textContent.includes(GROUPS[0].title),
@@ -212,8 +237,8 @@ try {
   const rung2Mark = played.length;
   up.click();
   await waitFor(() => $('.dots') && !$('.celebrate'), 'الدرجة الثانية');
-  ok($$('.dot').length === 6 && $$('.dot--done').length === 0,
-    'والدرجةُ الثانية تبدأ من أولها بستّة تمارين');
+  ok($$('.dot').length === SAMPLE && $$('.dot--done').length === 0,
+    'والدرجةُ الثانية تبدأ من أولها بعيّنةٍ كاملة');
   // **الترويسةُ تتبع الدرجة**: المحرّكُ لا يعيد رسمَ `header`، فسطرٌ ساكن يبقى
   // «المجموعة الأولى» فوق تمارين الثانية — وهو ما وقع ساعةَ كُتب هذا المشهد.
   ok($('.gate-head').textContent.includes(GROUPS[1].title)
@@ -231,7 +256,7 @@ try {
   const rung3Mark = played.length;
   btn(GROUPS[2].title).click();
   await waitFor(() => $('.dots') && !$('.celebrate'), 'الدرجة الثالثة');
-  await runRung([3, 3, 2, 2], rung3Mark);      // أخطاءٌ متعمَّدة ⇒ دون العتبة
+  await runRung([3, 3, 2, 2, 2], rung3Mark);   // أخطاءٌ متعمَّدة ⇒ دون العتبة
   ok(!!$('.celebrate--again') && $('.celebrate h2').textContent.includes('وَقَفْنَا'),
     `دون ٨٠٪ يقف الامتحان (${$('.celebrate h2').textContent})`);
   ok($('.celebrate .rule').textContent.includes('تَبْدَأُ رِحْلَتُكْ')
@@ -248,21 +273,34 @@ try {
   btn('→ الخريطة').click();
   await waitFor(() => $('.station'), 'العودة إلى الخريطة');
   const cont = $$('.continue').find((c) => c.textContent.includes('تابع من هنا'));
-  // أوّلُ عقدةٍ بلا نجمة في الرحلة — وهي **درسُ علامةٍ بين المجموعتين**: لم يُمتحَن
-  // فيه فلم يُفتح عليه، فجبهتُه هناك لا عند المجموعة الثالثة.
+  // أوّلُ عقدةٍ بلا نجمة في الرحلة — وهي **صدرُ الشريحة الثالثة**: الشريحتان
+  // المجتازتان فُتحتا **كاملتين** بدرسَي علامتيهما (حكمُ المدير أ، الجلسة ل٢)،
+  // فجبهتُه عند شرخه بالضبط لا قبله بدرسٍ لم يُفتح عليه.
   const first = allNodes().find((n) => !stored().stars[n.id]);
   ok(cont && first && cont.textContent.includes(nodeTitle(first)),
     `و«تابع من هنا» عند أوّل ما لم يُثبته: ${nodeTitle(first)}`
     + ` (المعروض: ${cont?.querySelector('b')?.textContent})`);
-  ok(first?.type === 'skill',
-    `وهو درسُ علامةٍ لا مجموعة — «لم يُمتحَن فيها فلا تُفتح عليه» (${first?.type})`);
+  ok(first?.id === rungs()[2].nodes[0].id,
+    `وهو صدرُ الشريحة التي وقف عندها لا ما قبلها (${first?.id})`);
+  const slices = rungs();
+  const marks = [...slices[0].nodes, ...slices[1].nodes].filter((n) => n.type === 'skill');
+  ok(marks.length > 0 && marks.every((n) => stored().stars[n.id] === 1),
+    `ودروسُ العلامات في الشريحتين فُتحت معهما — امتُحن فيها فتُفتح له (${marks.map((n) => n.id).join('، ')})`);
+  ok(slices[2].nodes.every((n) => !stored().stars[n.id]),
+    'ولم يُفتح من الشريحة الثالثة شيءٌ — لا مجموعتُها ولا ما بعدها');
 
-  const g1Station = $$('.station').find((s) => s.textContent.includes(GROUPS[0].title));
-  const g3Station = $$('.station').find((s) => s.textContent.includes(GROUPS[2].title));
+  const stationOf = (title) => $$('.station').find((s) => s.textContent.includes(title));
+  const g1Station = stationOf(GROUPS[0].title);
+  const g3Station = stationOf(GROUPS[2].title);
+  const g4Station = stationOf(GROUPS[3].title);
   ok(g1Station && !g1Station.classList.contains('station--locked'),
-    'والمجموعتان المفتوحتان مفتوحتان على الخريطة');
-  ok(g3Station && g3Station.classList.contains('station--locked'),
-    'وما بعد الشرخ مقفلٌ حتى يبلغه بالتسلسل');
+    'والشريحتان المفتوحتان مفتوحتان على الخريطة');
+  // **وشريحةُ الشرخ نفسُها مفتوحة**: هي بدايةُ رحلته — «يقف حيث انكسر» بالضبط، لا
+  // قبله بدرسٍ لم يُفتح عليه (حكمُ المدير أ). والمقفلُ ما بعدها بالتسلسل.
+  ok(g3Station && !g3Station.classList.contains('station--locked'),
+    'وشريحةُ الشرخ مفتوحةٌ أمامه — من هناك تبدأ رحلتُه');
+  ok(g4Station && g4Station.classList.contains('station--locked'),
+    'وما بعدها مقفلٌ حتى يبلغه بالتسلسل');
 
   win.location.hash = '#/lesson/g1/ا';
   await sleep(200);

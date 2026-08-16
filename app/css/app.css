@@ -1879,6 +1879,18 @@ button.sentence-word { min-width: 3rem; min-height: 3rem; }
   .pairs--grid .vchip--pair .vchip-face { font-size: 2.1rem; }
 }
 
+/* المقاسان العرضيان القصيران (آيباد ٩٫٧ والميني): خطوةُ «قارِن» كانت تفيض
+   رأسياً ٢٧/٥١ بكسل — ضغطٌ أعمق لعناصرها وحدَها (رُصد بعدّة الجهاز بعد
+   إصلاح بصمتها، ١٦ أغسطس ٢٠٢٦)، وأهدافُ اللمس ≥ ٦٤ بكسل محفوظة. */
+@media (orientation: landscape) and (max-height: 48.5rem) {
+  .contrast-head { margin-bottom: .4rem; padding-bottom: .35rem; }
+  .pairs--grid { margin-top: .5rem; gap: .35rem 1.5rem; }
+  .pairs--grid .vchip--pair { padding-block: .45rem; }
+  .pairs--grid .vchip--pair .vchip-face { font-size: 1.9rem; line-height: 1.25; }
+  .pairs--grid .vchip--pair small { margin-top: 0; }
+  .pairs--grid ~ .next { margin-top: .6rem; }
+}
+
 /* ═════ مهمة «أيقونات لا إيموجي» (أمر المالك، ٧ أغسطس ٢٠٢٦) ═════
    يُضاف في ذيل الملف حصراً تحت هذا العنوان (ترسيمُ التوازي مع الحزمة ١١).
 

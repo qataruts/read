@@ -6,10 +6,16 @@
 //
 // وستُّ قواعد تحكم هذا الملف — وكلُّها قيودُ صدقٍ لا زينة:
 //
-// ١) **السلّمُ مشتقٌّ لا مكتوب**: درجاتُه مجموعاتُ `journey()` بترتيبها، ومادّةُ كل
-//    درجةٍ مفاتيحُ مهارات **عقدها** (درسُ الحرف يكتب `quiz` و`haraka`، ولعبةُ
-//    الكلمات تكتب `build` — وهو عينُ ما يعلنه جردُ `test_measure.mjs` لنوعيهما).
-//    فمجموعةٌ ثامنة تدخل السلّم يومَ تُضاف، بلا سطرٍ يُعدَّل.
+// ١) **السلّمُ مشتقٌّ لا مكتوب، ودرجتُه شريحةٌ لا مجموعة** (حكمُ المدير أ على تسليم
+//    ل١، ١٦ أغسطس ٢٠٢٦): درجاتُه مجموعاتُ `journey()` بترتيبها، **ومع كل مجموعةٍ ما
+//    يتلوها حتى المجموعة التالية** من درسِ علامةٍ ومحطةِ مواجهةٍ وقصة. ومادّةُ كل
+//    درجةٍ مفاتيحُ مهارات **عقدها كلِّها** (درسُ الحرف يكتب `quiz` و`haraka`، ولعبةُ
+//    الكلمات `build`، ودرسُ العلامة نوعَيه، ومحطةُ المواجهة `contrast` — وهو عينُ
+//    ما يعلنه جردُ `test_measure.mjs` لهذه الأنواع). فمجموعةٌ ثامنة تدخل السلّم
+//    يومَ تُضاف، ومحطةٌ تُوضَع بين مجموعتين تدخل شريحتَها يومَ تُوضَع، بلا سطرٍ
+//    يُعدَّل. **وعلّةُ الشريحة**: كانت الدرجةُ المجموعةَ وحدَها فيقف طفلٌ أثبت خمساً
+//    عند درسِ مدٍّ لا عند مجموعته السادسة؛ وفتحُ ما بينها بلا امتحانٍ يخون قيدَ
+//    الصدق الثاني — فالوسطُ الصادق أن **تُمتحَن الشريحةُ كلُّها فتُفتح كلُّها**.
 //
 // ٢) **صفرُ شكلِ تمرينٍ جديد**: التمارينُ تمارينُ المراجعة/البوابة نفسُها
 //    (`buildSession` ثم `renderSession`) — فكلُّ ما تنطقه له ملفٌ مولَّد أصلاً،
@@ -18,11 +24,12 @@
 // ٣) **عتبةُ البوابة نفسُها لا رقمٌ ثانٍ**: `passed` من `gate.js` — فلو تحرّكت
 //    ثمانون غداً تحرّكتا معاً، ولا يفترق حكمان على شيءٍ واحد.
 //
-// ٤) **حدودُ الفتح ثلاثة**: عقدُ المجموعة المجتازة وحدَها تُعلَّم (لا ما بينها من
-//    درسِ علامةٍ أو قصةٍ أو مواجهة — **لم يُمتحَن فيها فلا تُفتَح عليه**، وهي أصعبُ
-//    أجزاء فكّ الشيفرة)؛ و**السلّمُ يقف عند أوّل بوّابة إتقانٍ لم تُجتز** (البواباتُ
-//    لا تُقفز — تُجتاز بنفسها)؛ و**المرحلةُ القرآنية خارج السلّم كلياً** (المصحفُ
-//    يُتلى لا يُمتحَن — إعفاؤه المكتوب في `test_measure.mjs`).
+// ٤) **حدودُ الفتح ثلاثة**: عقدُ الشريحة المجتازة كلُّها تُعلَّم — **وقد امتُحن في
+//    كل محطةٍ منها** (`stationKeys`: مفتاحان من كل محطةٍ سوى المجموعة، فلا تُفتح
+//    محطةٌ لم تُمَسّ)، والقصةُ فيها تتبع (مادّةُ قراءةٍ لا قياس — إعفاؤها المكتوب
+//    في `test_measure.mjs`)؛ و**السلّمُ يقف عند أوّل بوّابة إتقانٍ لم تُجتز**
+//    (البواباتُ لا تُقفز — تُجتاز بنفسها)؛ و**المرحلةُ القرآنية خارج السلّم كلياً**
+//    (المصحفُ يُتلى لا يُمتحَن — إعفاؤه المكتوب هناك كذلك).
 //
 // ٥) **ليتنر يقرأ محاولاته كسائرها**: `renderSession` تكتب كلَّ محاولةٍ بـ
 //    `recordAttempt` — لا وسمَ خاصاً ولا استثناء، وقواعدُ الخفوت بحالها.
@@ -32,14 +39,26 @@
 // ٦) **فتحٌ لا قفل**: لا يُغلق مفتوحٌ أبداً (النجمةُ ترتفع ولا تنخفض — قيدُ
 //    `recordPlacement`)، والإعادةُ من اللوحة تستأنف من **آخر حدّ** لا من الألف.
 
-import { HARAKAT, syllableSkill } from './curriculum.js';
+import { HARAKAT, markSkillKey, syllableSkill } from './curriculum.js';
 import { passed } from './gate.js';
 import * as progress from './progress.js';
 import { buildSession, renderSession } from './review.js';
-import { h, icon, arNum, arCount, faceEl, go, mascot, shuffle, PAUSE_ACCENT } from './ui.js';
+import { h, icon, arNum, arCount, faceEl, go, mascot, pick, shuffle, PAUSE_ACCENT } from './ui.js';
 
-/** عيّنةُ الدرجة الواحدة: ستّةُ تمارين — جلسةُ المراجعة اليومية نفسُها طولاً. */
-export const SAMPLE = 6;
+/**
+ * عيّنةُ الدرجة الواحدة: ثمانيةُ تمارين — بين جلسة المراجعة (ستّ) والبوابة (عشر).
+ * وكانت ستّاً يومَ كانت الدرجةُ مجموعةً؛ فلمّا صارت **شريحةً** بمحطاتها زادت ركنين
+ * تسعان لمفاتيح تلك المحطات بلا أن تبتلعا مادّةَ المجموعة نفسِها.
+ */
+export const SAMPLE = 8;
+
+/**
+ * كم مفتاحاً يُمتحَن من كل محطةٍ في الشريحة **سوى مجموعتها**: اثنان — نوعا العلامة
+ * (قراءةٌ صامتة وتمييزٌ بالأذن: مهارتان في ليتنر لا واحدة)، أو زوجان مختلفان من
+ * محطة المواجهة. وهو الحدُّ الأدنى الذي يجعل الفتحَ **مُثبَتاً**: لا تُفتح محطةٌ
+ * لم تُمَسّ، ولا تبتلع محطةٌ واحدةٌ العيّنةَ كلَّها.
+ */
+export const PER_STATION = 2;
 
 /**
  * وجوهُ الشاشة — **من أيقونات الواجهة الخطية** لا من رموز البيانات (`ICONS` في
@@ -52,32 +71,44 @@ const FACES = { exam: 'books', step: 'gift', done: 'party', stop: 'smile' };
 // ————— السلّم —————
 
 /**
- * درجاتُ السلّم: مجموعاتُ الرحلة قبل المرحلة القرآنية بترتيبها — **مشتقّةٌ من
- * `journey()` لا مكتوبة**.
+ * درجاتُ السلّم: **شرائحُ** الرحلة قبل المرحلة القرآنية بترتيبها — **مشتقّةٌ من
+ * `journey()` لا مكتوبة**. والشريحةُ مجموعةٌ وما يتلوها من أقسامٍ حتى المجموعة
+ * التالية (درسُ علامةٍ · محطةُ مواجهةٍ · قصة)، فهي **وحدةُ الامتحان والفتح معاً**.
  *
  * والحدّان مرسومان هنا لا في موضعٍ آخر، فيُقرآن حيث يعملان:
  *   • **المرحلةُ القرآنية تقطع السلّم** — لا تُمتحَن ولا يُمتحَن ما بعدها.
  *   • **البوّابةُ التي لم تُجتز تقطعه كذلك** — «تُجتاز بنفسها»؛ وإن كان الطفلُ قد
  *     عبَرها بنفسه مضى السلّمُ إلى ما بعدها. فبوّابةٌ تُوضَع بين مجموعتين غداً
- *     تقصُر السلّمَ عندها **يومَ تُوضَع** بلا سطرٍ يُعدَّل.
+ *     تقصُر السلّمَ عندها **يومَ تُوضَع** بلا سطرٍ يُعدَّل. (والبوّابةُ المجتازة
+ *     لا تدخل شريحةً: تُتخطّى ولا تُضمّ — لا يُفتح ما يُجتاز بنفسه.)
+ *
+ * والشريحةُ **تحمل أقسامَها لا نسخةً عنها** (`sections` مراجعُ `journey()` أنفسُها)،
+ * وعقدُها مسطَّحُ عقدها، واسمُها اسمُ مجموعتها — فما يقرؤه وليُّ الأمر لا يتبدّل.
  */
 /**
  * القاعدةُ **دالّةً خالصة** — تُحقَن بأقسام الرحلة وبمن يعرف البوّابةَ المجتازة،
  * فيمتحنها حارسُها بأقسامٍ مصنوعة: بوّابةٌ في وسط المجموعات تقصُر السلّمَ عندها،
- * ومجتازةٌ لا تقصُره، ومرحلةٌ قرآنية تقطعه. ولولا الحقنُ لكان الحدّان **صامتين**
- * (لا بوّابةَ اليومَ بين المجموعتين) — والحدُّ الصامت لا يُعرَف صحيحاً من فاسد.
+ * ومجتازةٌ لا تقصُره، ومرحلةٌ قرآنية تقطعه، ومحطةٌ بين مجموعتين تنضمّ إلى شريحتها.
+ * ولولا الحقنُ لكان الحدّان **صامتين** (لا بوّابةَ اليومَ بين المجموعتين) — والحدُّ
+ * الصامت لا يُعرَف صحيحاً من فاسد.
  */
 export function rungsOf(sections, crossed) {
-  const out = [];
+  const parts = [];
   for (const section of sections) {
     if (section.kind === 'quran') break;
     if (section.kind === 'gate') {
       if (crossed(section.id)) continue;
       break;
     }
-    if (section.kind === 'group') out.push(section);
+    if (section.kind === 'group') parts.push([section]);
+    else if (parts.length) parts[parts.length - 1].push(section);
   }
-  return out;
+  return parts.map((slice) => ({
+    id: slice[0].id,
+    group: slice[0].group,
+    sections: slice,
+    nodes: slice.flatMap((section) => section.nodes),
+  }));
 }
 
 export function rungs() {
@@ -90,35 +121,59 @@ export function rungs() {
  * (وتعود بطول القائمة إن لم يبق شيء — أي: لا امتحانَ له.)
  */
 export function startRung(list = rungs()) {
-  const at = list.findIndex((section) => section.nodes.some((node) => !progress.isDone(node.id)));
+  const at = list.findIndex((rung) => rung.nodes.some((node) => !progress.isDone(node.id)));
   return at < 0 ? list.length : at;
 }
 
 /**
+ * أنواعُ عقدِ الشريحة التي **تُقاس**، ولكلٍّ مُشتقُّ مفاتيحه أدناه. ونوعٌ خامسٌ يدخل
+ * شريحةً غداً **يُسقِط حارسَه** (`test_placement.mjs` يجرد أنواعَ عقد الدرجات): فلا
+ * يمرّ صامتاً بلا مفاتيحَ تُمتحَن ثم يُفتح بامتحانٍ لم يمسّه.
+ */
+export const MEASURED = new Set(['letter', 'words', 'skill', 'contrast']);
+
+/**
+ * وما يُقرأ ولا يُقاس — **مكتوبٌ بسببه** كإعفاءات `test_measure.mjs`: القصةُ مادّةُ
+ * قراءةٍ لا مهارةَ فيها تُمتحَن، فتُفتح تبعاً لشريحتها وتبقى متاحةً للقراءة الحرّة.
+ */
+export const READ_ONLY = new Set(['story']);
+
+/**
  * مفاتيحُ مهارات الدرجة المتمايزة — **من عقدها لا من قائمةٍ تُكتب**: لكل حرفٍ
  * تمييزُه بأذنه (`quiz`) وتمييزُ حركته (`haraka`) بحركاتها الثلاث، ولكل مقطعٍ في
- * كلمات مجموعتها تركيبُه (`build`).
- *
- * ونوعٌ ثالثٌ يدخل عقدَ المجموعة غداً **يُسقِط حارسَه** (`test_placement.mjs` يجرد
- * أنواعَ عقد الدرجات): فلا يمرّ صامتاً بلا مفاتيحَ تُمتحَن.
+ * كلمات مجموعتها تركيبُه (`build`)، **ولكل درسِ علامةٍ نوعاه** (`mark-compare`
+ * و`mark-quiz` بمفتاح `mark-<الدرس>`)، **ولكل زوجٍ في محطة المواجهة** حروفُه
+ * بحركاتها (`contrast`) — وهي مفاتيحُ تلك المحطات أنفسِها في ليتنر لا مفاتيحُ
+ * أُخَرُ تشبهها.
  */
-export function skillKeys(section) {
+export function skillKeys(rung) {
   const keys = new Map();
   const put = (letter, haraka, kind) => {
     if (!letter) return;
-    keys.set(progress.skillKey(letter, haraka, kind), { letter, haraka, kind });
+    const key = progress.skillKey(letter, haraka, kind);
+    if (!keys.has(key)) keys.set(key, { letter, haraka, kind });
   };
-  for (const node of section.nodes) {
+  for (const node of rung.nodes) {
     if (node.type === 'letter') {
       for (const k of HARAKAT) {
         put(node.letter, k.key, progress.KINDS.QUIZ);
         put(node.letter, k.key, progress.KINDS.HARAKA);
       }
     } else if (node.type === 'words') {
-      for (const word of section.group.words || []) {
+      for (const word of rung.group.words || []) {
         for (const tile of word.tiles || []) {
           const skill = syllableSkill(tile);
           if (skill) put(skill.letter, skill.haraka, progress.KINDS.BUILD);
+        }
+      }
+    } else if (node.type === 'skill') {
+      for (const kind of [progress.KINDS.MARK_COMPARE, progress.KINDS.MARK_QUIZ]) {
+        put(markSkillKey(node.skill.id), null, kind);
+      }
+    } else if (node.type === 'contrast') {
+      for (const pair of node.contrast?.pairs || []) {
+        for (const letter of pair.letters) {
+          for (const k of HARAKAT) put(letter, k.key, progress.KINDS.CONTRAST);
         }
       }
     }
@@ -127,45 +182,95 @@ export function skillKeys(section) {
 }
 
 /**
- * حصيلةُ الدرجة: حروفُ مجموعتها وما قبلها وكلماتُها — **حوضُ المشتّتات كما يراه
- * الطفلُ في تلك المحطة من الرحلة** (لا حرفٌ لم يبلغه، ولا مجموعتُه وحدها فيلتبس
- * بابُ الاختيار على ثلاثة أحرفٍ متشابهة).
+ * **مفاتيحُ المحطات المضمونة**: `PER_STATION` من كل محطةٍ في الشريحة سوى مجموعتها.
+ *
+ * وعلّتُها أنّ العيّنةَ خلطٌ: لو أُلقيت مفاتيحُ درسِ العلامة في حوضٍ فيه أربعةٌ
+ * وعشرون مفتاحَ حرفٍ لَما ظهرت إلا نادراً — **فيُفتح درسُ المدّ بامتحانٍ لم يذكره**.
+ * فتُقدَّم هنا على غيرها في `due`، ويتكفّل الحوضُ بالباقي. والمواجهةُ **زوجان
+ * مختلفان** لا زوجٌ مرتين: المحطةُ ستّةُ أزواج، وزوجٌ واحدٌ لا يشهد لها.
+ *
+ * **وحرفان مختلفان كذلك**: الحرفُ قد يقع في زوجين من المحطة نفسِها (`ح` في «هـ/ح»
+ * و«ع/ح»)، فزوجان مختلفان قد يعطيان مفتاحاً واحداً — ومفتاحان متّحدان تمرينٌ واحد
+ * في `buildSession` (تُسقِطه مطابقةُ المعرّف)، فتُفلت المحطةُ بنصف حصّتها.
+ */
+export function stationKeys(rung, rnd = Math.random) {
+  const out = [];
+  for (const node of rung.nodes) {
+    if (node.type === 'skill') {
+      for (const kind of [progress.KINDS.MARK_COMPARE, progress.KINDS.MARK_QUIZ]) {
+        out.push({ letter: markSkillKey(node.skill.id), haraka: null, kind });
+      }
+    } else if (node.type === 'contrast') {
+      const taken = new Set();
+      for (const pair of shuffle(node.contrast?.pairs || [], rnd)) {
+        if (taken.size >= PER_STATION) break;
+        const fresh = pair.letters.filter((letter) => !taken.has(letter));
+        if (!fresh.length) continue;
+        const letter = pick(fresh, rnd);
+        taken.add(letter);
+        out.push({ letter, haraka: pick(HARAKAT, rnd).key, kind: progress.KINDS.CONTRAST });
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * حصيلةُ الدرجة: حروفُ شريحتها وما قبلها وكلماتُها **ودروسُ علاماتها وأزواجُ
+ * مواجهاتها** — **حوضُ المادّة كما يراه الطفلُ في تلك المحطة من الرحلة** (لا حرفٌ
+ * لم يبلغه ولا علامةٌ لم تُدرَّس، ولا مجموعتُه وحدها فيلتبس بابُ الاختيار على
+ * ثلاثة أحرفٍ متشابهة). وبها تعمل مُنشئاتُ المراجعة: `markItem` ترفض درساً ليس في
+ * `marks`، و`contrastItem` ترفض حرفاً ليس في `pairs` — فالمفكوكيةُ بالبناء.
  */
 function stock(list, index) {
   const upto = list.slice(0, index + 1);
+  const nodes = upto.flatMap((rung) => rung.nodes);
   return {
-    letters: upto.flatMap((section) => section.group.letters),
-    words: upto.flatMap((section) => section.group.words),
+    letters: upto.flatMap((rung) => rung.group.letters),
+    words: upto.flatMap((rung) => rung.group.words),
+    marks: nodes.filter((node) => node.type === 'skill').map((node) => node.skill),
+    pairs: nodes.filter((node) => node.type === 'contrast')
+      .flatMap((node) => node.contrast?.pairs || []),
   };
 }
 
 /**
- * تمارينُ درجةٍ واحدة — بمُنشئات المراجعة نفسِها. والمفاتيحُ تُخلَط قبل أن تُعرَض
- * على المُنشئ، فلا تُستظهَر عيّنةٌ ولا تُمتحَن حركةُ الفتحة وحدَها في كل مرة.
+ * تمارينُ درجةٍ واحدة — بمُنشئات المراجعة نفسِها، ومادّتُها **حصّتان**:
+ *   • مفاتيحُ محطاتها المضمونة أوّلاً — فلا تُفتح محطةٌ لم تُمَسّ؛
+ *   • ثم مفاتيحُ **مجموعتها** مخلوطةً تُكمل العدد — فلا تُستظهَر عيّنةٌ ولا تُمتحَن
+ *     حركةُ الفتحة وحدَها في كل مرة.
+ *
+ * **ولِمَ كان الباقي للمجموعة وحدَها**: هي أكبرُ محطات الشريحة وأجدُّ مادّتها (خمسةُ
+ * حروفٍ جديدة)، وقد أخذت كلُّ محطةٍ سواها حصّتَها المضمونة — فلولا ذلك لابتلعت محطةُ
+ * مواجهةٍ بأربعة أزواجٍ نصفَ الامتحان لأنّ مفاتيحَها أكثرُ عدداً لا أعظمُ شأناً.
  */
 export function rungItems(index, rnd = Math.random) {
   const list = rungs();
-  const section = list[index];
-  if (!section) return [];
-  const { letters, words } = stock(list, index);
+  const rung = list[index];
+  if (!rung) return [];
+  const { letters, words, marks, pairs } = stock(list, index);
+  const own = skillKeys({ group: rung.group, nodes: rung.sections[0].nodes });
   return buildSession({
     letters,
     words,
-    due: shuffle(skillKeys(section), rnd),
+    marks,
+    pairs,
+    due: [...shuffle(stationKeys(rung, rnd), rnd), ...shuffle(own, rnd)],
     size: SAMPLE,
     rnd,
   });
 }
 
 /**
- * ما يُفتَح باجتياز درجة: عقدُها وحدَها، **ولا بوّابةَ ولا عقدةً قرآنيةً بحال**.
- * والحدُّ مكتوبٌ هنا وإن كانت الدرجةُ اليومَ مجموعةً محضة: هو الذي يبقى صحيحاً
- * حين تتبدّل الرحلة، والحارسُ يقرؤه لا يقرأ حالَ اليوم.
+ * ما يُفتَح باجتياز درجة: عقدُ شريحتها كلُّها — دروسُها ومواجهتُها وقصّتُها،
+ * **ولا بوّابةَ ولا عقدةً قرآنيةً بحال**. والحدُّ مكتوبٌ هنا وإن لم تقع في شريحةٍ
+ * اليومَ بوّابةٌ ولا عقدةٌ قرآنية: هو الذي يبقى صحيحاً حين تتبدّل الرحلة، والحارسُ
+ * يقرؤه لا يقرأ حالَ اليوم.
  */
 const NEVER_OPENED = new Set(['gate', 'quran', 'prophet']);
 
-export function openableNodes(section) {
-  return section.nodes.filter((node) => !NEVER_OPENED.has(node.type)).map((node) => node.id);
+export function openableNodes(rung) {
+  return rung.nodes.filter((node) => !NEVER_OPENED.has(node.type)).map((node) => node.id);
 }
 
 // ————— ما يقرؤه وليُّ الأمر —————
@@ -178,7 +283,7 @@ export function state() {
   const list = rungs();
   const at = startRung(list);
   const log = progress.placementLog();
-  const titleOf = (id) => list.find((section) => section.id === id)?.group?.title || id;
+  const titleOf = (id) => list.find((rung) => rung.id === id)?.group?.title || id;
   return {
     total: list.length,
     at,
@@ -220,7 +325,7 @@ export function renderPlacement({ onDone = () => go('#/') } = {}) {
   const where = h('p', { class: 'hint' });
   const paintHead = () => {
     where.textContent = `${list[at]?.group?.title || ''} — ${arNum(SAMPLE)} تمارين،`
-      + ' وكلُّ مجموعةٍ تُجتاز تُفتح لك.';
+      + ' وما تجتازه يُفتح لك بدروسه وقصصه.';
   };
   paintHead();
   const head = h('div', { class: 'gate-head' },
@@ -235,7 +340,7 @@ export function renderPlacement({ onDone = () => go('#/') } = {}) {
     leaveAsk: 'تريد إنهاء امتحان اللحاق؟ ما فُتح يبقى مفتوحاً.',
     header: head,
     verdict: ({ rightItems, missedItems, again }) => {
-      const section = list[at];
+      const rung = list[at];
       const tries = rightItems + missedItems;
       const rate = tries ? Math.round((rightItems / tries) * 100) : 0;
       const open = passed(rightItems, missedItems);
@@ -243,25 +348,25 @@ export function renderPlacement({ onDone = () => go('#/') } = {}) {
       // **الكتابةُ عند كل درجة لا عند الختام**: مَن أغلق الجهاز في منتصف السلّم
       // يبقى له ما أثبته — والامتحانُ لا يُطالَب بأن يُتَمّ ليُثمر.
       if (open) {
-        opened.push(section.id);
+        opened.push(rung.id);
         count += progress.recordPlacement({
           groups: opened,
-          nodes: openableNodes(section),
+          nodes: openableNodes(rung),
           stopped: list[at + 1]?.id || null,
           right: rightItems,
           tries,
         });
       } else if (opened.length) {
-        progress.recordPlacement({ groups: opened, stopped: section.id, right: rightItems, tries });
+        progress.recordPlacement({ groups: opened, stopped: rung.id, right: rightItems, tries });
       } else {
-        progress.recordPlacement({ stopped: section.id, right: rightItems, tries });
+        progress.recordPlacement({ stopped: rung.id, right: rightItems, tries });
       }
 
       // **اسمُ المجموعة في سطر الخبر لا في سطر القراءة**: `.rule` يقرؤه الطفلُ
       // بعينه فيلزمه الشكلُ الكامل، وعناوينُ المنهج عاريةٌ — فمزجُهما يعطيه سطراً
       // نصفُه مشكول. فالعنوانُ هنا مع الأرقام (خبرٌ لوليّ أمره)، والمشكولُ وحدَه ثمّة.
       const score = h('p', { class: 'hint' },
-        `${section.group.title} — أصبتَ ${arNum(rightItems)} من ${arNum(tries)} `
+        `${rung.group.title} — أصبتَ ${arNum(rightItems)} من ${arNum(tries)} `
         + `تمريناً (${arNum(rate)}٪)`);
       const tally = count
         ? h('p', { class: 'note' },

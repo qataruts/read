@@ -65,6 +65,7 @@ import { renderGarden } from './js/garden.js';
 import { renderLadder } from './js/ladder.js';
 import { renderStory } from './js/story.js';
 import { renderReview } from './js/review.js';
+import { renderPlacement, rungs } from './js/placement.js';
 import * as progress from './js/progress.js';
 import { LETTERS } from './js/curriculum.js';
 import { GARDENS } from './js/lexicon.js';
@@ -119,6 +120,26 @@ function contrastAt(id, step) {
   return el;
 }
 
+/**
+ * شاشةُ «امتحان اللحاق» (الجلسة ل٢): أطولُ صورةٍ لمحرّك الجلسة — ترويسةُ البوابة
+ * وفوقها سطرُ الدرجة، وثمانيةُ نقاطٍ لا ستّ. فإن فاض شيءٌ فهنا يفيض.
+ *
+ * وتُبنى على **درجةٍ حقيقية**: الصفحةُ تُتمّ الرحلةَ كلَّها عند تحميلها (فتُفتح كلُّ
+ * شاشة) فلا يبقى في السلّم درجة — فتُصفَّر أقسامُ أولِ شريحةٍ لحظةَ البناء ثم تُردّ
+ * نجومُها. والعنصرُ المبنيُّ لا يتأثر بالردّ (الدرجةُ محسوبةٌ ساعةَ التركيب)،
+ * **فلا تتلوّث شاشةٌ بعدها** — والقياسُ هنا شاشةً شاشةً في صفحةٍ واحدة.
+ */
+function placementScreen() {
+  const rung = rungs()[0];
+  const ids = rung.nodes.map((node) => node.id);
+  for (const section of rung.sections) progress.clearSection(section.id);
+  try {
+    return renderPlacement({ onDone: () => {} });
+  } finally {
+    for (const id of ids) progress.setStars(id, 3);
+  }
+}
+
 // الحروف الممثِّلة لأصناف الأجرام: ألفٌ طويلة، باءٌ منقوطة تحت، ميمٌ نازلة،
 // عينٌ وسطى، غينٌ منقوطة فوق — وعليها تُحكَّم المعايرة بالعين.
 const SAMPLE = [...'ابمعغ'];
@@ -153,6 +174,7 @@ export const SCREENS = [
   ['surah-words', 'كلمات السورة ١ — البطاقات', () => surahWordsAt('s1', 0)],
   ['surah-find', 'كلمات السورة ٢ — جِدْها في الآية', () => surahWordsAt('s1', 1)],
   ['gate', 'بوابة المصحف', () => renderGate('quran')],
+  ['placement', 'امتحان اللحاق', () => placementScreen()],
   ['words', 'لعبة تركيب الكلمات', () => renderWordsGame('g1')],
   ['garden', 'بستان المعجم', () => renderGarden(firstBundleId())],
   ['ladder', 'سلّم الجمل', () => renderLadder(firstRungId())],
@@ -246,7 +268,7 @@ function metrics() {
 if (params.get('metrics')) {
   // الصفحة تبدأ خاليةً فلا يُطلَب خطُّ النسخ من تلقائه — ولا تصحّ المعايرة بخطٍّ احتياطيّ
   document.fonts.load('200px "Noto Naskh Arabic"', 'اب')
-    .then(() => fetch('/result', { method: 'POST', body: JSON.stringify([metrics()]) }));
+    .then(() => fetch('/result?from=read', { method: 'POST', body: JSON.stringify([metrics()]) }));
 } else if (params.get('screen')) {
   const found = SCREENS.find(([id]) => id === params.get('screen'));
   if (!found) shout('لا شاشة بهذا الاسم: ' + params.get('screen'));
@@ -315,7 +337,10 @@ if (params.get('metrics')) {
   }
   frame.remove();
 
-  fetch('/result', { method: 'POST', body: JSON.stringify(out) });
+  // **بصمةُ المصدر `?from=read`** (بلاغا العائلة، ١٢ أغسطس ٢٠٢٦): الخادمُ يرفض تقريراً
+  // بلا بصمة — وهذه الصفحةُ وحدَها بقيت بلا واحدة يومَ سُنّت القاعدة، فكان `--device`
+  // يردّ «لم تصل نتيجة» على كل مقاس. (تشخيصُ الجلسة ل٢، وهو سابقٌ لها.)
+  fetch('/result?from=read', { method: 'POST', body: JSON.stringify(out) });
 }
 </script>
 </body>
