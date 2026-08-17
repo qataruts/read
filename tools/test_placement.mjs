@@ -421,10 +421,64 @@ ok(!src('main.js').includes('placement'),
 
 const sw = readFileSync(new URL('../app/sw.js', import.meta.url), 'utf8');
 // **رقمُ القشرة مكتوبٌ بيدٍ هنا** فيلزم تحريكُه مع كل حزمةٍ ترفعه (v32 ← v33 في
-// الجلسة د١ — وضعُ الدعم): والمحروسُ أنّ `placement.js` في القشرة فيعمل دون إنترنت،
-// والرقمُ شاهدُ أنّها قشرةٌ حيّةٌ مرفوعة. وشكلُ الحارس ملكُ صاحبه فلم يُمَسّ.
-ok(/'js\/placement\.js'/.test(sw) && /const VERSION = 'v33'/.test(sw),
-  'وهو في قشرة v33 فيعمل دون إنترنت');
+// الجلسة د١، وv33 ← v34 في د٢): والمحروسُ أنّ `placement.js` في القشرة فيعمل دون
+// إنترنت، والرقمُ شاهدُ أنّها قشرةٌ حيّةٌ مرفوعة. وشكلُ الحارس ملكُ صاحبه فلم يُمَسّ.
+ok(/'js\/placement\.js'/.test(sw) && /const VERSION = 'v34'/.test(sw),
+  'وهو في قشرة v34 فيعمل دون إنترنت');
+
+// ————— ١١) مسطرةُ الامتحان الواحدة — طفلُ الدعم يُمتحَن بمقادير القائم —————
+//
+// **قاعدةُ المالك** (بلاغ `2026-08-17-support-and-placement-coexist.md`): العونُ الذي
+// يريح يُسمح في الامتحان، والذي يجيب يُمنع. **والعلّةُ التي يحرسها هذا الباب**: حوضٌ
+// أضيق في الامتحان يعني احتمالَ تخمينٍ أعلى ⇒ **فتحاً بغير حقّ** — وهو عينُ الخطأ
+// الذي يحرسه هذا الملفّ كلُّه: رحلةٌ تُختصَر بلا إثبات، لا تُرى في شاشةٍ ولا يشتكي منها أحد.
+//
+// **ومُجرَّبٌ سالباً**: نزعُ `duringExam` من `rungItems` يُحمِّر السطرين بالأرقام
+// (خياران بدل ثلاثة في تمارين الاختيار كلِّها).
+
+console.log('\n١١. مسطرةُ الامتحان الواحدة (وضعُ الدعم لا يُخفّف امتحاناً)');
+
+const support = await import(new URL('support.js', APP));
+
+/**
+ * جردُ سعة الحوض في امتحان السلّم كلِّه، **نوعاً نوعاً**: بذرةٌ واحدة في الحالين
+ * فالتمارينُ هي هي، وإنما يُقاس عددُ خياراتها. و**النوعُ لا المجموع**: أزواجُ
+ * المواجهة خياراها الزوجُ نفسُه لا الحوض، فمجموعٌ واحد قد يستوي في الحالين ويكون
+ * تمييزُ الحرف قد ضاق — فالمقايسةُ بالأنواع، ومعها `quiz` صريحاً (وحوضُه أوسعُ من
+ * سعته دائماً: خمسةُ حروفٍ فأكثر في كل درجة).
+ */
+const byKind = (rnd) => {
+  const out = {};
+  for (let i = 0; i < pl.rungs().length; i++) {
+    for (const item of pl.rungItems(i, rnd)) {
+      if (!item.options) continue;
+      (out[item.kind] ??= new Set()).add(item.options.length);
+    }
+  }
+  return Object.fromEntries(Object.entries(out).sort()
+    .map(([kind, set]) => [kind, [...set].sort()]));
+};
+
+p.reset();
+const standingWidth = byKind(rng(5));
+support.setMode(true);
+const supportedWidth = byKind(rng(5));
+
+ok(support.modeOn() && support.distractors() === support.KNOBS.pool.supported,
+  `وضعُ الدعم مشتغلٌ الآن وحوضُه أضيق خارجَ الامتحان (${1 + support.distractors()} خيارات)`);
+ok(JSON.stringify(supportedWidth) === JSON.stringify(standingWidth),
+  `وحوضُ الامتحان لا يضيق بتشغيله — نوعاً نوعاً (${JSON.stringify(supportedWidth)})`);
+ok(supportedWidth[p.KINDS.QUIZ]?.join('،') === String(1 + support.KNOBS.pool.standing),
+  `وتمييزُ الحرف ثلاثةُ خيارات في الامتحان ولو ضاق حوضُ المراجعة`
+  + ` (${supportedWidth[p.KINDS.QUIZ]?.join('، ')})`);
+ok(pl.rungItems(0, rng(9)).length === pl.SAMPLE,
+  `وعيّنتُه ثمانٍ لا جرعةَ وليّ الأمر (${pl.rungItems(0, rng(9)).length})`);
+ok(support.EXAM_OFF.includes('prompt') && !/mayPrompt/.test(placementSrc),
+  'ولا تلقينَ فيه بطبقتين: لا تستدعيه الشاشةُ أصلاً، ويعود إلى القائم في النطاق');
+ok(support.rate() === support.KNOBS.pace.supported && support.calm() === true,
+  'ومقابضُ الراحة تسري كما هي — يُقاس بمسطرةٍ واحدة ولا يُمتحَن بشاشةٍ تُربكه');
+support.reset();
+p.reset();
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «بوابة اللحاق» ناجحة');
 process.exit(fails ? 1 : 0);

@@ -2,7 +2,7 @@
 //   node tools/test_support.mjs
 // يخرج بـ١ عند أي إخفاق.
 //
-// المحروسُ هنا ستّة، وكلُّها من المبدأين الحاكمين للجلسة:
+// المحروسُ هنا تسعة، وكلُّها من المبدأين الحاكمين للجلسة:
 //   ١) **الافتراضُ الصامت هو السلوكُ القائم حرفاً** — مخزنٌ فارغ ⇒ لا فرقَ ببايت.
 //   ٢) المقابضُ تعمل حين تُشغَّل، والإطفاءُ يردّ القائم بلا فقدِ اختيارات الوالد.
 //   ٣) **الملقَّنُ لا يرقّي صندوقاً ولا يُحتسب إتقاناً** (القاعدة التي لا تُخرَق).
@@ -10,6 +10,13 @@
 //      حصانةٌ بنيوية تُجرد على المصدر (تلك الوحداتُ لا تعرف `mayPrompt` أصلاً).
 //   ٥) **لا مِقبضَ يمسّ نصَّ محتوىً أو بيانَ منهج** — جردٌ على المصدر وعلى الجدول.
 //   ٦) **المقاديرُ من مخزنٍ واحد** لا ثوابتَ متناثرة، و`parent.js` صفرُ `https://`.
+// وثلاثةٌ من الجلسة د٢ (١٧ أغسطس ٢٠٢٦):
+//   ٧) **عرضُ التلقين**: الوسمُ `pending` رُفع، و**المطابقةُ في الاتجاهين** — مفتاحٌ
+//      في اللوحة ⇔ شاشةُ اكتسابٍ تستدعيه، وكلُّ موضعِ قياسٍ فيها يمرّر وسمَ العون.
+//   ٨) **مسطرةُ الامتحان الواحدة**: ما يمسّ القياسَ يُعطَّل في `duringExam` وما يريح
+//      يسري — والنطاقُ يُردّ ولو رمى، ولا يُخزَّن في جهاز.
+//   ٩) **مؤشّرُ الوضع**: يظهر بالاشتغال ويغيب بالإطفاء، بلا نصٍّ يقرؤه طفل، وغيرُ
+//      تفاعليّ، وخارجَ التدفّق فلا فرقَ في التخطيط بين الحالين.
 
 import { readFileSync } from 'node:fs';
 
@@ -171,21 +178,42 @@ support.set('prompt', false);
 ok(support.mayPrompt(0) === false, 'ومفتاحُه يُطفأ وحدَه');
 support.reset();
 
-// **ومفتاحُه لا يُعرَض قبل أن تبلغه شاشة**: شاشاتُ الاكتساب (درسُ الحرف واللعبة
-// والمهارة والبستان) خارج ملفات الجلسة، فالقاعدةُ مبنيّةٌ محروسةٌ ولا تلميحَ يُعرَض
-// اليوم — ومفتاحٌ يقلّبه الوالدُ ولا يرى له أثراً وعدٌ كاذب. فالمقبضُ `pending`،
-// و**يُسقِط هذا السطرُ الوسمَ يومَ يُستدعى** فيظهر مفتاحُه في اللوحة.
-ok(support.KNOBS.prompt.pending === true && !support.PANEL_KEYS.includes('prompt'),
-  'ومفتاحُ التلقين لا يُعرَض في اللوحة ما دامت لا شاشةَ تستدعيه (`pending`)');
-const CALLERS = ['lesson.js', 'words.js', 'skill.js', 'garden.js', 'ladder.js', 'story.js',
-  'quran.js', 'contrast.js', 'roots.js', 'screens.js', 'sentences.js', 'library.js', 'main.js',
-  'parent.js', 'review.js', 'gate.js', 'placement.js'];
-ok(CALLERS.every((f) => !/mayPrompt\s*\(/.test(src(f))) === !support.PANEL_KEYS.includes('prompt'),
-  'ووسمُ الانتظار يطابق الواقع: لا شاشةَ تستدعي التلميح اليوم');
+// **ومفتاحُه يُعرَض يومَ تستدعيه شاشة** (الجلسة د٢): كان موسوماً `pending` لأنّ
+// شاشات الاكتساب كانت خارج ملفات د١ — ومفتاحٌ يقلّبه الوالدُ ولا يرى له أثراً وعدٌ
+// كاذب. فلمّا صارت الأربعُ تعرضه رُفع الوسمُ. **والمطابقةُ في الاتجاهين**: مفتاحٌ في
+// اللوحة ⇔ شاشةُ اكتسابٍ تستدعيه — فمن أعاد الوسمَ أو حذف الاستدعاء أحمرَّ.
+const ACQUIRE = ['lesson.js', 'words.js', 'skill.js', 'garden.js'];
+const OTHER = ['ladder.js', 'story.js', 'quran.js', 'contrast.js', 'roots.js', 'screens.js',
+  'sentences.js', 'library.js', 'main.js', 'parent.js', 'review.js', 'gate.js', 'placement.js'];
+const calls = (f) => /mayPrompt\s*\(/.test(src(f)) || /promptFor\w*\s*\(/.test(src(f));
+
+ok(!support.KNOBS.prompt.pending && support.PANEL_KEYS.includes('prompt'),
+  'ومفتاحُ التلقين يُعرَض في اللوحة — رُفع وسمُ الانتظار لأنّ الشاشاتِ صارت تعرضه');
+ok(ACQUIRE.every(calls) === support.PANEL_KEYS.includes('prompt'),
+  `والوسمُ يطابق الواقع في الاتجاهين: شاشاتُ الاكتساب الأربع تستدعيه (${ACQUIRE.join('، ')})`);
+// و**البستانُ يستعير قاعدةَ اللعبة ولا ينسخها**: تمرينُ التركيب فيهما واحد، فمدخلُ
+// إذنه واحد (`promptForTile` في `words.js`) — نسختان تفترقان يوماً في شرط الصندوق.
+ok(/import[^;]*promptForTile[^;]*'\.\/words\.js'/.test(src('garden.js'))
+  && !/mayPrompt/.test(src('garden.js')),
+  'والبستانُ يستعير قاعدةَ اللعبة (`promptForTile`) ولا يكتب لنفسه شرطاً ثانياً');
+
+// **وكلُّ موضعِ قياسٍ في شاشة اكتسابٍ يمرّر وسمَ العون**: موضعٌ جديد يُكتب بلا الوسم
+// يسجّل إتقاناً كاذباً على تلميحٍ معروض — فيُجرد على المصدر لا يُوثَق بتعليق.
+const CALL = /recordAttempt\((?:[^()]|\([^()]*\))*\)/g;
+const TAGGED = /,\s*progress\.dayNumber\(\)\s*,\s*\w+\s*\)$/;
+for (const file of ACQUIRE) {
+  const found = src(file).match(CALL) || [];
+  const bare = found.filter((c) => !TAGGED.test(c));
+  ok(found.length > 0 && bare.length === 0,
+    `[${file}] كلُّ مواضع القياس فيه تمرّر وسمَ العون (${found.length} موضعاً`
+    + `${bare.length ? ` — بلا وسم: ${bare.length}` : ''})`);
+}
 
 const REVIEW_SIDE = ['review.js', 'gate.js', 'placement.js'];
 ok(REVIEW_SIDE.every((f) => !/mayPrompt\s*\(/.test(src(f))),
   'ولا المراجعةُ ولا البوابتان ولا اللحاق تستدعي `mayPrompt` بحال (حصانةٌ بنيوية)');
+ok(OTHER.every((f) => !/mayPrompt\s*\(/.test(src(f))),
+  `ولا شاشةَ خارج الاكتساب تعرض تلميحاً (${OTHER.length} وحدة)`);
 ok(!/import[^;]*mayPrompt[^;]*support\.js/s.test(src('review.js')),
   'ومحرّكُ الجلسة يستورد المقادير ولا يستورد التلقين');
 
@@ -235,6 +263,98 @@ ok(parentSrc.includes('لا يُحتسب ما أُعين عليه إتقاناً
   'وفيها السطرُ الصريح: «لا يُحتسب ما أُعين عليه إتقاناً»');
 ok(/لا يشخّص/.test(parentSrc) && /غيرَ الناطق/.test(parentSrc),
   'ووعدُها صادقٌ بحدوده كما كتبته الدراسة');
+
+// ————— ٨) مسطرةُ الامتحان الواحدة (الجلسة د٢) —————
+//
+// **قاعدةُ المالك**: العونُ الذي يريح يُسمح في امتحان اللحاق، والذي يجيب يُمنع.
+// فالمحروسُ هنا **القسمةُ نفسُها** (كلُّ مقبضٍ مصنَّفٌ في الجدول) و**أثرُها**:
+// ما يمسّ القياسَ يعود إلى القائم داخل النطاق، وما يريح يبقى على حاله.
+
+console.log('\n٨. مسطرةُ الامتحان الواحدة');
+
+support.reset();
+support.setMode(true);
+
+ok(support.KEYS.every((k) => typeof support.KNOBS[k].measures === 'boolean'),
+  `كلُّ مقبضٍ مصنَّفٌ في الجدول: أيمسّ ما يُقاس أم يريح؟ (${support.KEYS.length} مقابض)`);
+ok(support.EXAM_OFF.join('،') === 'dose،pool،prompt',
+  `والذي يُعطَّل في الامتحان ما يمسّ القياسَ وحدَه (${support.EXAM_OFF.join('، ')})`);
+ok(support.EXAM_OFF.every((k) => support.PANEL_KEYS.includes(k)),
+  'وكلُّه معروضٌ في اللوحة — فلا مقبضَ خفيّ يُعطَّل خفيةً');
+
+ok(!support.examOn(), 'وخارج النطاق لا امتحانَ مشتغل');
+const inExam = support.duringExam(() => ({
+  on: support.examOn(),
+  dose: support.sessionSize(),
+  pool: support.distractors(),
+  prompt: support.mayPrompt(0),
+  pace: support.rate(),
+  calm: support.calm(),
+  hold: support.holdFade(),
+  days: progress.BOX_DAYS.map(support.days),
+}));
+ok(inExam.on && !support.examOn(), 'والنطاق يُفتَح ويُغلَق مع النداء المتزامن');
+ok(inExam.pool === support.KNOBS.pool.standing
+  && inExam.dose === support.KNOBS.dose.standing && inExam.prompt === false,
+  `وفيه يعود ما يجيب إلى القائم: حوضٌ ${inExam.pool} · جرعةٌ ${inExam.dose} · لا تلقين`);
+ok(inExam.pace === support.KNOBS.pace.supported && inExam.calm === true && inExam.hold === true,
+  `ويسري ما يريح: صوتٌ ${inExam.pace} · هدوءٌ · تشكيلٌ ثابت`);
+ok(inExam.days.join('،') === progress.BOX_DAYS.map(support.days).join('،'),
+  `وموعدُ ليتنر كما هو داخلَه وخارجَه (${inExam.days.join('،')}) — امتحانُ موضعٍ لا يقطع إيقاعَه`);
+ok(support.distractors() === support.KNOBS.pool.supported,
+  'وبعد انقضائه يعود الوضعُ إلى مقاديره — لا أثرَ يبقى على شاشات الطفل');
+
+let threw = false;
+try { support.duringExam(() => { throw new Error('عطب'); }); } catch { threw = true; }
+ok(threw && !support.examOn(), 'ولو رمى النداءُ رُدّ الحالُ — لا يعلق الامتحانُ مفتوحاً');
+ok(!String(store.get('muallim.support.v1') || '').includes('exam'),
+  'ولا يُخزَّن النطاقُ في الجهاز أصلاً — مدّةُ بناءٍ لا عَلَمٌ يعبر النسخ');
+
+const placementSrc = src('placement.js');
+ok(/duringExam\(\(\) => buildSession\(/.test(placementSrc),
+  'وامتحانُ اللحاق يبني تمارينَه داخل النطاق (`duringExam(() => buildSession(`)');
+ok(!/sessionSize|distractors|mayPrompt|holdFade|\brate\(/.test(placementSrc),
+  'ولا يقرأ مقداراً من مقادير الوضع بيده — يستورد النطاقَ وحدَه');
+ok(/from '\.\/gate\.js'/.test(placementSrc) && !/PASS_RATE\s*=/.test(placementSrc)
+  && !/passed\s*=/.test(placementSrc),
+  'وعتبتُه عتبةُ البوابة المستوردة — لا مقبضَ يمسّها ولا رقمَ ثانٍ في الملف');
+
+support.reset();
+
+// ————— ٩) مؤشّرُ الوضع على شاشة الطفل (أمر المالك، ١٧ أغسطس ٢٠٢٦) —————
+//
+// «يعرفه البالغ ولا يشغل الطفل»: يظهر بالاشتغال ويغيب بالإطفاء، بلا كلمةٍ يقرؤها
+// طفل، وغيرُ تفاعليّ، و**خارجَ التدفّق** فلا يزحزح تخطيطاً ولا يحجز فراغاً.
+
+console.log('\n٩. مؤشّرُ وضع الدعم');
+
+const mainSrc = src('main.js');
+const css = readFileSync(new URL('../app/css/app.css', import.meta.url), 'utf8');
+const markCall = mainSrc.match(/const supportMark = h\((?:[^()]|\([^()]*\))*\);/s)?.[0] || '';
+const markCss = css.match(/\.support-mark\s*\{[^}]*\}/)?.[0] || '';
+
+ok(support.MARK.label && support.MARK.note,
+  `واسمُها وسطرُها في جدول support.js حيث تُملَك العلامة («${support.MARK.label}»)`);
+ok(/const paintSupport[\s\S]*support\.modeOn\(\)[\s\S]*supportMark/.test(mainSrc)
+  && /supportMark\.remove\(\)/.test(mainSrc) && /support\.onChange\(paintSupport\)/.test(mainSrc),
+  'وظهورُها معلَّقٌ بالمفتاح الأعلى وحدَه — تُلحَق باشتغاله وتُنزَع بإطفائه في اللحظة نفسِها');
+ok(markCall.includes("class: 'support-mark'") && markCall.includes('support.MARK.label'),
+  'وتُبنى مرّةً واحدة خارجَ الشاشات كلِّها — فتُرى في كل شاشة ولا تعرفها شاشة');
+// **بلا أبناء**: النداءُ ينتهي بـ`})` — فلا وسيطَ ثالثَ فيه نصٌّ ولا عنصر، ولا
+// يُكتب نصُّها بعدُ (`textContent`). فحلقةٌ فارغة لا كلمةَ فيها ولا رمز.
+ok(/\}\s*\);?\s*$/.test(markCall.trim()) && !/supportMark\.textContent/.test(mainSrc),
+  'ولا نصَّ فيها يقرؤه طفل — اسمُها في `aria-label` و`title` للبالغ وحدَه');
+ok(markCall.includes("'aria-label'") && markCall.includes('title:')
+  && !/onclick|tabindex|tabIndex|role: 'button'/.test(markCall),
+  'وغيرُ تفاعلية: لا نقرَ ولا تركيزَ ولا فتحَ لوحة');
+ok(/pointer-events:\s*none/.test(markCss) && /position:\s*fixed/.test(markCss),
+  'ولا تُنقَر ولا تدخل تدفّقَ الصفحة — فلا فرقَ في تخطيط الشاشة بين الحالين');
+ok(!/\bcontent:\s*['"]/.test(markCss),
+  'ولا حرفَ يُرسَم فيها بـ`content` — حلقةٌ بلون اللوح لا رمزٌ ولا كلمة');
+ok(/var\(--accent-skills\)/.test(markCss) && !/#[0-9a-fA-F]{3,6}/.test(markCss),
+  'ولونُها من لوح `app.css` لا قيمةٌ منسوخة');
+ok(src('parent.js').includes('support.MARK.note'),
+  'ولوحةُ وليّ الأمر تذكرها بنصّها من الجدول — فلا يفترق ما يقرؤه عمّا يراه');
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «وضع الدعم» ناجحة');
 process.exit(fails ? 1 : 0);

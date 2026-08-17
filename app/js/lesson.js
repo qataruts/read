@@ -9,6 +9,7 @@ import {
 } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
+import { mayPrompt } from './support.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar, letterTitle, wordText,
   accentFor, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
@@ -20,6 +21,18 @@ const FATHA = HARAKAT[0].mark; // الفتحة أولاً (§٥.١)
 
 /** النجوم من الأخطاء: ٣ بلا خطأ، ٢ بخطأ واحد، ١ بأكثر. */
 export const starsForErrors = (errors) => (errors === 0 ? 3 : errors === 1 ? 2 : 1);
+
+/**
+ * **تلميحُ أوّل لقاء** (وضعُ الدعم — الجلسة د٢، حكمُ الدراسة ٣/أ): هل يُبرَز الصحيحُ
+ * **قبل** المحاولة في هذه الجولة؟ — إن أذن المخزنُ وكان صندوقُ ليتنر صفراً: أوّلُ
+ * لقاءٍ بهذه المهارة (أو عودتُها إليه بعد خطأ)، وما ارتفع صندوقُه فقد جاوز الاكتساب.
+ *
+ * **وثمنُه مدفوعٌ في مكانه**: كلُّ محاولةٍ تقع والتلميحُ معروضٌ تُسجَّل **معانة**
+ * فلا ترفع صندوقاً ولا تنقصه — والقاعدةُ في `progress.js` لا في هذه الشاشة، وهذا
+ * عرضُها وحدَه. ودالّةٌ واحدة لخطوتَي الدرس: لا شرطَ يُكتب مرّتين فيفترقا.
+ */
+const promptFor = (letter, haraka, kind) =>
+  mayPrompt(progress.getSkill(progress.skillKey(letter, haraka, kind))?.box ?? 0);
 
 /**
  * جولات «ميّز بأذنك»: الهدف وكل المشتّتات من الحروف المدروسة فقط،
@@ -185,6 +198,7 @@ export function renderLesson(groupId, letter) {
     let target = null;
     let solved = false;
     let asked = 0;
+    let hinted = false;      // أُبرِز الصحيحُ في هذه الجولة؟ ⇒ محاولاتُها معانة
 
     const prompt = h('p', { class: 'hint' }, 'اضغط كلَّ واحدة لتسمعها');
     const foot = h('div', { class: 'row foot' });
@@ -205,8 +219,9 @@ export function renderLesson(groupId, letter) {
         audio.play(item.text);
         return;
       }
-      // القياس على مستوى (حرف × حركة × تمرين) — METHOD §٦
-      progress.recordAttempt(letter, target.key, progress.KINDS.HARAKA, item.text === target.text);
+      // القياس على مستوى (حرف × حركة × تمرين) — METHOD §٦، والمعانُ يُسجَّل ولا يُرقّي
+      progress.recordAttempt(letter, target.key, progress.KINDS.HARAKA,
+        item.text === target.text, progress.dayNumber(), hinted);
       if (item.text === target.text) {
         // لا إعادة قراءةٍ للصواب (DESIGN §٥.٢): أثرٌ بصريّ وتقدُّم — والصوت الذي سمعه
         // كافٍ، وإعادته هنا تصطدم بنداءٍ لاحق فتلتبس على الطفل.
@@ -229,7 +244,9 @@ export function renderLesson(groupId, letter) {
       target = harakaTarget(asked, items);   // الفتحةُ أولاً ثم عشوائية (الحكم ج٨)
       asked++;
       solved = false;
-      for (const c of cards) c.classList.remove('good', 'bad');
+      for (const c of cards) c.classList.remove('good', 'bad', 'prompted');
+      hinted = promptFor(letter, target.key, progress.KINDS.HARAKA);
+      if (hinted) cards[items.indexOf(target)]?.classList.add('prompted');
       prompt.textContent = 'اضغط ما سمعت';
       audio.play(target.text);
       foot.replaceChildren(h('button', {
@@ -344,18 +361,20 @@ export function renderLesson(groupId, letter) {
     const counter = h('p', { class: 'hint' });
     const row = h('div', { class: 'row vrow' });
     let locked = false;
+    let hinted = false;      // أُبرِز الصحيحُ في هذه الجولة؟ ⇒ محاولاتُها معانة
 
     const playTarget = () => audio.play(harakaText(rounds[state.round].target, rounds[state.round].mark));
 
     function startRound() {
       const r = rounds[state.round];
       locked = false;
+      hinted = promptFor(r.target, HARAKA_BY_MARK[r.mark], progress.KINDS.QUIZ);
       prompt.textContent = 'أيَّ حرف سمعت؟';
       counter.textContent = `الجولة ${arNum(state.round + 1)} من ${arNum(rounds.length)}`;
       row.replaceChildren(...r.options.map((ch) => {
         const text = harakaText(ch, r.mark);
         const btn = h('button', {
-          class: 'vchip vchip--big',
+          class: `vchip vchip--big${hinted && ch === r.target ? ' prompted' : ''}`,
           'aria-label': text,
           onclick: () => onPick(ch, btn, r),
         }, h('span', { class: 'vchip-face' }, text));
@@ -366,7 +385,8 @@ export function renderLesson(groupId, letter) {
 
     function onPick(ch, btn, r) {
       if (locked) return;
-      progress.recordAttempt(r.target, HARAKA_BY_MARK[r.mark], progress.KINDS.QUIZ, ch === r.target);
+      progress.recordAttempt(r.target, HARAKA_BY_MARK[r.mark], progress.KINDS.QUIZ,
+        ch === r.target, progress.dayNumber(), hinted);
       if (ch === r.target) {
         // الصواب لا يُعاد نطقه (DESIGN §٥.٢). والانتقالُ بقاعدة «لا انتقالَ وكلامٌ
         // في الجوّ» (بلاغ احسب): سكوتُ القناة والمهلةُ معاً — فطفلٌ سريعٌ أجاب

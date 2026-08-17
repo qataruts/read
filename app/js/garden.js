@@ -18,7 +18,9 @@ import { bundleById } from './lexicon.js';
 import { credit, fadeWord } from './fade.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
-import { buildBoard, starsForGame } from './words.js';
+// **تلميحُ أوّل لقاء** من `words.js` نفسِه (وضعُ الدعم — الجلسة د٢): تمرينُ التركيب
+// هنا هو تمرينُ اللعبة بعينه، فقاعدةُ التلميح **مدخلٌ واحد** لا نسختان تفترقان.
+import { buildBoard, promptForTile, starsForGame } from './words.js';
 import { steppedScreen, readQuizStep, nextButton } from './screens.js';
 import { h, icon, faceEl, cheer, arNum, arCount, accentForGarden, shake } from './ui.js';
 
@@ -115,14 +117,26 @@ function buildStep(bundle, { next, fail }) {
     const built = h('div', { class: 'built' });
     const foot = h('div', { class: 'row foot' });
 
-    const tiles = h('div', { class: 'tiles' }, board.map((item) => {
-      const btn = h('button', {
+    const tileEls = board.map((item) => ({
+      item,
+      btn: h('button', {
         class: 'tile',
         'aria-label': `مقطع ${item.text}`,
-        onclick: () => onTile(item, btn),
-      }, h('span', { class: 'tile-face' }, item.text));
-      return btn;
+        onclick: () => onTile(item, tileEls.find((t) => t.item === item).btn),
+      }, h('span', { class: 'tile-face' }, item.text)),
     }));
+    const tiles = h('div', { class: 'tiles' }, tileEls.map((t) => t.btn));
+
+    // **التلميحُ يتبع الخانة** (كما في `words.js`): لكل مقطعٍ صندوقُه، فيُبرَز ما لم
+    // يُلقَه بعدُ ويُترَك ما عرفه — وما وقع تحته من محاولاتٍ يُسجَّل معاناً.
+    let hinted = false;
+    function paintHint() {
+      const next = word.tiles[filled];
+      hinted = promptForTile(syllableSkill(next));
+      for (const { item, btn } of tileEls) {
+        btn.classList.toggle('prompted', hinted && !btn.disabled && item.text === next);
+      }
+    }
 
     function onTile(item, btn) {
       if (filled >= word.tiles.length) return;
@@ -131,7 +145,10 @@ function buildStep(bundle, { next, fail }) {
       const expected = word.tiles[filled];
       const skill = syllableSkill(expected);
       const correct = item.text === expected;
-      if (skill) progress.recordAttempt(skill.letter, skill.haraka, progress.KINDS.BUILD, correct);
+      if (skill) {
+        progress.recordAttempt(skill.letter, skill.haraka, progress.KINDS.BUILD, correct,
+          progress.dayNumber(), hinted);
+      }
 
       if (!correct) {
         fail();
@@ -144,9 +161,11 @@ function buildStep(bundle, { next, fail }) {
 
       btn.disabled = true;
       btn.classList.add('tile--used');
+      btn.classList.remove('prompted');
       slotEls[filled].textContent = item.text;
       slotEls[filled].classList.add('slot--filled');
       filled++;
+      paintHint();                    // الخانةُ التالية: تلميحُها بصندوقها هي
 
       if (filled < word.tiles.length) return void audio.play(item.text);
       complete(item.text);
@@ -175,6 +194,8 @@ function buildStep(bundle, { next, fail }) {
       if (!live(token)) return;
       nextWord();
     }
+
+    paintHint();
 
     return h('div', {},
       h('p', { class: 'hint' }, `الكلمة ${arNum(state.index + 1)} من ${arNum(bundle.words.length)}`),

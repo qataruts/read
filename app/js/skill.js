@@ -27,6 +27,7 @@
 import { markLabel, markSkillKey, skillById, skillExamples } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
+import { mayPrompt } from './support.js';
 import { starsForReview } from './review.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar,
@@ -35,6 +36,16 @@ import {
 
 const ROUNDS = 3;
 const OPTIONS = 3;
+
+/**
+ * **تلميحُ أوّل لقاء** (وضعُ الدعم — الجلسة د٢): هل يُبرَز الصحيحُ **قبل** المحاولة؟
+ * — إن أذن المخزنُ وكان صندوقُ ليتنر صفراً (أوّلُ لقاءٍ بهذه العلامة في هذا التمرين).
+ * **ولكل تمرينٍ صندوقُه**: القراءةُ الصامتة (`mark-compare`) والتمييزُ بالأذن
+ * (`mark-quiz`) مهارتان في ليتنر لا واحدة، فيُلقَّن ما لم يُلقَه ويُترَك ما عرفه.
+ * وكلُّ محاولةٍ تقع والتلميحُ معروضٌ تُسجَّل **معانة** — القاعدةُ في `progress.js`.
+ */
+const promptFor = (markKey, kind) =>
+  mayPrompt(progress.getSkill(progress.skillKey(markKey, null, kind))?.box ?? 0);
 
 /**
  * جولات «ميّز بأذنك»: الهدف أحد طرفَي زوج، ومعه الطرف الآخر (وهو ألصق المشتّتات به)
@@ -210,15 +221,17 @@ export function renderSkillLesson(skillId) {
       const counter = h('p', { class: 'hint' });
       const row = h('div', { class: 'row vrow' });
       let locked = false;
+      let hinted = false;      // أُبرِز الصحيحُ في هذه الجولة؟ ⇒ محاولاتُها معانة
 
       function startRound() {
         const r = marks[state.mark];
         locked = false;
+        hinted = promptFor(markKey, progress.KINDS.MARK_COMPARE);
         prompt.textContent = `أيُّهما ${r.label}؟`;
         counter.textContent = `الجولة ${arNum(state.mark + 1)} من ${arNum(marks.length)}`;
         row.replaceChildren(...r.options.map((text) => {
           const btn = h('button', {
-            class: 'vchip vchip--pair',
+            class: `vchip vchip--pair${hinted && text === r.target ? ' prompted' : ''}`,
             'aria-label': text,
             onclick: () => onPick(text, btn, r),
           }, h('span', { class: 'vchip-face' }, text));
@@ -229,7 +242,8 @@ export function renderSkillLesson(skillId) {
       function onPick(text, btn, r) {
         if (locked) return;
         const correct = text === r.target;
-        progress.recordAttempt(markKey, null, progress.KINDS.MARK_COMPARE, correct);
+        progress.recordAttempt(markKey, null, progress.KINDS.MARK_COMPARE, correct,
+          progress.dayNumber(), hinted);
         if (!correct) {
           state.errors++;
           shake(btn);
@@ -271,17 +285,19 @@ export function renderSkillLesson(skillId) {
     const counter = h('p', { class: 'hint' });
     const row = h('div', { class: 'row vrow' });
     let locked = false;
+    let hinted = false;      // أُبرِز الصحيحُ في هذه الجولة؟ ⇒ محاولاتُها معانة
 
     const playTarget = () => audio.play(rounds[state.round].target);
 
     function startRound() {
       const r = rounds[state.round];
       locked = false;
+      hinted = promptFor(markKey, progress.KINDS.MARK_QUIZ);
       prompt.textContent = 'أيَّ واحدة سمعت؟';
       counter.textContent = `الجولة ${arNum(state.round + 1)} من ${arNum(rounds.length)}`;
       row.replaceChildren(...r.options.map((text) => {
         const btn = h('button', {
-          class: 'vchip vchip--pair',
+          class: `vchip vchip--pair${hinted && text === r.target ? ' prompted' : ''}`,
           'aria-label': text,
           onclick: () => onPick(text, btn, r),
         }, h('span', { class: 'vchip-face' }, text));
@@ -292,7 +308,8 @@ export function renderSkillLesson(skillId) {
 
     function onPick(text, btn, r) {
       if (locked) return;
-      progress.recordAttempt(markKey, null, progress.KINDS.MARK_QUIZ, text === r.target);
+      progress.recordAttempt(markKey, null, progress.KINDS.MARK_QUIZ, text === r.target,
+        progress.dayNumber(), hinted);
       if (text === r.target) {
         // الصواب لا يُعاد نطقه (DESIGN §٥.٢) — والانتقالُ بعد سكوت القناة والمهلة معاً.
         locked = true;

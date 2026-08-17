@@ -38,11 +38,21 @@
 //
 // ٦) **فتحٌ لا قفل**: لا يُغلق مفتوحٌ أبداً (النجمةُ ترتفع ولا تنخفض — قيدُ
 //    `recordPlacement`)، والإعادةُ من اللوحة تستأنف من **آخر حدّ** لا من الألف.
+//
+// ٧) **مسطرةٌ واحدة لكل مُمتحَن** (قاعدةُ المالك، ١٧ أغسطس ٢٠٢٦ — بلاغ
+//    `2026-08-17-support-and-placement-coexist.md`): طفلٌ في وضع الدعم يُمتحَن هنا
+//    **بمقادير القائم لا بمقاديره**: العونُ الذي **يريح** يسري (صوتٌ أبطأ · هدوءٌ
+//    حسّيّ · تشكيلٌ ثابت) فلا يُمتحَن بشاشةٍ تُربكه، والذي **يجيب** يُمنع قطعاً
+//    (حوضٌ أضيق · تلميحٌ · وأيُّ مسٍّ بالعتبة) فلا يُفتح له بامتحانٍ أسهلَ من امتحان
+//    غيره. وموضعُ التعطيل `rungItems` أدناه — حيث تُبنى التمارين وتُقرأ المقادير.
 
 import { HARAKAT, markSkillKey, syllableSkill } from './curriculum.js';
 import { passed } from './gate.js';
 import * as progress from './progress.js';
 import { buildSession, renderSession } from './review.js';
+// **مسطرةُ الامتحان الواحدة** (بلاغ `2026-08-17-support-and-placement-coexist.md`):
+// يُستورَد نطاقُ الامتحان وحدَه — لا مقدارٌ من مقادير وضع الدعم يُقرأ هنا.
+import { duringExam } from './support.js';
 import { h, icon, arNum, arCount, faceEl, go, mascot, pick, shuffle, PAUSE_ACCENT } from './ui.js';
 
 /**
@@ -243,6 +253,13 @@ function stock(list, index) {
  * **ولِمَ كان الباقي للمجموعة وحدَها**: هي أكبرُ محطات الشريحة وأجدُّ مادّتها (خمسةُ
  * حروفٍ جديدة)، وقد أخذت كلُّ محطةٍ سواها حصّتَها المضمونة — فلولا ذلك لابتلعت محطةُ
  * مواجهةٍ بأربعة أزواجٍ نصفَ الامتحان لأنّ مفاتيحَها أكثرُ عدداً لا أعظمُ شأناً.
+ *
+ * **وهنا تُشدّ مسطرةُ الامتحان الواحدة** (القيد ٧): البناءُ كلُّه داخل `duringExam`،
+ * وفيه تُقرأ مقاديرُ الصعوبة كلُّها — سعةُ الحوض في مُنشئات المراجعة، وحجمُ العيّنة
+ * (وهو `SAMPLE` هنا لا جرعةَ وليّ الأمر)، والتلقينُ الذي لا تعرفه هذه الشاشة أصلاً.
+ * فطفلُ الدعم وطفلُ القائم يُمتحَنان بحوضٍ واحد وعيّنةٍ واحدة، **ومقابضُ الراحة
+ * تسري في الحالين** لأنّها لا تُقرأ هنا: سرعةُ الصوت عند التشغيل، والهدوءُ صنفٌ على
+ * الجذر، وموعدُ ليتنر عند تسجيل المحاولة — كلُّها بعد انقضاء هذا النطاق.
  */
 export function rungItems(index, rnd = Math.random) {
   const list = rungs();
@@ -250,7 +267,7 @@ export function rungItems(index, rnd = Math.random) {
   if (!rung) return [];
   const { letters, words, marks, pairs } = stock(list, index);
   const own = skillKeys({ group: rung.group, nodes: rung.sections[0].nodes });
-  return buildSession({
+  return duringExam(() => buildSession({
     letters,
     words,
     marks,
@@ -258,7 +275,7 @@ export function rungItems(index, rnd = Math.random) {
     due: [...shuffle(stationKeys(rung, rnd), rnd), ...shuffle(own, rnd)],
     size: SAMPLE,
     rnd,
-  });
+  }));
 }
 
 /**

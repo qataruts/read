@@ -826,9 +826,28 @@ document.addEventListener('visibilitychange', () => {
 // **الهدوءُ الحسّي صنفٌ على الجذر** (وضعُ الدعم، الجلسة د١): يشغّل قواعدَ خفض الحركة
 // القائمة في `app.css` — إعادةُ استعمالٍ لا كتابةُ حركاتٍ ثانية. و**الوحدةُ لا تعرف
 // DOM**: هي مقاديرُ وحدَها، والصبغُ هنا حيث تُملَك الصفحة (نظيرُ `progress.onChange`).
-const paintCalm = () => document.documentElement.classList.toggle('calm', support.calm());
-support.onChange(paintCalm);
-paintCalm();
+
+/* **ومؤشّرُ الوضع على شاشة الطفل** (أمر المالك، ١٧ أغسطس ٢٠٢٦ — الجلسة د٢): «يعرفه
+   البالغ ولا يشغل الطفل». وموضعُه هنا لا في `topbar()`: عنصرٌ **واحد** خارج `#app`
+   يعلو الصفحةَ كلَّها، فيُرى في كل شاشة — الخريطةِ والدرسِ والمراجعةِ وجلسةِ اللحاق
+   — بلا أن تعرفه شاشةٌ واحدة، ولا يُعاد بناؤه مع كل تصيير. و**لا نصَّ فيه**:
+   اسمُه في `aria-label`/`title` للبالغ وحدَه (`support.MARK`)، والطفلُ يرى حلقةً
+   لا كلمة. و**غيابُه غيابٌ تامّ**: يُنزَع من الصفحة حين يُطفأ الوضع، ووجودُه لا
+   يزحزح شيئاً (`fixed` في `app.css`) — فلا فرقَ في التخطيط بين الحالين. */
+const supportMark = h('span', {
+  class: 'support-mark',
+  role: 'img',
+  'aria-label': support.MARK.label,
+  title: support.MARK.label,
+});
+
+const paintSupport = () => {
+  document.documentElement.classList.toggle('calm', support.calm());
+  if (!support.modeOn()) supportMark.remove();
+  else if (!supportMark.isConnected) document.body.append(supportMark);
+};
+support.onChange(paintSupport);
+paintSupport();
 
 window.addEventListener('hashchange', render);
 audio.ready();

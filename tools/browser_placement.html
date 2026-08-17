@@ -43,6 +43,8 @@ const { GROUPS } = await import('./js/curriculum.js');       // بيانات ا�
 // **عددُ تمارين الدرجة وعقدُ شريحتها من التطبيق لا مكتوبةً بيد**: رقمٌ يُكتب هنا
 // يفترق عن نظيره يومَ يتحرّك، فيحمرّ المشهدُ بلا علّةٍ في الشيفرة.
 const { SAMPLE, rungs } = await import('./js/placement.js');
+// جدولُ المقابض من مصدره كذلك (الجلسة د٢): سعةُ الحوض القائمة تُقرأ ولا تُكتب.
+const { KNOBS } = await import('./js/support.js');
 // بنيةُ الرحلة وعنوانُ العقدة **من التطبيق لا مكتوبين بيد**: عنوانٌ مشكولٌ يُكتب
 // هنا بلا شكله يُخفق بلا علّةٍ في الشيفرة (وقد وقع ساعةَ كُتب هذا المشهد).
 const { allNodes } = await import('./js/progress.js');
@@ -115,6 +117,7 @@ const heardTarget = (getFaces, mark) => waitFor(
   () => played.slice(mark).find((t) => getFaces().includes(t)) ?? null, 'صوت الهدف', 7000);
 
 let nextMark = 0;      // علامةُ «ما بعدها نداءُ التمرين التالي» — تضبطها answerOne
+const bigCounts = [];  // سعةُ حوض «أيَّ حرف سمعت؟» في كل تمرينٍ مرّ (مسطرةُ الامتحان)
 
 /** يجيب عن تمرينٍ واحد. `wrongs` نقراتٌ خاطئة متعمَّدة قبل الصواب. */
 async function answerOne(wrongs = 0, mark = 0) {
@@ -164,6 +167,12 @@ async function answerOne(wrongs = 0, mark = 0) {
   }
 
   const big = $$('.vchip--big').length > 0;              // تمييز حرف أو حركة
+  // **سعةُ حوض التمييز تُقاس على الشاشة** (مسطرةُ الامتحان الواحدة، الجلسة د٢):
+  // تُجمَع خياراتُ «أيَّ حرف سمعت؟» وحدَها — وتُستثنى المواجهةُ فخياراها زوجُها
+  // المتشابه لا حوضُ المشتّتات، فلا يكذب العدُّ على من يقرؤه.
+  if (big && !$$('.hint').some((p) => p.textContent.includes('متشابهان'))) {
+    bigCounts.push($$('.vchip--big').length);
+  }
   const heard = await heardTarget(
     () => $$('.vchip').map((c) => c.querySelector('.vchip-face').textContent), mark);
   const chips = $$('.vchip');
@@ -327,7 +336,38 @@ try {
   ok($('.gate-head').textContent.includes(GROUPS[2].title),
     `والإعادةُ تبدأ من الدرجة الثالثة لا الأولى (${$('.gate-head h2').nextSibling?.textContent || ''})`);
 
-  // ————— ٦) الصوت والأخطاء —————
+  // ————— ٦) مسطرةُ الامتحان الواحدة: وضعُ الدعم لا يُخفّف امتحاناً (الجلسة د٢) —————
+  //
+  // **قاعدةُ المالك**: ما يريح الطفلَ يسري في الامتحان، وما يجيب عنه يُمنع. فيُشغَّل
+  // وضعُ الدعم من مخزنه ثم يُعاد الامتحانُ على الشاشة نفسِها: الهدوءُ يسري ويظهر
+  // مؤشّرُ الوضع، **والحوضُ لا يضيق ولا تُقصَّر العيّنة** — فلا يُفتح له بامتحانٍ
+  // أسهلَ من امتحان غيره.
+  win.localStorage.setItem('muallim.support.v1', JSON.stringify({ on: true }));
+  const reloaded = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await reloaded;
+  attach();
+  await sleep(200);
+
+  const standingOptions = 1 + KNOBS.pool.standing;
+  await openPanel();
+  const supportMark = played.length;
+  (await waitFor(() => $('.start-placement'), 'زرّ الامتحان')).click();
+  await waitFor(() => $('.dots'), 'الامتحان في وضع الدعم');
+  ok($$('.dot').length === SAMPLE,
+    `في وضع الدعم: عيّنةُ الامتحان ${SAMPLE} تمارين لا جرعةَ اللوحة (${$$('.dot').length})`);
+  ok(!!doc.querySelector('.support-mark'),
+    'ومؤشّرُ الوضع ظاهرٌ في جلسة اللحاق كما في سائر الشاشات');
+  ok(doc.documentElement.classList.contains('calm'),
+    'ومقابضُ الراحة تسري فيه — الهدوءُ الحسّيّ مشتغل');
+
+  bigCounts.length = 0;
+  await runRung([], supportMark);
+  ok(bigCounts.length > 0 && bigCounts.every((n) => n === standingOptions),
+    `وحوضُ «أيَّ حرف سمعت؟» ${standingOptions} خيارات كما هي بلا دعم`
+    + ` (${bigCounts.join('، ') || 'لم يقع تمرينُ تمييز'})`);
+
+  // ————— ٧) الصوت والأخطاء —————
   const missing = played.filter((t) => t.startsWith('?'));
   ok(missing.length === 0,
     `كلُّ ما نطقه الامتحان له ملفٌّ مولَّد (${played.length} تشغيلاً، ${missing.length} ناقصاً)`);

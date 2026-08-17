@@ -8,6 +8,7 @@
 import { GROUPS, bareLetters, syllableSkill } from './curriculum.js';
 import * as progress from './progress.js';
 import * as audio from './audio.js';
+import { mayPrompt } from './support.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar, wordText,
   accentFor, mascot, shuffle, shake, DEV,
@@ -34,6 +35,17 @@ export function syllablePool(groupId) {
 
 /** النجوم: ٣ للوح بلا خطأ، ٢ ما دامت الأخطاء ≤ عدد الكلمات (زلّة لكل كلمة)، وإلا ١. */
 export const starsForGame = (errors, wordCount) => (errors === 0 ? 3 : errors <= wordCount ? 2 : 1);
+
+/**
+ * **تلميحُ أوّل لقاء** (وضعُ الدعم — الجلسة د٢): هل تُبرَز البلاطةُ المطلوبة **قبل**
+ * أن يختار؟ — إن أذن المخزنُ وكان صندوقُ ليتنر صفراً (أوّلُ لقاءٍ بمقطع هذه المهارة).
+ * **وكلُّ نقرةٍ تقع والتلميحُ معروضٌ تُسجَّل معانة** فلا ترفع صندوقاً ولا تنقصه —
+ * والقاعدةُ في `progress.js` لا هنا. و**الخانةُ وحدةُ التلميح** لا اللوحُ كلُّه:
+ * لكل مقطعٍ مهارتُه وصندوقُها، فيُبرَز ما لم يُلقَه بعدُ ويُترَك ما عرفه.
+ * @param {{letter: string, haraka: string}|null} skill مهارةُ المقطع المطلوب
+ */
+export const promptForTile = (skill) => Boolean(skill) && mayPrompt(
+  progress.getSkill(progress.skillKey(skill.letter, skill.haraka, progress.KINDS.BUILD))?.box ?? 0);
 
 /**
  * لوح كلمة: مقاطعها + المشتّتات، مخلوطة.
@@ -127,14 +139,25 @@ export function renderWordsGame(groupId) {
     const built = h('div', { class: 'built' });
     const foot = h('div', { class: 'row foot' });
 
-    const tiles = h('div', { class: 'tiles' }, board.map((item) => {
-      const btn = h('button', {
+    const tileEls = board.map((item) => ({
+      item,
+      btn: h('button', {
         class: 'tile',
         'aria-label': `مقطع ${item.text}`,
-        onclick: () => onTile(item, btn),
-      }, h('span', { class: 'tile-face' }, item.text));
-      return btn;
+        onclick: () => onTile(item, tileEls.find((t) => t.item === item).btn),
+      }, h('span', { class: 'tile-face' }, item.text)),
     }));
+    const tiles = h('div', { class: 'tiles' }, tileEls.map((t) => t.btn));
+
+    // **التلميحُ يتبع الخانة**: يُعاد طلاؤه كلّما امتلأت خانةٌ، فلكل مقطعٍ صندوقُه
+    let hinted = false;
+    function paintHint() {
+      const expected = word.tiles[state.filled];
+      hinted = promptForTile(syllableSkill(expected));
+      for (const { item, btn } of tileEls) {
+        btn.classList.toggle('prompted', hinted && !btn.disabled && item.text === expected);
+      }
+    }
 
     function onTile(item, btn) {
       if (state.filled >= word.tiles.length) return;      // اكتملت الكلمة
@@ -143,7 +166,7 @@ export function renderWordsGame(groupId) {
       const skill = syllableSkill(word.tiles[state.filled]);
       if (skill) {
         progress.recordAttempt(skill.letter, skill.haraka, progress.KINDS.BUILD,
-          item.text === word.tiles[state.filled]);
+          item.text === word.tiles[state.filled], progress.dayNumber(), hinted);
       }
 
       if (item.text !== word.tiles[state.filled]) {
@@ -157,10 +180,12 @@ export function renderWordsGame(groupId) {
 
       btn.disabled = true;
       btn.classList.add('tile--used');
+      btn.classList.remove('prompted');
       const slot = slotEls[state.filled];
       slot.textContent = item.text;
       slot.classList.add('slot--filled');
       state.filled++;
+      paintHint();                    // الخانةُ التالية: تلميحُها بصندوقها هي
 
       if (state.filled < word.tiles.length) audio.play(item.text);
       else complete(item.text);
@@ -191,6 +216,8 @@ export function renderWordsGame(groupId) {
       if (!live(token)) return;
       nextWord();
     }
+
+    paintHint();
 
     return h('div', {},
       h('p', { class: 'hint' }, `الكلمة ${arNum(state.index + 1)} من ${arNum(words.length)}`),
