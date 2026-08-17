@@ -8,6 +8,9 @@ import * as recitation from './recitation.js';
 import * as recorder from './recorder.js';
 import * as install from './install.js';
 import * as support from './support.js';
+// **بطاقةُ أول تشغيل وحدَها** (الجلسة د٣): يُقرأ منها قرارُ العرض ونصُّه — ولا
+// مسارَ للامتحان في التوجيه ولا نداءَ لشاشته من هنا؛ زرُّها يفتح بوابةَ وليّ الأمر.
+import * as placement from './placement.js';
 import { renderLesson } from './lesson.js';
 import { renderWordsGame } from './words.js';
 import { renderReview } from './review.js';
@@ -73,6 +76,11 @@ function renderMap() {
   );
 
   const main = h('main', { class: 'map' });
+
+  // **بطاقةُ أول تشغيل** — لوليّ الأمر لا للطفل، وفي صدر الخريطة لأنّ موضعَها أوّلُ
+  // ما يُرى أوّلَ مرّة. وتغيب فلا تترك أثراً: `null` لا عنصرٌ فارغ (ولا فراغَ محجوز).
+  const first = firstRunCard();
+  if (first) main.append(first);
 
   const review = reviewCard();
   if (review) main.append(review);
@@ -145,6 +153,43 @@ function renderMap() {
 
   screen.append(main);
   return screen;
+}
+
+/**
+ * **بطاقةُ أول تشغيل** (الجلسة د٣): سطرٌ لوليّ الأمر يدلّه على البابين قبل أن يمشي
+ * الطفل — التثبيتُ ما دام في المتصفّح، وامتحانُ اللحاق إن كان طفلُه يعرف حروفه.
+ *
+ * **والقرارُ والنصُّ في `placement.js`** (`firstRunState` و`CARD`) لا هنا: هذه
+ * الدالّةُ مُصيِّرٌ لا حاكم — فلا يُكتب في الشاشة شرطٌ يفترق عمّا يفحصه الحارس.
+ * **وزرُّها يفتح بوابةَ وليّ الأمر** (`cta.hash`) لا الامتحانَ رأساً: أمرٌ من البيان
+ * نفسِه — وفي وضع التثبيت لا زرَّ امتحانٍ أصلاً (`cta === null`).
+ *
+ * وتُرسَم بلا صوتٍ ولا حركة: بطاقةُ بالغٍ تُقرأ بالعين.
+ */
+function firstRunCard() {
+  const mode = placement.firstRunState({
+    pristine: progress.isPristine(),
+    dismissed: placement.cardDismissed(),
+    standalone: install.standalone(),
+  });
+  if (mode === 'hidden') return null;
+
+  const card = placement.CARD[mode];
+  // سطرُ «زرُّ التثبيت أعلى الشاشة» لا يُقال إلا وشريطُه معروضٌ فعلاً — فلا نَعِد
+  // بزرٍّ لا وجود له على جهازٍ لا طريقَ فيه (أو أرقده وليُّ الأمر أسبوعاً).
+  const bar = card.bar && install.barMode() !== 'hidden' ? ` ${card.bar}` : '';
+
+  return h('div', { class: `first-run first-run--${mode}` },
+    h('span', { class: 'first-run-text' }, `${card.text}${bar}`),
+    card.cta && h('button', {
+      class: 'btn btn--primary first-run-go',
+      onclick: () => go(card.cta.hash),
+    }, card.cta.label),
+    h('button', {
+      class: 'btn first-run-later',
+      onclick: () => { placement.dismissCard(); render(); },
+    }, placement.CARD.later),
+  );
 }
 
 /**

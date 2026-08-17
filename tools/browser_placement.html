@@ -208,7 +208,72 @@ try {
   await fresh();
   await waitFor(() => $('.station'), 'الخريطة');
   ok(!$$('.station').some((s) => s.textContent.includes('امتحان اللحاق')),
-    'لا أثرَ لامتحان اللحاق في شاشة الطفل (الخريطة)');
+    'لا محطةَ لامتحان اللحاق في رحلة الطفل — ولا يُفتَح إلا من بوابة وليّ أمره');
+
+  // ————— ١ب) بطاقةُ أول تشغيل: الدلالةُ على البابين مرّةً واحدة (الجلسة د٣) —————
+  //
+  // **الحقيقةُ التي لا يراها فحصُ node**: أين تقع البطاقةُ من الخريطة، وماذا يقع
+  // بالنقر عليها، **وهل تترك فراغاً حين تغيب** — يُقاس على الشاشة نفسِها بالبكسل.
+  const mapEl = () => $('main.map');
+  const cardEl = () => $('.first-run');
+  ok(!!cardEl() && mapEl().firstElementChild === cardEl(),
+    'بطاقةُ أول تشغيل في صدر الخريطة على رحلةٍ بكر (صفرُ نجومٍ وصفرُ محاولات)');
+
+  // **والمتصفّحُ ليس مثبَّتاً**: تُقدَّم دعوةُ التثبيت وحدَها — فالقياسُ في المتصفّح
+  // قد لا ينتقل إلى المثبَّت (على iOS مخزنان لا مخزن).
+  ok(cardEl().classList.contains('first-run--install') && !$('.first-run-go'),
+    'وفي المتصفّح: دعوةُ التثبيت وحدَها — لا زرَّ امتحانٍ يُعرَض قبل التثبيت');
+  ok(cardEl().textContent.includes('ثبّت'),
+    `ونصُّها نصُّ التثبيت (${cardEl().querySelector('.first-run-text').textContent.slice(0, 40)}…)`);
+
+  // ثم يُرى الجهازُ مثبَّتاً (`navigator.standalone`) وتُعاد رسمةُ الخريطة
+  Object.defineProperty(win.navigator, 'standalone', { value: true, configurable: true });
+  win.dispatchEvent(new win.Event('hashchange'));
+  await waitFor(() => $('.first-run--exam'), 'بطاقةُ الامتحان في المثبَّت');
+  ok(!!$('.first-run-go'), 'وفي التطبيق المثبَّت: دعوةُ الامتحان بزرِّها');
+
+  const cardTop = cardEl().getBoundingClientRect().top;
+  $('.first-run-go').click();
+  await waitFor(() => $('.gate .giant') || $('.dots'), 'ما تفتحه البطاقة');
+  ok(!!$('.gate .giant') && !$('.dots'),
+    'وزرُّها يفتح بوابةَ وليّ الأمر (مسألةُ الضرب) لا الامتحانَ رأساً');
+
+  win.location.hash = '#/';
+  await waitFor(() => $('.first-run-later'), 'العودة إلى الخريطة');
+  $('.first-run-later').click();
+  await sleep(150);
+  ok(!$('.first-run'), 'و«لاحقاً» تُخفيها من الخريطة');
+  // **ولا فراغَ محجوز**: ما كان تحتها يصعد إلى موضعها بالضبط — لا هامشَ يبقى بعدها
+  const roseTo = mapEl().firstElementChild.getBoundingClientRect().top;
+  ok(Math.abs(roseTo - cardTop) < 2,
+    `ولا فراغَ محجوز — صعد ما تحتها إلى موضعها بالضبط (${Math.round(cardTop)} ← ${Math.round(roseTo)})`);
+
+  // **ولا تعود**: مذكّرتُها في المخزن تعبر إعادةَ التحميل (وقد سقط تنكُّرُ المثبَّت
+  // مع النافذة الجديدة — فلو عادت لعادت بدعوة التثبيت، وهي لا تعود بحال).
+  let reboot = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await reboot;
+  attach();
+  await waitFor(() => $('.station'), 'الخريطة بعد إعادة التحميل');
+  ok(!$('.first-run'), 'ولا تعود بعد إعادة التحميل — «لاحقاً» تُخفيها إلى الأبد');
+
+  // **وأوّلُ نجمةٍ تُخفيها** ولو لم تُخفَ بيد: تُمحى المذكّرةُ وتُزرع نجمةٌ واحدة
+  win.localStorage.removeItem('muallim.placement.card.v1');
+  win.localStorage.setItem('muallim.progress.v1', JSON.stringify({
+    v: 2, stars: { 'g1:ا': 1 }, skills: {}, days: {}, reviews: {}, records: [], reads: {},
+    placement: null, mic: false, seconds: 0, startedAt: Date.now(), updatedAt: Date.now(),
+  }));
+  reboot = new Promise((r) => frame.addEventListener('load', r, { once: true }));
+  frame.src = 'index.html';
+  await reboot;
+  attach();
+  await waitFor(() => $('.station'), 'الخريطة بنجمةٍ واحدة');
+  ok(!$('.first-run'),
+    'وأوّلُ نجمةٍ تُخفيها ولو لم تُخفَ بيد — رحلةٌ مُسَّت لا يُدعى صاحبُها إلى امتحان موضع');
+
+  win.localStorage.removeItem('muallim.placement.card.v1');
+  await fresh();                       // ويعود المشهدُ إلى طفلٍ جديدٍ لم يُمتحَن
+  await waitFor(() => $('.station'), 'الخريطة من جديد');
 
   win.location.hash = '#/placement';
   await sleep(200);
@@ -356,7 +421,10 @@ try {
   await waitFor(() => $('.dots'), 'الامتحان في وضع الدعم');
   ok($$('.dot').length === SAMPLE,
     `في وضع الدعم: عيّنةُ الامتحان ${SAMPLE} تمارين لا جرعةَ اللوحة (${$$('.dot').length})`);
-  ok(!!doc.querySelector('.support-mark'),
+  // **المؤشّرُ صنفٌ على الجذر لا حلقةٌ عائمة** (بلاغ ميدان المالك، ١٧ أغسطس ٢٠٢٦:
+  // الحلقةُ تُبتلَع في الجوال — فصار الخطُّ تحت شارة النجوم وحدَه). وكان هذا السطرُ
+  // يطلب `.support-mark` **بعد إلغائها** فبقي أحمرَ في مشهدٍ لم يُعَد تشغيلُه.
+  ok(doc.documentElement.classList.contains('support-on'),
     'ومؤشّرُ الوضع ظاهرٌ في جلسة اللحاق كما في سائر الشاشات');
   ok(doc.documentElement.classList.contains('calm'),
     'ومقابضُ الراحة تسري فيه — الهدوءُ الحسّيّ مشتغل');

@@ -416,15 +416,24 @@ ok(/فُتح باللحاق/.test(parentSrc), 'وسجلُّ آخر نتيجةٍ 
 ok(/placement\.renderPlacement\(/.test(parentSrc) && /examining/.test(parentSrc),
   'والامتحانُ يحلّ محلّ اللوحة خلف بوابتها — لا مسارَ ثانياً يبلغه طفل');
 ok(!/https:\/\//.test(parentSrc), 'واللوحةُ تبقى صفرَ عناوينَ خارجية');
-ok(!src('main.js').includes('placement'),
+// **ولا مسارَ له في التوجيه** — وهو المحروسُ لا ذِكرُ الاسم: صارت الخريطةُ تقرأ
+// من `placement.js` قرارَ **بطاقة أول تشغيل** ونصَّها (الجلسة د٣)، والبطاقةُ تفتح
+// بوابةَ وليّ الأمر لا الامتحان. فالحدُّ: لا شاشةَ امتحانٍ تُستدعى من `main.js`،
+// ولا مسارَ `#/placement` يبلغه طفلٌ بعنوانٍ يكتبه.
+const mainSrc = src('main.js');
+ok(!/renderPlacement/.test(mainSrc) && !/#\/placement/.test(mainSrc)
+  && !/case 'placement'/.test(mainSrc),
   'ولا بابَ له في التوجيه — فلا يفتحه طفلٌ بعنوانٍ يكتبه');
 
 const sw = readFileSync(new URL('../app/sw.js', import.meta.url), 'utf8');
-// **رقمُ القشرة مكتوبٌ بيدٍ هنا** فيلزم تحريكُه مع كل حزمةٍ ترفعه (v32 ← v33 في
-// الجلسة د١، وv33 ← v34 في د٢): والمحروسُ أنّ `placement.js` في القشرة فيعمل دون
-// إنترنت، والرقمُ شاهدُ أنّها قشرةٌ حيّةٌ مرفوعة. وشكلُ الحارس ملكُ صاحبه فلم يُمَسّ.
-ok(/'js\/placement\.js'/.test(sw) && /const VERSION = 'v34'/.test(sw),
-  'وهو في قشرة v34 فيعمل دون إنترنت');
+// **رقمُ القشرة يُشتقّ ولا يُكتب** (حكم المدير، ١٧ أغسطس ٢٠٢٦ — بعد أن احمرّ هذا
+// السطرُ في أربع حزمٍ متتالية بلا ذنبِ أحد): كتابةُ الرقم بيدٍ في حارسٍ هي **عينُ
+// الصنف الأول** من عيوب `FAMILY §٣.٩` («رقمٌ مكتوب بيد في حارس»)، وقد عاش عندنا
+// أربع مرّات. **والمحروسُ ليس الرقمَ** بل أنّ `placement.js` في القشرة فيعمل دون
+// إنترنت، وأنّ للقشرة رقماً بصيغته — فيُقرأ الرقمُ من `sw.js` نفسِه ويُعرَض.
+const shellVersion = sw.match(/const VERSION = '(v\d+)'/)?.[1] || '';
+ok(/'js\/placement\.js'/.test(sw) && /^v\d+$/.test(shellVersion),
+  `وهو في قشرة ${shellVersion} فيعمل دون إنترنت`);
 
 // ————— ١١) مسطرةُ الامتحان الواحدة — طفلُ الدعم يُمتحَن بمقادير القائم —————
 //
@@ -479,6 +488,103 @@ ok(support.rate() === support.KNOBS.pace.supported && support.calm() === true,
   'ومقابضُ الراحة تسري كما هي — يُقاس بمسطرةٍ واحدة ولا يُمتحَن بشاشةٍ تُربكه');
 support.reset();
 p.reset();
+
+// ————— ١٢) بطاقةُ أول تشغيل: الدلالةُ على البابين مرّةً واحدة (الجلسة د٣) —————
+//
+// **العلّةُ التي يحرسها هذا الباب**: بوابةُ العائلة تدعو الوالدَ «اختبر مستوى طفلك»
+// فيفتح التطبيق **في المتصفّح** ويمتحن، **وعلى iOS للمثبَّت مخزنٌ مستقلٌّ عن سفاري**
+// — فيثبّت بعدها فيجد الرحلةَ من أوّلها. وخطأُ العلاج صنفان: **بطاقةٌ لا تنتهي**
+// (تُلحّ على والدٍ يمشي طفلُه منذ أسبوع) و**بطاقةٌ تفتح امتحاناً بنقرة طفل**.
+//
+// **ومُجرَّبٌ سالباً بأبوابه الخمسة** — خمسةُ كسورٍ متعمَّدة، كلٌّ أحمرَّ باسمه ثم رُدّ:
+//   • إسقاطُ `!pristine` من `firstRunState`        ⇒ «ولا تظهر لمن مشى» (حالتان)
+//   • إسقاطُ `dismissed` منها                      ⇒ «و«لاحقاً» تُخفيها»
+//   • قصرُ `isPristine` على النجوم وحدَها          ⇒ «ومحاولةٌ في ليتنر تكذبها»
+//   • `cta.hash = '#/placement'` في `CARD.exam`     ⇒ «زرُّها يفتح بوابةَ وليّ الأمر»
+//   • `cta` غيرُ فارغٍ في `CARD.install`            ⇒ «ولا دعوةَ امتحانٍ قبل التثبيت»
+
+console.log('\n١٢. بطاقةُ أول تشغيل — التثبيتُ أولاً ثم بابُ اللحاق');
+
+// **جدولُ الحالات كاملاً** (نظيرُ `installState`): القرارُ دالّةٌ نقيّة تُحقَن بحالها.
+const card = (pristine, dismissed, standalone) =>
+  pl.firstRunState({ pristine, dismissed, standalone });
+
+ok(card(true, false, true) === 'exam',
+  'رحلةٌ بكرٌ في تطبيقٍ مثبَّت ⇒ دعوةُ الامتحان');
+ok(card(true, false, false) === 'install',
+  'وفي المتصفّح ⇒ دعوةُ التثبيت وحدَها — القياسُ في المتصفّح قد لا ينتقل إلى المثبَّت');
+ok(card(false, false, true) === 'hidden' && card(false, false, false) === 'hidden',
+  'ولا تظهر لمن مشى في رحلته — بطاقةُ أوّلِ تشغيلٍ لا دعوةٌ دائمة');
+ok(card(true, true, true) === 'hidden' && card(true, true, false) === 'hidden',
+  'و«لاحقاً» تُخفيها في الحالين — ودعوةٌ تُلحّ مرّتين ليست دعوة');
+
+// **«رحلةٌ بكر» بشاهدين لا شاهد**: نجمةٌ أو محاولةٌ في ليتنر تكذبها — فمَن فُتح له
+// بيد وليّه (نجومٌ بلا محاولة) ومَن لعب ولم يُتمّ عقدةً (محاولةٌ بلا نجمة) كلاهما مَسَّ.
+p.reset();
+pl.resetCard();
+ok(p.isPristine(), 'وطفلٌ جديد رحلتُه بكرٌ: صفرُ نجومٍ وصفرُ محاولات');
+p.setStars('g1:ا', 1);
+ok(!p.isPristine(), 'وأوّلُ نجمةٍ تُخفيها — ولو كانت نجمةَ فتحٍ بيد وليّه');
+p.reset();
+p.recordAttempt('ا', 'fatha', p.KINDS.QUIZ, true);
+ok(!p.isPristine(), 'ومحاولةٌ في ليتنر تكذبها ولو لم تكتمل عقدة');
+p.reset();
+
+// **«لاحقاً» تعبر إعادةَ التحميل**: مذكّرةٌ في المخزن لا عَلَمٌ في الذاكرة — ولولا
+// ذلك لعادت البطاقةُ مع كل فتحةٍ جديدة، وهي التي وُعد بأنّها لا تعود.
+ok(!pl.cardDismissed(), 'والبطاقةُ غيرُ مُخفاةٍ لطفلٍ جديد');
+pl.dismissCard();
+ok(pl.cardDismissed() && store.get(pl.CARD_KEY) === '1',
+  'و«لاحقاً» تُخفيها إلى الأبد — مذكّرتُها في المخزن فتعبر إعادةَ التحميل');
+pl.resetCard();
+ok(!pl.cardDismissed() && !store.has(pl.CARD_KEY), 'وتُردّ في الاختبارات وحدها');
+
+// **البابُ يبقى واحداً**: زرُّها بوابةُ وليّ الأمر (مسألةُ الضرب) لا شاشةُ الامتحان.
+ok(pl.CARD.exam.cta?.hash === '#/parent',
+  `زرُّها يفتح بوابةَ وليّ الأمر لا الامتحانَ رأساً (${pl.CARD.exam.cta?.hash})`);
+ok(pl.CARD.install.cta === null,
+  'ولا دعوةَ امتحانٍ قبل التثبيت — **بالبيان لا بشرطٍ في الشاشة**');
+ok(/ثبّت/.test(pl.CARD.install.text) && /امتحن/.test(pl.CARD.exam.text),
+  'ولكل حالٍ سطرُها: تثبيتٌ في المتصفّح، وامتحانٌ في المثبَّت');
+
+// **والشاشةُ مُصيِّرٌ لا حاكم**: `main.js` يقرأ القرارَ والنصَّ من مصدرهما ولا يكتب
+// شرطاً يفترق عمّا يُفحَص هنا — ولا يكتب عنواناً بيده.
+const cardBlock = mainSrc.slice(mainSrc.indexOf('function firstRunCard'),
+  mainSrc.indexOf('function reviewCard'));
+ok(cardBlock.length > 200, 'وبطاقتُها في الخريطة (`firstRunCard` في `main.js`)');
+ok(/placement\.firstRunState\(/.test(cardBlock)
+  && /progress\.isPristine\(\)/.test(cardBlock)
+  && /install\.standalone\(\)/.test(cardBlock),
+  'تقرأ قرارَها من `firstRunState` بحال الرحلة والتثبيت — لا شرطَ ثانٍ في الشاشة');
+ok(/placement\.CARD\[mode\]/.test(cardBlock) && !/#\/parent/.test(cardBlock)
+  && /go\(card\.cta\.hash\)/.test(cardBlock),
+  'ونصُّها وعنوانُها من `CARD` — لا حرفَ يُكتب في الشاشة فيفترق غداً');
+ok(/card\.cta &&/.test(cardBlock),
+  'وزرُّ الامتحان لا يُبنى إلا وللحال دعوتُه — فوضعُ التثبيت بلا زرِّ امتحانٍ بالبناء');
+ok(/placement\.dismissCard\(\)/.test(cardBlock) && /placement\.CARD\.later/.test(cardBlock),
+  'وزرُّ «لاحقاً» يكتب مذكّرتَه ثم يُعيد الرسم');
+
+// **صفرُ صوت**: بطاقةُ بالغٍ تُقرأ بالعين — لا نداءَ صوتٍ فيها ولا نصَّ منطوقاً جديد.
+ok(!/audio\./.test(cardBlock) && !/say\(/.test(cardBlock) && !/speak/.test(cardBlock),
+  'ولا صوتَ فيها — بطاقةُ بالغٍ تُقرأ بالعين (صفرُ نصٍّ منطوقٍ جديد)');
+const cardTexts = [pl.CARD.install.text, pl.CARD.install.bar, pl.CARD.exam.text,
+  pl.CARD.exam.cta.label, pl.CARD.later];
+ok(cardTexts.every((t) => !have.has(t)),
+  `ولا نصَّ من نصوصها في بنك الصوت (${cardTexts.length} نصاً مقروءاً)`);
+
+// **ولا فراغَ محجوز حين تغيب**: تُنزَع من DOM أصلاً (`null` لا عنصرٌ فارغ)،
+// وهامشُها أسفلَها وحدَه فلا تترك أثراً في التخطيط. (والقياسُ على الشاشة نفسِها
+// في `browser_test.py --placement`.)
+ok(/if \(first\) main\.append\(first\)/.test(mainSrc)
+  && /if \(mode === 'hidden'\) return null/.test(cardBlock),
+  'وتغيب فلا تترك عنصراً في الخريطة — لا فراغَ محجوز');
+const css = readFileSync(new URL('../app/css/app.css', import.meta.url), 'utf8');
+const rule = css.slice(css.indexOf('.first-run {'), css.indexOf('.first-run .first-run-text'));
+ok(rule.includes('margin-bottom') && !/margin-top|[\s;{]height:|min-height:/.test(rule),
+  'وهامشُها أسفلَها وحدَه — فيصعد ما تحتها إلى موضعها بالضبط');
+
+p.reset();
+pl.resetCard();
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات «بوابة اللحاق» ناجحة');
 process.exit(fails ? 1 : 0);

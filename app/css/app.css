@@ -262,6 +262,29 @@ button {
 
 /* ————— خريطة الرحلة: درب متعرج بمعالم المراحل ————— */
 
+/* **بطاقةُ أول تشغيل** (الجلسة د٣): سطرٌ لوليّ الأمر في صدر الخريطة، يظهر على
+   رحلةٍ بكرٍ وحدَها ثم لا يعود. **وهي بطاقةُ بالغٍ لا شاشةُ طفل**: هادئةٌ بلون
+   الورق العميق كشريط التثبيت — لا تنافس «تابع من هنا» الذهبية ولا تشدّ إصبعَ
+   الطفل. **ولا فراغَ محجوز حين تغيب**: لا ارتفاعَ مفروضٌ ولا هامشٌ على حاويتها،
+   وإنما هامشُها أسفلَها وحدَه — فتُنزَع فيصعد ما تحتها إلى موضعها بالضبط. */
+.first-run {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem .85rem;
+  margin-bottom: 1.25rem;
+  padding: .85rem 1rem;
+  border-radius: var(--radius);
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: .95rem;
+  line-height: 1.7;
+}
+
+.first-run .first-run-text { flex: 1 1 16rem; }
+.first-run .btn { font-size: 1rem; }
+
 .continue {
   display: flex;
   align-items: center;

@@ -40,16 +40,29 @@ export function installState({ standalone, ua, touchPoints, promptReady, memo, n
   return safari ? 'ios' : 'ios-other';
 }
 
+/**
+ * **أمثبَّتٌ يعمل الآن؟** — قراءةٌ لا فعل. يقرؤها **بطاقةُ أول تشغيل** في الخريطة
+ * (الجلسة د٣): على iOS للتطبيق المثبَّت مخزنٌ مستقلٌّ عن سفاري، فما يقيسه المتصفّح
+ * قد لا ينتقل إليه — فتُقدَّم دعوةُ التثبيت على دعوة الامتحان ما دام في المتصفّح.
+ */
+export function standalone() {
+  return matchMedia('(display-mode: standalone)').matches
+    || navigator.standalone === true;
+}
+
 const memo = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 const remember = (patch) => {
   try { localStorage.setItem(KEY, JSON.stringify({ ...memo(), ...patch })); } catch { /* تخزينٌ ممتلئ: يظهر الشريط أكثر، ولا يضرّ */ }
 };
 
-function state() {
-  const standalone = matchMedia('(display-mode: standalone)').matches
-    || navigator.standalone === true;
+/**
+ * ما يعرضه الشريطُ الآن على هذا الجهاز — **قراءةٌ لا فعل** كذلك: تقرؤها بطاقةُ أول
+ * تشغيل لتعرف أثمّ طريقٌ إلى التثبيت الآن (فتدلّ على زرّه أعلى الشاشة) أم لا طريق
+ * (فتصمت عنه، ولا تَعِد بزرٍّ لا وجود له).
+ */
+export function barMode() {
   return installState({
-    standalone,
+    standalone: standalone(),
     ua: navigator.userAgent,
     touchPoints: navigator.maxTouchPoints || 0,
     promptReady: Boolean(deferredPrompt),
@@ -60,7 +73,7 @@ function state() {
 
 function paint() {
   if (bar) { bar.remove(); bar = null; }
-  const mode = state();
+  const mode = barMode();
   if (mode === 'hidden') return;
 
   const close = h('button', {
