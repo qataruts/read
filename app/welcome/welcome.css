@@ -909,3 +909,15 @@
 .w-steps { margin: 0 0 1.5rem; }
 .w-steps svg { display: block; width: 100%; height: auto; }
 .w-steps figcaption { margin-top: .5rem; }
+
+/* **شريطُ الإنصاف** (أمر المالك، ١٧ أغسطس ٢٠٢٦): تحت الصدر مباشرة — يُرى قبل أن
+   يمرّر الزائرُ سطراً، ويحيل إلى قسمه المفصَّل. لونُه من اللوح لا قيمةٌ منسوخة. */
+.w-band {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.25rem;
+  border-radius: 18px;
+  border: 2px solid color-mix(in srgb, var(--accent-skills) 35%, var(--line));
+  background: color-mix(in srgb, var(--accent-skills) 8%, var(--card));
+}
+.w-band p { margin: 0; font-size: 1.02rem; }
+.w-band a { font-weight: 700; white-space: nowrap; }
