@@ -330,36 +330,23 @@ console.log('\n٩. مؤشّرُ وضع الدعم');
 
 const mainSrc = src('main.js');
 const css = readFileSync(new URL('../app/css/app.css', import.meta.url), 'utf8');
-const markCall = mainSrc.match(/const supportMark = h\((?:[^()]|\([^()]*\))*\);/s)?.[0] || '';
-const markCss = css.match(/\.support-mark\s*\{[^}]*\}/)?.[0] || '';
+const barCss = css.match(/\.support-on \.pill--stars\s*\{[^}]*\}/)?.[0] || '';
 
 ok(support.MARK.label && support.MARK.note,
   `واسمُها وسطرُها في جدول support.js حيث تُملَك العلامة («${support.MARK.label}»)`);
-ok(/const paintSupport[\s\S]*support\.modeOn\(\)[\s\S]*supportMark/.test(mainSrc)
-  && /supportMark\.remove\(\)/.test(mainSrc) && /support\.onChange\(paintSupport\)/.test(mainSrc),
-  'وظهورُها معلَّقٌ بالمفتاح الأعلى وحدَه — تُلحَق باشتغاله وتُنزَع بإطفائه في اللحظة نفسِها');
-ok(markCall.includes("class: 'support-mark'") && markCall.includes('support.MARK.label'),
-  'وتُبنى مرّةً واحدة خارجَ الشاشات كلِّها — فتُرى في كل شاشة ولا تعرفها شاشة');
-// **بلا أبناء**: النداءُ ينتهي بـ`})` — فلا وسيطَ ثالثَ فيه نصٌّ ولا عنصر، ولا
-// يُكتب نصُّها بعدُ (`textContent`). فحلقةٌ فارغة لا كلمةَ فيها ولا رمز.
-ok(/\}\s*\);?\s*$/.test(markCall.trim()) && !/supportMark\.textContent/.test(mainSrc),
-  'ولا نصَّ فيها يقرؤه طفل — اسمُها في `aria-label` و`title` للبالغ وحدَه');
-ok(markCall.includes("'aria-label'") && markCall.includes('title:')
-  && !/onclick|tabindex|tabIndex|role: 'button'/.test(markCall),
-  'وغيرُ تفاعلية: لا نقرَ ولا تركيزَ ولا فتحَ لوحة');
-ok(/pointer-events:\s*none/.test(markCss) && /position:\s*fixed/.test(markCss),
-  'ولا تُنقَر ولا تدخل تدفّقَ الصفحة — فلا فرقَ في تخطيط الشاشة بين الحالين');
-ok(!/\bcontent:\s*['"]/.test(markCss),
-  'ولا حرفَ يُرسَم فيها بـ`content` — حلقةٌ بلون اللوح لا رمزٌ ولا كلمة');
-ok(/var\(--accent-skills\)/.test(markCss) && !/#[0-9a-fA-F]{3,6}/.test(markCss),
-  'ولونُها من لوح `app.css` لا قيمةٌ منسوخة');
-const barCss = css.match(/\.support-on \.pill--stars\s*\{[^}]*\}/)?.[0] || '';
-ok(/support-on/.test(mainSrc) && /modeOn\(\)/.test(mainSrc.split('paintSupport')[1] || ''),
-  'ومعها خطُّ شارة النجوم: صنفُ `support-on` على الجذر يتبع المفتاح الأعلى');
+ok(/const paintSupport[\s\S]*support-on[\s\S]*support\.modeOn\(\)/.test(mainSrc)
+  && /support\.onChange\(paintSupport\)/.test(mainSrc),
+  'وصبغُها معلَّقٌ بالمفتاح الأعلى وحدَه — صنفُ `support-on` على الجذر يتبعه في اللحظة نفسِها');
+// **ولا حلقةَ عائمة** (أمر المالك، ١٧ أغسطس ٢٠٢٦): أُلغيت لأنها تُبتلَع في
+// الجوّال — فعلامةٌ واحدة لا اثنتان، وعودتُها تُحمِّر هذا الباب.
+ok(!/support-mark/.test(mainSrc) && !/\.support-mark/.test(css),
+  'ولا حلقةَ عائمة في أعلى الصفحة — أُلغيت ببلاغ الميدان، والعلامةُ واحدة');
 ok(barCss && !/\bcontent:\s*['"]/.test(barCss) && !/#[0-9a-fA-F]{3,6}/.test(barCss),
-  'والخطُّ بلون اللوح بلا حرفٍ يُرسَم — يُرى في الجوّال حيث تُبتلَع الحلقةُ العائمة');
+  'والخطُّ بلون اللوح بلا حرفٍ يُرسَم — يُرى في الجوّال حيث تُبتلَع الحلقة');
 ok(/box-shadow/.test(barCss) && !/\b(height|padding|margin|border(-bottom)?:)/.test(barCss),
   'ولا يزحزح تخطيطاً: ظلٌّ داخليّ لا حدٌّ يزيد ارتفاعَ الشارة');
+ok(/title: support\.modeOn\(\) \? support\.MARK\.label/.test(mainSrc),
+  'واسمُ العلامة على حاملها — شارةُ النجوم تحمله للبالغ، ولا نصَّ يقرؤه طفل');
 ok(src('parent.js').includes('support.MARK.note'),
   'ولوحةُ وليّ الأمر تذكرها بنصّها من الجدول — فلا يفترق ما يقرؤه عمّا يراه');
 

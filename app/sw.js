@@ -36,7 +36,7 @@
 // ومع الاسم الثابت **لا يُطلَب من الشبكة إلا الناقص** (`cache.add` يجلب دائماً وإن
 // كان مخزوناً — فالسكوت عن ذلك كان يُبقي العيب قائماً باسمٍ ثابت).
 
-const VERSION = 'v35';  // v34: الجلسة د٢ — عرضُ التلقين ومسطرةُ الامتحان الواحدة ومؤشّرُ الوضع
+const VERSION = 'v36';  // v34: الجلسة د٢ — عرضُ التلقين ومسطرةُ الامتحان الواحدة ومؤشّرُ الوضع
 const SHELL_CACHE = `muallim-shell-${VERSION}`;
 const AUDIO_CACHE = 'muallim-audio';        // ثابتٌ عمداً — لا يحمل VERSION
 const KEEP = [SHELL_CACHE, AUDIO_CACHE];

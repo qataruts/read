@@ -33,5 +33,44 @@
   </noscript>
 
   <script type="module" src="js/main.js"></script>
+
+  <!-- **حارسُ الإقلاع** (بلاغ ميدان المالك، ١٧ أغسطس ٢٠٢٦): علق سفاري على شاشة
+       «يُحمَّل التطبيق…» بعد تحديثاتٍ متكررة — عاملُ خدمةٍ في حالٍ وسط، والمثبَّتُ
+       وكرومُ يعملان. فلا يُترك والدٌ أمام صفحةٍ صامتة: إن لم يقلع التطبيقُ في
+       ثماني ثوانٍ ظهر زرٌّ واحد يُصلح بنفسه — **يُلغي تسجيلَ العامل ويمسح قشرته
+       وحدَها** (`muallim-shell-*`) ثم يعيد التحميل. **ومخزنُ الصوت لا يُمَسّ**
+       (٤١ ميغابايت لا تُنزَّل مرّتين)، ولا يُمسّ تقدّمُ الطفل (في `localStorage`).
+       سطرٌ واحد بلا وحدةٍ ولا استيراد — كي يعمل ولو سقط بناءُ الوحدات كلُّه. -->
+  <script>
+    setTimeout(function () {
+      var app = document.getElementById('app');
+      if (!app || !app.querySelector('.boot')) return;
+      var btn = document.createElement('button');
+      btn.className = 'btn btn--primary btn--wide';
+      btn.textContent = 'أصلِح وأعِد المحاولة';
+      btn.onclick = function () {
+        btn.disabled = true;
+        btn.textContent = 'يُصلَح…';
+        var done = function () { location.reload(); };
+        var jobs = [];
+        if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+          jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) {
+            return Promise.all(rs.map(function (r) { return r.unregister(); }));
+          }));
+        }
+        if (window.caches && caches.keys) {
+          jobs.push(caches.keys().then(function (keys) {
+            return Promise.all(keys.filter(function (k) { return k.indexOf('muallim-shell-') === 0; })
+              .map(function (k) { return caches.delete(k); }));
+          }));
+        }
+        Promise.all(jobs).then(done, done);
+      };
+      var note = document.createElement('p');
+      note.className = 'note';
+      note.textContent = 'تأخّر فتحُ التطبيق. اضغط الزرّ — لا يُمسّ تقدّمُ طفلك ولا الأصواتُ المخزونة.';
+      app.append(note, btn);
+    }, 8000);
+  </script>
 </body>
 </html>

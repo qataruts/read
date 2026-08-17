@@ -118,7 +118,15 @@ const $ = (sel) => doc.querySelector(sel);
 const $$ = (sel) => [...doc.querySelectorAll(sel)];
 const btn = (label) => $$('.btn').find((b) => b.textContent.includes(label));
 const calmOn = () => doc.documentElement.classList.contains('calm');
-const mark = () => doc.querySelector('.support-mark');
+// **المؤشّرُ خطٌّ تحت شارة النجوم** (بلاغ ميدان المالك، ١٧ أغسطس ٢٠٢٦): الحلقةُ
+// العائمة أُلغيت لأنها تُبتلَع في الجوّال. فيُقاس الآن بصنف الجذر وبظلّ الشارة
+// نفسِها على الشاشة — لا بوجود عنصرٍ عائم.
+const markOn = () => doc.documentElement.classList.contains('support-on');
+const starPill = () => doc.querySelector('.pill--stars');
+const barShadow = () => {
+  const pill = starPill();
+  return pill ? win.getComputedStyle(pill).boxShadow : '';
+};
 
 /** هندسةُ الشريط العلوي: يُقاس قبل تشغيل الوضع وبعده — فالمؤشّرُ لا يزحزح شيئاً. */
 const barGeometry = () => [...doc.querySelectorAll('.topbar > *')]
@@ -183,7 +191,8 @@ ok(!calmOn(), 'ولا صنفَ هدوءٍ على جذر الصفحة');
 await goto('#/');
 await waitFor(() => $('.station'), 'الخريطة');
 const barBefore = barGeometry();
-ok(!mark(), 'ولا مؤشّرَ لوضع الدعم في شاشة الطفل — ولا فراغَ محجوزٌ له');
+ok(!markOn() && !barShadow().includes('inset'),
+  'ولا مؤشّرَ لوضع الدعم في شاشة الطفل — والشارةُ بظلّها الأصليّ بلا خطّ');
 
 /** يفتح درسَ الحرف ويبلغ خطوةَ «الحركات» ويسأل: أيّها سمعت؟ */
 async function askHaraka(letter) {
@@ -244,23 +253,17 @@ ok(Object.values(reads).every((r) => r.n === BARE_AT),
 
 // ————— ٣ب) مؤشّرُ الوضع: يعرفه البالغُ بنظرة ولا يشغل الطفل —————
 
-ok(!!mark(), 'المؤشّر: علامةٌ في شاشة المراجعة ما دام الوضعُ مشتغلاً');
+ok(markOn(), 'المؤشّر: صنفُ الوضع على الجذر ما دام الوضعُ مشتغلاً');
 await goto('#/');
 await waitFor(() => $('.station'), 'الخريطة');
-const dot = mark();
-ok(!!dot, 'وفي الخريطة كذلك — عنصرٌ واحد يعلو الشاشات كلَّها');
+ok(markOn() && !!starPill(), 'وفي الخريطة كذلك — شارةُ النجوم في الشريط تحمله');
+const shadowOn = barShadow();
+ok(shadowOn.includes('inset'), `وخطٌّ داخليٌّ تحت الشارة يُرى (${shadowOn.slice(0, 46)}…)`);
 ok(barGeometry() === barBefore,
   `ولا يزحزح تخطيطاً: الشريطُ العلويّ بموضعه نفسِه قبلَه وبعده (${barBefore})`);
-ok(dot.textContent === '' && !dot.querySelector('img, svg'),
-  'ولا كلمةَ فيه ولا رمزَ يقرؤه الطفل — حلقةٌ لا غير');
-ok(dot.getAttribute('aria-label') && dot.title,
-  `واسمُه للبالغ في aria-label وtitle («${dot.title}»)`);
-const dotStyle = win.getComputedStyle(dot);
-ok(dotStyle.pointerEvents === 'none' && dot.tabIndex <= -1 && dot.tagName !== 'BUTTON',
-  'وغيرُ تفاعليّ: لا يُنقَر ولا يُركَّز عليه');
-const dotBox = dot.getBoundingClientRect();
-ok(dotStyle.position === 'fixed' && dotBox.width >= 10 && dotBox.width <= 24 && dotBox.top < 40,
-  `وثابتُ الموضع أعلى الشاشة بحجمٍ يُرى ولا يجذب (${Math.round(dotBox.width)}px)`);
+ok(starPill().textContent.includes('★') && !starPill().querySelector('img, svg'),
+  'ولا كلمةَ زائدة يقرؤها الطفل — الشارةُ كما هي، وإنما تحتها خطّ');
+ok(!!starPill().title, `واسمُه للبالغ في title («${starPill().title}»)`);
 
 // ————— ٣ج) التلميحُ في الاكتساب وحدَه — ولا يرقّي صندوقاً —————
 
@@ -286,12 +289,13 @@ ok(!$('.prompted'),
 // ————— ٤) الإطفاءُ يردّ كلَّ شيء —————
 
 await openPanel();
-ok($('.audit').textContent.includes('علامةٌ هادئة أعلى شاشة طفلك'),
-  'واللوحةُ تقول لوليّ الأمر ما هذه العلامة');
+ok($('.audit').textContent.includes('خطٌّ أخضر تحت شارة النجوم'),
+  'واللوحةُ تقول لوليّ الأمر ما هذه العلامة بلفظها الذي يراه');
 (await waitFor(() => $('[data-knob="on"]'), 'مفتاحُ وضع الدعم')).click();
 await sleep(220);
 ok(!calmOn(), 'إطفاءُ الوضع من اللوحة يرفع صنفَ الهدوء فوراً');
-ok(!mark(), 'ويغيب المؤشّرُ في اللحظة نفسِها — غياباً تامّاً لا خفوتاً');
+ok(!markOn() && !barShadow().includes('inset'),
+  'ويغيب الخطُّ في اللحظة نفسِها — غياباً تامّاً لا خفوتاً');
 
 const restored = await measure();
 ok(restored.dots === before.dots && restored.options === before.options
@@ -299,7 +303,7 @@ ok(restored.dots === before.dots && restored.options === before.options
   `ويعود كلُّ شيء كما كان (${restored.dots} تمارين · ${restored.options} خيارات · ز${restored.fades.join('،')})`);
 await goto('#/');
 await waitFor(() => $('.station'), 'الخريطة');
-ok(!mark() && barGeometry() === barBefore,
+ok(!markOn() && barGeometry() === barBefore,
   'ولا مؤشّرَ ولا أثرَ له في تخطيط الشريط — الشاشةُ كما كانت حرفاً');
 
 // ————— ٥) صفرُ إضافةٍ صوتية وصفرُ عطب —————

@@ -246,6 +246,17 @@ button {
 
 .btn--wide { width: 100%; }
 
+/* **زرُّ وليّ الأمر ظاهرٌ للمعلّم** (بلاغ ميدان المالك، ١٧ أغسطس ٢٠٢٦): كان
+   شبحياً فلا يُهتدى إليه — فصار بحدٍّ وأيقونةٍ أكبر واسمٍ مكتوب. **والاسمُ
+   يسقط في الشاشات الضيّقة** فيبقى الحدُّ والأيقونةُ ولا يزاحم شارةَ النجوم. */
+.btn--parent { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); color: var(--ink); }
+
+/* **سطرُ النسخة في صدر اللوحة** (بلاغ ميدان المالك): أولُ ما يُسأل عنه في بلاغ
+   ميدانٍ — فلا يكون رمادياً في الذيل. */
+.parent-version { margin: -.25rem 0 .75rem; font-weight: 700; color: var(--ink-soft); }
+.btn--parent svg { width: 1.6rem; height: 1.6rem; }
+@media (max-width: 30rem) { .btn--parent .btn-word { display: none; } }
+
 /* الفعل الرئيس في الشاشة ≥ ٦٤ بكسل (DESIGN §٤) */
 .next, .continue { min-height: 4rem; }
 
@@ -1847,20 +1858,6 @@ html.calm *, html.calm *::before, html.calm *::after {
    `aria-label`/`title`)، و**غيرُ تفاعلية** (`pointer-events: none` فلا نقرَ ولا
    تركيز)، و**خارجَ التدفّق** (`fixed`) فلا تزحزح تخطيطاً ولا تحجز فراغاً حين تغيب.
    وموضعُها وسطُ الشريط: طرفاه مشغولان في كل شاشة (زرٌّ وشارة) ووسطُه خالٍ دائماً. */
-.support-mark {
-  position: fixed;
-  top: max(.45rem, env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 7;
-  width: .85rem;
-  height: .85rem;
-  border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--accent-skills) 55%, var(--paper));
-  background: color-mix(in srgb, var(--accent-skills) 18%, var(--paper));
-  pointer-events: none;
-}
-
 /* **وخطُّ شارة النجوم** (بلاغُ ميدان المالك، ١٧ أغسطس ٢٠٢٦): الحلقةُ العائمة
    تُرى في متصفّح الحاسوب ولا تُرى في الجوّال — شريطُ المتصفّح وقُصاصةُ الشاشة
    يبتلعان أعلى الصفحة. فصار المؤشّرُ **حيث لا يُبتلَع**: خطٌّ تحت شارة النجوم

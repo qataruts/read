@@ -55,12 +55,20 @@ function renderMap() {
       brandMark('h1'),
       h('span', { class: 'spacer' }),
       DEV && h('button', { class: 'btn btn--ghost', onclick: () => go('#/audio') }, icon('ear'), ' فحص الأصوات'),
+      // **زرُّ وليّ الأمر يُرى** (بلاغ ميدان المالك، ١٧ أغسطس ٢٠٢٦): كان شبحياً
+      // (`btn--ghost`) فلا يهتدي إليه معلّمٌ يفتح التطبيق أولَ مرة — فصار زرّاً
+      // بحدّه واسمِه المكتوب، والاسمُ **للبالغ لا للطفل** (لا فعلَ يلزم الطفلَ
+      // قراءتُه: مسارُه «تابع من هنا» وحدَه).
       h('button', {
-        class: 'btn btn--ghost',
+        class: 'btn btn--parent',
         'aria-label': 'لوحة وليّ الأمر',
         onclick: () => go('#/parent'),
-      }, icon('family')),
-      h('span', { class: 'pill pill--stars' }, `★ ${arNum(earned)} / ${arNum(progress.maxTotalStars())}`),
+      }, icon('family'), h('span', { class: 'btn-word' }, 'وليّ الأمر')),
+      h('span', {
+        class: 'pill pill--stars',
+        // اسمُ العلامة على حاملها نفسِه — للبالغ وحدَه، ولا نصَّ يقرؤه طفل.
+        title: support.modeOn() ? support.MARK.label : null,
+      }, `★ ${arNum(earned)} / ${arNum(progress.maxTotalStars())}`),
     ),
   );
 
@@ -827,27 +835,16 @@ document.addEventListener('visibilitychange', () => {
 // القائمة في `app.css` — إعادةُ استعمالٍ لا كتابةُ حركاتٍ ثانية. و**الوحدةُ لا تعرف
 // DOM**: هي مقاديرُ وحدَها، والصبغُ هنا حيث تُملَك الصفحة (نظيرُ `progress.onChange`).
 
-/* **ومؤشّرُ الوضع على شاشة الطفل** (أمر المالك، ١٧ أغسطس ٢٠٢٦ — الجلسة د٢): «يعرفه
-   البالغ ولا يشغل الطفل». وموضعُه هنا لا في `topbar()`: عنصرٌ **واحد** خارج `#app`
-   يعلو الصفحةَ كلَّها، فيُرى في كل شاشة — الخريطةِ والدرسِ والمراجعةِ وجلسةِ اللحاق
-   — بلا أن تعرفه شاشةٌ واحدة، ولا يُعاد بناؤه مع كل تصيير. و**لا نصَّ فيه**:
-   اسمُه في `aria-label`/`title` للبالغ وحدَه (`support.MARK`)، والطفلُ يرى حلقةً
-   لا كلمة. و**غيابُه غيابٌ تامّ**: يُنزَع من الصفحة حين يُطفأ الوضع، ووجودُه لا
-   يزحزح شيئاً (`fixed` في `app.css`) — فلا فرقَ في التخطيط بين الحالين. */
-const supportMark = h('span', {
-  class: 'support-mark',
-  role: 'img',
-  'aria-label': support.MARK.label,
-  title: support.MARK.label,
-});
-
+/* **ومؤشّرُ الوضع على شاشة الطفل** (أمر المالك، ١٧ أغسطس ٢٠٢٦): «يعرفه البالغ
+   ولا يشغل الطفل». **وصورتُه خطٌّ تحت شارة النجوم** لا حلقةٌ عائمة — بلاغُ ميدان
+   المالك: الحلقةُ في أعلى الصفحة يبتلعها شريطُ الجوّال، **والشريطُ اللاصق لا
+   يُبتلَع**؛ وأُلغيت الحلقةُ بأمره فلا علامتان لشيءٍ واحد. والصبغُ صنفٌ على الجذر
+   يقرؤه `app.css`، فلا تعرفه شاشةٌ ولا يُعاد بناؤه مع كل تصيير. */
 const paintSupport = () => {
   document.documentElement.classList.toggle('calm', support.calm());
   // **وخطُّ شارة النجوم**: صنفٌ على الجذر يصبغ الشارةَ في الشريط اللاصق —
   // الحلقةُ العائمة يبتلعها أعلى الشاشة في الجوّال (بلاغ ميدان المالك).
   document.documentElement.classList.toggle('support-on', support.modeOn());
-  if (!support.modeOn()) supportMark.remove();
-  else if (!supportMark.isConnected) document.body.append(supportMark);
 };
 support.onChange(paintSupport);
 paintSupport();

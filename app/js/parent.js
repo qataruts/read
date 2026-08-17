@@ -629,22 +629,6 @@ function backupSection(rerender) {
     if (count) paint(count.stored, count.total, false);
   });
 
-  // **رقمُ النسخة تحت حال التخزين** (أمر المالك): سطرٌ هادئ يقرؤه الوالد فيعرف
-  // أنّ التحديث بلغ جهازَه — ومن قبله كان يُظنّ ولا يُرى.
-  const version = h('p', { class: 'note', id: 'app-version' }, 'نسخة التطبيق: …');
-  navigator.serviceWorker?.addEventListener?.('message', (e) => {
-    if (e.data?.type === 'version' && version.isConnected) {
-      version.textContent = `نسخة التطبيق: ${e.data.version}`;
-      version.dataset.v = e.data.version;      // تقرؤه «بلِّغنا» فيدخل السياقَ
-    }
-  });
-  const askVersion = () => {
-    const sw = navigator.serviceWorker?.controller;
-    if (sw) sw.postMessage({ type: 'version' });
-    else version.textContent = 'نسخة التطبيق: تظهر بعد تثبيته (يعمل العاملُ حينها)';
-  };
-  askVersion();
-
   progress.persistedStorage().then((persisted) => {
     if (!storage.isConnected) return;
     storage.textContent = persisted === null
@@ -711,7 +695,6 @@ function backupSection(rerender) {
     ),
     slot,
     storage,
-    version,
     dlRow,
     h('p', { class: 'note' },
       'في النسخة: النجوم وصناديق المراجعة ودقائق التعلّم ومدد قراءاته الجهرية'
@@ -800,6 +783,25 @@ function journeySection(rerender) {
   );
 }
 
+/**
+ * **رقمُ النسخة في صدر اللوحة** (بلاغُ ميدان المالك، ١٧ أغسطس ٢٠٢٦: «لا أعرف أين
+ * أجده — اجعله فوق»): كان في ذيل قسم النسخ الاحتياطي فلا يهتدي إليه معلّمٌ يريد
+ * أن يعرف أبلغَ التحديثُ جهازَه — **وهو أولُ ما يُسأل عنه في كل بلاغ ميدان**.
+ */
+function versionLine() {
+  const version = h('p', { class: 'note parent-version', id: 'app-version' }, 'نسخة التطبيق: …');
+  navigator.serviceWorker?.addEventListener?.('message', (e) => {
+    if (e.data?.type === 'version' && version.isConnected) {
+      version.textContent = `نسخة التطبيق: ${e.data.version}`;
+      version.dataset.v = e.data.version;      // تقرؤه «بلِّغنا» فيدخل السياقَ
+    }
+  });
+  const sw = navigator.serviceWorker?.controller;
+  if (sw) sw.postMessage({ type: 'version' });
+  else version.textContent = 'نسخة التطبيق: تظهر بعد تثبيته (يعمل العاملُ حينها)';
+  return version;
+}
+
 function dashboard(rerender = () => {}) {
   const letters = progress.studiedLetters();
   const stats = progress.letterStats();
@@ -832,6 +834,7 @@ function dashboard(rerender = () => {}) {
 
   const main = h('main', { class: 'screen-card audit' },
     h('h2', {}, 'لوحة وليّ الأمر'),
+    versionLine(),
 
     h('div', { class: 'audit-row' },
       pill('اليوم', minutesText(today)),
