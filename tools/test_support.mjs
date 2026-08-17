@@ -353,6 +353,13 @@ ok(!/\bcontent:\s*['"]/.test(markCss),
   'ولا حرفَ يُرسَم فيها بـ`content` — حلقةٌ بلون اللوح لا رمزٌ ولا كلمة');
 ok(/var\(--accent-skills\)/.test(markCss) && !/#[0-9a-fA-F]{3,6}/.test(markCss),
   'ولونُها من لوح `app.css` لا قيمةٌ منسوخة');
+const barCss = css.match(/\.support-on \.pill--stars\s*\{[^}]*\}/)?.[0] || '';
+ok(/support-on/.test(mainSrc) && /modeOn\(\)/.test(mainSrc.split('paintSupport')[1] || ''),
+  'ومعها خطُّ شارة النجوم: صنفُ `support-on` على الجذر يتبع المفتاح الأعلى');
+ok(barCss && !/\bcontent:\s*['"]/.test(barCss) && !/#[0-9a-fA-F]{3,6}/.test(barCss),
+  'والخطُّ بلون اللوح بلا حرفٍ يُرسَم — يُرى في الجوّال حيث تُبتلَع الحلقةُ العائمة');
+ok(/box-shadow/.test(barCss) && !/\b(height|padding|margin|border(-bottom)?:)/.test(barCss),
+  'ولا يزحزح تخطيطاً: ظلٌّ داخليّ لا حدٌّ يزيد ارتفاعَ الشارة');
 ok(src('parent.js').includes('support.MARK.note'),
   'ولوحةُ وليّ الأمر تذكرها بنصّها من الجدول — فلا يفترق ما يقرؤه عمّا يراه');
 

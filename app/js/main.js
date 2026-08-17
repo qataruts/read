@@ -843,6 +843,9 @@ const supportMark = h('span', {
 
 const paintSupport = () => {
   document.documentElement.classList.toggle('calm', support.calm());
+  // **وخطُّ شارة النجوم**: صنفٌ على الجذر يصبغ الشارةَ في الشريط اللاصق —
+  // الحلقةُ العائمة يبتلعها أعلى الشاشة في الجوّال (بلاغ ميدان المالك).
+  document.documentElement.classList.toggle('support-on', support.modeOn());
   if (!support.modeOn()) supportMark.remove();
   else if (!supportMark.isConnected) document.body.append(supportMark);
 };
