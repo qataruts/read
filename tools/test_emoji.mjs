@@ -61,9 +61,19 @@ ok(dirty.length === 0,
   `صفر إيموجي بخطّ النظام في شيفرة التطبيق (${codeFiles.length} ملفاً)`
   + (dirty.length ? ' — بقي: ' + dirty.map(([p, g]) => `${p} (${g.join('')})`).join('، ') : ''));
 
-const welcome = read('welcome/index.html');
-ok(glyphsIn(welcome).length === 0, 'ولا في الصفحة التعريفية (رموزُها `<img>` من app/emoji/)');
-ok(/<img[^>]+src="\.\.\/emoji\//.test(welcome),
+// **والمرجعُ التعريفيّ أربعُ صفحاتٍ لا واحدة، وفيه اللغتان معاً** (١٨ أغسطس
+// ٢٠٢٦ — `DESIGN §٦`): وجوهُ **بطاقات الواجهة** صارت أيقوناتَنا الخطية، ووجوهُ
+// **بطاقات المحطات** تبقى رموزَ بيانات من `app/emoji/`. فكان المحروسُ هنا وجودَ
+// رمزِ بياناتٍ في `index.html` بعينها — وقد خلَت منها بحقٍّ يومَ بُدّلت بطاقاتُها،
+// فصار المحروسُ **وجودَه في المرجع** حيث تُعرَض بيانات. (`test_welcome.mjs §١١`
+// يحرس الحدَّ بين اللغتين موضعاً موضعاً.)
+const WELCOME_PAGES = ['index.html', 'curriculum.html', 'method.html', 'guide.html'];
+const welcomePages = WELCOME_PAGES.map((f) => read(`welcome/${f}`));
+for (const [i, text] of welcomePages.entries()) {
+  ok(glyphsIn(text).length === 0,
+    `ولا في ${WELCOME_PAGES[i]} من المرجع التعريفيّ (رموزُها \`<img>\` من app/emoji/)`);
+}
+ok(welcomePages.some((t) => /<img[^>]+src="\.\.\/emoji\//.test(t)),
   'وهي تصل أيقونات التطبيق نفسِها (لا نسخةً ثانية تفترق عنها)');
 
 // ————— ٢. كل رمزٍ في البيانات له ملفُّ SVG، والفهرس يطابق القرص —————
@@ -138,8 +148,13 @@ ok(handmade.length === 0,
   `لا شاشةَ تبني صورةَ رمزٍ بيدها — كلُّها تمرّ بـfaceEl (${screens.length} وحدة)`
   + (handmade.length ? ' — بنت: ' + handmade.join('، ') : ''));
 
+// **وطالبُ الأيقونة شاشةٌ أو صفحة** (١٨ أغسطس ٢٠٢٦): الشاشةُ تطلبها بـ`icon('اسم')`،
+// وصفحاتُ `welcome/` بلا جافاسكربت فتُدرِج مسارَها نصّاً موسوماً `data-icon="اسم"`
+// — وهي طالبةٌ حقيقية. فلولا جردُها لعُدّت أيقوناتُ المرجع **رسماً ميتاً** وهي
+// معروضةٌ على شاشة معلّم، ولانقلب هذا الحارسُ يمنع ما أمر به `DESIGN §٦`.
 const asked = [...new Set(screens.concat('js/ui.js')
-  .flatMap((p) => [...read(p).matchAll(/\bicon\('([a-z]+)'/g)].map((m) => m[1])))];
+  .flatMap((p) => [...read(p).matchAll(/\bicon\('([a-z]+)'/g)].map((m) => m[1]))
+  .concat(welcomePages.flatMap((t) => [...t.matchAll(/data-icon="([a-z]+)"/g)].map((m) => m[1]))))];
 const unknown = asked.filter((name) => !ICON_NAMES.includes(name));
 ok(unknown.length === 0,
   `وكلُّ أيقونةٍ تطلبها شاشةٌ لها رسمُها في ICONS (${asked.length} من ${ICON_NAMES.length})`
