@@ -36,7 +36,7 @@ async function waitFor(fn, label = '', ms = 8000) {
 
 const { LIBRARY, libraryOf } = await import('./js/library.js');
 const { GARDENS } = await import('./js/lexicon.js');
-const { allNodes } = await import('./js/progress.js');
+const { allNodes, journey } = await import('./js/progress.js');
 const manifest = await (await fetch('audio/manifest.json')).json();
 const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
 const frame = document.getElementById('frame');
@@ -114,6 +114,13 @@ const unfoldAll = () => {
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 const lineWords = (i) => [...$$('.line')[i].querySelectorAll('.story-word')];
 
+// **المواضعُ تُشتقّ من ترتيب الرحلة الواقع** (الجلسة ع٤): شقُّ ب١٠ جعل لبستانٍ واحد
+// محطتَي باقاتٍ ومحطتَي سلّم، فالمكتبةُ لم تعد تلي `$$('.station--ladder')[i]` بترتيب
+// عالم العشرة — وهي تلي **بقيّةَ سلّم بستانها** كما هي اليوم. ومحطاتُ الخريطة أقسامُ
+// `journey()` بترتيبها عنصراً بعنصر (`main.js` يبني محطةً لكل قسم).
+const sections = journey();
+const kindSections = (kind) => sections.filter((s) => s.kind === kind);
+
 async function goto(hash) {
   win.location.hash = hash;
   await sleep(200);
@@ -136,12 +143,25 @@ try {
   // **محطاتُ المكتبة بساتينُها وحدها**: رفُّ المكتبة يشاركها لونَها ومعلمَها
   // ويفترق بصنفه `station--shelf` — فلا يختلط العدّان (حزمة المكتبة).
   const libStations = () => $$('.station--library:not(.station--shelf)');
-  ok(libStations().length === GARDENS.filter((g) => libraryOf(g.id).length).length,
+  const librarySecs = kindSections('library');
+  ok(libStations().length === GARDENS.filter((g) => libraryOf(g.id).length).length
+    && libStations().length === librarySecs.length,
     `الخريطة فيها ${arNum(libStations().length)} مكتبات — مكتبةٌ بعد كل بستان`);
   const stations = $$('.station');
-  ok(libStations().every((el, i) =>
-    stations.indexOf(el) === stations.indexOf($$('.station--ladder')[i]) + 1),
-    'وكل مكتبة تلي سلّم جملها مباشرةً (كلماتُ البستان ← جملُه ← قصةٌ تجمعها)');
+  ok(stations.length === sections.length,
+    `والخريطة محطةٌ لكل قسمٍ في الرحلة (${arNum(stations.length)} محطة) — `
+    + 'وعليها يقوم اشتقاقُ المواضع بعدُ');
+  // الجوارُ يُشتقّ من ترتيب `journey()` ويُقابَل بما رُسم على الشاشة صنفاً بصنف:
+  // مكتبةُ البستان تلي **بقيّةَ سلّمه** (باقاتُ أ ← درجاتُها ← باقاتُ ب ← بقيّةُ السلّم
+  // ← المكتبة) — فلا يكفي أنّ البيانات مرتَّبة، ولا يُكتب موضعٌ باليد.
+  ok(librarySecs.every((sec) => {
+    const i = sections.indexOf(sec);
+    const before = sections[i - 1];
+    return before?.kind === 'ladder' && before.garden.id === sec.garden.id
+      && stations[i].classList.contains('station--library')
+      && stations[i - 1].classList.contains('station--ladder');
+  }), `وكل مكتبة تلي سلّم جملها مباشرةً — ${arNum(librarySecs.length)} مكتبةً كلُّها `
+    + '(كلماتُ البستان ← جملُه ← قصةٌ تجمعها)');
   ok(libStations().every((s) => s.classList.contains('station--locked')),
     'وكلها مقفلة في بداية الرحلة');
   ok($$('.station--shelf').length === 1

@@ -17,11 +17,47 @@
 <div id="toast" class="toast" hidden></div>
 <div class="grid" id="grid"></div>
 <script type="module">
-import { renderLesson } from './js/lesson.js';
+import { renderLesson, harakaRounds } from './js/lesson.js';
+import { HARAKAT } from './js/curriculum.js';
+
+// صوتٌ لا ينتهي أبداً (نمطُ عدّة الجهاز): تتجمّد الحالُ المعروضة، والقناةُ تعدّه
+// متعذّراً فتصفو فوراً — فلا تتكدّس نقراتُ القيادة أصواتاً تُعلّق `afterSpeech`.
+window.Audio = class { play() { return new Promise(() => {}); } pause() {} };
+// **والزمنُ مُسرَّع**: المشغّل يلتقط لقطةً واحدة عند سكون التحميل، وخطوةُ الحركات
+// تنتقل بمهلة ٧٥٠ منذ ع٢ — فتُصفَّر مُهَلُ المؤقّتات (بترتيبها) كي تكتمل الوضعيةُ
+// قبل لحظة الالتقاط. صفحةُ عرضٍ تُصوَّر، لا حارسَ يقيس تعاقباً.
+const realSetTimeout = window.setTimeout.bind(window);
+window.setTimeout = (fn, _ms, ...args) => realSetTimeout(fn, 0, ...args);
 
 const grid = document.getElementById('grid');
 const $$ = (root, sel) => [...root.querySelectorAll(sel)];
 
+// **القيادةُ غيرُ متزامنة منذ ع٢** (تصحيحُ المدير، ٢٢ أغسطس ٢٠٢٦ — نمطُ ع٤ في
+// `browser_device.html`): خطوةُ الحركات ثلاثةُ أسئلةٍ تنتقل بعد سكوت القناة
+// ومهلة العين، فتُقاد جولةً جولة بعددٍ مشتقٍّ من `harakaRounds` لا بنقرةٍ واحدة —
+// وكانت الصفحةُ على شكل ما قبل ع٢ فتنهار على `.next` معدوماً.
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function until(fn, label, ms = 8000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(20);
+  }
+}
+async function solveHarakat(app) {
+  $$(app, '.btn').find((b) => b.textContent.includes('أيها سمعت')).click();
+  const rounds = harakaRounds(HARAKAT).length;
+  for (let r = 1; r <= rounds; r++) {
+    await until(() => $$(app, '.vchip').length
+      && !$$(app, '.vchip').some((c) => c.classList.contains('good')),
+    `فتحُ جولة الحركات ${r} من ${rounds}`);
+    $$(app, '.vchip').forEach((c) => c.click());
+  }
+  return until(() => app.querySelector('.next'), 'زرُّ «تابع» بعد الجولات');
+}
+const queue = [];
 function instance(title, drive) {
   const cell = document.createElement('div');
   cell.className = 'cell';
@@ -31,7 +67,7 @@ function instance(title, drive) {
   app.append(renderLesson('g1', 'ب'));
   cell.append(app);
   grid.append(cell);
-  drive(app);
+  queue.push(() => drive(app));
 }
 
 instance('١ — اسمع وشاهد', () => {});
@@ -42,24 +78,20 @@ instance('٢ — الحركات (بعد السؤال)', (app) => {
   chips[0].classList.add('good');
   chips[2].classList.add('bad');
 });
-instance('٣ — تتبّع', (app) => {
+instance('٣ — تتبّع', async (app) => {
   app.querySelector('.next').click();
-  $$(app, '.btn').find((b) => b.textContent.includes('أيها سمعت')).click();
-  $$(app, '.vchip')[0].click();
-  $$(app, '.vchip')[1].click();
-  $$(app, '.vchip')[2].click();
-  app.querySelector('.next')?.click();
+  (await solveHarakat(app)).click();
 });
-instance('٤ — ميّز بأذنك', (app) => {
+instance('٤ — ميّز بأذنك', async (app) => {
   app.querySelector('.next').click();
-  $$(app, '.btn').find((b) => b.textContent.includes('أيها سمعت')).click();
-  $$(app, '.vchip').forEach((c) => c.click());          // إحداها الصحيحة فيظهر «تابع»
-  app.querySelector('.next').click();                   // ← تتبّع
+  (await solveHarakat(app)).click();                    // ← تتبّع
   $$(app, '.btn').find((b) => b.textContent.includes('تمّ')).click();
 });
 instance('٥ — الاحتفال', (app) => {
   $$(app, '.btn').find((b) => b.textContent.includes('إنهاء الدرس')).click();
 });
+
+for (const drive of queue) await drive();
 </script>
 </body>
 </html>

@@ -35,7 +35,7 @@ async function waitFor(fn, label = '', ms = 6000) {
 }
 
 const { LADDERS, RUNGS, MECHANIC_TITLES } = await import('./js/sentences.js');
-const { allNodes } = await import('./js/progress.js');
+const { allNodes, journey } = await import('./js/progress.js');
 const { wordSkill } = await import('./js/curriculum.js');
 const manifest = await (await fetch('audio/manifest.json')).json();
 const pendingAudio = new Set(await (await fetch('/__queue.json')).json());
@@ -109,6 +109,15 @@ const unfoldAll = () => {
   for (const b of $$('.station--folded .station-head--fold')) b.click();
 };
 const arNum = (n) => String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
+
+// **الأعدادُ والمواضعُ تُشتقّ من الرحلة الواقعة** (الجلسة ع٤): شقُّ ب١٠ جعل لسلّم
+// البستان الواحد **محطتين** على الخريطة (درجاتُ باقات أ ثم بقيّتُه بعد باقات ب)،
+// فعددُ محطات السلالم ليس عددَ السلالم. ومحطاتُ الخريطة أقسامُ `journey()` بترتيبها
+// عنصراً بعنصر (`main.js` يبني محطةً لكل قسم) — فمنها يُشتقّ كلُّ عددٍ وكلُّ موضع.
+const sections = journey();
+const kindSections = (kind) => sections.filter((s) => s.kind === kind);
+const sectionOf = (nodeId) => sections.find((s) => s.nodes.some((n) => n.id === nodeId));
+const stationOf = (section) => $$('.station')[sections.indexOf(section)];
 
 async function goto(hash) {
   win.location.hash = hash;
@@ -266,12 +275,25 @@ try {
   // ————— ١) الخريطة: سلّم جمل بعد كل بستان —————
   await seed([]);
   await waitFor(() => $('.station'), 'الخريطة');
-  ok($$('.station--ladder').length === LADDERS.length,
-    `الخريطة فيها ${arNum(LADDERS.length)} سلالم جمل — سلّمٌ بعد كل بستان`);
   const stations = $$('.station');
-  ok(LADDERS.every((l, i) => stations.indexOf($$('.station--ladder')[i])
-    === stations.indexOf($$('.station--garden')[i]) + 1),
-    'وكل سلّم يلي بستانه مباشرةً (بند الحزمة: تُفتح بإتمام باقاته)');
+  ok(stations.length === sections.length,
+    `الخريطة محطةٌ لكل قسمٍ في الرحلة (${arNum(stations.length)} محطة) — `
+    + 'وعليها يقوم اشتقاقُ المواضع بعدُ');
+  const ladderSecs = kindSections('ladder');
+  ok($$('.station--ladder').length === ladderSecs.length
+    && new Set(ladderSecs.map((s) => s.garden.id)).size === LADDERS.length,
+    `الخريطة فيها ${arNum(ladderSecs.length)} محطةَ سلّمٍ — `
+    + `${arNum(LADDERS.length)} سلالمَ شُقَّ كلٌّ منها محطتين (الحكم ب١٠)`);
+  // وكلُّ محطةِ سلّمٍ تلي **باقاتِ نصفِها** مباشرةً: يُشتقّ الجوارُ من ترتيب `journey()`
+  // ويُقابَل بما رُسم على الشاشة صنفاً بصنف — فلا يكفي أنّ البيانات مرتَّبة.
+  ok(ladderSecs.every((sec) => {
+    const i = sections.indexOf(sec);
+    const before = sections[i - 1];
+    return before?.kind === 'garden' && before.garden.id === sec.garden.id
+      && stations[i].classList.contains('station--ladder')
+      && stations[i - 1].classList.contains('station--garden');
+  }), `وكل سلّم يلي باقات نصفِه مباشرةً — ${arNum(ladderSecs.length)} محطةً كلُّها `
+    + '(تُفتح بإتمام باقاته)');
   ok($$('.station--ladder').every((s) => s.classList.contains('station--locked')),
     'وكلها مقفلة في بداية الرحلة');
   unfoldAll();
@@ -308,14 +330,44 @@ try {
   const orderKeys = skills.filter(([k]) => k.endsWith('|order'));
   ok(orderKeys.length > 0 && orderKeys.length === skills.length,
     `كل ما سُجّل تمارين ترتيب (${arNum(orderKeys.length)} مهارة) — لا قياس في «اقرأ ونفّذ» ولا «أكمل»`);
+  // **قاعدةُ ب٨** (وز٢، `openRound` في `progress.js`): أولُ محاولةٍ في الجولة وحدَها
+  // تدخل ليتنر، وما بعدها **تعلُّمٌ لا قياس** — فالصوابُ التصحيحيُّ بعد الخطأ المقصود
+  // لا يُسجَّل. وكان الشرطُ يطلب «كلماتِ الترتيب + الخطأ» فيطلب **عكسَ القاعدة**
+  // (عينُ شيخوخة مشهد الجذور المصحَّحة في ع٢).
+  //
+  // **والجولاتُ تُشتقّ من بيانات الدرجة لا تُعَدّ باليد**: كلُّ خانةٍ في «رتّب» جولةٌ
+  // مفتاحُها كلمتُها المطلوبة، فلكلِّ مفتاحٍ عددُ جولاتِه — و**محاولةٌ مقيسةٌ واحدة
+  // لكل جولة** مهما تكرّرت النقرات فيها. وهو أدقُّ من عدٍّ إجماليّ: يمسك المفتاحَ
+  // المتكرّر (`س|fatha` جولتان في درجة البَيْت) الذي يبتلعه المجموع.
   const taps = orderKeys.reduce((s, [, v]) => s + v.right + v.wrong, 0);
-  const need = first.sentences.filter((s) => s.mechanic === 'order')
-    .reduce((s, x) => s + x.words.length, 0);
-  ok(taps === need + 1, `وعدد المحاولات = كلمات جمل الترتيب + الخطأ المقصود (${arNum(taps)} من ${arNum(need + 1)})`);
-  const firstOrder = first.sentences.find((s) => s.mechanic === 'order');
+  const orderSentences = first.sentences.filter((s) => s.mechanic === 'order');
+  const need = orderSentences.reduce((s, x) => s + x.words.length, 0);
+  const roundsOf = {};
+  for (const sentence of orderSentences) {
+    for (const word of sentence.words) {
+      const skill = wordSkill(word);
+      if (!skill) continue;
+      const key = `${skill.letter}|${skill.haraka}|order`;
+      roundsOf[key] = (roundsOf[key] || 0) + 1;
+    }
+  }
+  ok(taps === need,
+    `وعدد المحاولات = كلمات جمل الترتيب (${arNum(taps)} من ${arNum(need)}) — جولةٌ لكل كلمة، `
+    + 'والخطأ المقصود يفتح جولتَه ولا يزيدها محاولة (ب٨)');
+  const overCounted = orderKeys
+    .filter(([k, v]) => v.right + v.wrong !== roundsOf[k])
+    .map(([k, v]) => `${k}: ${v.right + v.wrong} ≠ ${roundsOf[k]}`);
+  ok(overCounted.length === 0 && orderKeys.length === Object.keys(roundsOf).length,
+    `ولكل مفتاحٍ محاولةٌ مقيسةٌ واحدة لكل جولةٍ من جولاته — ب٨ `
+    + `(${arNum(orderKeys.length)} مفتاحاً${overCounted.length ? ' — ' + overCounted.join('، ') : ''})`);
+  const firstOrder = orderSentences[0];
   const expected = wordSkill(firstOrder.words[0]);
-  ok(skills.some(([k, v]) => k === `${expected.letter}|${expected.haraka}|order` && v.wrong === 1),
-    `والخطأ مسجَّل على الكلمة المطلوبة في موضعها لا على ما لُمس (${expected.letter}|${expected.haraka})`);
+  const opener = Object.fromEntries(skills)[`${expected.letter}|${expected.haraka}|order`];
+  ok(opener && opener.wrong === 1
+    && orderKeys.filter(([, v]) => v.wrong).length === 1,
+    `والخطأ المقصود وحدَه مسجَّلٌ على الكلمة المطلوبة في موضعها لا على ما لُمس `
+    + `(${expected.letter}|${expected.haraka}: خطأ ${arNum(opener?.wrong)} · `
+    + `صواب ${arNum(opener?.right)} في ${arNum(roundsOf[`${expected.letter}|${expected.haraka}|order`])} جولتين)`);
 
   // ————— ٤) درجة من بستان آخر: بلا خطأ —————
   const second = LADDERS[1].rungs[0];
@@ -331,8 +383,12 @@ try {
   $('.celebrate .btn--primary').click();
   await waitFor(() => $('.station'), 'العودة للخريطة');
   unfoldAll();
-  ok($$('.station--ladder')[1].querySelectorAll('.node--done').length === 1,
-    'والخريطة تُظهر الدرجة المُنجَزة في سلّمها');
+  // **محطةُ الدرجة تُشتقّ من الرحلة لا تُعَدّ باليد**: `$$('.station--ladder')[1]` كان
+  // «السلّمَ الثاني» في عالم العشرة، وهو بعد الشقّ **بقيّةُ سلّم البستان الأول**.
+  const secondSec = sectionOf(`ladder:${second.id}`);
+  const secondDone = stationOf(secondSec).querySelectorAll('.node--done').length;
+  ok(secondDone === 1,
+    `والخريطة تُظهر الدرجة المُنجَزة في محطتها «${secondSec.garden.title}» (${arNum(secondDone)})`);
 
   // ————— ٤ب) التدرّج في متصفّح حقيقي: ٢ ← ٣ ← ٤/٥ في بستانين (بند الحزمة ٩أ) —————
   const lens = (r) => r.sentences.map((s) => s.words.length);
@@ -372,7 +428,8 @@ try {
   await waitFor(() => $('.station'), 'الخريطة بعد إتمام كل شيء');
   ok($('.map .note')?.textContent.includes('سلّم الجمل'),
     `والرحلة لا تكتمل إلا بآخر درجة (${$('.map .note')?.textContent.trim()})`);
-  ok($$('.station--ladder.station--done').length === LADDERS.length, 'وكل السلالم مُنجَزة');
+  ok($$('.station--ladder.station--done').length === ladderSecs.length,
+    `وكل محطات السلالم مُنجَزة (${arNum($$('.station--ladder.station--done').length)})`);
 
   // ————— ٧) الصوت: ملفات مولَّدة، والنطق الآلي للمنتظِر وحده —————
   const missing = played.filter((t) => t.startsWith('?'));

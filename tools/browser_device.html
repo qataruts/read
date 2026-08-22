@@ -54,7 +54,7 @@ window.addEventListener('unhandledrejection', (e) => shout(e.reason?.stack || e.
 </script>
 
 <script type="module">
-import { renderLesson } from './js/lesson.js';
+import { renderLesson, harakaRounds } from './js/lesson.js';
 import { renderSkillLesson } from './js/skill.js';
 import { renderGate } from './js/gate.js';
 import { renderContrast } from './js/contrast.js';
@@ -67,7 +67,7 @@ import { renderStory } from './js/story.js';
 import { renderReview } from './js/review.js';
 import { renderPlacement, rungs } from './js/placement.js';
 import * as progress from './js/progress.js';
-import { LETTERS } from './js/curriculum.js';
+import { HARAKAT, LETTERS } from './js/curriculum.js';
 import { GARDENS } from './js/lexicon.js';
 import { RUNGS } from './js/sentences.js';
 import { h, giantInk, accentFor } from './js/ui.js';
@@ -86,19 +86,51 @@ for (const node of progress.allNodes()) progress.setStars(node.id, 3);
 const $$ = (root, sel) => [...root.querySelectorAll(sel)];
 const hit = (app, label) => $$(app, 'button').find((b) => b.textContent.includes(label))?.click();
 
-/** درس الحرف عند خطوةٍ بعينها (القيادة عينُها في `browser_shots.html`). */
-function lessonAt(step) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function until(fn, label, ms = 6000) {
+  const t0 = Date.now();
+  for (;;) {
+    let v; try { v = fn(); } catch { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > ms) throw new Error('انتظار طويل: ' + label);
+    await sleep(20);
+  }
+}
+
+/**
+ * درس الحرف عند خطوةٍ بعينها (القيادة عينُها في `browser_shots.html`).
+ *
+ * **وخطوةُ الحركات جولاتٌ بعدد الحركات لا جولةٌ واحدة** (ع٢، ٢٢ أغسطس ٢٠٢٦: «الحركاتُ
+ * الثلاث مضمونةٌ في كل تشغيل» — الفرعُ الميت الذي كان يترك ٥٦ مفتاحاً بلا قياس). وكان
+ * هذا المشهد يقودها على شكلِ ما قبلها — نقرةٌ واحدة على البطاقات ثم `.next` — و`.next`
+ * لا يظهر إلا بعد آخر جولة، فصار `null` وانهارت شاشتا `lesson-trace` و`lesson-quiz`
+ * على المقاسات الخمسة («Cannot read properties of null (reading 'click')»).
+ *
+ * فتُقاد الآن **جولةً جولة**: نقرُ البطاقات يحلّ الجولة، وانتقالُها بعد سكوت القناة
+ * ومهلة العين (`audio.afterSpeech`) فيُنتظَر لا يُفترَض. **وعددُ الجولات مشتقٌّ من
+ * المُنشئ نفسِه** (`harakaRounds`) لا مكتوباً بيد — فحركةٌ رابعةٌ غداً تُقاد بلا تعديل
+ * (سنّةُ ع٢: «نموذجُ الحارس يُشتقّ من المُنشئ ولا يُكتب بيد»).
+ */
+async function lessonAt(step) {
   const el = renderLesson('g1', 'ب');
   const drives = [
     () => el.querySelector('.next').click(),
-    () => {
+    async () => {
       hit(el, 'أيها سمعت');
-      $$(el, '.vchip').forEach((c) => c.click());     // إحداها الصحيحة فيظهر «تابع»
-      el.querySelector('.next').click();
+      const rounds = harakaRounds(HARAKAT).length;
+      for (let r = 1; r <= rounds; r++) {
+        // `ask()` تنزع «good» من البطاقات كلِّها ⇒ خلوُّها علامةُ فتحِ الجولة التالية
+        await until(() => $$(el, '.vchip').length
+          && !$$(el, '.vchip').some((c) => c.classList.contains('good')),
+        `فتحُ جولة الحركات ${r} من ${rounds}`);
+        $$(el, '.vchip').forEach((c) => c.click());   // إحداها الصحيحة فتُحَلّ الجولة
+      }
+      (await until(() => el.querySelector('.next'),
+        'زرُّ «تابع» بعد جولات الحركات كلِّها')).click();
     },
     () => hit(el, 'تمّ'),
   ];
-  for (let i = 0; i < step; i++) drives[i]();
+  for (let i = 0; i < step; i++) await drives[i]();
   return el;
 }
 
@@ -193,8 +225,8 @@ if (params.get('flat')) {
   document.head.append(off);
 }
 
-function show(build) {
-  const node = build();
+async function show(build) {
+  const node = await build();
   // شاشةٌ تعود بـ`null` (معرّفٌ مجهول) تُقاس صفحةً خاوية فتُقال «تسع الشاشة» كذباً
   if (!node || !node.nodeType) throw new Error('لم تُبنَ الشاشة (معرّف مجهول؟)');
   app.replaceChildren(node);
@@ -272,7 +304,7 @@ if (params.get('metrics')) {
 } else if (params.get('screen')) {
   const found = SCREENS.find(([id]) => id === params.get('screen'));
   if (!found) shout('لا شاشة بهذا الاسم: ' + params.get('screen'));
-  else show(found[2]);
+  else await show(found[2]);
 } else {
   // وضع القياس: شاشةً شاشةً، ويُرسَل الفائض الرأسي والأفقي بمقاس النافذة الحالي
   const out = [];
@@ -280,7 +312,7 @@ if (params.get('metrics')) {
   const orient = vw > vh ? 'عرضي' : 'طولي';
   for (const [id, label, build] of SCREENS) {
     try {
-      show(build);
+      await show(build);
       const doc = document.documentElement;
       out.push({
         id, label, orient, vw, vh,
