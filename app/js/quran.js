@@ -490,6 +490,13 @@ function renderQuranMuqattaat() {
 /**
  * جولات «جِدْها في الآية»: أهدافٌ من كلمات السورة، **موزَّعةٌ على آياتها** ما أمكن
  * (لا ثلاثُ جولاتٍ من آيةٍ واحدة والطفلُ قد حفظ موضعَها).
+ *
+ * **وكلُّ مهارةٍ تعلنها المحطةُ تُسأل جولةً على الأقل في كل تشغيل** (حكم المدير،
+ * ٢٢ أغسطس ٢٠٢٦ — جلسة ع٣): المحطةُ تفتح مهارةَ كلِّ كلمةٍ من كلماتها
+ * (`mushafSkill`)، وكان الاقتراعُ يسأل ستاً من ٨–١٦ مهارةً مميّزة فيبقى المفتوحُ
+ * بلا قياسٍ أو يُقاس في سورةٍ لاحقة تصادفه بعد شهور. فصارت المهاراتُ مضمونةً
+ * (نمطُ «المفاتيح المضمونة» من ل٢: لا عشوائيةَ تُضيّع مفتاحاً)، و`rounds` أرضيةٌ
+ * تُكمَل بالتناوب القديم لا سقفٌ يقصّ التغطية.
  */
 export function buildFindRounds(words, rounds = FIND_ROUNDS, rnd = Math.random) {
   const pool = shuffle(words, rnd);
@@ -497,14 +504,31 @@ export function buildFindRounds(words, rounds = FIND_ROUNDS, rnd = Math.random) 
   let used = new Set();
   // **والتمييزُ بالنصّ لا بالعنصر**: صارت الكلماتُ تُعرَض بتتابعها، فالكلمةُ الواحدة
   // قد تَرِد مرّتين بعنصرين — ولو مُيِّزت بالعنصر لسُئل الطفلُ عن «ٱللَّهُ» جولتين.
-  while (out.length < Math.min(rounds, pool.length)) {
-    const taken = (w) => out.some((o) => o.text === w.text);
-    const fresh = pool.find((w) => !taken(w) && !used.has(w.ayah));
-    const pick = fresh || pool.find((w) => !taken(w));
-    if (!pick) break;
+  const taken = (w) => out.some((o) => o.text === w.text);
+  const take = (cands) => {
+    const fresh = cands.find((w) => !taken(w) && !used.has(w.ayah));
+    const pick = fresh || cands.find((w) => !taken(w));
+    if (!pick) return;
     if (!fresh) used = new Set();          // دارت الآيات كلها: نبدأ دورةً جديدة
     used.add(pick.ayah);
     out.push(pick);
+  };
+  // مهارةً مهارة: لكلِّ مهارةٍ معلَنةٍ كلماتُها، وممثِّلُها كلمةٌ من آيةٍ لم تُزَر
+  // ما أمكن. (وكلمةٌ بلا مهارة — رسمُها كلُّه من حرفَي المرحلة — لا إعلانَ لها،
+  // فلا جولةَ تُضمَن وتبقى في حوض الإكمال.)
+  const byKey = new Map();
+  for (const w of pool) {
+    const skill = mushafSkill(w.text);
+    if (!skill) continue;
+    const key = `${skill.letter}|${skill.haraka}`;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(w);
+  }
+  for (const cands of byKey.values()) take(cands);
+  while (out.length < Math.min(rounds, pool.length)) {
+    const before = out.length;
+    take(pool);
+    if (out.length === before) break;
   }
   return out;
 }
@@ -514,6 +538,7 @@ function renderSurahWords(surahId) {
   if (!surah) return null;
   const words = surahWords(surah);
   const heard = new Set();
+  let findCount = 0;                 // جولاتُ «جِدْها» المبنيّة فعلاً — مقامُ النجوم
 
   // نسبةُ التلاوة إلى صاحبها — **قارئُ الكلمة وحده** لا قارئُ الآية: هما مصدران
   // مختلفان قد يختلف قارئاهما، ونسبةُ تلاوةٍ إلى غير صاحبها كذبٌ على الطفل ووليّه.
@@ -591,6 +616,7 @@ function renderSurahWords(surahId) {
         title: 'جِدْها في الآية',
         build: ({ next, fail }) => {
           const rounds = buildFindRounds(words);
+          findCount = rounds.length;
           if (!rounds.length) {
             setTimeout(next, 0);
             return h('p', { class: 'hint' }, '…');
@@ -656,7 +682,8 @@ function renderSurahWords(surahId) {
       },
     ],
     celebrate: (state) => ({
-      stars: starsForGame(state.errors, Math.min(FIND_ROUNDS, words.length)),
+      // مقامُ النجوم عددُ الجولات المبنيّ فعلاً (صار يفوق `FIND_ROUNDS` بضمان التغطية)
+      stars: starsForGame(state.errors, findCount || Math.min(FIND_ROUNDS, words.length)),
       line: state.errors === 0
         ? cheer(`صارت كلمات سورة ${surah.name} في يدك — اقرأها الآن!`)
         : 'أعِد النظر في الكلمات، ثم اقرأ السورة على مهل.',

@@ -165,10 +165,14 @@ export function skillKeys(rung) {
   };
   for (const node of rung.nodes) {
     if (node.type === 'letter') {
-      for (const k of HARAKAT) {
-        put(node.letter, k.key, progress.KINDS.QUIZ);
-        put(node.letter, k.key, progress.KINDS.HARAKA);
-      }
+      // **بُعدُ الحركة تملكه خطوةُ الحركات وحدَها** (حكمُ المدير في بوابة تصميم ع٢):
+      // «ميّز بأذنك» خياراتُها حروفٌ بحركةٍ **واحدة متطابقة** فلا يُفرَّق بينها إلا
+      // بالحرف — فمقيسُها الحرفُ لا الحركة، ومفتاحُها الفتحةُ وحدَها. وكان يُعلَن
+      // ثلاثةً وتُبنى له ثلاثُ جولاتٍ مقترَعة، فبقي **٢٩ مفتاحاً يُفتَح ولا يُقاس**
+      // في الرحلة كلِّها (حارسُ الوعد، سورُه الأوّل) وامتحنت بوابةُ اللحاق ما لا
+      // تقيسه محطتُه. وأما الحركاتُ فثلاثتُها معلَنةٌ ومقيسةٌ في درسها (لا تضييق).
+      put(node.letter, HARAKAT[0].key, progress.KINDS.QUIZ);
+      for (const k of HARAKAT) put(node.letter, k.key, progress.KINDS.HARAKA);
     } else if (node.type === 'words') {
       for (const word of rung.group.words || []) {
         for (const tile of word.tiles || []) {

@@ -123,10 +123,17 @@ for (const rung of list) {
   const quiz = keys.filter((k) => k.kind === p.KINDS.QUIZ);
   const haraka = keys.filter((k) => k.kind === p.KINDS.HARAKA);
   const build = keys.filter((k) => k.kind === p.KINDS.BUILD);
+  // **ولكلِّ نوعٍ بُعدُه** (حكمُ المدير في بوابة تصميم ع٢): خطوةُ الحركات تملك بُعدَ
+  // الحركة فمفاتيحُها حرفٌ × ثلاث، و«ميّز بأذنك» تقيس تمييزَ الحرف بأذنٍ (خياراتُها
+  // بحركةٍ متطابقة) فمفتاحُها الفتحةُ وحدَه — واحدٌ للحرف. **والمحروسُ التطابقُ مع ما
+  // تقيسه المحطةُ فعلاً**: مفتاحٌ يُعلَن ولا يُقاس يُفتح بامتحانٍ لا تدرّسه محطتُه.
   const want = letters.length * HARAKAT.length;
-  ok(quiz.length === want && haraka.length === want && build.length > 0,
-    `[${rung.id}] ${letters.length} حروفٍ × ${HARAKAT.length} حركات ⇒ `
-    + `${quiz.length} تمييزاً و${haraka.length} حركةً و${build.length} مقطعاً`);
+  const quizKeys = new Set(quiz.map((k) => `${k.letter}|${k.haraka}`));
+  const wantQuiz = new Set(letters.map((l) => `${l}|${HARAKAT[0].key}`));
+  ok(haraka.length === want && build.length > 0
+    && quizKeys.size === wantQuiz.size && [...wantQuiz].every((k) => quizKeys.has(k)),
+    `[${rung.id}] ${letters.length} حروفٍ ⇒ ${haraka.length} حركةً (× ${HARAKAT.length}) `
+    + `و${quiz.length} تمييزاً (الفتحةُ وحدَها) و${build.length} مقطعاً`);
   ok(keys.every((k) => new Set(keys.map((x) => p.skillKey(x.letter, x.haraka, x.kind))).size === keys.length),
     `[${rung.id}] ولا مفتاحَ مكرَّر`);
   // **المفكوكية بالبناء**: لا مفتاحَ لحرفٍ من خارج المجموعة (والمقاطعُ من كلماتها،

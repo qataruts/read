@@ -44,8 +44,13 @@ async function waitFor(fn, label = '', ms = 4000) {
 
 const {
   QURAN, quranMushafTexts, quranSpokenTexts, quranWordTexts, quranWordItems,
-  surahWords, surahWordsPart, rasmLessons,
+  surahWords, surahWordsPart, rasmLessons, wordSkill, QURAN_LETTERS,
 } = await import('./js/curriculum.js');
+// مهارةُ الكلمة العثمانية — سطرُ `quran.js` نفسُه (`mushafSkill` خاصٌّ بملفّه)
+const mushafSkillKey = (text) => {
+  const s = wordSkill([...String(text)].filter((c) => !QURAN_LETTERS.has(c)).join(''));
+  return s ? `${s.letter}|${s.haraka}` : null;
+};
 const { allNodes, SURAHS_PER_STATION } = await import('./js/progress.js');
 const { LIBRARY } = await import('./js/library.js');
 const manifest = await (await fetch('audio/manifest.json')).json();
@@ -152,22 +157,41 @@ function checkTargets(where) {
 /** يلعب خطوة «اقرأ واختر» كاملةً: خطأ مقصود في جولة ثم الصواب في كلٍّ. */
 async function playReadQuiz(items, { mistakeAt = 1 } = {}) {
   // جولةٌ لكل كلمة **مصوَّرة** («صدق الصورة»، DESIGN §٦: الصورة هي السؤال كلُّه هنا،
-  // فكلمةٌ لا تصوّرها صورةٌ صادقة تبقى خياراً مكتوباً ولا تكون هدفاً).
-  const shown = items.filter((w) => w.pictured !== false);
+  // فكلمةٌ لا تصوّرها صورةٌ صادقة تبقى خياراً مكتوباً ولا تكون هدفاً) — **والموسومةُ
+  // `byEar` معها** (حكم المدير، ٢٢ أغسطس ٢٠٢٦ — ع٣): سؤالُها زرُّ سماعٍ لا صورة،
+  // فلا صورةَ تُعرَض في جولتها أصلاً وصدقُ الصورة سليم.
+  const shown = items.filter((w) => w.pictured !== false || w.byEar);
+  let sawPic = false;
+  let sawEar = false;
   for (let round = 1; round <= shown.length; round++) {
     const mark = heardLog.length;
     await waitFor(() => $$('.vchip--word').length === 3, `خيارات الجولة ${round}`);
-    const emoji = picOf($('.pick-pic'));
-    const target = items.find((w) => w.emoji === emoji);
-    const faces = texts('.vchip-face');
-    if (round === 1) {
-      ok(!!target && faces.includes(target.read),
-        `الجولة ١: صورة «${emoji}» وكلمتها بين الخيارات (${faces.join('|')})`);
-      ok(shown.length < items.length ? shown.every((w) => w.pictured !== false) : true,
-        `والأهداف كلها مصوَّرة (${shown.length} من ${items.length} كلمة)`);
-      ok(heardLog.length === mark,
-        'ولا يُسمَع شيء قبل الاختيار — الحكم على القراءة لا على السمع');
+    let target;
+    if ($('.pick-pic [data-emoji]')) {
+      const emoji = picOf($('.pick-pic'));
+      target = items.find((w) => w.emoji === emoji);
+      if (!sawPic) {
+        sawPic = true;
+        ok(!!target && texts('.vchip-face').includes(target.read),
+          `جولة الصورة: «${emoji}» وكلمتها بين الخيارات (${texts('.vchip-face').join('|')})`);
+        ok(target.pictured !== false, 'وهدفُ جولة الصورة مصوَّرٌ دائماً («صدق الصورة»)');
+        ok(heardLog.length === mark,
+          'ولا يُسمَع شيء قبل الاختيار — الحكم على القراءة لا على السمع');
+      }
+    } else {
+      // جولةُ الأذن: السؤالُ سماعُ الكلمة بنقرة الطفل، والحكمُ على فكّ رسم الخيارات
+      const earBtn = await waitFor(() => $$('.pick-pic .btn')
+        .find((b) => b.textContent.includes('اسمع الكلمة')), 'زرّ جولة الأذن');
+      earBtn.click();
+      await waitFor(() => heardLog.length > mark, 'صوت جولة الأذن');
+      target = items.find((w) => w.read === lastHeard());
+      if (!sawEar) {
+        sawEar = true;
+        ok(!!target && target.byEar === true && target.pictured === false,
+          `جولة الأذن: بلا صورةٍ وسؤالُها سماعُ «${lastHeard()}» — للموسومة \`byEar\` وحدَها`);
+      }
     }
+    const faces = texts('.vchip-face');
     if (round === mistakeAt) {
       const wrong = $$('.vchip--word')[faces.findIndex((f) => f !== target.read)];
       wrong.click();
@@ -179,6 +203,7 @@ async function playReadQuiz(items, { mistakeAt = 1 } = {}) {
     $$('.vchip--word')[texts('.vchip-face').indexOf(target.read)].click();
     await sleep(900);
   }
+  return { sawEar };
 }
 
 try {
@@ -281,10 +306,19 @@ try {
     ok(lastHeard() === level.items.at(-1).read, `وتُسمع بنقرة (${lastHeard()})`);
     $('.next').click();
     await waitFor(() => $('.vchip--word'), 'اقرأ واختر');
-    await playReadQuiz(level.items, { mistakeAt: 0 });
+    const { sawEar } = await playReadQuiz(level.items, { mistakeAt: 0 });
     await waitFor(() => $('.celebrate'), `ختام ${level.title}`);
     ok($$('.big-stars .on').length === 3, 'بلا خطأ ⇒ ثلاث نجوم');
     ok(stored().stars[`quran:${level.id}`] === 3, 'ونجوم الدرجة محفوظة بمعرّفها');
+    // **جولةُ أذنِ نُورْ تُرى على الشاشة وتُقاس** (حكم المدير — ع٣): كانت غيرُ
+    // المصوَّرة محجوبةً عن الهدفية فمهارتُها تُفتح ولا تُقاس إلا في بستانٍ بعد
+    // مئتي يوم (فجوة ١٩٩ يوماً في حارس الوعد).
+    ok(sawEar === level.items.some((w) => w.byEar),
+      `${level.title}: جولةُ الأذن حيث الوسمُ وحدَه (${sawEar ? 'وُجدت' : 'لا موسومةَ ولا جولة'})`);
+    if (level.items.some((w) => w.byEar)) {
+      ok('ن|damma|build' in stored().skills,
+        'ومهارةُ نُورْ تدخل ليتنر من محطتها — لا من بستانٍ بعد مئتي يوم');
+    }
   }
 
   // ————— ٤) رسم المصحف —————
@@ -420,13 +454,21 @@ try {
 
   $('.next').click();
   await waitFor(() => $('.sw-ayah'), 'خطوة جِدْها في الآية');
-  for (let round = 1; round <= 6; round++) {
+  // **التغطيةُ المضمونة** (حكم المدير، ٢٢ أغسطس ٢٠٢٦ — ع٣): جولةٌ لكل مهارةٍ تفتحها
+  // المحطة — لا ستٌّ مقترَعةٌ تُبقي المفتوحَ بلا قياسٍ أو تؤجّله سورةً تصادفه.
+  const declaredSw = new Set(swWords.map((w) => mushafSkillKey(w.text)).filter(Boolean));
+  const askedSw = new Set();
+  const totalSw = declaredSw.size;
+  for (let round = 1; round <= totalSw; round++) {
     await waitFor(() => $('.sw-word'), `جولة ${round}`);
     const target = $('.sw-target').textContent.trim();
+    askedSw.add(mushafSkillKey(target));
     const chips = $$('.sw-word');
     const line = chips.map((c) => c.textContent.trim()).join(' ');
     const ayah = QURAN.surahs[0].ayat.find((a) => a === line);
     if (round === 1) {
+      ok($$('.hint').some((el) => el.textContent.trim() === `الجولة ١ من ${arNum(totalSw)}`),
+        `والجولاتُ بعدد مهارات السورة المعلَنة (${arNum(totalSw)}) لا ستاً مقترَعة`);
       const mark = heardLog.length;
       ok(!!ayah, `الجولة ١: الآية معروضة كاملةً حرفاً بحرف («${line.slice(0, 24)}…»)`);
       // ترتيبُ العرض عربيّ: أوّلُ كلمةٍ في الآية أيمنُ ما في سطرها
@@ -452,6 +494,8 @@ try {
     await sleep(900);
   }
   await waitFor(() => $('.celebrate'), 'ختام كلمات السورة');
+  ok([...declaredSw].every((k) => askedSw.has(k)),
+    `وكلُّ مهارةٍ معلَنةٍ سُئلت جولتَها فعلاً (${arNum(askedSw.size)} من ${arNum(totalSw)})`);
   ok($$('.big-stars .on').length === 2, `خطأ واحد ⇒ نجمتان (${$$('.big-stars .on').length})`);
   ok(stored().stars[`quran:${surahWordsPart('s1')}`] === 2, 'ونجومها محفوظة بمعرّف عقدتها');
   // **و«جِدْها في الآية» تُقاس** (الحكم ب١): مهارةُ كلمتها (أوّلُ حرفٍ متحرّك) بنوع

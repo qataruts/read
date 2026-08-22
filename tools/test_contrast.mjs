@@ -19,7 +19,7 @@ globalThis.localStorage = {
 const {
   GROUPS, HARAKAT, CONTRASTS, contrastById, contrastPairs, contrastTexts,
 } = await import(new URL('curriculum.js', APP));
-const { buildContrastRounds, contrastRoundTexts, ROUNDS_PER_PAIR } =
+const { buildContrastRounds, contrastRoundTexts, ROUNDS_PER_LETTER } =
   await import(new URL('contrast.js', APP));
 const { buildSession, itemTexts, studiedPairs, starsForReview } =
   await import(new URL('review.js', APP));
@@ -85,7 +85,8 @@ for (let seed = 1; seed <= 60; seed++) {
   const rnd = rng(seed);
   for (const c of CONTRASTS) {
     const built = buildContrastRounds(c, rnd);
-    if (built.length !== c.pairs.length * ROUNDS_PER_PAIR) {
+    const letters = [...new Set(c.pairs.flatMap((x) => x.letters))];
+    if (built.length !== letters.length * ROUNDS_PER_LETTER) {
       bad ||= `[${c.id}] عدد الجولات ${built.length}`;
     }
     for (const r of built) {
@@ -99,12 +100,23 @@ for (let seed = 1; seed <= 60; seed++) {
         bad ||= `[${c.id}] حركة مجهولة`;
       }
     }
-    // جولتان لكل زوج بحركتين مختلفتين: لا يُحفَظ الجواب بنغمة واحدة
-    for (const pair of c.pairs) {
-      const mine = built.filter((r) => r.pair === pair.id);
-      if (mine.length !== ROUNDS_PER_PAIR) bad ||= `[${c.id}] ${pair.id}: ${mine.length} جولة`;
-      if (new Set(mine.map((r) => r.haraka)).size !== mine.length) {
-        bad ||= `[${c.id}] ${pair.id}: حركة مكرَّرة في جولتيه`;
+    // **جولةٌ لكل مفتاحٍ تعلنه المحطة** (حكمُ المدير في بوابة ع٢): لكل حرفٍ حركاتُه
+    // الثلاث مرّةً مرّة — لا حركةَ تتكرّر عليه (فيُحفَظ الجواب بنغمة) ولا واحدةَ تغيب
+    // (فيُفتح مفتاحٌ لا يقيسه أحد — وهو عينُ عيب حارس الوعد: ٣٣ مفتاحاً).
+    for (const letter of letters) {
+      const mine = built.filter((r) => r.letter === letter);
+      const keys = new Set(mine.map((r) => r.haraka));
+      if (mine.length !== ROUNDS_PER_LETTER || keys.size !== ROUNDS_PER_LETTER) {
+        bad ||= `[${c.id}] «${letter}»: ${mine.length} جولة بـ${keys.size} حركة`;
+      }
+    }
+    // **وحرفٌ في زوجين يواجههما كليهما**: مفتاحُه واحدٌ لا يتكرّر، وأزواجُه تتناوب
+    // جولاتِه الثلاث — فلا يُحرَم مواجهةً لأنّ أخرى سبقتها في الإعلان.
+    for (const letter of letters) {
+      const own = c.pairs.filter((x) => x.letters.includes(letter));
+      const faced = new Set(built.filter((r) => r.letter === letter).map((r) => r.pair));
+      if (own.length > 1 && faced.size !== Math.min(own.length, ROUNDS_PER_LETTER)) {
+        bad ||= `[${c.id}] «${letter}» في ${own.length} زوجٍ وواجه ${faced.size}`;
       }
     }
   }

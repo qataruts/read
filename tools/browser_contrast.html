@@ -170,7 +170,10 @@ try {
   // ————— ٣) الجولات: أيَّ حرف سمعت؟ —————
   btn('تابع').click();
   await waitFor(() => $('.vchip--big'), 'جولات المواجهة');
-  const total = CONTRASTS[0].pairs.length * 2;
+  // **العددُ محسوبٌ لا مكتوب**: جولةٌ لكل مفتاحٍ تعلنه المحطة — حرفٌ × حركاته الثلاث
+  // (حكمُ المدير في بوابة ع٢: «تغطيةٌ تامّة بلا تضييق»).
+  const lettersOf = (c) => [...new Set(c.pairs.flatMap((p) => p.letters))];
+  const total = lettersOf(CONTRASTS[0]).length * HARAKAT.length;
   const counter = () => $('.lesson-body .hint').textContent;
   ok(counter().includes('من'), `عدّاد الجولات ظاهر (${counter()})`);
 
@@ -222,8 +225,16 @@ try {
 
   const skills = Object.entries(stored().skills).map(([k, v]) => ({ k, ...v }));
   const contrastSkills = skills.filter((s) => s.k.endsWith('|contrast'));
-  ok(contrastSkills.length >= CONTRASTS[0].pairs.length,
-    `القياس يدخل ليتنر بنوع «contrast» (${contrastSkills.length} مهارة)`);
+  // **التغطيةُ لا العدد** (الجلسة ع٢): المحروسُ أن يبلغ **كلُّ مفتاحٍ تعلنه المحطة**
+  // قياسَه في لعبةٍ واحدة — حرفٌ × حركاته الثلاث — لا أن يبلغه بعضُها. وكان القائمُ
+  // جولتين مقترَعتين لكل زوج، فبقي ٣٣ مفتاحاً يُفتح ولا يقيسه أحدٌ في الرحلة كلِّها.
+  const measured = new Set(contrastSkills.map((s) => s.k));
+  const wantKeys = lettersOf(CONTRASTS[0])
+    .flatMap((l) => HARAKAT.map((k) => `${l}|${k.key}|contrast`));
+  const unmeasured = wantKeys.filter((k) => !measured.has(k));
+  ok(unmeasured.length === 0 && contrastSkills.length === wantKeys.length,
+    `وكلُّ مفاتيح المحطة (${wantKeys.length}) دخلت ليتنر بنوع «contrast»`
+    + (unmeasured.length ? ` — بلا قياس: ${unmeasured.join('، ')}` : ''));
   // قاعدةُ وز٢ (ب٨): أولُ محاولةٍ في الجولة وحدها تدخل ليتنر — فالجولةُ التي
   // أُخطئ فيها أولاً تسجّل خطأها ولا تسجّل صوابَها اللاحق (تعلّمٌ لا قياس)
   ok(contrastSkills.reduce((n, s) => n + s.wrong, 0) === 1
@@ -253,10 +264,10 @@ try {
 
   btn('تابع').click();
   await waitFor(() => $('.vchip--big'), 'جولات المحطة الثانية');
-  // **العددُ محسوبٌ لا مكتوب**: جولتان لكل زوج — فزوجٌ يُضاف (ع/ح وغ/خ بالحكم ج٢)
-  // يحرّك العددَ بلا سطرٍ يُعدَّل هنا.
-  const expected = arNum(CONTRASTS[1].pairs.length * 2);
-  ok(counter().includes(expected), `${expected} جولات (جولتان لكل زوج) — ${counter()}`);
+  // **العددُ محسوبٌ لا مكتوب**: حرفٌ × حركاته الثلاث — فزوجٌ يُضاف (ع/ح وغ/خ بالحكم ج٢)
+  // يحرّك العددَ بلا سطرٍ يُعدَّل هنا، وحرفٌ في زوجين لا يُحسَب مرّتين (`ح`).
+  const expected = arNum(lettersOf(CONTRASTS[1]).length * HARAKAT.length);
+  ok(counter().includes(expected), `${expected} جولة (حرفٌ × حركاته الثلاث) — ${counter()}`);
 
   const small = $$('.screen-card button')
     .map((el) => [el, el.getBoundingClientRect()])

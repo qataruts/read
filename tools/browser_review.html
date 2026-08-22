@@ -143,20 +143,33 @@ try {
   const hTarget = lastPlayed();
   const hChips = $$('.vchip');
   hChips.find((c) => c.querySelector('.vchip-face').textContent !== hTarget).click();   // خطأ مقصود
-  await sleep(120);
+  await sleep(700);                     // إعادةُ السماع بعد الخطأ تتمّ قبل النقرة الصحيحة
   const hMark = played.length;
   hChips.find((c) => c.querySelector('.vchip-face').textContent === hTarget).click();
-  await waitFor(() => $('.next'), 'زر تابع بعد الإجابة');
+  await sleep(140);
   ok(played.length === hMark, 'الإجابة الصحيحة في خطوة الحركات لا تُعاد قراءتها (DESIGN §٥.٢)');
+
+  // **والحركاتُ الثلاث تُسأل كلُّها في الدرس الواحد** (الجلسة ع٢): كانت جولةً واحدة على
+  // الفتحة أبداً، فبقي ٥٦ مفتاحاً (٢٨ حرفاً × كسرةٍ وضمّة) يُفتح في الجرد المُعلَن
+  // ولا يقيسه أحدٌ في الرحلة كلِّها — وتمتحن به بوابةُ اللحاق.
+  for (let ask = 2; ask <= 3; ask++) {
+    const before = played.length;
+    await waitFor(() => played.length > before, `نداء السؤال ${ask}`, 4000);
+    const t = lastPlayed();
+    $$('.vchip').find((c) => c.querySelector('.vchip-face').textContent === t).click();
+    await sleep(140);
+  }
+  await waitFor(() => $('.next'), 'زر تابع بعد تمام الحركات الثلاث');
 
   const afterHaraka = stored().skills;
   const hKeys = Object.keys(afterHaraka).filter((k) => k.endsWith('|haraka'));
-  ok(hKeys.length === 1 && hKeys[0].startsWith('ب|'),
-    `خطوة الحركات تسجّل مهارة واحدة بمفتاح (حرف|حركة|تمرين): ${hKeys.join('،')}`);
+  ok(hKeys.length === 3 && hKeys.every((k) => k.startsWith('ب|')),
+    `خطوة الحركات تسجّل الحركات الثلاث بمفاتيح (حرف|حركة|تمرين): ${hKeys.join('،')}`);
   // **أولُ محاولةٍ في الجولة وحدَها تدخل ليتنر** (الحكم ب٨، جلسة وز٢): نُقر الخطأُ
   // ثم الصواب في **الجولة نفسِها** — فتُسجَّل واحدة: الخطأ. وهذا شاهدُ الحكم الحيّ
   // على شاشةٍ حقيقية: كان يُسجَّل خطأ وصواب فيتضخّم الضعفُ المقيس بعدد النقرات.
-  ok(afterHaraka[hKeys[0]].wrong === 1 && afterHaraka[hKeys[0]].right === 0,
+  // والخطأُ المتعمَّد كان في السؤال الأوّل — وهو الفتحةُ دائماً (§٥.١ والحكم ج٨)
+  ok(afterHaraka['ب|fatha|haraka']?.wrong === 1 && afterHaraka['ب|fatha|haraka']?.right === 0,
     'جولةٌ بخطأ ثم صواب: الخطأ وحدَه يُسجَّل — وما بعده تعلُّمٌ لا قياس');
   ok(afterHaraka[hKeys[0]].box === 0 && afterHaraka[hKeys[0]].due === dayNumber(),
     'فتبقى في صندوق اليوم وتعود في مراجعته (تصفيرٌ واحد لا تصفيران)');
@@ -168,7 +181,8 @@ try {
   // `mark` تُحدَّث قبل النقرة الصحيحة لا في رأس الجولة: الصواب صار صامتاً ونداءُ
   // الجولة التالية مؤجَّلاً، فالتقاطها في الرأس قد يقع بعد النداء فينتظر صوتاً لا يأتي.
   let mark = played.length;
-  for (let round = 1; round <= 3; round++) {
+  // جولتان لا ثلاث (بوابةُ تصميم ع٢): سقفُ §٤ خمسُ جولاتٍ، وخطوةُ الحركات تأخذ ثلاثاً
+  for (let round = 1; round <= 2; round++) {
     await waitFor(() => $$('.vchip--big').length, `جولة ${round}`);
     const heard = await heardTarget(texts('.vchip--big'), mark);
     if (round === 1) {                                   // خطأ مقصود في الجولة الأولى
@@ -184,8 +198,11 @@ try {
   }
   await waitFor(() => $('.celebrate'), 'ختام الدرس');
   const quizKeys = Object.keys(stored().skills).filter((k) => k.endsWith('|quiz'));
-  ok(quizKeys.length >= 1 && quizKeys.every((k) => /^.\|(fatha|kasra|damma)\|quiz$/.test(k)),
-    `تمرين التمييز يسجّل مهاراته بالحركة المسموعة (${quizKeys.join('، ')})`);
+  // **وبالفتحة**: مفتاحُ «ميّز بأذنك» في الجرد المُعلَن حرفٌ بالفتحة — التمييزُ على
+  // الحرف والحركةُ مركبٌ لا مقيس (حكمُ المدير في بوابة ع٢)، فمفتاحٌ بغيرها يُكتب
+  // خارج الجرد. وهدفُ الجولتين حرفان: حرفُ الدرس ثم مراجعةُ ما سبقه.
+  ok(quizKeys.length === 2 && quizKeys.every((k) => /^.\|fatha\|quiz$/.test(k)),
+    `تمرين التمييز يسجّل مهاراته بمفتاحها المُعلَن (${quizKeys.join('، ')})`);
   ok(Object.values(stored().skills).reduce((s, x) => s + x.wrong, 0) === 2,
     'مجموع الأخطاء المسجّلة في الدرس = خطآن (واحد في كل تمرين)');
 

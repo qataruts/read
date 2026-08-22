@@ -26,6 +26,10 @@ import * as audio from './audio.js';
 import { KNOBS, sessionSize, distractors } from './support.js';
 import { credit } from './fade.js';   // شاهدُ «رتّب» — الكلمةُ في موضعها (مدخلٌ واحد)
 import { buildBoard } from './words.js';
+// **حوضُ الجذر كتلةٌ واحدة تُستورَد ولا تُنسَخ** (الجلسة ع٢): كانت هنا نسخةٌ ثانية من
+// القاعدة سقط منها إخراجُ الشائكة قبل الحشو، فوقع خياران متطابقان — والقاعدةُ التي
+// تُنسخ تفترق غداً (سنّةُ `record.js`).
+import { rootDistractors } from './roots.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, arCount, starsRow, topbar, letterTitle, wordText,
   mascot, shuffle, pick, shake, pop, DEV,
@@ -109,16 +113,15 @@ function rootItem(rootId, words, rnd) {
   const branches = root.members.filter((m) => known.has(m));
   if (!branches.length) return null;
   const outside = [...new Set(texts)].filter((t) => !root.members.includes(t));
-  const smart = root.stranger ? [root.stranger] : [];
-  const others = [...smart, ...shuffle(outside, rnd)].slice(0, distractors());
-  if (others.length < distractors()) return null;
   const target = pick(branches, rnd);
+  const others = rootDistractors(root, target, outside, distractors(), { rnd });
+  if (others.length < distractors()) return null;
   return {
     id: `root|${root.id}`,
     kind: progress.KINDS.ROOT,
     root,
     target,
-    options: shuffle([target, ...others.filter((o) => o !== target)], rnd),
+    options: shuffle([target, ...others], rnd),
   };
 }
 

@@ -27,6 +27,7 @@ async function waitFor(fn, label = '', ms = 4000) {
   }
 }
 
+const { HARAKAT } = await import('./js/curriculum.js');   // بيانات المنهج مصدرها الوحيد
 const manifest = await (await fetch('audio/manifest.json')).json();
 // النصوص المنتظِرة في قائمة الانتظار الصوتية: لا ملف لها بعدُ، فاحتياط النطق الآلي
 // هو الصواب مؤقتاً — وتفرغ القائمة بعد التصريف فيعود الفحص صارماً بلا تعديل هنا.
@@ -102,9 +103,53 @@ function checkTargets(where) {
   ok(small.length === 0, `${where}: أهداف اللمس ≥٤٨ بكسل${small.length ? ' — ' + small.join('،') : ''}`);
 }
 
+/**
+ * يخوض **أسئلة خطوة الحركات كلَّها** ويتحقّق أنّ الحركات الثلاث تُقاس في كل تشغيل:
+ * كانت جولةً واحدةً على الفتحة أبداً، فبقي ٥٦ مفتاحاً (٢٨ حرفاً × كسرةٍ وضمّة) يُفتح
+ * في الجرد ولا يقيسه أحدٌ في الرحلة كلِّها (حارسُ الوعد، سورُه الأوّل).
+ */
+async function playHarakat(faces, { missFirst = false } = {}) {
+  const heard = [];
+  let mark = played.length;
+  btn('أيها سمعت').click();
+  for (let ask = 1; ask <= faces.length; ask++) {
+    await waitFor(() => played.length > mark, `نداء السؤال ${ask}`, 4000);
+    const target = lastPlayed();
+    heard.push(target);
+    ok(faces.includes(target), `السؤال ${ask}: المسموع «${target}» من بطاقات الحرف`);
+    if (ask === 1) ok(target === faces[0], `والأولُ على الفتحة دائماً — §٥.١ والحكم ج٨ (${target})`);
+    const faceOfChip = (c) => c.querySelector('.vchip-face').textContent;
+    if (missFirst && ask === 1) {
+      const wrong = $$('.vchip').find((c) => faceOfChip(c) !== target);
+      wrong.click();
+      await sleep(80);
+      ok(wrong.classList.contains('bad'), 'الاختيار الخاطئ يُعلَّم ولا ينتقل');
+      ok(!$('.next'), 'زر «تابع» لا يظهر قبل الإجابة الصحيحة');
+      await sleep(700);                    // إعادةُ السماع بعد الخطأ
+    }
+    const right = $$('.vchip').find((c) => faceOfChip(c) === target);
+    const quiet = played.length;
+    right.click();
+    await sleep(90);
+    ok(right.classList.contains('good'), `السؤال ${ask}: الاختيار الصحيح يُعلَّم`);
+    ok(played.length === quiet, `السؤال ${ask}: ولا يُعاد نطقه (DESIGN §٥.٢)`);
+    if (ask < faces.length) {
+      ok(!$('.next'), `السؤال ${ask}: ولا «تابع» قبل تمام الحركات الثلاث`);
+      mark = played.length;
+      await sleep(950);                    // نداءُ التالي بعد سكوت القناة ومهلة العين (٧٥٠)
+    }
+  }
+  ok(!!$('.next'), 'زر «تابع» ظهر بعد تمام الأسئلة الثلاثة');
+  // **التغطيةُ لا العدد**: الحركاتُ الثلاث كلُّها سُئل عنها في هذا التشغيل بعينه
+  ok(new Set(heard).size === faces.length && faces.every((f) => heard.includes(f)),
+    `والحركاتُ الثلاث كلُّها قِيست في الدرس الواحد (${heard.join('|')})`);
+}
+
 /** يخوض جولات «ميّز بأذنك» بلا خطأ ويتحقّق من سلامة كل جولة. */
 async function playQuiz(studied, expectedOptions) {
-  for (let round = 1; round <= 3; round++) {
+  // جولتان لا ثلاث (بوابةُ تصميم ع٢: سقفُ §٤ خمسُ جولاتٍ، وخطوةُ الحركات تأخذ ثلاثاً)
+  const targets = [];
+  for (let round = 1; round <= 2; round++) {
     await waitFor(() => $$('.vchip--big').length > 0, 'خيارات الجولة');
     await sleep(340);                     // الهدف يُشغَّل بعد ربع ثانية من بدء الجولة
     const heard = lastPlayed();
@@ -113,6 +158,10 @@ async function playQuiz(studied, expectedOptions) {
     ok(opts.every((o) => studied.includes(bare(o))), `الجولة ${round}: الخيارات من المدروس فقط`);
     ok(opts.includes(heard), `الجولة ${round}: المسموع «${heard}» بين الخيارات`);
     ok(new Set(opts.map((o) => o.slice(1))).size === 1, `الجولة ${round}: حركة واحدة لكل الخيارات`);
+    // **وبالفتحة**: مفتاحُ هذا التمرين في الجرد المُعلَن حرفٌ بالفتحة — التمييزُ على
+    // الحرف والحركةُ مركبٌ لا مقيس (حكمُ المدير في بوابة ع٢).
+    ok(opts.every((o) => o.slice(1) === HARAKAT[0].mark), `الجولة ${round}: وبالفتحة — مفتاحُها المُعلَن`);
+    targets.push(bare(heard));
     assertDecodable(studied, `الجولة ${round}`);
     if (round === 1) checkTargets('ميّز بأذنك');
     const chip = $$('.vchip--big').find((c) => c.textContent === heard);
@@ -124,6 +173,9 @@ async function playQuiz(studied, expectedOptions) {
     ok(chip.classList.contains('good'), `الجولة ${round}: وأثرُها بصريّ على البلاطة`);
     await sleep(700);
   }
+  // **مفاتيحُ مضمونة**: الأولى على حرف الدرس والثانية مراجعةٌ لحرفٍ سبقه — لا اقتراعٌ
+  // يقع على حرفٍ واحد مرّتين فيضيع مفتاحُ غيره.
+  ok(new Set(targets).size === targets.length, `وهدفا الجولتين حرفان لا حرفٌ مرّتين (${targets.join('|')})`);
 }
 
 try {
@@ -135,8 +187,12 @@ try {
     + ':not(.station--ladder):not(.station--library):not(.station--gate)'
     + ':not(.station--contrast):not(.station--roots)').length === 7,
     'الخريطة تعرض المحطات السبع');
-  ok($$('.station--pause').length === 6,
-    `ومحطات المهارات والقصص بينها (${$$('.station--pause').length})`);
+  // **العددُ يُحسب من الرحلة لا يُكتب** (تصحيح ٢٢ أغسطس ٢٠٢٦: كان «٦» بيدٍ فاحمرّ
+  // يومَ وُلدت قصةُ وز٣ الرابعة بعد المجموعة ٧ — الصنفُ المقفل: الرقمُ يُشتقّ).
+  const interludes = (await import('./js/progress.js')).journey()
+    .filter((s) => s.kind === 'interlude').length;
+  ok($$('.station--pause').length === interludes,
+    `ومحطات المهارات والقصص بينها (${$$('.station--pause').length} من ${interludes} محسوبةً)`);
   ok($$('.station--gate').length === 2,
     `وبوابتا الإتقان قبل المفصلين (${$$('.station--gate').length} — الحزمة ١٤)`);
   // **محطاتُ القرآنية محسوبةٌ لا مكتوبة** (حزمة «مفاصل المرحلة القرآنية»): كانت
@@ -186,23 +242,8 @@ try {
   await sleep(40);
   ok(lastPlayed() === 'إِ', 'نقرة على البلاطة تُسمعها قبل السؤال');
 
-  btn('أيها سمعت').click();
-  await sleep(60);
-  const target = lastPlayed();
-  ok(target === 'أَ', `السؤال الأول على الفتحة دائماً — §٥.١ والحكم ج٨ (${target})`);
-  const chips = $$('.vchip');
-  const wrong = chips.find((c) => c.querySelector('.vchip-face').textContent !== target);
-  wrong.click();
-  await sleep(80);
-  ok(wrong.classList.contains('bad'), 'الاختيار الخاطئ يُعلَّم ولا ينتقل');
-  ok(!$('.next'), 'زر «تابع» لا يظهر قبل الإجابة الصحيحة');
-  const right = chips.find((c) => c.querySelector('.vchip-face').textContent === target);
-  const markHaraka = played.length;
-  right.click();
-  await sleep(80);
-  ok(right.classList.contains('good'), 'الاختيار الصحيح يُعلَّم');
-  ok(played.length === markHaraka, 'ولا يُعاد نطقه (DESIGN §٥.٢: الصواب أثرٌ بصريّ)');
-  ok(!!$('.next'), 'زر «تابع» ظهر بعد الإجابة الصحيحة');
+  // بطاقاتُ الألف «أَ إِ أُ» (الحكم ب٩) — والحركاتُ الثلاث تُسأل كلُّها في الدرس الواحد
+  await playHarakat(['أَ', 'إِ', 'أُ'], { missFirst: true });
 
   // الخطوة ٣: التتبّع
   await clickNext();
@@ -262,11 +303,7 @@ try {
   ok(lastPlayed() === 'بابا', `كلمة المثال تُسمع كاملة (${lastPlayed()})`);
 
   await clickNext();
-  btn('أيها سمعت').click();
-  await sleep(60);
-  const t2 = lastPlayed();
-  $$('.vchip').find((c) => c.querySelector('.vchip-face').textContent === t2).click();
-  await sleep(80);
+  await playHarakat(['بَ', 'بِ', 'بُ']);
   await clickNext();
   btn('تمّ').click();
   await sleep(80);
@@ -300,11 +337,7 @@ try {
   ok($('.example-word .word-text').textContent === 'نَارْ', `كلمة مثال الراء: ${$('.example-word .word-text').textContent}`);
   assertDecodable('ابملنر', 'درس الراء');
   await clickNext();
-  btn('أيها سمعت').click();
-  await sleep(60);
-  const t3 = lastPlayed();
-  $$('.vchip').find((c) => c.querySelector('.vchip-face').textContent === t3).click();
-  await sleep(80);
+  await playHarakat(['رَ', 'رِ', 'رُ']);
   await clickNext();
   btn('تمّ').click();
   await sleep(80);

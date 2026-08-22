@@ -19,7 +19,7 @@ globalThis.localStorage = {
 const {
   GROUPS, SKILLS, STORIES, GATES, CONTRASTS, ROOTS, QURAN, quranParts, surahById,
   quranSpokenTexts, quranMushafTexts, quranWordTexts, quranWordItems, surahWords,
-  surahWordsPart, surahOfWordsPart, quranWordLevel, bareLetters,
+  surahWordsPart, surahOfWordsPart, quranWordLevel, bareLetters, wordSkill, QURAN_LETTERS,
   rasmLessons, rasmSigns, rasmLessonById, rasmSkillKey, muqSkillKey, quranLetterSkills,
   markSkillKey,
 } = await import(new URL('curriculum.js', APP));
@@ -328,13 +328,20 @@ for (let seed = 1; seed <= 60; seed++) {
   }
 }
 ok(true, `جولات سليمة في ٦٠ بذرة عشوائية (${rounds} جولة قراءة + جولات الرسم)`);
-// غيرُ المصوَّرة لا تكون هدفاً وتبقى خياراً مكتوباً («صدق الصورة»، DESIGN §٦)
+// غيرُ المصوَّرة لا يُحكَم **بصورتها** («صدق الصورة»، DESIGN §٦) — ومَن وسمها
+// مؤلّفُها `byEar` تُسأل جولةَ أذنٍ بصوتها المولَّد القائم لا بصورةٍ (حكم المدير،
+// ٢٢ أغسطس ٢٠٢٦ — ع٣): محطةُ الكلمات لا تمرينَ مقيساً فيها سوى «اقرأ واختر»،
+// فكانت مهارةُ نُورْ تُفتح وتبقى بلا قياسٍ ١٩٩ يوماً. والحارسُ صار أشدَّ لا أرخى:
+// كلُّ الكلمات تبلغ هدفَها (لا المصوَّرةُ وحدَها)، وجولةُ غير المصوَّرة أذنٌ لا
+// صورة، والوسمُ استثناءُ مؤلّفٍ على غير مصوَّرةٍ معلَنة لا بابٌ عامّ.
 const level1 = QURAN.words.levels[0].items;
-const pictured = level1.filter((w) => w.pictured !== false);
-ok(buildReadRounds(level1).length === pictured.length,
-  `كل كلمة مصوَّرة تأتي دورها مرة (${pictured.length} من ${level1.length} كلمة في الدرجة الأولى)`);
-ok(buildReadRounds(level1).every((r) => r.target.pictured !== false),
-  'ولا غيرَ مصوَّرةٍ هدفاً — الصورة هي السؤال كلُّه في «اقرأ واختر»');
+ok(buildReadRounds(level1).length === level1.length,
+  `كل كلمة تأتي دورها مرة (${level1.length} كلمة في الدرجة الأولى — والموسومة \`byEar\` معها)`);
+ok(buildReadRounds(level1).every((r) => (r.target.pictured === false) === Boolean(r.byEar)),
+  'وغيرُ المصوَّرة سؤالُها الأذنُ لا الصورة، وجولةُ المصوَّرة لا أذنَ لها');
+ok(quranWordItems().some((w) => w.byEar)
+  && quranWordItems().every((w) => !w.byEar || w.pictured === false),
+  'ولا وسمَ `byEar` إلا على غير مصوَّرةٍ معلَنة — استثناءُ مؤلّفٍ لا تخمينُ شاشة');
 ok(buildReadRounds([{ read: 'أ', emoji: '' }]).length === 0
   && buildRasmRounds([QURAN.rasm.signs[0]]).length === 0
   && buildMuqRounds(QURAN.muqattaat.items.slice(0, 2)).length === 0,
@@ -440,6 +447,17 @@ for (const surah of QURAN.surahs) {
 ok(stationWords === quranWordTexts().length,
   `وجملةُ ما تعرضه المحطات ${stationWords} كلمة (بلا تكرارٍ داخل السورة)`);
 
+// **مهارةُ الكلمة العثمانية** — سطرُ `quran.js` نفسُه (`mushafSkill` خاصٌّ بملفّه):
+// حرفا المرحلة يُنزَعان أوّلاً، ثم أوّلُ حرفٍ متحرّكٍ من حروف المجموعات.
+const mushafSkillKey = (text) => {
+  const s = wordSkill([...String(text)].filter((c) => !QURAN_LETTERS.has(c)).join(''));
+  return s ? `${s.letter}|${s.haraka}` : null;
+};
+// **التغطيةُ المضمونة** (حكم المدير، ٢٢ أغسطس ٢٠٢٦ — ع٣): المحطةُ تفتح مهارةَ كلِّ
+// كلمةٍ من كلماتها، وكان الاقتراعُ يسأل ستاً من ٨–١٦ مهارةً مميّزة فيبقى المفتوحُ
+// بلا قياسٍ (١٣ مفتاحاً) أو يُقاس في سورةٍ لاحقة بعد شهور (فجواتُ ٨٠ يوماً). فصار
+// الحارسُ يُثبت في كل بذرة أنّ **كلَّ مهارةٍ معلَنة هدفُ جولةٍ** — أشدُّ من عدّ
+// الجولات القديم (`=== 6`)، وهو عينُ ما يحاكمه حارسُ الوعد بأيامه.
 let findRounds = 0;
 for (let seed = 1; seed <= 60; seed++) {
   const rnd = rng(seed);
@@ -447,17 +465,24 @@ for (let seed = 1; seed <= 60; seed++) {
     const words = surahWords(surah);
     const built = buildFindRounds(words, 6, rnd);
     findRounds += built.length;
-    if (built.length !== Math.min(6, words.length)) { fails++; console.log('  ✗ عدد جولات غير متوقَّع'); }
-    if (new Set(built).size !== built.length) { fails++; console.log('  ✗ هدف مكرَّر في المحطة'); }
+    const declared = new Set(words.map((w) => mushafSkillKey(w.text)).filter(Boolean));
+    const asked = new Set(built.map((w) => mushafSkillKey(w.text)).filter(Boolean));
+    const lost = [...declared].filter((k) => !asked.has(k));
+    if (lost.length) { fails++; console.log(`  ✗ مهارة معلنة بلا جولة في ${surah.name}: ${lost.join('، ')}`); }
+    // والضمانُ لا يتضخّم حشواً: جولةٌ لكل مهارة، والأرضيةُ القديمة (٦) لمن قلّت مهاراتُه
+    const expected = Math.max(declared.size, Math.min(6, new Set(words.map((w) => w.text)).size));
+    if (built.length !== expected) { fails++; console.log(`  ✗ عدد جولات غير متوقَّع في ${surah.name}: ${built.length} ≠ ${expected}`); }
+    if (new Set(built.map((w) => w.text)).size !== built.length) { fails++; console.log('  ✗ هدف مكرَّر في المحطة'); }
     if (built.some((w) => !words.includes(w))) { fails++; console.log('  ✗ هدف من خارج السورة'); }
-    // التوزيع: ما دامت آياتُ السورة تكفي، فلا جولتان من آيةٍ واحدة
+    // التوزيع: ما دامت آياتُ السورة تكفي، فلا جولتان من آيةٍ واحدة. (شرطُه اليوم
+    // لا يقع — الجولاتُ تفوق الآيات في السور الاثنتي عشرة — ويبقى لمادةٍ تصغر.)
     const ayat = built.map((w) => w.ayah);
     if (surah.ayat.length >= built.length && new Set(ayat).size !== ayat.length) {
       fails++; console.log(`  ✗ جولتان من آيةٍ واحدة في ${surah.name}`);
     }
   }
 }
-ok(true, `وجولات «جِدْها في الآية» سليمة في ٦٠ بذرة (${findRounds} جولة)`);
+ok(true, `وجولات «جِدْها في الآية» تستوفي كلَّ مهارةٍ معلَنة في ٦٠ بذرة (${findRounds} جولة)`);
 ok(buildFindRounds([]).length === 0, 'ومحطةٌ بلا كلمات ⇒ لا جولات (تفشل مغلقةً)');
 
 // كلمةٌ متكرّرة في آيتها: كلُّ موضعٍ لها صواب — لا جولةَ بلا جواب

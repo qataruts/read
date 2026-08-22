@@ -17,7 +17,7 @@ const {
   GROUPS, HARAKAT, SUKUN, harakaText, lettersThrough, exampleWordFor, bareLetters,
 } = await import(new URL('curriculum.js', APP));
 const {
-  buildRounds, harakaTarget, starsForErrors, clusters,
+  buildRounds, harakaRounds, starsForErrors, clusters,
 } = await import(new URL('lesson.js', APP));
 
 let fails = 0;
@@ -74,7 +74,8 @@ for (let seed = 1; seed <= 40; seed++) {
       acc.push(letter);
       const studied = lettersThrough(g.id, letter);
       const rounds = buildRounds(studied, letter, rnd);
-      const expected = studied.length < 2 ? 0 : 3;
+      // جولتان لا ثلاث (بوابةُ تصميم ع٢): سقفُ §٤ خمسُ جولاتٍ، وخطوةُ الحركات تأخذ ثلاثاً
+      const expected = studied.length < 2 ? 0 : 2;
       if (rounds.length !== expected) {
         fails++;
         console.log(`  ✗ عدد الجولات عند «${letter}» = ${rounds.length} (المتوقع ${expected})`);
@@ -99,19 +100,49 @@ for (let seed = 1; seed <= 40; seed++) {
           fails++;
           console.log(`  ✗ عدد الخيارات عند «${letter}» = ${r.options.length} (المتوقع ${size})`);
         }
-        if (!'َُِ'.includes(r.mark)) {
+        // **الفتحةُ وحدَها**: مفتاحُ هذا التمرين في `placement.skillKeys` حرفٌ بالفتحة،
+        // فجولةٌ بغيرها تكتب مفتاحاً خارج الجرد المُعلَن (حكمُ المدير في بوابة ع٢).
+        if (r.mark !== HARAKAT[0].mark) {
           fails++;
-          console.log(`  ✗ حركة غير معروفة في جولة «${letter}»`);
+          console.log(`  ✗ جولة «${letter}» بغير الفتحة — مفتاحٌ خارج الجرد`);
         }
       }
       if (rounds.length && rounds[0].target !== letter) {
         fails++;
         console.log(`  ✗ الجولة الأولى في درس «${letter}» ليست على الحرف نفسه`);
       }
+      // الثانيةُ **مراجعةٌ لحرفٍ سبقه** لا اقتراعٌ قد يقع على حرف الدرس مرّتين
+      if (rounds.length > 1 && rounds[1].target === letter) {
+        fails++;
+        console.log(`  ✗ الجولة الثانية في درس «${letter}» على الحرف نفسه لا مراجعةً لما سبق`);
+      }
     }
   }
 }
 ok(true, `جولات مفكوكة وصحيحة التركيب في ٤٠ بذرة عشوائية (${roundChecks} جولة)`);
+
+// ————— ٢أ. تغطيةُ المفاتيح المضمونة: العددُ لا يكفي —————
+//
+// **المحروسُ أن يبلغ كلُّ حرفٍ في الرحلة مفتاحَه المُعلَن** (الحرفُ بالفتحة) في درسٍ من
+// دروسها، **في كل بذرةٍ على حدة** لا في مجموعها — فعشوائيةٌ تُضيّع مفتاحاً تُسقِط هذا
+// السطر. وأوّلُ حروف الرحلة لا جولةَ في درسه (حرفٌ واحدٌ مدروس لا مشتّتَ له)، فيبلغه
+// درسُ ثانيها بجولة المراجعة. وهو نظيرُ `test_measure` في بابه: يحرس **الغياب**.
+const wanted = GROUPS.flatMap((g) => g.letters);
+let worst = '';
+for (let seed = 1; seed <= 40 && !worst; seed++) {
+  const rnd = rng(seed);
+  const covered = new Set();
+  for (const g of GROUPS) {
+    for (const letter of g.letters) {
+      for (const r of buildRounds(lettersThrough(g.id, letter), letter, rnd)) {
+        if (r.mark === HARAKAT[0].mark) covered.add(r.target);
+      }
+    }
+  }
+  const missed = wanted.filter((l) => !covered.has(l));
+  if (missed.length) worst = `[بذرة ${seed}] بلا قياس: ${missed.join('، ')}`;
+}
+ok(!worst, `وكلُّ حروف الرحلة (${wanted.length}) تبلغ مفتاحَها المُعلَن في كل بذرة${worst ? ' — ' + worst : ''}`);
 
 // الحالة الحدّية: أول درس في الرحلة (حرف واحد مدروس) تُطوى فيه خطوة التمييز
 ok(buildRounds(['ا'], 'ا').length === 0, 'أول درس: لا جولات تمييز (لا مشتّت مدروس بعد)');
@@ -145,11 +176,17 @@ ok(alef.every((t) => !waiting.has(t)), 'ولا واحدٌ منها في قائم
 // ————— ٥. خطوة الحركات: الفتحةُ أولاً ثم عشوائية (الحكم ج٨) —————
 
 const items = HARAKAT.map((k) => ({ ...k, text: harakaText('ب', k.mark) }));
-ok(harakaTarget(0, items).key === 'fatha', 'أولُ سؤالٍ في خطوة الحركات على الفتحة دائماً (§٥.١)');
 const rnd = rng(7);
-const later = new Set(Array.from({ length: 60 }, (_, i) => harakaTarget(1 + i, items, rnd).key));
-ok(later.size === HARAKAT.length,
-  `وما بعدها عشوائيّ يبلغ الحركات الثلاث (${[...later].join('، ')})`);
+const orders = Array.from({ length: 60 }, () => harakaRounds(items, rnd));
+ok(orders.every((o) => o[0].key === 'fatha'),
+  'أولُ سؤالٍ في خطوة الحركات على الفتحة دائماً (§٥.١)');
+// **والثلاثُ مضمونةٌ في كل تشغيل** لا في مجموع التشغيلات (حكمُ المدير على تسليم ع١):
+// درسُ الحرف يُعلن مفاتيحَه الثلاثة وتمتحن بها بوابةُ اللحاق، فاقتراعٌ يُضيّع واحدةً
+// يفتح ما لا يُقاس — وهو عينُ العيب الذي أمسكه حارسُ الوعد (٥٦ مفتاحاً).
+ok(orders.every((o) => new Set(o.map((k) => k.key)).size === HARAKAT.length),
+  `والحركاتُ الثلاث مضمونةٌ في كل سؤالٍ من ${HARAKAT.length} (${orders.length} تشغيلاً)`);
+ok(new Set(orders.map((o) => o.map((k) => k.key).join('|'))).size > 1,
+  'وترتيبُ الأخريين مقترَعٌ فلا يُحفَظ الجوابُ بالترتيب («ثم عشوائية» — الحكم ج٨)');
 
 console.log(fails ? `\n${fails} فشل` : '\nكل اختبارات درس الحرف ناجحة');
 process.exit(fails ? 1 : 0);

@@ -24,25 +24,45 @@ import * as audio from './audio.js';
 import { starsForReview, compareSounds } from './review.js';
 import {
   h, icon, faceEl, cheer, toast, go, arNum, starsRow, topbar, letterTitle,
-  PAUSE_ACCENT, mascot, shuffle, pick, shake, pop, DEV,
+  PAUSE_ACCENT, mascot, shuffle, shake, pop, DEV,
 } from './ui.js';
 
-export const ROUNDS_PER_PAIR = 2;    // جولتان لكل زوج: تكفيان للمواجهة ولا تُطيلان الجلسة
+/**
+ * **جولةٌ لكل مفتاحٍ تعلنه المحطة** (حكمُ المدير على جدول تغطية الجلسة ع٢: «تغطيةٌ تامّة
+ * بلا تضييق»): المحطةُ تُعلن في `placement.skillKeys` كلَّ حرفٍ من أزواجها × الحركات
+ * الثلاث، فصار لكلِّ مفتاحٍ منها جولتُه. وكان القائمُ **جولتين لكل زوج** بحركتين
+ * مقترَعتين وحرفٍ مقترَع — فبقي **٣٣ مفتاحاً يُفتَح ولا يُقاس** في الرحلة كلِّها
+ * (حارسُ الوعد، سورُه الأوّل)، وامتحنت بوابةُ اللحاق ما لا تقيسه محطتُه.
+ */
+export const ROUNDS_PER_LETTER = HARAKAT.length;
 
 /**
- * جولات المحطة: لكل زوجٍ جولتان بحركتين مختلفتين (فلا يُحفَظ الجواب بنغمةٍ واحدة)،
- * ثم تُخلط الجولات كلها فتتداخل الأزواج — التداخل يمنع الإجابة بالإيقاع.
- * الخيارات هي حروف الزوج نفسها بحركةٍ واحدة: التمييز على الحرف وحده.
+ * جولات المحطة: **لكل حرفٍ ثلاثُ جولاتٍ بحركاته الثلاث** لا اقتراعَ فيها، ثم تُخلط
+ * الجولات كلها فتتداخل الأزواج — التداخل يمنع الإجابة بالإيقاع، واختلافُ الحركة على
+ * الحرف الواحد يمنع حفظَ الجواب بنغمةٍ واحدة. والخيارات حروف الزوج نفسها **بحركةٍ
+ * واحدة**: التمييز على الحرف وحده.
+ *
+ * **وحرفٌ في زوجين يواجههما كليهما** (`ح` في «هـ/ح» و«ع/ح»): مفتاحُه واحدٌ لا يتكرّر
+ * — فجولاتُه ثلاثٌ لا ستّ — وأزواجُه تتناوبها، فلا يُحرَم مواجهةً لأنّ أخرى سبقتها.
  * تفشل مغلقةً: محطةٌ بلا أزواج ⇒ لا جولات.
  */
 export function buildContrastRounds(contrast, rnd = Math.random) {
-  const rounds = [];
+  const pairsOf = new Map();          // حرف ← أزواجُه في هذه المحطة بترتيب إعلانها
   for (const pair of contrast?.pairs || []) {
     if (pair.letters.length < 2) continue;
-    for (const k of shuffle(HARAKAT, rnd).slice(0, ROUNDS_PER_PAIR)) {
+    for (const letter of pair.letters) {
+      if (!pairsOf.has(letter)) pairsOf.set(letter, []);
+      pairsOf.get(letter).push(pair);
+    }
+  }
+
+  const rounds = [];
+  for (const [letter, own] of pairsOf) {
+    for (const [i, k] of HARAKAT.entries()) {
+      const pair = own[i % own.length];
       rounds.push({
         pair: pair.id,
-        letter: pick(pair.letters, rnd),
+        letter,
         haraka: k.key,
         mark: k.mark,
         options: shuffle(pair.letters, rnd),

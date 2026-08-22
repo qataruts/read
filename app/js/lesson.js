@@ -15,7 +15,10 @@ import {
   accentFor, mascot, shuffle, pick, shake, pop, giantInk, heroStep, DEV,
 } from './ui.js';
 
-const ROUNDS = 3;              // جولات «ميّز بأذنك»
+// **جولتا «ميّز بأذنك»** (حكمُ المدير على جدول تغطية الجلسة ع٢): سقفُ §٤ خمسُ جولاتٍ
+// بتسعيرة حارس الوعد (زيارةٌ ١ + ١٠ بطاقاتٍ ١٫٥ + ٠٫٥ للجولة)، وخطوةُ الحركات تأخذ
+// ثلاثاً — فبقيت اثنتان. وثمنُها مدفوعٌ في الجرد: مفتاحُ هذا التمرين **الفتحةُ وحدَها**.
+const ROUNDS = 2;              // جولات «ميّز بأذنك»
 const OPTIONS = 3;             // خيارات كل جولة
 const FATHA = HARAKAT[0].mark; // الفتحة أولاً (§٥.١)
 
@@ -35,35 +38,48 @@ const promptFor = (letter, haraka, kind) =>
   mayPrompt(progress.getSkill(progress.skillKey(letter, haraka, kind))?.box ?? 0);
 
 /**
- * جولات «ميّز بأذنك»: الهدف وكل المشتّتات من الحروف المدروسة فقط،
- * وحركة واحدة داخل الجولة كي يكون التمييز على الحرف لا على الحركة.
- * الجولة الأولى على الحرف المدروس بالفتحة، وما بعدها مراجعة لما سبق.
+ * جولات «ميّز بأذنك»: الهدف وكل المشتّتات من الحروف المدروسة فقط، **وبالفتحة كلُّها**.
+ *
+ * **والحركةُ هنا مركبٌ لا مقيس** (حكمُ المدير في بوابة تصميم ع٢): خيارات الجولة حروفٌ
+ * بحركةٍ **واحدة متطابقة** فلا يُفرَّق بينها إلا بالحرف — فهذا التمرين يقيس تمييزَ
+ * الحرف بالأذن، وبُعدُ الحركة تملكه خطوةُ الحركات بمفاتيحها الثلاثة. ولذلك صار المُعلَن
+ * في `placement.skillKeys` **الفتحةَ وحدَها** لهذا النوع، وكان ثلاثاً فيُفتَح ما لا
+ * يُقاس (٢٩ مفتاحاً في سور حارس الوعد الأوّل) وتمتحن بوابةُ اللحاق ما لا تدرّسه محطتُه.
+ *
+ * **ومفاتيحُها مضمونةٌ في كل تشغيل** (نمطُ `placement.stationKeys`): الجولةُ الأولى على
+ * حرف الدرس — مفتاحُه المُعلَن — والثانيةُ **مراجعةٌ لحرفٍ سبقه** لا اقتراعٌ من الحوض
+ * كلِّه، وبها يُقاس مفتاحُ أوّلِ حروف الرحلة في درس ثانيها (لا جولةَ في درسه هو: حرفٌ
+ * واحدٌ مدروس لا مشتّتَ له).
+ *
  * تعود [] إن لم يكن للطفل حرفان مدروسان بعدُ (أول درس في الرحلة) فتُطوى الخطوة.
  */
 export function buildRounds(studied, letter, rnd = Math.random) {
   const pool = [...new Set(studied)];
   if (pool.length < 2) return [];
   const size = Math.min(OPTIONS, pool.length);
+  const earlier = pool.filter((c) => c !== letter);
 
-  const rounds = [];
-  for (let i = 0; i < ROUNDS; i++) {
-    const target = i === 0 ? letter : pick(pool, rnd);
+  const targets = [letter, pick(earlier, rnd)].slice(0, ROUNDS);
+  return targets.map((target) => {
     const others = shuffle(pool.filter((c) => c !== target), rnd).slice(0, size - 1);
-    const mark = i === 0 ? FATHA : pick(HARAKAT, rnd).mark;
-    rounds.push({ target, mark, options: shuffle([target, ...others], rnd) });
-  }
-  return rounds;
+    return { target, mark: FATHA, options: shuffle([target, ...others], rnd) };
+  });
 }
 
 /**
- * هدفُ سؤال «أيها سمعت؟» في خطوة الحركات: **الفتحةُ أولاً ثم عشوائية**
+ * أسئلةُ خطوة الحركات بترتيبها: **الفتحةُ أولاً ثم الأخريان مقترَعتَي الترتيب**
  * (الحكم ج٨، جلسة وز٣ — تنفيذُ نصّ METHOD §٥.١ «الفتحة أولاً، ثم الكسرة والضمة»).
- * كان الهدفُ عشوائياً من أول سؤال، فقد يُمتحَن الطفلُ بالضمّة قبل أن يقصده أحدٌ
- * بالفتحة — والأولى فتحةٌ كنظيرتها في `buildRounds`، وما بعدها عشوائيٌّ فلا يُحفَظ
- * ترتيبٌ بدل أن تُسمَع الحركة. دالّةٌ نقيّة: `items` بترتيب HARAKAT (الفتحة أولها).
+ *
+ * وكان الفرعُ «ثم عشوائية» **شيفرةً ميتة**: `ask()` تُنادى مرّةً واحدة ثم يصير الذيلُ
+ * زرَّ «تابع»، فلا يُسأل الطفلُ إلا عن الفتحة — و**٥٦ مفتاحاً** (٢٨ حرفاً × كسرةٍ
+ * وضمّة) تُفتَح في الجرد ولا يقيسها أحدٌ في الرحلة كلِّها، وبوابةُ اللحاق تمتحن بها.
+ * فصار السؤالُ ثلاثةً و**الحركاتُ الثلاث مضمونةٌ في كل تشغيل** لا واحدةً تُقترَع
+ * (حكمُ المدير على تسليم ع١: «مفاتيحُ الحركات تُقاس في درسها — لا تضييقَ للجرد هنا»).
+ *
+ * دالّةٌ نقيّة: `items` بترتيب HARAKAT (الفتحة أولها).
  */
-export const harakaTarget = (asked, items, rnd = Math.random) => (
-  asked === 0 ? items[0] : pick(items, rnd));
+export const harakaRounds = (items, rnd = Math.random) =>
+  [items[0], ...shuffle(items.slice(1), rnd)];
 
 /** تقطيع نص مشكول إلى «حرف + حركاته» لتلوين الحرف المستهدف داخل الكلمة. */
 export function clusters(text) {
@@ -195,6 +211,7 @@ export function renderLesson(groupId, letter) {
     // البطاقاتُ بترتيب HARAKAT: الفتحة أولاً (§٥.١)، ورسمُها `harakaText` — فبطاقاتُ
     // الألف «أَ إِ أُ» لا «اَ اِ اُ» (الحكم ب٩).
     const items = HARAKAT.map((k) => ({ ...k, text: harakaText(letter, k.mark) }));
+    const order = harakaRounds(items);   // الفتحةُ أولاً ثم الأخريان — والثلاثُ مضمونة
     let target = null;
     let solved = false;
     let asked = 0;
@@ -229,7 +246,12 @@ export function renderLesson(groupId, letter) {
         btn.classList.add('good');
         pop(btn);
         prompt.textContent = `أحسنت! هذه ${target.name} ✓`;
-        foot.replaceChildren(nextButton());
+        // **الانتقالُ بقاعدة «لا انتقالَ وكلامٌ في الجوّ»** (بلاغ احسب): سكوتُ القناة
+        // ومهلةُ العين معاً — فإن سبق الطفلُ بالإجابة والصوتُ في الجو لم يُقطَش سؤالُه
+        // بنداء السؤال التالي. وذيلُ الخطوة يبقى كما هو في المهلة («أعِد السماع» بيده،
+        // ونقرتُه تمدّ السياج) ثم يستبدله `ask` — فلا يومض فراغٌ ولا تزحزح الشاشةُ.
+        if (asked < order.length) audio.afterSpeech(750, ask);
+        else foot.replaceChildren(nextButton());
       } else {
         state.errors++;
         shake(btn);
@@ -241,13 +263,14 @@ export function renderLesson(groupId, letter) {
     }
 
     function ask() {
-      target = harakaTarget(asked, items);   // الفتحةُ أولاً ثم عشوائية (الحكم ج٨)
+      target = order[asked];                 // الفتحةُ أولاً ثم الأخريان (الحكم ج٨)
       asked++;
       solved = false;
       for (const c of cards) c.classList.remove('good', 'bad', 'prompted');
       hinted = promptFor(letter, target.key, progress.KINDS.HARAKA);
       if (hinted) cards[items.indexOf(target)]?.classList.add('prompted');
-      prompt.textContent = 'اضغط ما سمعت';
+      // عدّادُ الأسئلة في النصّ نفسِه لا في سطرٍ جديد: لا عنصرَ يُضاف فتزحزح الشاشة
+      prompt.textContent = `اضغط ما سمعت — ${arNum(asked)} من ${arNum(order.length)}`;
       audio.play(target.text);
       foot.replaceChildren(h('button', {
         class: 'btn',

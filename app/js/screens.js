@@ -21,15 +21,25 @@ const AFTER_PICK_MS = 750;
  * هي السؤال كلُّه، فكلمةٌ لا تصوّرها صورةٌ صادقة لا يجوز أن يُحكَم بها على قراءة.
  * وتبقى **خياراً مكتوباً** (مشتّتاً) فيقرؤها الطفل ويميّزها — فلا تخرج من الشاشة،
  * وإنما يخرج الحكمُ بصورتها.
+ *
+ * **إلا مَن وسمها مؤلّفُها `byEar`** (حكم المدير، ٢٢ أغسطس ٢٠٢٦ — جلسة ع٣): تُسأل
+ * جولةً سؤالُها **صوتُها المولَّد القائم** لا صورتُها — فلا صورةَ تُعرَض أصلاً وصدقُ
+ * الصورة سليم، والحكمُ على فكّ رسم الخيارات المكتوبة كما في «ميّز بأذنك». والوسمُ
+ * إعلانُ المؤلّف لا تخمينُ الشاشة (سنّةُ «الاستثناءُ يُعلنه المؤلّفُ بالوسم»)، وحاجتُه
+ * كلمةٌ محطتُها لا تمرينَ مقيساً فيها سواه (نُورْ في `words1`).
  */
 export function buildReadRounds(items, rnd = Math.random) {
   if (items.length < QUIZ_OPTIONS) return [];
-  return shuffle(items.filter((w) => w.pictured !== false), rnd).map((target) => {
+  return shuffle(items.filter((w) => w.pictured !== false || w.byEar), rnd).map((target) => {
     const others = items.filter((w) => w.read !== target.read);
     const kin = others.filter((w) => w.read[0] === target.read[0]);
     const rest = others.filter((w) => w.read[0] !== target.read[0]);
     const distractors = [...shuffle(kin, rnd), ...shuffle(rest, rnd)].slice(0, QUIZ_OPTIONS - 1);
-    return { target, options: shuffle([target, ...distractors], rnd) };
+    return {
+      target,
+      byEar: target.pictured === false,
+      options: shuffle([target, ...distractors], rnd),
+    };
   });
 }
 
@@ -44,13 +54,26 @@ export function readQuizStep(items, { next, fail }, { onPick } = {}) {
   let locked = false;
 
   const pic = h('div', { class: 'pick-pic' });
+  const lead = h('p', { class: 'hint' });
   const counter = h('p', { class: 'hint' });
   const row = h('div', { class: 'row vrow' });
 
   function startRound() {
     const r = rounds[index];
     locked = false;
-    pic.replaceChildren(faceEl(r.target.emoji, 'pic-emoji'));
+    if (r.byEar) {
+      // جولةُ الأذن (وسمُ `byEar` — حكم المدير، جلسة ع٣): السؤالُ صوتُ الكلمة لا
+      // صورتُها، بنقرة الطفل لا ببثٍّ مبرمَج («لا انتقالَ وكلامٌ في الجوّ»).
+      lead.textContent = 'اسمع الكلمة، واقرأ الكلمات، واختر كلمتها';
+      pic.replaceChildren(h('button', {
+        class: 'btn btn--primary',
+        'aria-label': 'اسمع الكلمة',
+        onclick: () => audio.play(r.target.say ?? r.target.read),
+      }, icon('ear'), ' اسمع الكلمة'));
+    } else {
+      lead.textContent = 'انظر الصورة، واقرأ الكلمات، واختر كلمتها';
+      pic.replaceChildren(faceEl(r.target.emoji, 'pic-emoji'));
+    }
     counter.textContent = `الكلمة ${arNum(index + 1)} من ${arNum(rounds.length)}`;
     row.replaceChildren(...r.options.map((word) => {
       const btn = h('button', {
@@ -86,7 +109,7 @@ export function readQuizStep(items, { next, fail }, { onPick } = {}) {
 
   const screen = h('div', {},
     h('h2', {}, 'اقرأ واختر'),
-    h('p', { class: 'hint' }, 'انظر الصورة، واقرأ الكلمات، واختر كلمتها'),
+    lead,
     pic,
     counter,
     row,

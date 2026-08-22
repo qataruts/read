@@ -54,19 +54,34 @@ export const branchesOf = (root, studied) => {
 export const MIN_BRANCHES = 3;
 
 /**
- * جولاتُ «اجمع العائلة»: في كل جولة **عضوٌ واحد** من الشجرة ومعه مشتّتان من خارجها.
- * وأوّلُ المشتّتات «الحروفُ بلا المعنى» إن وُجد لهذه العائلة، ثم كلماتٌ من حصيلة
- * الطفل لا تنتمي إليها. تفشل مغلقةً: حوضٌ لا يكفي ⇒ لا جولات.
+ * **حوضُ مشتّتات الجذر — كتلةٌ واحدة لموضعيها** (الجلسة ع٢، سنّةُ `record.js`): تستهلكه
+ * شاشةُ الشجرة هنا **وجلسةُ المراجعة** (`rootItem` في `review.js`). وكان نسختين افترقتا:
+ * سقط من الثانية **إخراجُ الشائكة قبل الحشو**، وهي كلمةُ معجمٍ في حصيلة الطفل، فإن
+ * أوقعها الخلطُ صدرَ الحوض صارت الخياراتُ [الهدف · رَاحَةْ · رَاحَةْ] — خياران متطابقان
+ * في المعروض أحدُهما يُحسَب خطأً (سورُ «لا سؤالَ جوابُه اثنان» في حارس الوعد).
+ *
+ * والقاعدةُ سطران: **الهدفُ والشائكةُ يخرجان من الحشو** فلا يعود أحدُهما مرّتين،
+ * **والشائكةُ تتصدّر** إن أُذن لها — هي الدرسُ المقصود لا زينةُ الحوض.
+ */
+export function rootDistractors(root, target, outsiders, count, { smart = true, rnd = Math.random } = {}) {
+  const stranger = root?.stranger;
+  const lead = smart && stranger && stranger !== target ? [stranger] : [];
+  const filler = shuffle(outsiders.filter((w) => w !== target && w !== stranger), rnd);
+  return [...lead, ...filler].slice(0, count);
+}
+
+/**
+ * جولاتُ «اجمع العائلة»: في كل جولة **عضوٌ واحد** من الشجرة ومعه مشتّتان من خارجها،
+ * حوضُهما `rootDistractors` أعلاه. تفشل مغلقةً: حوضٌ لا يكفي ⇒ لا جولات.
  */
 export function buildRootRounds(root, branches, outsiders, rnd = Math.random) {
   if (branches.length < MIN_BRANCHES) return [];
   const rounds = [];
   const targets = shuffle(branches, rnd).slice(0, ROUNDS);
   for (const [i, target] of targets.entries()) {
-    const pool = shuffle(outsiders.filter((w) => w !== target), rnd);
     // المشتّتُ الأذكى يدخل جولةً واحدة على الأقلّ: هو الدرسُ لا زينةُ الحوض
-    const smart = root.stranger && (i === 0 || rnd() < 0.5) ? [root.stranger] : [];
-    const others = [...smart, ...pool.filter((w) => w !== root.stranger)].slice(0, OPTIONS - 1);
+    const others = rootDistractors(root, target, outsiders, OPTIONS - 1,
+      { smart: i === 0 || rnd() < 0.5, rnd });
     if (others.length < OPTIONS - 1) continue;
     rounds.push({ target, options: shuffle([target, ...others], rnd) });
   }
