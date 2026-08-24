@@ -2,21 +2,24 @@
   "folders": [
     {
       "name": "read",
-      "path": "."
+      "path": ".",
     },
     {
       "name": "calc",
-      "path": "../calc"
+      "path": "../calc",
     },
     {
-      "path": "../write"
+      "path": "../write",
     },
     {
-      "path": "../english"
+      "path": "../english",
     },
     {
-      "path": "../learn"
-    }
+      "path": "../learn",
+    },
+    {
+      "path": "../write-engine",
+    },
   ],
   "settings": {},
 }
